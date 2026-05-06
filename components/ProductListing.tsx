@@ -1,18 +1,36 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Leaf, Star, ChevronDown } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
-import { products, Product } from "@/lib/data";
+
+import { supabase } from '@/utils/supabase'
+import { Product } from "@/lib/data";
 
 export default function ProductListing() {
+  const [products, setProducts] = useState<any>([])
+
+  useEffect(() => {
+    async function getProducts() {
+      const { data: products } = await supabase.from('products').select('*')
+
+      if (products) {
+        console.log("Data successfully fetched from Supabase:", products);
+
+        setProducts(products)
+      }
+    }
+
+    getProducts()
+  }, [])
+
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
-  
+
   // Extract unique categories
-  const categories = ["All", ...Array.from(new Set(products.map(p => p.category)))];
+  const categories = ["All", ...Array.from(new Set(products.map((p: Product) => p.category)))];
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -31,7 +49,7 @@ export default function ProductListing() {
     }
 
     return result;
-  }, [selectedCategory, sortOrder]);
+  }, [selectedCategory, sortOrder, products]);
 
   return (
     <section id="shop" className="py-32 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
@@ -54,11 +72,10 @@ export default function ProductListing() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${
-                selectedCategory === category 
-                  ? "bg-brand-brown text-white" 
-                  : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
-              }`}
+              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${selectedCategory === category
+                ? "bg-brand-brown text-white"
+                : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
+                }`}
             >
               {category}
             </button>
@@ -67,7 +84,7 @@ export default function ProductListing() {
 
         {/* Sort Dropdown */}
         <div className="relative group">
-          <select 
+          <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
             className="appearance-none bg-transparent border border-brand-brown/30 text-brand-brown text-xs font-medium uppercase tracking-widest py-2 pl-4 pr-10 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-brown cursor-pointer"
@@ -124,7 +141,7 @@ export default function ProductListing() {
           </Link>
         ))}
       </div>
-      
+
       {filteredProducts.length === 0 && (
         <div className="text-center py-20 text-brand-brown">
           No products found matching your selection.

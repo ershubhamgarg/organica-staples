@@ -12,7 +12,7 @@ export interface Product {
 
 export const products: Product[] = [
   {
-    id: "org-khapli-aata-01",
+    id: "0",
     name: "Khapli Whole Wheat Aata",
     description:
       "Traditionally stone-ground from ancient Emmer wheat (Khapli), our whole wheat aata retains its natural bran and germ. Known for its low glycemic index, it makes soft, easily digestible rotis while offering a naturally sweet, nutty flavor.",
@@ -24,7 +24,7 @@ export const products: Product[] = [
     benefits: ["Low GI", "Rich in Dietary Fiber", "Easy to Digest"],
   },
   {
-    id: "org-multi-khapli-02",
+    id: "1",
     name: "Multigrain Khapli Aata",
     description:
       "A nourishing blend of ancient Khapli wheat with organic millets like Ragi, Jowar, and Bajra. This fiber-rich flour creates wholesome, rustic flatbreads that provide sustained energy throughout the day.",
@@ -40,21 +40,9 @@ export const products: Product[] = [
       "Packed with Micronutrients",
     ],
   },
-  // {
-  //   id: "org-diabetes-aata-03",
-  //   name: "Diabetes Care Aata",
-  //   description:
-  //     "Specially formulated with a low glycemic index, combining Khapli wheat, roasted Bengal gram (chana), barley, and methi seeds. It helps manage blood sugar spikes without compromising on the taste and softness of your daily meals.",
-  //   price: 250,
-  //   image:
-  //     "https://images.unsplash.com/photo-1561016428-f6e07b8b7a86?auto=format&fit=crop&q=80&w=1000",
-  //   category: "Flour & Grains",
-  //   origin: "Madhya Pradesh, India",
-  //   weight: "1 kg",
-  //   benefits: ["Regulates Blood Sugar", "High Satiety", "Diabetic Friendly"],
-  // },
+
   {
-    id: "org-coconut-oil-04",
+    id: "2",
     name: "Cold Pressed Coconut Oil",
     description:
       "Extracted from sun-dried, premium copras without using heat, our virgin coconut oil retains its vital nutrients, medium-chain triglycerides (MCTs), and natural tropical aroma. Perfect for cooking, baking, or wellness rituals.",
@@ -67,7 +55,7 @@ export const products: Product[] = [
     benefits: ["Rich in MCTs", "Boosts Immunity", "Unrefined & Pure"],
   },
   {
-    id: "org-mustard-oil-05",
+    id: "3",
     name: "Cold Pressed Mustard Oil",
     description:
       "Wood-pressed (Kachi Ghani) from native black mustard seeds to preserve its pungent flavor and robust nutritional profile. Rich in monounsaturated fats, it adds an authentic, earthy punch to traditional Indian curries.",
@@ -84,7 +72,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "org-lakadong-turmeric-06",
+    id: "4",
     name: "Lakadong Turmeric Powder",
     description:
       "Sourced directly from the pristine hills of Meghalaya, Lakadong turmeric is celebrated for its exceptionally high curcumin content (7-9%). A vibrant, aromatic spice with potent anti-inflammatory and medicinal benefits.",
@@ -101,7 +89,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "org-unpolished-dal-07",
+    id: "5",
     name: "Unpolished Mixed Pulses",
     description:
       "A wholesome mix of native, unpolished dals including Toor, Moong, Masoor, and Chana. Unpolished means they retain their natural dietary fiber and essential nutrients that are otherwise lost during commercial polishing.",
