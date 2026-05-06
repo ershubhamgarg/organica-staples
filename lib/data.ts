@@ -40,19 +40,19 @@ export const products: Product[] = [
       "Packed with Micronutrients",
     ],
   },
-  {
-    id: "org-diabetes-aata-03",
-    name: "Diabetes Care Aata",
-    description:
-      "Specially formulated with a low glycemic index, combining Khapli wheat, roasted Bengal gram (chana), barley, and methi seeds. It helps manage blood sugar spikes without compromising on the taste and softness of your daily meals.",
-    price: 250,
-    image:
-      "https://images.unsplash.com/photo-1561016428-f6e07b8b7a86?auto=format&fit=crop&q=80&w=1000",
-    category: "Flour & Grains",
-    origin: "Madhya Pradesh, India",
-    weight: "1 kg",
-    benefits: ["Regulates Blood Sugar", "High Satiety", "Diabetic Friendly"],
-  },
+  // {
+  //   id: "org-diabetes-aata-03",
+  //   name: "Diabetes Care Aata",
+  //   description:
+  //     "Specially formulated with a low glycemic index, combining Khapli wheat, roasted Bengal gram (chana), barley, and methi seeds. It helps manage blood sugar spikes without compromising on the taste and softness of your daily meals.",
+  //   price: 250,
+  //   image:
+  //     "https://images.unsplash.com/photo-1561016428-f6e07b8b7a86?auto=format&fit=crop&q=80&w=1000",
+  //   category: "Flour & Grains",
+  //   origin: "Madhya Pradesh, India",
+  //   weight: "1 kg",
+  //   benefits: ["Regulates Blood Sugar", "High Satiety", "Diabetic Friendly"],
+  // },
   {
     id: "org-coconut-oil-04",
     name: "Cold Pressed Coconut Oil",
@@ -60,7 +60,7 @@ export const products: Product[] = [
       "Extracted from sun-dried, premium copras without using heat, our virgin coconut oil retains its vital nutrients, medium-chain triglycerides (MCTs), and natural tropical aroma. Perfect for cooking, baking, or wellness rituals.",
     price: 450,
     image:
-      "https://images.unsplash.com/photo-1611078028045-81206f4948a3?auto=format&fit=crop&q=80&w=1000",
+      "https://img.freepik.com/free-photo/jug-coconut-oil-whit-coconut-put-dark-background_1150-28252.jpg?semt=ais_hybrid&w=740&q=80",
     category: "Oils & Ghee",
     origin: "Kerala, India",
     weight: "500 ml",
@@ -73,7 +73,7 @@ export const products: Product[] = [
       "Wood-pressed (Kachi Ghani) from native black mustard seeds to preserve its pungent flavor and robust nutritional profile. Rich in monounsaturated fats, it adds an authentic, earthy punch to traditional Indian curries.",
     price: 280,
     image:
-      "https://images.unsplash.com/photo-1519735777090-ec97162dc266?auto=format&fit=crop&q=80&w=1000",
+      "https://www.tastingtable.com/img/gallery/everything-you-need-to-know-about-mustard-oil/intro-1664635121.jpg",
     category: "Oils & Ghee",
     origin: "Rajasthan, India",
     weight: "1 L",
@@ -90,7 +90,7 @@ export const products: Product[] = [
       "Sourced directly from the pristine hills of Meghalaya, Lakadong turmeric is celebrated for its exceptionally high curcumin content (7-9%). A vibrant, aromatic spice with potent anti-inflammatory and medicinal benefits.",
     price: 350,
     image:
-      "https://images.unsplash.com/photo-1615485934520-222a3615568f?auto=format&fit=crop&q=80&w=1000",
+      "https://www.greendna.in/cdn/shop/files/turmeric_lak_1200x.jpg?v=1748618768",
     category: "Spices",
     origin: "Meghalaya, India",
     weight: "250 g",
@@ -107,7 +107,7 @@ export const products: Product[] = [
       "A wholesome mix of native, unpolished dals including Toor, Moong, Masoor, and Chana. Unpolished means they retain their natural dietary fiber and essential nutrients that are otherwise lost during commercial polishing.",
     price: 220,
     image:
-      "https://images.unsplash.com/photo-1585996872517-380d321d585d?auto=format&fit=crop&q=80&w=1000",
+      "https://media.istockphoto.com/id/659524906/photo/composition-with-variety-of-vegetarian-food-ingredients.jpg?s=612x612&w=0&k=20&c=AzFdpJXWAVArpzTxJxhUqCENYcYb2ozltPhYaYJAkFQ=",
     category: "Pulses & Dals",
     origin: "Gujarat, India",
     weight: "1 kg",

@@ -70,7 +70,7 @@ export default function RootLayout({
                 <h4 className="text-white font-medium mb-4">Connect</h4>
                 <ul className="space-y-2 text-sm">
                   <li>
-                    <a href="#" className="hover:text-white transition-colors">
+                    <a href="https://www.instagram.com/organicastaples/" className="hover:text-white transition-colors">
                       Instagram
                     </a>
                   </li>
