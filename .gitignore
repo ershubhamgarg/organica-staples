@@ -67,9 +67,9 @@ ios/DerivedData/
 .idea/
 
 # Misc
-.env.*
-.env
-.env.*.local
+# .env.*
+# .env
+# .env.*.local
 *.iml
 service-account-file.json
 credentials.json
@@ -110,7 +110,7 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+# .env*.local
 
 # typescript
 *.tsbuildinfo
