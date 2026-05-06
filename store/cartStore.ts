@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Product } from "@/lib/data";
+import { getDiscountedPrice } from "@/lib/pricing";
 import { supabase } from "@/utils/supabase";
 
 export interface CartItem extends Product {
@@ -48,7 +49,7 @@ export const useCartStore = create<CartState>()(
           const newItems = existingItem
             ? state.items.map((item) =>
                 item.id === product.id
-                  ? { ...item, quantity: item.quantity + quantity }
+                  ? { ...product, quantity: item.quantity + quantity }
                   : item,
               )
             : [...state.items, { ...product, quantity }];
@@ -130,7 +131,7 @@ export const useCartStore = create<CartState>()(
 
       getTotalPrice: () => {
         return get().items.reduce(
-          (total, item) => total + item.price * item.quantity,
+          (total, item) => total + getDiscountedPrice(item) * item.quantity,
           0,
         );
       },

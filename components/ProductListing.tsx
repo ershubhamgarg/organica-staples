@@ -3,11 +3,17 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Leaf, Star, ChevronDown } from "lucide-react";
-import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
+import ProductImageCarousel from "@/components/ProductImageCarousel";
 
 import { supabase } from "@/utils/supabase";
 import { Product } from "@/lib/data";
+import {
+  getDiscountedPrice,
+  getDiscountPercent,
+  hasHighProductDiscount,
+  hasProductDiscount,
+} from "@/lib/pricing";
 
 export default function ProductListing() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -46,9 +52,9 @@ export default function ProductListing() {
 
     // Sort
     if (sortOrder === "price-asc") {
-      result.sort((a, b) => a.price - b.price);
+      result.sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
     } else if (sortOrder === "price-desc") {
-      result.sort((a, b) => b.price - a.price);
+      result.sort((a, b) => getDiscountedPrice(b) - getDiscountedPrice(a));
     }
 
     return result;
@@ -109,51 +115,83 @@ export default function ProductListing() {
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
-        {filteredProducts.map((product) => (
-          <Link
-            href={`/product/${product.id}`}
-            key={product.id}
-            className="group flex flex-col"
-          >
-            <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
-              <ImageWithFallback
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              />
-              <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors duration-500" />
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
-                {product.category}
+        {filteredProducts.map((product) => {
+          const hasDiscount = hasProductDiscount(product);
+          const hasHighDiscount = hasHighProductDiscount(product);
+          const discountPercent = getDiscountPercent(product);
+          const discountedPrice = getDiscountedPrice(product);
+
+          return (
+            <Link
+              href={`/product/${product.id}`}
+              key={product.id}
+              className="group flex flex-col"
+            >
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
+                <ProductImageCarousel
+                  product={product}
+                  imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                />
+                <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors duration-500" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
+                  {product.category}
+                </div>
+                {hasDiscount && (
+                  <div
+                    className={`absolute left-4 top-4 text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+                      hasHighDiscount
+                        ? "bg-brand-gold text-stone-950 ring-2 ring-white/80"
+                        : "bg-brand-green"
+                    }`}
+                  >
+                    {hasHighDiscount ? "Mega Deal" : `${discountPercent}% Off`}
+                  </div>
+                )}
               </div>
-            </div>
-            <div className="flex flex-col flex-grow text-center">
-              <div className="flex justify-center items-center gap-1 mb-2 text-brand-gold">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={12}
-                    className="fill-brand-gold text-brand-gold"
-                  />
-                ))}
+              <div className="flex flex-col flex-grow text-center">
+                <div className="flex justify-center items-center gap-1 mb-2 text-brand-gold">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={12}
+                      className="fill-brand-gold text-brand-gold"
+                    />
+                  ))}
+                </div>
+                <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
+                  {product.name}
+                </h3>
+                <div className="mb-4 flex flex-col items-center gap-1">
+                  {hasDiscount ? (
+                    <>
+                      <span className="text-sm text-stone-400 line-through">
+                        ₹{product.price.toFixed(2)}
+                      </span>
+                      <span className="text-xl font-bold text-brand-green">
+                        ₹{discountedPrice.toFixed(2)}{" "}
+                        <span className="text-sm text-stone-400 font-light">
+                          / {product.weight}
+                        </span>
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-lg text-brand-green">
+                      ₹{product.price.toFixed(2)}{" "}
+                      <span className="text-sm text-stone-400 font-light">
+                        / {product.weight}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-stone-500 mb-6 line-clamp-2 font-light px-4">
+                  {product.description}
+                </p>
+                <QuickAddButton product={product} />
               </div>
-              <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
-                {product.name}
-              </h3>
-              <span className="text-lg text-brand-green mb-4">
-                ₹{product.price.toFixed(2)}{" "}
-                <span className="text-sm text-stone-400 font-light">
-                  / {product.weight}
-                </span>
-              </span>
-              <p className="text-sm text-stone-500 mb-6 line-clamp-2 font-light px-4">
-                {product.description}
-              </p>
-              <QuickAddButton product={product} />
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {filteredProducts.length === 0 && (

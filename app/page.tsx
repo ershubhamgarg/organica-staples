@@ -1,11 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { products } from "@/lib/data";
-import { ArrowRight, Leaf, Star } from "lucide-react";
-import ImageWithFallback from "@/components/ImageWithFallback";
-import QuickAddButton from "@/components/QuickAddButton";
+import { ArrowRight, Leaf } from "lucide-react";
 import ProductListing from "@/components/ProductListing";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";

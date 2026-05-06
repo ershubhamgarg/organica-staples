@@ -1,15 +1,22 @@
 "use client";
 
-import { useCartStore } from "@/store/cartStore";
+import { CartItem, useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { useAddressStore } from "@/store/addressStore";
 import { useOrderStore } from "@/store/orderStore";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { getDiscountedPrice } from "@/lib/pricing";
+
+interface PlacedOrderDetails {
+  id: string;
+  items: CartItem[];
+  paymentMethod: string;
+  total: number;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -21,7 +28,7 @@ export default function CheckoutPage() {
   const { placeOrder, isLoading: isPlacingOrder } = useOrderStore();
   const [mounted, setMounted] = useState(false);
 
-  const totalPrice = useMemo(() => getTotalPrice(), [items, getTotalPrice]);
+  const totalPrice = getTotalPrice();
   const finalTotal =
     totalPrice + (totalPrice > 0 && totalPrice <= 500 ? 50 : 0);
 
@@ -44,7 +51,8 @@ export default function CheckoutPage() {
   // Payment state
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [placedOrderDetails, setPlacedOrderDetails] = useState<any>(null);
+  const [placedOrderDetails, setPlacedOrderDetails] =
+    useState<PlacedOrderDetails | null>(null);
 
   // UPI state
   const [upiId, setUpiId] = useState("");
@@ -81,7 +89,7 @@ export default function CheckoutPage() {
           error: data.error?.message || data.message || "Invalid UPI ID",
         });
       }
-    } catch (error) {
+    } catch {
       setUpiVerificationResult({
         success: false,
         error: "Verification failed. Please try again.",
@@ -126,7 +134,7 @@ export default function CheckoutPage() {
               Order Summary
             </h3>
             <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-              {placedOrderDetails.items.map((item: any, idx: number) => (
+              {placedOrderDetails.items.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-4">
                   <div className="relative w-12 h-12 bg-stone-100 rounded-lg overflow-hidden shrink-0">
                     <ImageWithFallback
@@ -146,7 +154,7 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                   <p className="text-sm font-medium text-stone-900">
-                    ₹{(item.price * item.quantity).toFixed(2)}
+                    ₹{(getDiscountedPrice(item) * item.quantity).toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -651,7 +659,7 @@ export default function CheckoutPage() {
                         Qty: {item.quantity}
                       </p>
                       <p className="text-sm font-medium text-stone-900 mt-1">
-                        ₹{(item.price * item.quantity).toFixed(2)}
+                        ₹{(getDiscountedPrice(item) * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   </div>

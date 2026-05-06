@@ -3,9 +3,7 @@
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   Check,
@@ -15,8 +13,15 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { useState, use } from "react";
-import ImageWithFallback from "@/components/ImageWithFallback";
+import { useEffect, useState, use } from "react";
+import ProductImageCarousel from "@/components/ProductImageCarousel";
+import { Product } from "@/lib/data";
+import {
+  getDiscountedPrice,
+  getDiscountPercent,
+  hasHighProductDiscount,
+  hasProductDiscount,
+} from "@/lib/pricing";
 
 export default function ProductPage({
   params,
@@ -24,15 +29,68 @@ export default function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const product = useProductStore((state) => state.getProduct(id));
+  const fetchProductById = useProductStore((state) => state.fetchProductById);
+  const isLoading = useProductStore((state) => state.isLoading);
+  const error = useProductStore((state) => state.error);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [hasFetched, setHasFetched] = useState(false);
   const { addToCart } = useCartStore();
   const { user } = useUserStore();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  if (!product) {
-    notFound();
+  useEffect(() => {
+    let isActive = true;
+
+    fetchProductById(id).then((fetchedProduct) => {
+      if (isActive) {
+        setProduct(fetchedProduct);
+        setHasFetched(true);
+      }
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, [fetchProductById, id]);
+
+  if ((!hasFetched || isLoading) && !product) {
+    return (
+      <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-stone-500">
+          Loading product...
+        </div>
+      </div>
+    );
   }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <Link
+            href="/#shop"
+            className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-700 transition-colors mb-8 text-sm font-medium"
+          >
+            <ArrowLeft size={16} /> Back to Shop
+          </Link>
+          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-12 text-center">
+            <h1 className="text-2xl font-serif text-stone-900 mb-2">
+              Product not found
+            </h1>
+            <p className="text-stone-500">
+              {error || "This product is unavailable."}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const hasDiscount = hasProductDiscount(product);
+  const hasHighDiscount = hasHighProductDiscount(product);
+  const discountPercent = getDiscountPercent(product);
+  const discountedPrice = getDiscountedPrice(product);
 
   const handleAddToCart = () => {
     addToCart(product, quantity, user?.id);
@@ -54,14 +112,23 @@ export default function ProductPage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Product Image */}
             <div className="relative aspect-square md:aspect-auto md:h-full bg-stone-100">
-              <ImageWithFallback
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
+              <ProductImageCarousel
+                product={product}
+                imageClassName="object-cover"
                 priority
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
+              {hasDiscount && (
+                <div
+                  className={`absolute left-6 top-6 shadow-md px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] ${
+                    hasHighDiscount
+                      ? "bg-brand-gold text-stone-950 ring-2 ring-white/80"
+                      : "bg-brand-green text-white"
+                  }`}
+                >
+                  {hasHighDiscount ? "Mega Deal" : `${discountPercent}% Off`}
+                </div>
+              )}
             </div>
 
             {/* Product Details */}
@@ -74,9 +141,27 @@ export default function ProductPage({
               <h1 className="text-3xl md:text-4xl font-serif text-stone-900 mb-4">
                 {product.name}
               </h1>
-              <p className="text-2xl text-stone-800 font-light mb-6">
-                ₹{product.price.toFixed(2)}
-              </p>
+              <div className="mb-6">
+                {hasDiscount ? (
+                  <div className="flex flex-wrap items-end gap-3">
+                    <span className="text-lg text-stone-400 line-through pb-1">
+                      ₹{product.price.toFixed(2)}
+                    </span>
+                    <span className="text-3xl font-bold text-brand-green">
+                      ₹{discountedPrice.toFixed(2)}
+                    </span>
+                    <span className="mb-1 bg-brand-cream px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-brown">
+                      {hasHighDiscount
+                        ? `Mega save ${discountPercent}%`
+                        : `Save ${discountPercent}%`}
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-2xl text-stone-800 font-light">
+                    ₹{product.price.toFixed(2)}
+                  </p>
+                )}
+              </div>
 
               <div className="prose prose-stone mb-8">
                 <p className="text-stone-600 leading-relaxed">
@@ -117,7 +202,7 @@ export default function ProductPage({
                   Key Benefits
                 </h4>
                 <ul className="space-y-2">
-                  {product.benefits.map((benefit, idx) => (
+                  {(product.benefits || []).map((benefit, idx) => (
                     <li
                       key={idx}
                       className="flex items-center gap-2 text-sm text-stone-600"

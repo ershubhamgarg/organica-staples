@@ -2,27 +2,44 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import {
+  getDiscountedPrice,
+  getDiscountPercent,
+  hasHighProductDiscount,
+  hasProductDiscount,
+} from "@/lib/pricing";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
-  const getTotalItems = useCartStore((state) => state.getTotalItems);
-  const syncCartWithSupabase = useCartStore((state) => state.syncCartWithSupabase);
+  const syncCartWithSupabase = useCartStore(
+    (state) => state.syncCartWithSupabase,
+  );
   const { user } = useUserStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
-  const totalPrice = useMemo(() => getTotalPrice(), [items, getTotalPrice]);
-  const totalItems = useMemo(() => getTotalItems(), [items, getTotalItems]);
+  const effectiveSubtotal = getTotalPrice();
+  const actualSubtotal = useMemo(
+    () =>
+      items.reduce((total, item) => total + item.price * item.quantity, 0),
+    [items],
+  );
+  const totalDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
+  const shipping =
+    effectiveSubtotal > 0 && effectiveSubtotal <= 500 ? 50 : 0;
+  const totalPayable = effectiveSubtotal + shipping;
 
   useEffect(() => {
-    setMounted(true);
     if (user) {
       syncCartWithSupabase(user.id);
     }
@@ -68,7 +85,7 @@ export default function CartPage() {
               Your cart is empty
             </h2>
             <p className="text-stone-500 mb-8">
-              Looks like you haven't added any organic staples yet.
+              Looks like you haven&apos;t added any organic staples yet.
             </p>
             <Link
               href="/#shop"
@@ -80,70 +97,115 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white rounded-xl shadow-sm border border-stone-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start"
-                >
-                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-stone-100 rounded-lg overflow-hidden shrink-0">
-                    <ImageWithFallback
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 96px, 128px"
-                    />
-                  </div>
-                  <div className="flex-grow flex flex-col justify-between w-full">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <span className="text-xs text-stone-500 mb-1 block">
-                          {item.category}
-                        </span>
-                        <h3 className="text-lg font-medium text-stone-900 leading-tight">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-stone-500 mt-1">
-                          {item.weight}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.id, user?.id)}
-                        className="text-stone-400 hover:text-red-500 transition-colors p-1"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+              {items.map((item) => {
+                const itemHasDiscount = hasProductDiscount(item);
+                const itemHasHighDiscount = hasHighProductDiscount(item);
+                const discountPercent = getDiscountPercent(item);
+                const discountedUnitPrice = getDiscountedPrice(item);
+                const actualLinePrice = item.price * item.quantity;
+                const discountedLinePrice = discountedUnitPrice * item.quantity;
+
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-white rounded-xl shadow-sm border border-stone-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start"
+                  >
+                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-stone-100 rounded-lg overflow-hidden shrink-0">
+                      <ImageWithFallback
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 96px, 128px"
+                      />
                     </div>
-                    <div className="flex items-center justify-between mt-4 sm:mt-auto pt-4 border-t border-stone-100">
-                      <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50">
+                    <div className="flex-grow flex flex-col justify-between w-full">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <span className="text-xs text-stone-500 mb-1 block">
+                            {item.category}
+                          </span>
+                          <h3 className="text-lg font-medium text-stone-900 leading-tight">
+                            {item.name}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-1">
+                            <p className="text-sm text-stone-500">
+                              {item.weight}
+                            </p>
+                            {itemHasDiscount && (
+                              <span
+                                className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] ${
+                                  itemHasHighDiscount
+                                    ? "bg-brand-gold text-stone-950"
+                                    : "bg-brand-cream text-brand-brown"
+                                }`}
+                              >
+                                {itemHasHighDiscount
+                                  ? "Mega Deal"
+                                  : `${discountPercent}% Off`}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         <button
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1, user?.id)
-                          }
-                          className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-l-lg transition-colors"
+                          onClick={() => removeFromCart(item.id, user?.id)}
+                          className="text-stone-400 hover:text-red-500 transition-colors p-1"
+                          aria-label="Remove item"
                         >
-                          <Minus size={14} />
-                        </button>
-                        <span className="px-4 py-1.5 text-sm font-medium text-stone-900 w-10 text-center">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1, user?.id)
-                          }
-                          className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-r-lg transition-colors"
-                        >
-                          <Plus size={14} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
-                      <span className="text-lg font-medium text-stone-900">
-                        ₹{(item.price * item.quantity).toFixed(2)}
-                      </span>
+                      <div className="flex items-center justify-between mt-4 sm:mt-auto pt-4 border-t border-stone-100">
+                        <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50">
+                          <button
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.quantity - 1,
+                                user?.id,
+                              )
+                            }
+                            className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-l-lg transition-colors"
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <span className="px-4 py-1.5 text-sm font-medium text-stone-900 w-10 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() =>
+                              updateQuantity(
+                                item.id,
+                                item.quantity + 1,
+                                user?.id,
+                              )
+                            }
+                            className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-r-lg transition-colors"
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                        <div className="text-right">
+                          {itemHasDiscount && (
+                            <div className="text-sm text-stone-400 line-through">
+                              ₹{actualLinePrice.toFixed(2)}
+                            </div>
+                          )}
+                          <div
+                            className={`text-lg ${
+                              itemHasDiscount
+                                ? "font-bold text-brand-green"
+                                : "font-medium text-stone-900"
+                            }`}
+                          >
+                            ₹{discountedLinePrice.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className="lg:col-span-1">
@@ -158,15 +220,23 @@ export default function CartPage() {
                       {items.reduce((acc, item) => acc + item.quantity, 0)}{" "}
                       items)
                     </span>
-                    <span>₹{totalPrice.toFixed(2)}</span>
+                    <span>₹{actualSubtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-emerald-700">
+                    <span>Total Discount</span>
+                    <span>-₹{totalDiscount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium text-stone-900">
+                    <span>Effective Price</span>
+                    <span>₹{effectiveSubtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>{totalPrice > 500 ? "Free" : "₹50.00"}</span>
+                    <span>{shipping === 0 ? "Free" : "₹50.00"}</span>
                   </div>
-                  {totalPrice > 0 && totalPrice <= 500 && (
+                  {effectiveSubtotal > 0 && effectiveSubtotal <= 500 && (
                     <div className="text-xs text-emerald-600 bg-emerald-50 p-2 rounded">
-                      Add ₹{(500 - totalPrice).toFixed(2)} more for free
+                      Add ₹{(500 - effectiveSubtotal).toFixed(2)} more for free
                       shipping!
                     </div>
                   )}
@@ -174,14 +244,10 @@ export default function CartPage() {
                 <div className="border-t border-stone-100 pt-4 mb-6">
                   <div className="flex justify-between items-end">
                     <span className="text-base font-medium text-stone-900">
-                      Total
+                      Total Payable
                     </span>
-                    <span className="text-2xl font-medium text-stone-900">
-                      ₹
-                      {(
-                        totalPrice +
-                        (totalPrice > 0 && totalPrice <= 500 ? 50 : 0)
-                      ).toFixed(2)}
+                    <span className="text-2xl font-bold text-brand-green">
+                      ₹{totalPayable.toFixed(2)}
                     </span>
                   </div>
                   <p className="text-xs text-stone-500 mt-1 text-right">
