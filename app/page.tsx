@@ -1,114 +1,151 @@
 import Image from "next/image";
 import Link from "next/link";
 import { products } from "@/lib/data";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Leaf, Star } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import QuickAddButton from "@/components/QuickAddButton";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-stone-50">
+    <div className="flex flex-col min-h-screen bg-brand-cream animate-fade-in">
       {/* Hero Section */}
-      <section className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=2000"
+            src="https://www.bakingbusiness.com/ext/resources/2024/01/16/0116-AdobeStock1.webp?height=667&t=1764179383&width=1080"
             alt="Organic farming"
             fill
-            className="object-cover object-center brightness-50"
+            className="object-cover object-center brightness-[0.65]"
             priority
           />
         </div>
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
-          <h1 className="text-4xl md:text-6xl font-serif text-white font-bold tracking-tight mb-6">
-            Purity in Every Grain
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center mt-20">
+          <div className="flex items-center gap-2 mb-6 text-brand-cream opacity-90">
+            <div className="h-[1px] w-12 bg-current"></div>
+            <span className="uppercase tracking-[0.2em] text-sm font-medium">
+              Est. 2026
+            </span>
+            <div className="h-[1px] w-12 bg-current"></div>
+          </div>
+          <h1 className="md:text-5xl font-serif text-white font-bold mb-6 drop-shadow-md">
+            Pure by nature <br />
+            Essential by choice
           </h1>
-          <p className="text-lg md:text-xl text-stone-200 mb-8 max-w-2xl font-light leading-relaxed">
+          <p className="text-lg md:text-xl text-stone-100 mb-10 max-w-2xl font-light leading-relaxed drop-shadow-sm">
             Discover our curated collection of ethically sourced, premium
             organic staples designed to nourish your body and elevate your
             everyday meals.
           </p>
           <a
             href="#shop"
-            className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-8 py-3 rounded-full transition-all duration-300 font-medium"
+            className="inline-flex items-center gap-3 bg-brand-brown hover:bg-brand-brown-light text-white px-8 py-4 transition-all duration-300 font-medium uppercase tracking-widest text-sm shadow-lg hover:shadow-xl"
           >
             Shop the Collection <ArrowRight size={18} />
           </a>
         </div>
       </section>
 
+      {/* Featured Banner */}
+      <div className="bg-brand-green text-white py-4 overflow-hidden">
+        <div className="flex whitespace-nowrap animate-[scroll_20s_linear_infinite]">
+          {[...Array(10)].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-4 mx-8 text-sm uppercase tracking-widest font-medium"
+            >
+              <span>100% Organic</span>
+              <Leaf size={14} className="fill-white/50" />
+              <span>Sustainably Sourced</span>
+              <Leaf size={14} className="fill-white/50" />
+              <span>Premium Quality</span>
+              <Leaf size={14} className="fill-white/50" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Product Grid Section */}
       <section
         id="shop"
-        className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
+        className="py-32 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
       >
-        <div className="flex justify-between items-end mb-12">
-          <div>
-            <h2 className="text-3xl font-serif text-stone-800 mb-2">
-              Our Essentials
-            </h2>
-            <p className="text-stone-500">
-              The foundation of a wholesome pantry.
-            </p>
-          </div>
+        <div className="flex flex-col items-center text-center mb-20">
+          <Leaf
+            className="text-brand-green mb-4 fill-brand-green/20"
+            size={32}
+          />
+          <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4">
+            Our Essentials
+          </h2>
+          <p className="text-stone-600 max-w-lg mx-auto font-light leading-relaxed">
+            The foundation of a wholesome pantry. Each product is carefully
+            selected to bring the highest nutritional value to your table.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
           {products.map((product) => (
             <Link
               href={`/product/${product.id}`}
               key={product.id}
               className="group flex flex-col"
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-200 rounded-lg mb-4">
+              <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
                 <ImageWithFallback
                   src={product.image}
                   alt={product.name}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur text-xs font-medium px-3 py-1 rounded-full text-stone-800 shadow-sm">
+                <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors duration-500" />
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
                   {product.category}
                 </div>
               </div>
-              <div className="flex flex-col flex-grow">
-                <div className="flex justify-between items-start mb-1">
-                  <h3 className="text-lg font-medium text-stone-900 group-hover:text-emerald-700 transition-colors">
-                    {product.name}
-                  </h3>
-                  <span className="text-lg font-medium text-stone-900">
-                    ₹{product.price.toFixed(2)}
-                  </span>
+              <div className="flex flex-col flex-grow text-center">
+                <div className="flex justify-center items-center gap-1 mb-2 text-amber-500">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={12} className="fill-amber-500" />
+                  ))}
                 </div>
-                <p className="text-sm text-stone-500 mb-4 line-clamp-2">
+                <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
+                  {product.name}
+                </h3>
+                <span className="text-lg text-brand-green mb-4">
+                  ₹{product.price.toFixed(2)}{" "}
+                  <span className="text-sm text-stone-400 font-light">
+                    / {product.weight}
+                  </span>
+                </span>
+                <p className="text-sm text-stone-500 mb-6 line-clamp-2 font-light px-4">
                   {product.description}
                 </p>
-                <div className="mt-auto pt-2 border-t border-stone-200 flex items-center justify-between text-sm">
-                  <span className="text-emerald-700 font-medium group-hover:underline">
-                    View Details
-                  </span>
-                  <span className="text-stone-400">{product.weight}</span>
-                </div>
+                <QuickAddButton product={product} />
               </div>
             </Link>
           ))}
         </div>
+        <div className="mt-20 flex justify-center">
+          <button className="border border-brand-brown text-brand-brown hover:bg-brand-brown hover:text-white px-10 py-3 transition-colors uppercase tracking-widest text-sm font-medium">
+            View All Products
+          </button>
+        </div>
       </section>
 
       {/* Values Section */}
-      <section className="bg-stone-200 py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm text-emerald-700">
+      <section className="bg-white py-32 px-4 sm:px-6 lg:px-8 border-t border-brand-cream">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+          <div className="flex flex-col items-center group">
+            <div className="w-20 h-20 bg-brand-cream flex items-center justify-center mb-8 text-brand-green group-hover:scale-110 transition-transform duration-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="32"
+                height="32"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -116,49 +153,36 @@ export default function Home() {
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-stone-900 mb-2">
+            <h3 className="text-xl font-serif text-brand-brown mb-4">
               Fairly Priced
             </h3>
-            <p className="text-stone-600 text-sm">
+            <p className="text-stone-500 font-light leading-relaxed">
               Direct relationships with farmers ensure premium quality without
-              the premium markup.
+              the premium markup. Fair to them, fair to you.
             </p>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm text-emerald-700">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-              </svg>
+          <div className="flex flex-col items-center group">
+            <div className="w-20 h-20 bg-brand-cream flex items-center justify-center mb-8 text-brand-green group-hover:scale-110 transition-transform duration-500">
+              <Leaf size={32} strokeWidth={1.5} />
             </div>
-            <h3 className="text-lg font-medium text-stone-900 mb-2">
+            <h3 className="text-xl font-serif text-brand-brown mb-4">
               100% Organic
             </h3>
-            <p className="text-stone-600 text-sm">
-              Certified organic goods, grown without synthetic pesticides or
-              fertilizers.
+            <p className="text-stone-500 font-light leading-relaxed">
+              Certified organic goods, grown with respect for the earth and free
+              from synthetic pesticides or fertilizers.
             </p>
           </div>
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm text-emerald-700">
+          <div className="flex flex-col items-center group">
+            <div className="w-20 h-20 bg-brand-cream flex items-center justify-center mb-8 text-brand-green group-hover:scale-110 transition-transform duration-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="32"
+                height="32"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -166,12 +190,12 @@ export default function Home() {
                 <circle cx="12" cy="10" r="3" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-stone-900 mb-2">
+            <h3 className="text-xl font-serif text-brand-brown mb-4">
               Ethically Sourced
             </h3>
-            <p className="text-stone-600 text-sm">
+            <p className="text-stone-500 font-light leading-relaxed">
               We partner with communities worldwide to bring you ingredients
-              with integrity.
+              that are harvested with integrity and care.
             </p>
           </div>
         </div>

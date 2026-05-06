@@ -118,3 +118,5 @@ yarn-error.*
 # @end expo-cli
 
 #android
+
+.next
