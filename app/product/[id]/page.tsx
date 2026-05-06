@@ -1,6 +1,8 @@
 "use client";
 
-import { getProduct, products } from "@/lib/data";
+import { useProductStore } from "@/store/productStore";
+import { useCartStore } from "@/store/cartStore";
+import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,7 +15,6 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { useCart } from "@/lib/CartContext";
 import { useState, use } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 
@@ -23,8 +24,9 @@ export default function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const product = getProduct(id);
-  const { addToCart } = useCart();
+  const product = useProductStore((state) => state.getProduct(id));
+  const { addToCart } = useCartStore();
+  const { user } = useUserStore();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -33,7 +35,7 @@ export default function ProductPage({
   }
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    addToCart(product, quantity, user?.id);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };

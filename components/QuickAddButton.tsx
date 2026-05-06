@@ -1,40 +1,45 @@
 "use client";
 
-import { useCart } from "@/lib/CartContext";
+import { useCartStore } from "@/store/cartStore";
+import { useUserStore } from "@/store/userStore";
 import { Product } from "@/lib/data";
 import { Plus, Minus } from "lucide-react";
 
 export default function QuickAddButton({ product }: { product: Product }) {
-  const { items, addToCart, updateQuantity } = useCart();
-  
+  const { items, addToCart, updateQuantity } = useCartStore();
+  const { user } = useUserStore();
+
   const cartItem = items.find((item) => item.id === product.id);
   const quantity = cartItem?.quantity || 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product, 1);
+    addToCart(product, 1, user?.id);
   };
 
   const handleIncrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    updateQuantity(product.id, quantity + 1);
+    updateQuantity(product.id, quantity + 1, user?.id);
   };
 
   const handleDecrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    updateQuantity(product.id, quantity - 1);
+    updateQuantity(product.id, quantity - 1, user?.id);
   };
 
   if (quantity > 0) {
     return (
-      <div 
+      <div
         className="mt-auto flex items-center justify-between w-full max-w-[120px] mx-auto border border-brand-brown/30 rounded-full px-3 py-1 z-10 relative bg-white shadow-sm"
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
-        <button 
+        <button
           onClick={handleDecrease}
           className="text-brand-brown hover:text-brand-green transition-colors p-1"
         >
@@ -43,7 +48,7 @@ export default function QuickAddButton({ product }: { product: Product }) {
         <span className="text-brand-brown text-sm font-medium w-6 text-center">
           {quantity}
         </span>
-        <button 
+        <button
           onClick={handleIncrease}
           className="text-brand-brown hover:text-brand-green transition-colors p-1"
         >
@@ -54,7 +59,7 @@ export default function QuickAddButton({ product }: { product: Product }) {
   }
 
   return (
-    <div 
+    <div
       onClick={handleAdd}
       className="mt-auto border-b border-brand-brown/20 pb-1 w-max mx-auto hover:border-brand-brown transition-colors cursor-pointer z-10 relative group-hover:border-brand-brown"
     >

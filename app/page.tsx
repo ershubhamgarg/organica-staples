@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { products } from "@/lib/data";
@@ -5,8 +7,22 @@ import { ArrowRight, Leaf, Star } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductListing from "@/components/ProductListing";
+import { useCartStore } from "@/store/cartStore";
+import { useUserStore } from "@/store/userStore";
+import { useEffect } from "react";
 
 export default function Home() {
+  const syncCartWithSupabase = useCartStore(
+    (state) => state.syncCartWithSupabase,
+  );
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    if (user) {
+      syncCartWithSupabase(user.id);
+    }
+  }, [user, syncCartWithSupabase]);
+
   return (
     <div className="flex flex-col min-h-screen bg-brand-cream animate-fade-in">
       {/* Hero Section */}
