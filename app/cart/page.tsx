@@ -29,11 +29,11 @@ export default function CartPage() {
   }, [user, syncCartWithSupabase]);
 
   if (!mounted) {
-    return <div className="min-h-screen bg-stone-50 py-24 px-4 sm:px-6 lg:px-8"></div>;
+    return <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8"></div>;
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-serif text-stone-900">Your Cart</h1>
@@ -188,9 +188,9 @@ export default function CartPage() {
                     Including taxes
                   </p>
                 </div>
-                <button className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors">
+                <Link href="/checkout" className="w-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors">
                   Proceed to Checkout
-                </button>
+                </Link>
               </div>
             </div>
           </div>

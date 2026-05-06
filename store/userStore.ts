@@ -35,6 +35,10 @@ export const useUserStore = create<UserState>()(
 
           if (data.user) {
             await useCartStore.getState().syncCartWithSupabase(data.user.id);
+            const { useAddressStore } = await import("./addressStore");
+            await useAddressStore.getState().fetchAddresses(data.user.id);
+            const { useOrderStore } = await import("./orderStore");
+            await useOrderStore.getState().fetchOrders(data.user.id);
           }
         } catch (error) {
           set({ error: (error as AuthError).message, isLoading: false });
@@ -61,6 +65,10 @@ export const useUserStore = create<UserState>()(
           await supabase.auth.signOut();
           set({ user: null, isLoading: false });
           useCartStore.getState().clearCart();
+          const { useAddressStore } = await import("./addressStore");
+          useAddressStore.getState().clearAddresses();
+          const { useOrderStore } = await import("./orderStore");
+          useOrderStore.getState().clearOrders();
         } catch (error) {
           set({ error: (error as AuthError).message, isLoading: false });
         }
@@ -76,6 +84,11 @@ export const useUserStore = create<UserState>()(
 
           if (user) {
             await useCartStore.getState().syncCartWithSupabase(user.id);
+            // Dynamic import to avoid circular dependency issues if any
+            const { useAddressStore } = await import("./addressStore");
+            await useAddressStore.getState().fetchAddresses(user.id);
+            const { useOrderStore } = await import("./orderStore");
+            await useOrderStore.getState().fetchOrders(user.id);
           }
         } catch (error) {
           set({ error: (error as AuthError).message, isLoading: false });

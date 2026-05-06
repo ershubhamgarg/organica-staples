@@ -4,7 +4,7 @@ import { ArrowRight, Leaf } from "lucide-react";
 
 export default function OurStory() {
   return (
-    <div className="flex flex-col min-h-screen bg-brand-cream animate-fade-in pt-32 pb-20">
+    <div className="flex flex-col min-h-screen bg-brand-cream animate-fade-in pt-12 pb-20">
       
       {/* Header Section */}
       <div className="max-w-4xl mx-auto px-4 text-center mb-20">

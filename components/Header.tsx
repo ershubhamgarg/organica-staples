@@ -61,7 +61,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-4" : "bg-brand-cream py-6"}`}
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-4" : "bg-brand-cream py-6"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Mobile Menu Toggle */}
@@ -77,6 +77,12 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 flex-1">
+            <Link
+              href="/"
+              className="text-stone-800 hover:text-brand-green transition-colors text-sm uppercase tracking-widest font-medium"
+            >
+              Home
+            </Link>
             <Link
               href="/#shop"
               className="text-stone-800 hover:text-brand-green transition-colors text-sm uppercase tracking-widest font-medium"
@@ -199,6 +205,13 @@ export default function Header() {
         style={{ top: "80px" }} // Start below header
       >
         <div className="flex flex-col p-8 gap-8">
+          <Link
+            href="/"
+            className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Home
+          </Link>
           <Link
             href="/#shop"
             className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
