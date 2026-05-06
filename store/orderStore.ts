@@ -27,8 +27,8 @@ interface OrderState {
     items: CartItem[],
     deliveryAddress: Address,
     paymentMethod: string,
-    totalAmount: number
-  ) => Promise<void>;
+    totalAmount: number,
+  ) => Promise<Order>;
   clearOrders: () => void;
 }
 
@@ -68,7 +68,7 @@ export const useOrderStore = create<OrderState>()(
         items: CartItem[],
         deliveryAddress: Address,
         paymentMethod: string,
-        totalAmount: number
+        totalAmount: number,
       ) => {
         set({ isLoading: true, error: null });
         try {
@@ -98,7 +98,7 @@ export const useOrderStore = create<OrderState>()(
                 created_at: new Date().toISOString(),
               };
               set({ orders: [localOrder, ...get().orders], isLoading: false });
-              return;
+              return localOrder;
             }
             throw error;
           }
@@ -107,6 +107,8 @@ export const useOrderStore = create<OrderState>()(
             orders: [data, ...get().orders],
             isLoading: false,
           });
+
+          return data;
         } catch (error: any) {
           set({ error: error.message, isLoading: false });
           throw error; // Re-throw to handle it in the component if necessary
@@ -119,6 +121,6 @@ export const useOrderStore = create<OrderState>()(
     }),
     {
       name: "organica-order-storage",
-    }
-  )
+    },
+  ),
 );

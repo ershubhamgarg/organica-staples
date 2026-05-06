@@ -34,6 +34,9 @@ export default function ProfilePage() {
     zipCode: "",
   });
 
+  const [visibleAddressesCount, setVisibleAddressesCount] = useState(3);
+  const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
+
   useEffect(() => {
     if (user) {
       fetchAddresses(user.id);
@@ -228,7 +231,7 @@ export default function ProfilePage() {
 
               {addresses.length > 0 ? (
                 <div className="space-y-3">
-                  {addresses.map((addr) => (
+                  {addresses.slice(0, visibleAddressesCount).map((addr) => (
                     <div
                       key={addr.id}
                       className="bg-white p-4 rounded-xl border border-stone-200 flex justify-between items-start"
@@ -256,6 +259,17 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   ))}
+
+                  {visibleAddressesCount < addresses.length && (
+                    <button
+                      onClick={() =>
+                        setVisibleAddressesCount((prev) => prev + 3)
+                      }
+                      className="w-full py-2 mt-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      Show More Addresses
+                    </button>
+                  )}
                 </div>
               ) : (
                 !showAddForm && (
@@ -275,7 +289,7 @@ export default function ProfilePage() {
 
               {orders.length > 0 ? (
                 <div className="space-y-4">
-                  {orders.map((order) => (
+                  {orders.slice(0, visibleOrdersCount).map((order) => (
                     <div
                       key={order.id}
                       className="bg-white p-6 rounded-xl border border-stone-200"
@@ -351,6 +365,15 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   ))}
+
+                  {visibleOrdersCount < orders.length && (
+                    <button
+                      onClick={() => setVisibleOrdersCount((prev) => prev + 3)}
+                      className="w-full py-3 mt-4 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors"
+                    >
+                      Show More Orders
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -373,7 +396,7 @@ export default function ProfilePage() {
                 await signOut();
                 router.push("/");
               }}
-              className="w-full bg-stone-100 hover:bg-stone-200 text-stone-800 font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               <LogOut size={18} /> Sign Out
             </button>

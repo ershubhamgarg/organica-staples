@@ -44,8 +44,52 @@ export default function CheckoutPage() {
   // Payment state
   const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
-
   const [placedOrderDetails, setPlacedOrderDetails] = useState<any>(null);
+
+  // UPI state
+  const [upiId, setUpiId] = useState("");
+  const [isVerifyingUpi, setIsVerifyingUpi] = useState(false);
+  const [upiVerificationResult, setUpiVerificationResult] = useState<{
+    success: boolean;
+    name?: string;
+    error?: string;
+  } | null>(null);
+
+  const verifyUpiId = async () => {
+    if (!upiId) return;
+
+    setIsVerifyingUpi(true);
+    setUpiVerificationResult(null);
+
+    try {
+      const response = await fetch("/api/verify-vpa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vpa: upiId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setUpiVerificationResult({
+          success: true,
+          name: data.data.customer_name,
+        });
+      } else {
+        setUpiVerificationResult({
+          success: false,
+          error: data.error?.message || data.message || "Invalid UPI ID",
+        });
+      }
+    } catch (error) {
+      setUpiVerificationResult({
+        success: false,
+        error: "Verification failed. Please try again.",
+      });
+    } finally {
+      setIsVerifyingUpi(false);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -69,9 +113,12 @@ export default function CheckoutPage() {
           <h2 className="text-2xl font-serif text-stone-900 mb-2">
             Order Placed Successfully!
           </h2>
-          <p className="text-stone-500 mb-8">
+          <p className="text-stone-500 mb-2">
             Thank you for choosing Organica Staples. Your order will be
             delivered soon.
+          </p>
+          <p className="text-stone-900 font-bold text-lg mb-8">
+            Order ID: #{placedOrderDetails.id.slice(0, 8).toUpperCase()}
           </p>
 
           <div className="bg-stone-50 rounded-xl p-6 text-left mb-8 border border-stone-100">
@@ -482,11 +529,47 @@ export default function CheckoutPage() {
                     </span>
                     {selectedPayment === "upi" && (
                       <div className="mt-4">
-                        <input
-                          type="text"
-                          placeholder="Enter UPI ID (e.g. username@upi)"
-                          className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Enter UPI ID (e.g. username@upi)"
+                            value={upiId}
+                            onChange={(e) => {
+                              setUpiId(e.target.value);
+                              setUpiVerificationResult(null); // Reset on typing
+                            }}
+                            className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              verifyUpiId();
+                            }}
+                            disabled={
+                              !upiId ||
+                              isVerifyingUpi ||
+                              upiVerificationResult?.success
+                            }
+                            className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {isVerifyingUpi
+                              ? "..."
+                              : upiVerificationResult?.success
+                                ? "Verified"
+                                : "Verify"}
+                          </button>
+                        </div>
+
+                        {upiVerificationResult && (
+                          <div
+                            className={`mt-2 text-xs font-medium ${upiVerificationResult.success ? "text-emerald-600" : "text-red-500"}`}
+                          >
+                            {upiVerificationResult.success
+                              ? `✓ Verified: ${upiVerificationResult.name}`
+                              : `✗ ${upiVerificationResult.error}`}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -495,7 +578,12 @@ export default function CheckoutPage() {
 
               <div className="mt-8 pt-6 border-t border-stone-100">
                 <button
-                  disabled={!selectedPayment || isPlacingOrder}
+                  disabled={
+                    !selectedPayment ||
+                    isPlacingOrder ||
+                    (selectedPayment === "upi" &&
+                      !upiVerificationResult?.success)
+                  }
                   onClick={async () => {
                     if (!user || !selectedAddressId || !selectedPayment) return;
                     const address = addresses.find(
@@ -504,7 +592,7 @@ export default function CheckoutPage() {
                     if (!address) return;
 
                     try {
-                      await placeOrder(
+                      const placedOrder = await placeOrder(
                         user.id,
                         items,
                         address,
@@ -514,12 +602,13 @@ export default function CheckoutPage() {
 
                       // Save details for the confirmation screen before clearing
                       setPlacedOrderDetails({
+                        id: placedOrder.id,
                         items: [...items],
                         total: finalTotal,
                         paymentMethod: selectedPayment,
                       });
 
-                      clearCart();
+                      clearCart(user.id);
                       setOrderPlaced(true);
                     } catch (error) {
                       console.error("Failed to place order", error);
