@@ -6,31 +6,34 @@ import { Leaf, Star, ChevronDown } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
 
-import { supabase } from '@/utils/supabase'
+import { supabase } from "@/utils/supabase";
 import { Product } from "@/lib/data";
 
 export default function ProductListing() {
-  const [products, setProducts] = useState<any>([])
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function getProducts() {
-      const { data: products } = await supabase.from('products').select('*')
+      const { data: products } = await supabase.from("products").select("*");
 
       if (products) {
         console.log("Data successfully fetched from Supabase:", products);
 
-        setProducts(products)
+        setProducts(products);
       }
     }
 
-    getProducts()
-  }, [])
+    getProducts();
+  }, []);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
 
   // Extract unique categories
-  const categories = ["All", ...Array.from(new Set(products.map((p: Product) => p.category)))];
+  const categories: string[] = [
+    "All",
+    ...Array.from(new Set(products.map((p: Product) => p.category))),
+  ];
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -38,7 +41,7 @@ export default function ProductListing() {
 
     // Filter by category
     if (selectedCategory !== "All") {
-      result = result.filter(p => p.category === selectedCategory);
+      result = result.filter((p) => p.category === selectedCategory);
     }
 
     // Sort
@@ -52,7 +55,10 @@ export default function ProductListing() {
   }, [selectedCategory, sortOrder, products]);
 
   return (
-    <section id="shop" className="py-32 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto">
+    <section
+      id="shop"
+      className="py-32 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
+    >
       <div className="flex flex-col items-center text-center mb-16">
         <Leaf className="text-brand-green mb-4 fill-brand-green/20" size={32} />
         <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4">
@@ -68,14 +74,15 @@ export default function ProductListing() {
       <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-brand-brown/10 pb-6">
         {/* Categories */}
         <div className="flex flex-wrap items-center justify-center gap-3">
-          {categories.map(category => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${selectedCategory === category
-                ? "bg-brand-brown text-white"
-                : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
-                }`}
+              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${
+                selectedCategory === category
+                  ? "bg-brand-brown text-white"
+                  : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
+              }`}
             >
               {category}
             </button>
@@ -93,7 +100,10 @@ export default function ProductListing() {
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-brown pointer-events-none" size={16} />
+          <ChevronDown
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-brown pointer-events-none"
+            size={16}
+          />
         </div>
       </div>
 
@@ -121,7 +131,11 @@ export default function ProductListing() {
             <div className="flex flex-col flex-grow text-center">
               <div className="flex justify-center items-center gap-1 mb-2 text-brand-gold">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={12} className="fill-brand-gold text-brand-gold" />
+                  <Star
+                    key={i}
+                    size={12}
+                    className="fill-brand-gold text-brand-gold"
+                  />
                 ))}
               </div>
               <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
