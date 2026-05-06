@@ -75,7 +75,7 @@ export default function RootLayout({
                     </a>
                   </li>
                   <li>
-                    <a href="#" className="hover:text-white transition-colors">
+                    <a href="mailto:bilonanaturals@gmail.com" className="hover:text-white transition-colors">
                       Contact Us
                     </a>
                   </li>
