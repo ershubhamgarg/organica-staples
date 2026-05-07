@@ -11,3 +11,10 @@ export interface Product {
   benefits: string[];
   discount?: number | null;
 }
+
+export function getProductThumbnail(product: Product): string {
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return product.images[0];
+  }
+  return product.image;
+}

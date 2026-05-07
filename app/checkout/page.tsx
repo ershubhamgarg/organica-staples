@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getDiscountedPrice } from "@/lib/pricing";
+import { getProductThumbnail } from "@/lib/data";
 
 interface PlacedOrderDetails {
   id: string;
@@ -135,25 +136,25 @@ export default function CheckoutPage() {
             </h3>
             <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
               {placedOrderDetails.items.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-4">
-                  <div className="relative w-12 h-12 bg-stone-100 rounded-lg overflow-hidden shrink-0">
+                <div key={idx} className="flex items-start gap-4">
+                  <div className="relative w-32 aspect-video bg-stone-100 rounded-lg overflow-hidden shrink-0">
                     <ImageWithFallback
-                      src={item.image}
+                      src={getProductThumbnail(item)}
                       alt={item.name}
                       fill
                       className="object-cover"
-                      sizes="48px"
+                      sizes="128px"
                     />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 pt-1">
                     <p className="text-sm font-medium text-stone-900 line-clamp-1">
                       {item.name}
                     </p>
-                    <p className="text-xs text-stone-500">
+                    <p className="text-xs text-stone-500 mt-0.5">
                       Qty: {item.quantity}
                     </p>
                   </div>
-                  <p className="text-sm font-medium text-stone-900">
+                  <p className="text-sm font-medium text-stone-900 pt-1">
                     ₹{(getDiscountedPrice(item) * item.quantity).toFixed(2)}
                   </p>
                 </div>
@@ -641,21 +642,21 @@ export default function CheckoutPage() {
               {/* Items Preview */}
               <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-4 items-center">
-                    <div className="relative w-16 h-16 bg-stone-100 rounded-lg overflow-hidden shrink-0">
+                  <div key={item.id} className="flex gap-4 items-start">
+                    <div className="relative w-36 aspect-video bg-stone-100 rounded-lg overflow-hidden shrink-0">
                       <ImageWithFallback
-                        src={item.image}
+                        src={getProductThumbnail(item)}
                         alt={item.name}
                         fill
                         className="object-cover"
-                        sizes="64px"
+                        sizes="144px"
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 pt-0.5">
                       <h4 className="text-sm font-medium text-stone-900 line-clamp-1">
                         {item.name}
                       </h4>
-                      <p className="text-xs text-stone-500">
+                      <p className="text-xs text-stone-500 mt-0.5">
                         Qty: {item.quantity}
                       </p>
                       <p className="text-sm font-medium text-stone-900 mt-1">

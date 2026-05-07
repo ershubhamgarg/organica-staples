@@ -12,6 +12,7 @@ import {
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
+import { getProductThumbnail } from "@/lib/data";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -30,13 +31,11 @@ export default function CartPage() {
 
   const effectiveSubtotal = getTotalPrice();
   const actualSubtotal = useMemo(
-    () =>
-      items.reduce((total, item) => total + item.price * item.quantity, 0),
+    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
   const totalDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
-  const shipping =
-    effectiveSubtotal > 0 && effectiveSubtotal <= 500 ? 50 : 0;
+  const shipping = effectiveSubtotal > 0 && effectiveSubtotal <= 500 ? 50 : 0;
   const totalPayable = effectiveSubtotal + shipping;
 
   useEffect(() => {
@@ -46,33 +45,35 @@ export default function CartPage() {
   }, [user, syncCartWithSupabase]);
 
   if (!mounted) {
-    return <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8"></div>;
+    return (
+      <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8"></div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex items-center justify-between mb-10">
           <h1 className="text-3xl font-serif text-stone-900">Your Cart</h1>
           <Link
             href="/#shop"
-            className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-700 transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 text-stone-500 hover:text-brand-green transition-colors text-sm font-medium"
           >
             <ArrowLeft size={16} /> Continue Shopping
           </Link>
         </div>
 
         {items.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-12 text-center">
-            <div className="w-20 h-20 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-6 text-stone-400">
+          <div className="bg-white rounded-3xl shadow-sm border border-brand-cream p-12 text-center">
+            <div className="w-24 h-24 bg-brand-cream rounded-full flex items-center justify-center mx-auto mb-6 text-brand-green">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
+                width="40"
+                height="40"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -81,7 +82,7 @@ export default function CartPage() {
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
             </div>
-            <h2 className="text-xl font-medium text-stone-900 mb-2">
+            <h2 className="text-2xl font-serif text-stone-900 mb-3">
               Your cart is empty
             </h2>
             <p className="text-stone-500 mb-8">
@@ -89,7 +90,7 @@ export default function CartPage() {
             </p>
             <Link
               href="/#shop"
-              className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white font-medium px-8 py-3 rounded-xl transition-colors"
+              className="inline-block bg-brand-brown hover:bg-brand-brown-light text-white font-medium px-8 py-3 rounded-xl transition-colors"
             >
               Start Shopping
             </Link>
@@ -108,33 +109,33 @@ export default function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-xl shadow-sm border border-stone-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start"
+                    className="bg-white rounded-2xl shadow-sm border border-stone-100 p-4 sm:p-5 flex flex-col sm:flex-row gap-4 items-start"
                   >
-                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 bg-stone-100 rounded-lg overflow-hidden shrink-0">
+                    <div className="relative w-full sm:w-40 aspect-video bg-stone-100 rounded-xl overflow-hidden shrink-0">
                       <ImageWithFallback
-                        src={item.image}
+                        src={getProductThumbnail(item)}
                         alt={item.name}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 640px) 96px, 128px"
+                        sizes="(max-width: 640px) 100vw, 256px"
                       />
                     </div>
                     <div className="flex-grow flex flex-col justify-between w-full">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <span className="text-xs text-stone-500 mb-1 block">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="flex-1">
+                          <span className="text-[10px] text-stone-500 mb-1 block uppercase tracking-widest">
                             {item.category}
                           </span>
-                          <h3 className="text-lg font-medium text-stone-900 leading-tight">
+                          <h3 className="text-base sm:text-lg font-medium text-stone-900 leading-tight">
                             {item.name}
                           </h3>
                           <div className="flex flex-wrap items-center gap-2 mt-1">
-                            <p className="text-sm text-stone-500">
+                            <p className="text-xs text-stone-500">
                               {item.weight}
                             </p>
                             {itemHasDiscount && (
                               <span
-                                className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] ${
+                                className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] ${
                                   itemHasHighDiscount
                                     ? "bg-brand-gold text-stone-950"
                                     : "bg-brand-cream text-brand-brown"
@@ -155,8 +156,8 @@ export default function CartPage() {
                           <Trash2 size={18} />
                         </button>
                       </div>
-                      <div className="flex items-center justify-between mt-4 sm:mt-auto pt-4 border-t border-stone-100">
-                        <div className="flex items-center border border-stone-200 rounded-lg bg-stone-50">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 sm:mt-6 pt-4 border-t border-stone-100 gap-3">
+                        <div className="flex items-center border border-brand-brown/20 rounded-xl bg-brand-cream/50">
                           <button
                             onClick={() =>
                               updateQuantity(
@@ -165,11 +166,11 @@ export default function CartPage() {
                                 user?.id,
                               )
                             }
-                            className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-l-lg transition-colors"
+                            className="px-4 py-2 text-stone-600 hover:text-brand-green hover:bg-brand-cream rounded-l-xl transition-all"
                           >
-                            <Minus size={14} />
+                            <Minus size={16} />
                           </button>
-                          <span className="px-4 py-1.5 text-sm font-medium text-stone-900 w-10 text-center">
+                          <span className="px-4 py-2 text-base font-medium text-stone-900 w-10 text-center">
                             {item.quantity}
                           </span>
                           <button
@@ -180,9 +181,9 @@ export default function CartPage() {
                                 user?.id,
                               )
                             }
-                            className="px-3 py-1.5 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-r-lg transition-colors"
+                            className="px-4 py-2 text-stone-600 hover:text-brand-green hover:bg-brand-cream rounded-r-xl transition-all"
                           >
-                            <Plus size={14} />
+                            <Plus size={16} />
                           </button>
                         </div>
                         <div className="text-right">
@@ -192,7 +193,7 @@ export default function CartPage() {
                             </div>
                           )}
                           <div
-                            className={`text-lg ${
+                            className={`text-xl ${
                               itemHasDiscount
                                 ? "font-bold text-brand-green"
                                 : "font-medium text-stone-900"
@@ -254,7 +255,10 @@ export default function CartPage() {
                     Including taxes
                   </p>
                 </div>
-                <Link href="/checkout" className="w-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors">
+                <Link
+                  href="/checkout"
+                  className="w-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors"
+                >
                   Proceed to Checkout
                 </Link>
               </div>
