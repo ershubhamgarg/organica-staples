@@ -5,7 +5,7 @@ import { ArrowRight, Leaf } from "lucide-react";
 import ProductListing from "@/components/ProductListing";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const syncCartWithSupabase = useCartStore(
@@ -13,11 +13,42 @@ export default function Home() {
   );
   const { user } = useUserStore();
 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
   useEffect(() => {
     if (user) {
       syncCartWithSupabase(user.id);
     }
   }, [user, syncCartWithSupabase]);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const whatsappMessage = `
+[Organica Staples]
+Name: ${formData.name}
+Email: ${formData.email}
+Subject: ${formData.subject}
+Message: ${formData.message}
+    `.trim();
+
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/918295433041?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-brand-cream animate-fade-in">
@@ -164,7 +195,10 @@ export default function Home() {
               message and we'll respond shortly.
             </p>
           </div>
-          <form className="bg-white rounded-2xl shadow-sm border border-brand-cream p-8 md:p-12">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white rounded-2xl shadow-sm border border-brand-cream p-8 md:p-12"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-2">
@@ -172,6 +206,9 @@ export default function Home() {
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
                   placeholder="John Doe"
                   required
@@ -183,6 +220,9 @@ export default function Home() {
                 </label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
                   placeholder="john@example.com"
                   required
@@ -195,6 +235,9 @@ export default function Home() {
               </label>
               <input
                 type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
                 placeholder="How can we help?"
                 required
@@ -205,6 +248,9 @@ export default function Home() {
                 Message
               </label>
               <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
                 rows={5}
                 className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all resize-none"
                 placeholder="Write your message here..."
