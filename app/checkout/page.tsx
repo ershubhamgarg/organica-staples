@@ -123,7 +123,7 @@ export default function CheckoutPage() {
             Order Placed Successfully!
           </h2>
           <p className="text-stone-500 mb-2">
-            Thank you for choosing Organica Staples. Your order will be
+            Thank you for choosing Bhaarat Organics. Your order will be
             delivered soon.
           </p>
           <p className="text-stone-900 font-bold text-lg mb-8">

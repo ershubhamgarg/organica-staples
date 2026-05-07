@@ -106,14 +106,14 @@ export default function Header() {
             >
               {/* Text: ORGANICA */}
               <span className="text-xl md:text-2xl font-sans text-brand-brown tracking-[0.35em] uppercase leading-none pl-[0.35em] font-light group-hover:text-brand-brown-light transition-colors">
-                Organica
+                Bhaarat
               </span>
 
               {/* Text: STAPLES */}
               <div className="flex items-center gap-2 mt-1">
                 <div className="h-[0.5px] w-6 bg-brand-gold opacity-70"></div>
                 <span className="text-[8px] md:text-[9px] font-sans text-brand-gold tracking-[0.4em] uppercase pl-[0.4em]">
-                  Staples
+                  Organics
                 </span>
                 <div className="h-[0.5px] w-6 bg-brand-gold opacity-70"></div>
               </div>
