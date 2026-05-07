@@ -147,6 +147,79 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Contact Us Section */}
+      <section className="bg-brand-cream py-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <Leaf
+              className="text-brand-green mb-4 mx-auto fill-brand-green/20"
+              size={32}
+            />
+            <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4">
+              Get in Touch
+            </h2>
+            <p className="text-stone-600 max-w-lg mx-auto font-light leading-relaxed">
+              Have a question or feedback? We'd love to hear from you. Send us a
+              message and we'll respond shortly.
+            </p>
+          </div>
+          <form className="bg-white rounded-2xl shadow-sm border border-brand-cream p-8 md:p-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                Subject
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all"
+                placeholder="How can we help?"
+                required
+              />
+            </div>
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                Message
+              </label>
+              <textarea
+                rows={5}
+                className="w-full px-4 py-3 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all resize-none"
+                placeholder="Write your message here..."
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-brand-brown hover:bg-brand-brown-light text-white px-8 py-4 rounded-xl transition-all duration-300 font-medium uppercase tracking-widest text-sm shadow-lg hover:shadow-xl"
+            >
+              Send Message
+            </button>
+          </form>
+        </div>
+      </section>
     </div>
   );
 }
