@@ -12,6 +12,7 @@ import {
   Leaf,
   Minus,
   Plus,
+  Star,
 } from "lucide-react";
 import { useEffect, useState, use } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
@@ -56,8 +57,8 @@ export default function ProductPage({
 
   if ((!hasFetched || isLoading) && !product) {
     return (
-      <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto text-stone-500">
+      <div className="min-h-screen bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto text-stone-500">
           Loading product...
         </div>
       </div>
@@ -66,15 +67,15 @@ export default function ProductPage({
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
           <Link
             href="/#shop"
-            className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-700 transition-colors mb-8 text-sm font-medium"
+            className="inline-flex items-center gap-2 text-stone-500 hover:text-brand-green transition-colors mb-8 text-sm font-medium"
           >
             <ArrowLeft size={16} /> Back to Shop
           </Link>
-          <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-12 text-center">
+          <div className="bg-white rounded-3xl shadow-sm border border-brand-cream p-12 text-center">
             <h1 className="text-2xl font-serif text-stone-900 mb-2">
               Product not found
             </h1>
@@ -99,30 +100,30 @@ export default function ProductPage({
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto">
         <Link
           href="/#shop"
-          className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-700 transition-colors mb-8 text-sm font-medium"
+          className="inline-flex items-center gap-2 text-stone-500 hover:text-brand-green transition-colors mb-12 text-sm font-medium"
         >
           <ArrowLeft size={16} /> Back to Shop
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-100 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-            {/* Product Image */}
-            <div className="relative aspect-square md:aspect-auto md:h-full bg-stone-100">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Product Image - Left Column */}
+          <div className="space-y-6">
+            <div className="relative aspect-video bg-white rounded-3xl overflow-hidden shadow-sm border border-brand-cream">
               <ProductImageCarousel
                 product={product}
-                imageClassName="object-cover"
+                imageClassName="object-cover transition-transform duration-700"
                 priority
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
               {hasDiscount && (
                 <div
-                  className={`absolute left-6 top-6 shadow-md px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] ${
+                  className={`absolute left-6 top-6 shadow-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${
                     hasHighDiscount
-                      ? "bg-brand-gold text-stone-950 ring-2 ring-white/80"
+                      ? "bg-brand-gold text-stone-950 ring-2 ring-white"
                       : "bg-brand-green text-white"
                   }`}
                 >
@@ -131,104 +132,117 @@ export default function ProductPage({
               )}
             </div>
 
-            {/* Product Details */}
-            <div className="p-8 md:p-12 flex flex-col justify-center">
-              <div className="mb-2">
-                <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full mb-4">
-                  {product.category}
-                </span>
-              </div>
-              <h1 className="text-3xl md:text-4xl font-serif text-stone-900 mb-4">
+            <div className="bg-white rounded-2xl border border-brand-cream p-6">
+              <h4 className="text-sm font-medium text-stone-900 mb-4 flex items-center gap-2">
+                <Check className="text-brand-green" size={18} />
+                Key Benefits
+              </h4>
+              <ul className="space-y-2">
+                {(product.benefits || []).map((benefit, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-center gap-3 text-sm text-stone-600"
+                  >
+                    <div className="w-2 h-2 bg-brand-green rounded-full" />
+                    {benefit}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Product Details - Right Column */}
+          <div className="flex flex-col">
+            <div className="mb-4">
+              <span className="inline-block px-3 py-1 bg-brand-cream text-brand-brown text-xs font-medium rounded-full mb-3 uppercase tracking-widest">
+                {product.category}
+              </span>
+              <h1 className="text-3xl md:text-4xl font-serif text-stone-900 mb-3 leading-tight">
                 {product.name}
               </h1>
-              <div className="mb-6">
+
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={14}
+                    className="fill-brand-gold text-brand-gold"
+                  />
+                ))}
+              </div>
+
+              <div className="mb-5">
                 {hasDiscount ? (
-                  <div className="flex flex-wrap items-end gap-3">
-                    <span className="text-lg text-stone-400 line-through pb-1">
+                  <div className="flex flex-wrap items-baseline gap-3">
+                    <span className="text-lg text-stone-400 line-through">
                       ₹{product.price.toFixed(2)}
                     </span>
                     <span className="text-3xl font-bold text-brand-green">
                       ₹{discountedPrice.toFixed(2)}
                     </span>
-                    <span className="mb-1 bg-brand-cream px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-brown">
-                      {hasHighDiscount
-                        ? `Mega save ${discountPercent}%`
-                        : `Save ${discountPercent}%`}
+                    <span className="bg-brand-cream px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown rounded-full">
+                      Save {discountPercent}%
                     </span>
                   </div>
                 ) : (
-                  <p className="text-2xl text-stone-800 font-light">
+                  <p className="text-2xl font-light text-stone-800">
                     ₹{product.price.toFixed(2)}
                   </p>
                 )}
               </div>
+            </div>
 
-              <div className="prose prose-stone mb-8">
-                <p className="text-stone-600 leading-relaxed">
-                  {product.description}
-                </p>
-              </div>
+            <div className="mb-5">
+              <p className="text-stone-600 leading-relaxed text-base">
+                {product.description}
+              </p>
+            </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="border border-stone-200 rounded-lg p-4 flex items-start gap-3">
-                  <Leaf className="text-emerald-600 shrink-0" size={20} />
-                  <div>
-                    <h4 className="text-xs font-medium text-stone-500 uppercase tracking-wider mb-1">
-                      Origin
-                    </h4>
-                    <p className="text-sm text-stone-900 font-medium">
-                      {product.origin}
-                    </p>
-                  </div>
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="bg-white rounded-2xl border border-brand-cream p-4 flex items-center gap-3">
+                <div className="w-10 h-10 bg-brand-cream flex items-center justify-center text-brand-green rounded-full">
+                  <Leaf size={20} />
                 </div>
-                <div className="border border-stone-200 rounded-lg p-4 flex items-start gap-3">
-                  <ShieldCheck
-                    className="text-emerald-600 shrink-0"
-                    size={20}
-                  />
-                  <div>
-                    <h4 className="text-xs font-medium text-stone-500 uppercase tracking-wider mb-1">
-                      Weight
-                    </h4>
-                    <p className="text-sm text-stone-900 font-medium">
-                      {product.weight}
-                    </p>
-                  </div>
+                <div>
+                  <h4 className="text-[10px] font-medium text-stone-500 uppercase tracking-wider mb-0.5">
+                    Origin
+                  </h4>
+                  <p className="text-sm text-stone-900 font-medium">
+                    {product.origin}
+                  </p>
                 </div>
               </div>
-
-              <div className="mb-8">
-                <h4 className="text-sm font-medium text-stone-900 mb-3">
-                  Key Benefits
-                </h4>
-                <ul className="space-y-2">
-                  {(product.benefits || []).map((benefit, idx) => (
-                    <li
-                      key={idx}
-                      className="flex items-center gap-2 text-sm text-stone-600"
-                    >
-                      <Check className="text-emerald-600" size={16} />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
+              <div className="bg-white rounded-2xl border border-brand-cream p-4 flex items-center gap-3">
+                <div className="w-10 h-10 bg-brand-cream flex items-center justify-center text-brand-green rounded-full">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-medium text-stone-500 uppercase tracking-wider mb-0.5">
+                    Weight
+                  </h4>
+                  <p className="text-sm text-stone-900 font-medium">
+                    {product.weight}
+                  </p>
+                </div>
               </div>
+            </div>
 
-              <div className="mt-auto pt-8 border-t border-stone-100 flex flex-col gap-4">
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="flex items-center border border-stone-200 rounded-xl bg-stone-50 h-12 flex-shrink-0">
+            <div className="mt-auto space-y-3">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center border border-brand-brown/20 rounded-2xl bg-white h-12 flex-shrink-0">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-4 py-2 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-l-xl transition-colors h-full flex items-center"
+                      className="px-4 py-3 text-stone-500 hover:text-brand-green hover:bg-brand-cream rounded-l-2xl transition-all h-full flex items-center"
                     >
                       <Minus size={16} />
                     </button>
-                    <span className="w-12 text-center text-sm font-medium text-stone-900">
+                    <span className="w-14 text-center text-base font-medium text-stone-900">
                       {quantity}
                     </span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="px-4 py-2 text-stone-500 hover:text-emerald-700 hover:bg-stone-100 rounded-r-xl transition-colors h-full flex items-center"
+                      className="px-4 py-3 text-stone-500 hover:text-brand-green hover:bg-brand-cream rounded-r-2xl transition-all h-full flex items-center"
                     >
                       <Plus size={16} />
                     </button>
@@ -236,10 +250,10 @@ export default function ProductPage({
 
                   <button
                     onClick={handleAddToCart}
-                    className={`flex-1 font-medium py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 h-12 ${
+                    className={`flex-1 font-medium py-3 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 h-12 text-sm ${
                       added
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-emerald-700 hover:bg-emerald-800 text-white"
+                        ? "bg-brand-cream text-brand-brown"
+                        : "bg-brand-brown hover:bg-brand-brown-light text-white shadow-lg hover:shadow-xl"
                     }`}
                   >
                     {added ? (
@@ -252,8 +266,9 @@ export default function ProductPage({
                   </button>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 text-xs text-stone-500">
-                  <Truck size={14} /> Free shipping on orders over ₹500
+                <div className="flex items-center justify-center gap-2 text-xs text-stone-500 bg-white rounded-2xl py-3 border border-brand-cream">
+                  <Truck size={16} className="text-brand-green" /> Free shipping
+                  on orders over ₹500
                 </div>
               </div>
             </div>

@@ -127,7 +127,7 @@ export default function ProductListing() {
               key={product.id}
               className="group flex flex-col"
             >
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
+              <div className="relative aspect-video w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
                 <ProductImageCarousel
                   product={product}
                   imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
