@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: "Bhaarat Organics | Premium Organic Goods",
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({

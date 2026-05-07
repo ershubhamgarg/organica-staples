@@ -1,6 +1,6 @@
-# Organica Staples
+# Bhaarat Organics
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Premium organic pantry ecommerce app built with Next.js 16 and React 19.
 
 ## Getting Started
 
@@ -8,31 +8,34 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Dev: `npm run dev`
+- Build: `npm run build`
+- Lint: `npm run lint`
 
-## Learn More
+## Stack
 
-To learn more about Next.js, take a look at the following resources:
+- TypeScript strict, path alias `@/*`
+- Tailwind CSS v4 tokens in `app/globals.css`
+- Zustand stores in `store/`, persisted to localStorage
+- Supabase client in `utils/supabase.ts`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Main Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `/`: hero + product listing
+- `/product/[id]`: product detail
+- `/cart`: cart with free shipping over ₹500
+- `/checkout`: address, mocked UPI verify, order placement
+- `/login`: Supabase email/password auth
+- `/profile`: user profile/orders/addresses
+- `/our-story`: brand content
 
-## Deploy on Vercel
+## Brand
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Brand colors: olive/gold/cream premium organic pantry tone
+- Currency: INR (₹)
