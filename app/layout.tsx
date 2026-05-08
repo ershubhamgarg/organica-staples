@@ -14,7 +14,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Bhaarat Organics | Premium Organic Goods",
+  title: "Amritya Organics | Premium Organic Goods",
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
@@ -41,7 +41,7 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-xl font-serif text-white mb-4">
-                Bhaarat Organics
+                Amritya Organics
               </h3>
               <p className="text-sm text-stone-400 max-w-xs">
                 Curating the finest organic goods for your everyday nourishment.
@@ -90,7 +90,7 @@ export default function RootLayout({
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-stone-800 text-xs text-stone-500 text-center">
-            &copy; {new Date().getFullYear()} Bhaarat Organics. All rights
+            &copy; {new Date().getFullYear()} Amritya Organics. All rights
             reserved.
           </div>
         </footer>

@@ -37,7 +37,7 @@ export default function Home() {
     e.preventDefault();
 
     const whatsappMessage = `
-[Bhaarat Organics]
+[Amritya Organics]
 Name: ${formData.name}
 Email: ${formData.email}
 Subject: ${formData.subject}

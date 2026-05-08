@@ -121,11 +121,10 @@ export default function ProductPage({
               />
               {hasDiscount && (
                 <div
-                  className={`absolute left-6 top-6 shadow-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${
-                    hasHighDiscount
+                  className={`absolute left-6 top-6 shadow-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] ${hasHighDiscount
                       ? "bg-brand-gold text-stone-950 ring-2 ring-white"
                       : "bg-brand-green text-white"
-                  }`}
+                    }`}
                 >
                   {hasHighDiscount ? "Mega Deal" : `${discountPercent}% Off`}
                 </div>
@@ -250,11 +249,10 @@ export default function ProductPage({
 
                   <button
                     onClick={handleAddToCart}
-                    className={`flex-1 font-medium py-3 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 h-12 text-sm ${
-                      added
+                    className={`flex-1 font-medium py-3 px-6 rounded-2xl transition-all flex items-center justify-center gap-2 h-12 text-sm ${added
                         ? "bg-brand-cream text-brand-brown"
                         : "bg-brand-brown hover:bg-brand-brown-light text-white shadow-lg hover:shadow-xl"
-                    }`}
+                      }`}
                   >
                     {added ? (
                       <>

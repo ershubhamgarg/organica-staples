@@ -11,8 +11,10 @@ export default function OurStory() {
           className="text-brand-green mb-6 fill-brand-green/20 mx-auto"
           size={40}
         />
-        <h1 className="text-5xl md:text-7xl font-serif text-brand-brown font-bold mb-8">
-          Our Journey to Purity
+        <h1 className="text-4xl md:text-5xl font-serif text-brand-brown mb-6 leading-tight">
+          Our Story: <br />
+          Curating the Best of <br />
+          Amritya Organics
         </h1>
         <p className="text-xl md:text-2xl text-stone-600 font-light leading-relaxed">
           Rooted in friendship, driven by a vision. How two lifelong companions
@@ -46,7 +48,7 @@ export default function OurStory() {
               artificially enhanced groceries, we embarked on a journey across
               the heartlands of India. We sought to rediscover the ancient
               grains, the unadulterated oils, and the vibrant spices that our
-              ancestors thrived upon. Bhaarat Organics was born not just as a
+              ancestors thrived upon. Amritya Organics was born not just as a
               brand, but as a commitment to restoring the sanctity of the
               kitchen pantry.
             </p>

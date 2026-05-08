@@ -22,6 +22,7 @@ export default function Header() {
   const { user, signOut } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0); // 0 to 1
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
@@ -30,7 +31,11 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 20);
+      // Transition over 120px for extra smoothness
+      const progress = Math.min(scrollY / 120, 1);
+      setScrollProgress(progress);
     };
     window.addEventListener("scroll", handleScroll);
 
@@ -61,81 +66,75 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-4" : "bg-brand-cream py-6"}`}
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-2" : "bg-brand-cream py-3"}`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          {/* Mobile Menu Toggle */}
-          <div className="flex items-center gap-4 md:hidden flex-1">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-stone-800 hover:text-brand-green transition-colors p-2 -ml-2"
-              aria-label="Toggle menu"
-            >
-              <Menu size={24} />
-            </button>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8 flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 md:h-14">
+          {/* Logo - Smoothly animated based on scroll progress */}
+          <div className="flex items-center flex-1">
             <Link
               href="/"
-              className="text-stone-800 hover:text-brand-green transition-colors text-sm uppercase tracking-widest font-medium"
+              className="relative z-50 hover:scale-105 transition-transform duration-300"
+              style={{
+                marginBottom: `${(1 - scrollProgress) * -56}px`, // Transition from -56px to 0
+                transform: `translateY(${(1 - scrollProgress) * 10}px)`, // Slight upward lift as it hangs
+              }}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <div
+                className="relative flex items-center justify-center"
+                style={{
+                  width: `${128 - scrollProgress * 80}px`, // 128px (32) to 48px (12)
+                  height: `${128 - scrollProgress * 80}px`,
+                  transition: "none", // Remove CSS transition to link directly to scroll
+                }}
+              >
+                <Image
+                  src="/logo.png"
+                  alt="Amritya Organics"
+                  fill
+                  className="object-contain"
+                  style={{
+                    filter: `drop-shadow(0 4px 6px rgba(0,0,0,${(1 - scrollProgress) * 0.15}))`,
+                  }}
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex items-center gap-10">
+            <Link
+              href="/"
+              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
             >
               Home
             </Link>
             <Link
               href="/#shop"
-              className="text-stone-800 hover:text-brand-green transition-colors text-sm uppercase tracking-widest font-medium"
+              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
             >
               Shop
             </Link>
             <Link
               href="/our-story"
-              className="text-stone-800 hover:text-brand-green transition-colors text-sm uppercase tracking-widest font-medium"
+              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
             >
               Our Story
             </Link>
           </nav>
 
-          {/* Logo */}
-          <div className="flex-shrink-0 flex items-center justify-center flex-[2] md:flex-none">
-            <Link
-              href="/"
-              className="flex flex-col items-center group relative pt-2"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {/* Text: ORGANICA */}
-              <span className="text-xl md:text-2xl font-sans text-brand-brown tracking-[0.35em] uppercase leading-none pl-[0.35em] font-light group-hover:text-brand-brown-light transition-colors">
-                Bhaarat
-              </span>
-
-              {/* Text: STAPLES */}
-              <div className="flex items-center gap-2 mt-1">
-                <div className="h-[0.5px] w-6 bg-brand-gold opacity-70"></div>
-                <span className="text-[8px] md:text-[9px] font-sans text-brand-gold tracking-[0.4em] uppercase pl-[0.4em]">
-                  Organics
-                </span>
-                <div className="h-[0.5px] w-6 bg-brand-gold opacity-70"></div>
-              </div>
-
-              {/* Tagline */}
-              <span className="text-[5px] md:text-[6px] text-brand-brown tracking-[0.25em] uppercase mt-1 hidden md:block opacity-80">
-                Pure By Nature &bull; Essential By Choice
-              </span>
-            </Link>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-6 flex-1">
+          {/* Actions - Right Aligned */}
+          <div className="flex items-center justify-end gap-5 md:gap-8 flex-1">
             {user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="text-stone-800 hover:text-brand-green transition-colors flex items-center gap-2"
                 >
-                  <UserCircle size={24} />
+                  <UserCircle size={22} />
                   <ChevronDown
-                    size={16}
+                    size={14}
                     className={
                       isDropdownOpen
                         ? "rotate-180 transition-transform"
@@ -178,23 +177,32 @@ export default function Header() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <User size={20} />
-                <span className="hidden md:block text-sm uppercase tracking-widest font-medium">
+                <span className="hidden md:block text-xs uppercase tracking-[0.2em] font-medium">
                   Sign In
                 </span>
               </Link>
             )}
             <Link
               href="/cart"
-              className="text-stone-800 hover:text-brand-green relative flex items-center justify-center transition-colors p-2 -mr-2 md:m-0"
+              className="text-stone-800 hover:text-brand-green relative flex items-center justify-center transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <ShoppingCart size={24} strokeWidth={1.5} />
+              <ShoppingCart size={22} strokeWidth={1.5} />
               {mounted && items.length > 0 && (
-                <span className="absolute top-0 right-0 md:-top-2 md:-right-2 bg-brand-green text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">
+                <span className="absolute -top-2 -right-2 bg-brand-green text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
                   {items.reduce((acc, item) => acc + item.quantity, 0)}
                 </span>
               )}
             </Link>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-stone-800 hover:text-brand-green transition-colors md:hidden"
+              aria-label="Toggle menu"
+            >
+              <Menu size={22} />
+            </button>
           </div>
         </div>
       </header>
@@ -202,7 +210,7 @@ export default function Header() {
       {/* Mobile Menu Overlay */}
       <div
         className={`fixed inset-0 bg-brand-cream z-40 transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
-        style={{ top: "80px" }} // Start below header
+        style={{ top: isScrolled ? "64px" : "80px" }} // Start below header
       >
         <div className="flex flex-col p-8 gap-8">
           <Link

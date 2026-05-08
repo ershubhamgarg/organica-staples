@@ -1,6 +1,10 @@
-# Bhaarat Organics
+# Amritya Organics - Premium Pantry Store
 
-Premium organic pantry ecommerce app built with Next.js 16 and React 19.
+A premium ecommerce experience for Amritya Organics, built with Next.js 16, React 19, and Supabase.
+
+## Project Overview
+
+Amritya Organics is an organic pantry store focused on providing premium, ethically sourced staples. This application provides a seamless shopping experience from product discovery to checkout.
 
 ## Getting Started
 

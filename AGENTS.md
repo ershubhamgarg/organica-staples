@@ -1,6 +1,6 @@
 # Agent Brief
 
-Next 16 + React 19 ecommerce app for Bhaarat Organics, an organic pantry store. App Router only; `pages/` is empty.
+Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. App Router only; `pages/` is empty.
 
 ## Commands
 
