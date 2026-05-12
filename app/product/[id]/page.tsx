@@ -15,62 +15,19 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageCircle,
+  ArrowRight,
 } from "lucide-react";
 import { useEffect, useState, use, useMemo } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import QuickAddButton from "@/components/QuickAddButton";
 import { Product } from "@/lib/data";
+import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
   getDiscountPercent,
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
-
-const MOCK_REVIEWS = [
-  {
-    id: 1,
-    user: "Ananya S.",
-    rating: 5,
-    comment: "Absolutely love the quality of this product! Highly recommended.",
-    date: "2026-05-10",
-  },
-  {
-    id: 2,
-    user: "Rahul M.",
-    rating: 4,
-    comment: "Great taste and very fresh. Will buy again.",
-    date: "2026-05-08",
-  },
-  {
-    id: 3,
-    user: "Priya K.",
-    rating: 5,
-    comment: "The best organic staples I've found so far. Premium quality.",
-    date: "2026-05-05",
-  },
-  {
-    id: 4,
-    user: "Vikram R.",
-    rating: 4,
-    comment: "Very good, though the delivery took an extra day.",
-    date: "2026-05-01",
-  },
-  {
-    id: 5,
-    user: "Sneha G.",
-    rating: 5,
-    comment: "Pure and authentic. You can really taste the difference.",
-    date: "2026-04-28",
-  },
-  {
-    id: 6,
-    user: "Amit B.",
-    rating: 4,
-    comment: "Consistent quality. Happy with my purchase.",
-    date: "2026-04-25",
-  },
-];
 
 const REVIEWS_PER_PAGE = 3;
 
@@ -86,6 +43,7 @@ export default function ProductPage({
   const isLoading = useProductStore((state) => state.isLoading);
   const error = useProductStore((state) => state.error);
   const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { addToCart } = useCartStore();
   const { user } = useUserStore();
@@ -93,15 +51,39 @@ export default function ProductPage({
   const [added, setAdded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // New Review Form States
+  const [newRating, setNewRating] = useState<number | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [newUserName, setNewUserName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+
   useEffect(() => {
     let isActive = true;
 
-    fetchProductById(id).then((fetchedProduct) => {
-      if (isActive) {
+    async function loadData() {
+      const fetchedProduct = await fetchProductById(id);
+      if (isActive && fetchedProduct) {
         setProduct(fetchedProduct);
         setHasFetched(true);
+
+        // Fetch reviews from Supabase
+        const { data: fetchedReviews } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("product_id", id)
+          .order("created_at", { ascending: false });
+
+        if (isActive && fetchedReviews) {
+          setReviews(fetchedReviews);
+        }
       }
-    });
+    }
+
+    loadData();
 
     if (products.length === 0) {
       fetchProducts();
@@ -121,10 +103,91 @@ export default function ProductPage({
 
   const paginatedReviews = useMemo(() => {
     const start = (currentPage - 1) * REVIEWS_PER_PAGE;
-    return MOCK_REVIEWS.slice(start, start + REVIEWS_PER_PAGE);
-  }, [currentPage]);
+    return reviews.slice(start, start + REVIEWS_PER_PAGE);
+  }, [currentPage, reviews]);
 
-  const totalPages = Math.ceil(MOCK_REVIEWS.length / REVIEWS_PER_PAGE);
+  const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
+
+  const { averageRating, reviewCount } = useMemo(() => {
+    if (reviews.length === 0) {
+      return {
+        averageRating: product?.rating || 0,
+        reviewCount: product?.review_count || 0,
+      };
+    }
+
+    const reviewsWithRating = reviews.filter((r) => r.rating);
+    const total = reviewsWithRating.reduce((acc, r) => acc + r.rating, 0);
+    const count = reviewsWithRating.length;
+
+    return {
+      averageRating: count > 0 ? total / count : product?.rating || 0,
+      reviewCount:
+        reviews.length > (product?.review_count || 0)
+          ? reviews.length
+          : product?.review_count || 0,
+    };
+  }, [reviews, product]);
+
+  useEffect(() => {
+    if (user && !newUserName) {
+      setNewUserName(user.email?.split("@")[0] || "");
+    }
+  }, [user, newUserName]);
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) return;
+
+    // Check if at least one field is provided (rating or comment)
+    if (!newRating && !newComment.trim()) {
+      setSubmitMessage({
+        type: "error",
+        text: "Please provide a rating or a review comment.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    try {
+      const { error: submitError } = await supabase.from("reviews").insert({
+        product_id: product.id,
+        user_id: user?.id || null,
+        user_name:
+          newUserName.trim() || user?.email?.split("@")[0] || "Anonymous",
+        rating: newRating,
+        comment: newComment.trim() || null,
+      });
+
+      if (submitError) throw submitError;
+
+      setSubmitMessage({
+        type: "success",
+        text: "Thank you! Your feedback has been submitted.",
+      });
+      setNewRating(null);
+      setNewComment("");
+      setNewUserName("");
+
+      // Refresh reviews list
+      const { data: refreshedReviews } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("product_id", id)
+        .order("created_at", { ascending: false });
+
+      if (refreshedReviews) setReviews(refreshedReviews);
+    } catch (err: any) {
+      setSubmitMessage({
+        type: "error",
+        text: err.message || "Failed to submit feedback.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if ((!hasFetched || isLoading) && !product) {
     return (
@@ -247,18 +310,22 @@ export default function ProductPage({
                       <Star
                         key={i}
                         size={16}
-                        className="fill-brand-gold text-brand-gold"
+                        className={
+                          i < Math.round(averageRating)
+                            ? "fill-brand-gold text-brand-gold"
+                            : "text-stone-200"
+                        }
                       />
                     ))}
                     <span className="ml-2 text-sm font-bold text-stone-900">
-                      4.8
+                      {averageRating.toFixed(1)}
                     </span>
                   </div>
                   <a
                     href="#reviews"
                     className="text-xs text-stone-500 font-medium hover:text-brand-green hover:underline transition-colors border-l border-stone-200 pl-4"
                   >
-                    124 customer reviews
+                    {reviewCount} customer reviews
                   </a>
                 </div>
 
@@ -382,117 +449,251 @@ export default function ProductPage({
                 ))}
               </div>
             </div>
+
+            {/* Submit Rating & Review Form */}
+            <div className="bg-white rounded-3xl border border-brand-cream p-8 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-brand-gold/10 rounded-xl flex items-center justify-center text-brand-gold">
+                  <Star size={24} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-stone-900 uppercase tracking-widest">
+                    Share Your Feedback
+                  </h4>
+                  <p className="text-[10px] text-stone-400 font-medium uppercase tracking-wider mt-1">
+                    Rating and review are optional
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitReview} className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-500 mb-3">
+                    Your Rating
+                  </label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() =>
+                          setNewRating(newRating === star ? null : star)
+                        }
+                        className="transition-transform hover:scale-110 active:scale-95"
+                      >
+                        <Star
+                          size={28}
+                          className={
+                            star <= (newRating || 0)
+                              ? "fill-brand-gold text-brand-gold"
+                              : "text-stone-200"
+                          }
+                        />
+                      </button>
+                    ))}
+                    {newRating && (
+                      <span className="ml-2 text-sm font-bold text-brand-gold">
+                        {newRating}/5
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                    placeholder="e.g. John Doe (Optional)"
+                    className="w-full px-4 py-3 bg-brand-cream/10 border border-brand-cream rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 text-sm transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                    Your Review
+                  </label>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Tell others about your experience (Optional)"
+                    rows={4}
+                    className="w-full px-4 py-3 bg-brand-cream/10 border border-brand-cream rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 text-sm transition-all resize-none"
+                  />
+                </div>
+
+                {submitMessage && (
+                  <div
+                    className={`p-4 rounded-xl text-xs font-medium ${
+                      submitMessage.type === "success"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                        : "bg-red-50 text-red-700 border border-red-100"
+                    }`}
+                  >
+                    {submitMessage.text}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-brand-brown hover:bg-brand-brown-light text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-brand-brown/10 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    "Submitting..."
+                  ) : (
+                    <>
+                      Submit Feedback <ArrowRight size={14} />
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
 
         {/* Customer Reviews Section */}
-        <div id="reviews" className="mb-24 scroll-mt-24">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-brand-green/10 rounded-xl flex items-center justify-center text-brand-green">
-                  <MessageCircle size={24} />
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-green">
-                  Testimonials
-                </span>
-              </div>
-              <h2 className="text-4xl font-serif text-stone-900">
-                Customer Reviews
-              </h2>
-            </div>
-            <div className="flex items-center gap-6 bg-white px-8 py-6 rounded-3xl border border-brand-cream shadow-sm">
-              <div className="text-center border-r border-stone-100 pr-6">
-                <span className="block text-4xl font-bold text-stone-900 mb-1">
-                  4.8
-                </span>
-                <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
-                  Average Rating
-                </span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      className="fill-brand-gold text-brand-gold"
-                    />
-                  ))}
-                </div>
-                <span className="text-xs text-stone-500 font-medium">
-                  Based on 124 reviews
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 mb-8">
-            {paginatedReviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-white rounded-2xl border border-brand-cream p-6 shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-brand-cream rounded-full flex items-center justify-center text-brand-brown font-bold text-sm">
-                      {review.user[0]}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-stone-900">
-                        {review.user}
-                      </h4>
-                      <p className="text-[10px] text-stone-400 uppercase tracking-widest">
-                        {review.date}
-                      </p>
-                    </div>
+        {reviews.length > 0 && (
+          <div id="reviews" className="mb-24 scroll-mt-24">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-brand-green/10 rounded-xl flex items-center justify-center text-brand-green">
+                    <MessageCircle size={24} />
                   </div>
-                  <div className="flex items-center gap-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-green">
+                    Testimonials
+                  </span>
+                </div>
+                <h2 className="text-4xl font-serif text-stone-900">
+                  Customer Reviews
+                </h2>
+              </div>
+              <div className="flex items-center gap-6 bg-white px-8 py-6 rounded-3xl border border-brand-cream shadow-sm">
+                <div className="text-center border-r border-stone-100 pr-6">
+                  <span className="block text-4xl font-bold text-stone-900 mb-1">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
+                    Average Rating
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        size={12}
+                        size={16}
                         className={
-                          i < review.rating
+                          i < Math.round(averageRating)
                             ? "fill-brand-gold text-brand-gold"
                             : "text-stone-200"
                         }
                       />
                     ))}
                   </div>
+                  <span className="text-xs text-stone-500 font-medium">
+                    Based on {reviewCount} reviews
+                  </span>
                 </div>
-                <p className="text-sm text-stone-600 leading-relaxed italic">
-                  "{review.comment}"
-                </p>
               </div>
-            ))}
-          </div>
-
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="p-2 rounded-full border border-brand-cream hover:bg-brand-cream disabled:opacity-30 transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <span className="text-sm font-medium text-stone-600">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage(Math.min(totalPages, currentPage + 1))
-                }
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-full border border-brand-cream hover:bg-brand-cream disabled:opacity-30 transition-colors"
-              >
-                <ChevronRight size={20} />
-              </button>
             </div>
-          )}
-        </div>
+
+            <div className="grid grid-cols-1 gap-6 mb-8">
+              {paginatedReviews.map((review) => {
+                const isCurrentUserReview =
+                  user?.id && review.user_id === user.id;
+
+                return (
+                  <div
+                    key={review.id}
+                    className={`bg-white rounded-2xl border p-6 shadow-sm transition-all ${
+                      isCurrentUserReview
+                        ? "border-brand-green ring-1 ring-brand-green/20"
+                        : "border-brand-cream"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-brand-cream rounded-full flex items-center justify-center text-brand-brown font-bold text-sm relative">
+                          {review.user_name?.[0] || "A"}
+                          {isCurrentUserReview && (
+                            <div className="absolute -top-1 -right-1 bg-brand-green text-white rounded-full p-0.5 border-2 border-white">
+                              <Check size={8} strokeWidth={4} />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-stone-900">
+                              {review.user_name}
+                            </h4>
+                            {isCurrentUserReview && (
+                              <span className="text-[9px] font-bold uppercase tracking-widest bg-brand-green/10 text-brand-green px-2 py-0.5 rounded">
+                                Your Review
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-stone-400 uppercase tracking-widest">
+                            {new Date(review.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      {review.rating && (
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={12}
+                              className={
+                                i < review.rating
+                                  ? "fill-brand-gold text-brand-gold"
+                                  : "text-stone-200"
+                              }
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-stone-600 leading-relaxed italic">
+                        "{review.comment}"
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-full border border-brand-cream hover:bg-brand-cream disabled:opacity-30 transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <span className="text-sm font-medium text-stone-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-full border border-brand-cream hover:bg-brand-cream disabled:opacity-30 transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* More Products Section */}
         {recommendedProducts.length > 0 && (
@@ -522,6 +723,26 @@ export default function ProductPage({
                       />
                     </div>
                     <div className="p-4 text-center">
+                      <div className="flex justify-center items-center gap-1.5 mb-2">
+                        <div className="flex items-center gap-0.5 text-brand-gold">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={10}
+                              className={
+                                i < Math.round(p.rating || 0)
+                                  ? "fill-brand-gold text-brand-gold"
+                                  : "text-stone-200"
+                              }
+                            />
+                          ))}
+                        </div>
+                        {(p.review_count || 0) > 0 && (
+                          <span className="text-[9px] text-stone-400 font-medium">
+                            ({p.review_count})
+                          </span>
+                        )}
+                      </div>
                       <h4 className="text-sm font-serif text-stone-900 mb-2 group-hover:text-brand-brown transition-colors">
                         {p.name}
                       </h4>

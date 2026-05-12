@@ -150,14 +150,23 @@ export default function ProductListing() {
                 )}
               </div>
               <div className="flex flex-col flex-grow text-center">
-                <div className="flex justify-center items-center gap-1 mb-2 text-brand-gold">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={12}
-                      className="fill-brand-gold text-brand-gold"
-                    />
-                  ))}
+                <div className="flex justify-center items-center gap-2 mb-2">
+                  <div className="flex items-center gap-0.5 text-brand-gold">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={12}
+                        className={
+                          i < Math.round(product.rating || 0)
+                            ? "fill-brand-gold text-brand-gold"
+                            : "text-stone-200"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[10px] text-stone-400 font-medium">
+                    {product.rating ? product.rating.toFixed(1) : "0.0"} ({(product.review_count || 0)})
+                  </span>
                 </div>
                 <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
                   {product.name}

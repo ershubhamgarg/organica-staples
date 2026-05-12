@@ -10,6 +10,8 @@ export interface Product {
   weight: string;
   benefits: string[];
   discount?: number | null;
+  rating?: number;
+  review_count?: number;
 }
 
 export function getProductThumbnail(product: Product): string {
