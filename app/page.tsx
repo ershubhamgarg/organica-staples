@@ -115,7 +115,7 @@ Message: ${formData.message}
       <HelpMeDecide />
 
       {/* Values Section */}
-      <section className="bg-white py-32 px-4 sm:px-6 lg:px-8 border-t border-brand-cream">
+      <section className="bg-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 border-t border-brand-cream">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
           <div className="flex flex-col items-center group">
             <div className="w-20 h-20 bg-brand-cream flex items-center justify-center mb-8 text-brand-green group-hover:scale-110 transition-transform duration-500">
@@ -183,7 +183,7 @@ Message: ${formData.message}
       </section>
 
       {/* Contact Us Section */}
-      <section className="bg-brand-cream py-32 px-4 sm:px-6 lg:px-8">
+      <section className="bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <Leaf

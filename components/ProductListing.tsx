@@ -63,7 +63,7 @@ export default function ProductListing() {
   return (
     <section
       id="shop"
-      className="py-32 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
+      className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
     >
       <div className="flex flex-col items-center text-center mb-16">
         <Leaf className="text-brand-green mb-4 fill-brand-green/20" size={32} />

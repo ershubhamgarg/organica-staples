@@ -173,7 +173,7 @@ export default function HelpMeDecide() {
   };
 
   return (
-    <section className="bg-brand-cream/30 py-24 px-4 sm:px-6 lg:px-8 border-y border-brand-cream/50">
+    <section className="bg-brand-cream/30 pt-12 pb-24 px-4 sm:px-6 lg:px-8 border-y border-brand-cream/50">
       <div className="max-w-7xl mx-auto">
         {/* Section Header - Now Centered and Full Width */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
