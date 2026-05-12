@@ -22,7 +22,6 @@ export default function Header() {
   const { user, signOut } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0); // 0 to 1
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
@@ -31,11 +30,7 @@ export default function Header() {
   useEffect(() => {
     setMounted(true);
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setIsScrolled(scrollY > 20);
-      // Transition over 120px for extra smoothness
-      const progress = Math.min(scrollY / 120, 1);
-      setScrollProgress(progress);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
 
@@ -69,34 +64,25 @@ export default function Header() {
         className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-2" : "bg-brand-cream py-3"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 md:h-14">
-          {/* Logo - Smoothly animated based on scroll progress */}
+          {/* Logo - Static and contained within header */}
           <div className="flex items-center flex-1">
             <Link
               href="/"
-              className="relative z-50 hover:scale-105 transition-transform duration-300"
-              style={{
-                marginBottom: `${(1 - scrollProgress) * -56}px`, // Transition from -56px to 0
-                transform: `translateY(${(1 - scrollProgress) * 10}px)`, // Slight upward lift as it hangs
-              }}
+              className="relative z-50 transition-transform duration-300 hover:scale-105"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <div
-                className="relative flex items-center justify-center"
-                style={{
-                  width: `${128 - scrollProgress * 80}px`, // 128px (32) to 48px (12)
-                  height: `${128 - scrollProgress * 80}px`,
-                  transition: "none", // Remove CSS transition to link directly to scroll
-                }}
-              >
+              <div>
                 <Image
-                  src="/logo.png"
+                  src="/logo-horizon.png"
                   alt="Amritya Organics"
-                  fill
+                  width={175}
+                  height={200}
                   className="object-contain"
-                  style={{
-                    filter: `drop-shadow(0 4px 6px rgba(0,0,0,${(1 - scrollProgress) * 0.15}))`,
-                  }}
                   priority
+                  style={{
+                    border: "none",
+                    flex: 1,
+                  }}
                 />
               </div>
             </Link>
@@ -210,7 +196,7 @@ export default function Header() {
       {/* Mobile Menu Overlay */}
       <div
         className={`fixed inset-0 bg-brand-cream z-40 transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
-        style={{ top: isScrolled ? "64px" : "80px" }} // Start below header
+        style={{ top: "64px" }} // Start below header
       >
         <div className="flex flex-col p-8 gap-8">
           <Link
