@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ArrowRight, Leaf } from "lucide-react";
+import HelpMeDecide from "@/components/HelpMeDecide";
 import ProductListing from "@/components/ProductListing";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
@@ -111,6 +112,8 @@ Message: ${formData.message}
       {/* Product Grid Section */}
       <ProductListing />
 
+      <HelpMeDecide />
+
       {/* Values Section */}
       <section className="bg-white py-32 px-4 sm:px-6 lg:px-8 border-t border-brand-cream">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
@@ -191,8 +194,8 @@ Message: ${formData.message}
               Get in Touch
             </h2>
             <p className="text-stone-600 max-w-lg mx-auto font-light leading-relaxed">
-              Have a question or feedback? We'd love to hear from you. Send us a
-              message and we'll respond shortly.
+              Have a question or feedback? We&apos;d love to hear from you. Send
+              us a message and we&apos;ll respond shortly.
             </p>
           </div>
           <form
