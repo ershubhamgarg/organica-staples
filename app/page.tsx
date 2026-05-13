@@ -180,7 +180,7 @@ Message: ${formData.message}
                 {
                   icon: MapPin,
                   title: "Ethically Sourced",
-                  body: "We partner with communities worldwide to bring you ingredients that are harvested with integrity and care.",
+                  body: "We partner with communities nation-wide to bring you ingredients that are harvested with integrity and care.",
                 },
               ].map((item) => {
                 const Icon = item.icon;
@@ -208,10 +208,7 @@ Message: ${formData.message}
       </section>
 
       {/* Contact Us Section */}
-      <section
-        id="contact"
-        className="bg-[#fbfaf7] py-24 px-4 sm:px-6 lg:px-8"
-      >
+      <section id="contact" className="bg-[#fbfaf7] py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-12 items-start">
           <div className="lg:pt-8">
             <div className="inline-flex items-center gap-3 text-brand-green mb-5">

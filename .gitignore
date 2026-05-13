@@ -67,6 +67,7 @@ ios/DerivedData/
 .idea/
 
 # Misc
+mobile/.env
 # .env.*
 # .env
 # .env.*.local
