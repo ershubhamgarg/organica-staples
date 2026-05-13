@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Image from "next/image";
 import "./globals.css";
 import Header from "@/components/Header";
 
@@ -40,12 +41,15 @@ export default function RootLayout({
         <footer className="bg-stone-900 text-stone-300 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-xl font-serif text-white mb-4">
-                Amritya Organics
-              </h3>
-              <p className="text-sm text-stone-400 max-w-xs">
+              <Image
+                src="/logo-white.png"
+                alt="Amritya Organics"
+                width={250}
+                height={10}
+              />
+              {/* <p className="text-sm text-stone-400 max-w-xs">
                 Curating the finest organic goods for your everyday nourishment.
-              </p>
+              </p> */}
             </div>
             <div>
               <h4 className="text-white font-medium mb-4">Explore</h4>

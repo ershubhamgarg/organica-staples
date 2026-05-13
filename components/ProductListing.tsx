@@ -63,31 +63,38 @@ export default function ProductListing() {
   return (
     <section
       id="shop"
-      className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
+      className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
     >
-      <div className="flex flex-col items-center text-center mb-16">
-        <Leaf className="text-brand-green mb-4 fill-brand-green/20" size={32} />
-        <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4">
-          Our Essentials
-        </h2>
-        <p className="text-stone-600 max-w-lg mx-auto font-light leading-relaxed">
+      <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 items-end mb-14">
+        <div>
+          <div className="inline-flex items-center gap-3 text-brand-green mb-4">
+            <Leaf className="fill-brand-green/15" size={25} />
+            <span className="text-xs uppercase tracking-[0.28em] font-bold">
+              Curated pantry
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4 leading-tight">
+            Our Essentials
+          </h2>
+        </div>
+        <p className="text-stone-600 max-w-2xl lg:ml-auto font-light leading-relaxed lg:text-right">
           The foundation of a wholesome pantry. Each product is carefully
           selected to bring the highest nutritional value to your table.
         </p>
       </div>
 
       {/* Filters & Sorting */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-brand-brown/10 pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-y border-brand-brown/10 py-5">
         {/* Categories */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${
+              className={`px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors ${
                 selectedCategory === category
                   ? "bg-brand-brown text-white"
-                  : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
+                  : "bg-white text-brand-brown border border-brand-brown/10 hover:bg-brand-brown/10"
               }`}
             >
               {category}
@@ -100,7 +107,7 @@ export default function ProductListing() {
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="appearance-none bg-transparent border border-brand-brown/30 text-brand-brown text-xs font-medium uppercase tracking-widest py-2 pl-4 pr-10 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-brown cursor-pointer"
+            className="appearance-none bg-white border border-brand-brown/20 text-brand-brown text-xs font-semibold uppercase tracking-widest py-2.5 pl-4 pr-10 focus:outline-none focus:ring-1 focus:ring-brand-brown cursor-pointer"
           >
             <option value="default">Sort by: Default</option>
             <option value="price-asc">Price: Low to High</option>
@@ -114,7 +121,7 @@ export default function ProductListing() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-14">
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
           const hasHighDiscount = hasHighProductDiscount(product);
@@ -125,21 +132,21 @@ export default function ProductListing() {
             <Link
               href={`/product/${product.id}`}
               key={product.id}
-              className="group flex flex-col"
+              className="group flex flex-col bg-white border border-brand-brown/10 p-3 shadow-[0_20px_70px_-55px_rgba(45,36,32,0.55)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_80px_-48px_rgba(45,36,32,0.6)]"
             >
-              <div className="relative aspect-video w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100 mb-6">
                 <ProductImageCarousel
                   product={product}
                   imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors duration-500" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
+                <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/10 transition-colors duration-500" />
+                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
                   {product.category}
                 </div>
                 {hasDiscount && (
                   <div
-                    className={`absolute left-4 top-4 text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+                    className={`absolute left-3 top-3 text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
                       hasHighDiscount
                         ? "bg-brand-gold text-stone-950 ring-2 ring-white/80"
                         : "bg-brand-green"
@@ -149,7 +156,7 @@ export default function ProductListing() {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col flex-grow text-center">
+              <div className="flex flex-col flex-grow text-center px-2 pb-3">
                 <div className="flex justify-center items-center gap-2 mb-2">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
@@ -165,7 +172,8 @@ export default function ProductListing() {
                     ))}
                   </div>
                   <span className="text-[10px] text-stone-400 font-medium">
-                    {product.rating ? product.rating.toFixed(1) : "0.0"} ({(product.review_count || 0)})
+                    {product.rating ? product.rating.toFixed(1) : "0.0"} (
+                    {product.review_count || 0})
                   </span>
                 </div>
                 <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">

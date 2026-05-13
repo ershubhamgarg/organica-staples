@@ -404,7 +404,7 @@ export default function HelpMeDecide() {
                         </p>
                         <div className="pt-4 border-t border-brand-brown/5 mt-auto">
                           <p className="text-[11px] text-stone-700 font-medium italic leading-relaxed">
-                            "{item.action}"
+                            &quot;{item.action}&quot;
                           </p>
                         </div>
                       </article>

@@ -31,6 +31,16 @@ import {
 
 const REVIEWS_PER_PAGE = 3;
 
+type Review = {
+  id: string;
+  product_id: string;
+  user_id: string | null;
+  user_name: string | null;
+  rating: number | null;
+  comment: string | null;
+  created_at: string;
+};
+
 export default function ProductPage({
   params,
 }: {
@@ -43,7 +53,7 @@ export default function ProductPage({
   const isLoading = useProductStore((state) => state.isLoading);
   const error = useProductStore((state) => state.error);
   const [product, setProduct] = useState<Product | null>(null);
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
   const { addToCart } = useCartStore();
   const { user } = useUserStore();
@@ -116,7 +126,9 @@ export default function ProductPage({
       };
     }
 
-    const reviewsWithRating = reviews.filter((r) => r.rating);
+    const reviewsWithRating = reviews.filter(
+      (r): r is Review & { rating: number } => typeof r.rating === "number",
+    );
     const total = reviewsWithRating.reduce((acc, r) => acc + r.rating, 0);
     const count = reviewsWithRating.length;
 
@@ -179,10 +191,11 @@ export default function ProductPage({
         .order("created_at", { ascending: false });
 
       if (refreshedReviews) setReviews(refreshedReviews);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setSubmitMessage({
         type: "error",
-        text: err.message || "Failed to submit feedback.",
+        text:
+          err instanceof Error ? err.message : "Failed to submit feedback.",
       });
     } finally {
       setIsSubmitting(false);
@@ -237,6 +250,41 @@ export default function ProductPage({
     <div className="min-h-screen bg-brand-cream pt-12 pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24">
+          <div className="lg:hidden bg-white rounded-3xl border border-brand-cream p-6 shadow-sm">
+            <h1 className="text-3xl font-serif text-stone-900 mb-4 leading-tight">
+              {product.name}
+            </h1>
+
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={16}
+                    className={
+                      i < Math.round(averageRating)
+                        ? "fill-brand-gold text-brand-gold"
+                        : "text-stone-200"
+                    }
+                  />
+                ))}
+                <span className="ml-2 text-sm font-bold text-stone-900">
+                  {averageRating.toFixed(1)}
+                </span>
+              </div>
+              <a
+                href="#reviews"
+                className="text-xs text-stone-500 font-medium hover:text-brand-green hover:underline transition-colors border-l border-stone-200 pl-4"
+              >
+                {reviewCount} customer reviews
+              </a>
+            </div>
+
+            <span className="inline-block px-3 py-1 bg-brand-cream text-brand-brown text-[10px] font-bold rounded-full uppercase tracking-[0.2em]">
+              {product.category}
+            </span>
+          </div>
+
           {/* Product Image & Info - Left Column (5/12) */}
           <div className="lg:col-span-5 space-y-8">
             <div className="sticky top-24 space-y-8">
@@ -261,7 +309,7 @@ export default function ProductPage({
               </div>
 
               {/* Nutritional Content Section - Moved here for better balance */}
-              <div className="bg-white rounded-3xl border border-brand-cream p-8 shadow-sm">
+              <div className="hidden lg:block bg-white rounded-3xl border border-brand-cream p-8 shadow-sm">
                 <h4 className="text-sm font-bold text-stone-900 mb-6 flex items-center gap-2 uppercase tracking-widest">
                   <Leaf className="text-brand-green" size={18} />
                   Nutritional Value
@@ -297,36 +345,38 @@ export default function ProductPage({
           <div className="lg:col-span-7 flex flex-col space-y-8">
             <div className="bg-white rounded-3xl border border-brand-cream p-8 md:p-10 shadow-sm">
               <div className="mb-6">
-                <span className="inline-block px-3 py-1 bg-brand-cream text-brand-brown text-[10px] font-bold rounded-full mb-4 uppercase tracking-[0.2em]">
-                  {product.category}
-                </span>
-                <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4 leading-tight">
-                  {product.name}
-                </h1>
+                <div className="hidden lg:block">
+                  <span className="inline-block px-3 py-1 bg-brand-cream text-brand-brown text-[10px] font-bold rounded-full mb-4 uppercase tracking-[0.2em]">
+                    {product.category}
+                  </span>
+                  <h1 className="text-4xl md:text-5xl font-serif text-stone-900 mb-4 leading-tight">
+                    {product.name}
+                  </h1>
 
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={16}
-                        className={
-                          i < Math.round(averageRating)
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-stone-200"
-                        }
-                      />
-                    ))}
-                    <span className="ml-2 text-sm font-bold text-stone-900">
-                      {averageRating.toFixed(1)}
-                    </span>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={
+                            i < Math.round(averageRating)
+                              ? "fill-brand-gold text-brand-gold"
+                              : "text-stone-200"
+                          }
+                        />
+                      ))}
+                      <span className="ml-2 text-sm font-bold text-stone-900">
+                        {averageRating.toFixed(1)}
+                      </span>
+                    </div>
+                    <a
+                      href="#reviews"
+                      className="text-xs text-stone-500 font-medium hover:text-brand-green hover:underline transition-colors border-l border-stone-200 pl-4"
+                    >
+                      {reviewCount} customer reviews
+                    </a>
                   </div>
-                  <a
-                    href="#reviews"
-                    className="text-xs text-stone-500 font-medium hover:text-brand-green hover:underline transition-colors border-l border-stone-200 pl-4"
-                  >
-                    {reviewCount} customer reviews
-                  </a>
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
@@ -445,6 +495,36 @@ export default function ProductPage({
                     <span className="text-sm text-stone-600 font-medium">
                       {benefit}
                     </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:hidden bg-white rounded-3xl border border-brand-cream p-8 shadow-sm">
+              <h4 className="text-sm font-bold text-stone-900 mb-6 flex items-center gap-2 uppercase tracking-widest">
+                <Leaf className="text-brand-green" size={18} />
+                Nutritional Value
+                <span className="text-[10px] text-stone-400 font-normal lowercase tracking-normal">
+                  (per 100g)
+                </span>
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Energy", value: "364 kcal" },
+                  { label: "Protein", value: "12.5g" },
+                  { label: "Carbs", value: "71.2g" },
+                  { label: "Fibre", value: "10.8g" },
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="p-4 bg-brand-cream/20 rounded-2xl border border-brand-cream/50"
+                  >
+                    <p className="text-[10px] text-stone-400 uppercase tracking-wider mb-1 font-bold">
+                      {stat.label}
+                    </p>
+                    <p className="text-base font-bold text-brand-brown">
+                      {stat.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -606,6 +686,8 @@ export default function ProductPage({
               {paginatedReviews.map((review) => {
                 const isCurrentUserReview =
                   user?.id && review.user_id === user.id;
+                const reviewRating =
+                  typeof review.rating === "number" ? review.rating : null;
 
                 return (
                   <div
@@ -642,14 +724,14 @@ export default function ProductPage({
                           </p>
                         </div>
                       </div>
-                      {review.rating && (
+                      {reviewRating !== null && (
                         <div className="flex items-center gap-0.5">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
                               size={12}
                               className={
-                                i < review.rating
+                                i < reviewRating
                                   ? "fill-brand-gold text-brand-gold"
                                   : "text-stone-200"
                               }
@@ -660,7 +742,7 @@ export default function ProductPage({
                     </div>
                     {review.comment && (
                       <p className="text-sm text-stone-600 leading-relaxed italic">
-                        "{review.comment}"
+                        &quot;{review.comment}&quot;
                       </p>
                     )}
                   </div>
