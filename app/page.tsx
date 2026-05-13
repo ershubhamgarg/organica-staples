@@ -68,14 +68,16 @@ Message: ${formData.message}
             src="https://qdrkqtcbninswzieszfx.supabase.co/storage/v1/object/sign/images/ChatGPT%20Image%20May%207,%202026,%2009_51_47%20AM.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV85YWMzMTk3Ny0wZTk5LTQ1NjQtODM2OC1iM2IzZTQzMzIyNDQiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJpbWFnZXMvQ2hhdEdQVCBJbWFnZSBNYXkgNywgMjAyNiwgMDlfNTFfNDcgQU0ucG5nIiwiaWF0IjoxNzc4MTI3NzIyLCJleHAiOjE4MDk2NjM3MjJ9.wG0Mdodjvtd8fKToIpBI2z3mRjfgi4ZnxXWxNwb3wFI"
             alt="Organic farming"
             fill
-            className="object-cover object-center opacity-80"
+            className="object-cover object-center opacity-60"
             priority
           />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(20,22,17,0.86)_0%,rgba(20,22,17,0.58)_48%,rgba(20,22,17,0.25)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-48 bg-[linear-gradient(0deg,#fbfaf7_0%,rgba(251,250,247,0)_100%)]" />
         </div>
 
-        <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8 pb-20 pt-40">
+        <div
+          // style={{ backgroundColor: "red" }}
+          className="relative z-10 w-full px-4 sm:px-6 lg:px-8 pb-20 pt-40"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-3 mb-7 text-brand-cream/90">
