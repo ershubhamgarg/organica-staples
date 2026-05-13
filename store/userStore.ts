@@ -11,6 +11,7 @@ interface UserState {
   isLoading: boolean;
   error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   fetchUser: () => Promise<void>;
@@ -40,6 +41,21 @@ export const useUserStore = create<UserState>()(
             const { useOrderStore } = await import("./orderStore");
             await useOrderStore.getState().fetchOrders(data.user.id);
           }
+        } catch (error) {
+          set({ error: (error as AuthError).message, isLoading: false });
+        }
+      },
+
+      signInWithGoogle: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: `${window.location.origin}/`,
+            },
+          });
+          if (error) throw error;
         } catch (error) {
           set({ error: (error as AuthError).message, isLoading: false });
         }

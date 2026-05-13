@@ -4,11 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
+import { supabase } from "@/utils/supabase";
 import {
   ShoppingCart,
   Menu,
-  Search,
-  Leaf,
   User,
   LogOut,
   ChevronDown,
@@ -19,7 +18,7 @@ import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { items } = useCartStore();
-  const { user, signOut } = useUserStore();
+  const { user, signOut, fetchUser } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,7 +27,21 @@ export default function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = window.requestAnimationFrame(() => {
+      setMounted(true);
+    });
+    void fetchUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        window.setTimeout(() => {
+          void fetchUser();
+        }, 0);
+      }
+    });
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -44,10 +57,12 @@ export default function Header() {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
+      window.cancelAnimationFrame(frame);
+      subscription.unsubscribe();
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [fetchUser]);
 
   // Prevent scrolling when menu is open
   useEffect(() => {

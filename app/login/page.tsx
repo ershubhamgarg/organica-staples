@@ -10,7 +10,8 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, signUp, isLoading, error } = useUserStore();
+  const { signIn, signInWithGoogle, signUp, isLoading, error } =
+    useUserStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,6 +22,10 @@ export default function LoginPage() {
       await signIn(email, password);
     }
     router.push("/");
+  };
+
+  const handleGoogleSignIn = async () => {
+    await signInWithGoogle();
   };
 
   return (
@@ -43,6 +48,26 @@ export default function LoginPage() {
               ? "Start your organic journey today"
               : "Welcome back! Please enter your details"}
           </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 border border-stone-200 bg-white hover:bg-stone-50 text-stone-800 font-medium py-2.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span className="flex h-5 w-5 items-center justify-center rounded-full border border-stone-200 text-sm font-semibold text-stone-700">
+            G
+          </span>
+          Continue with Google
+        </button>
+
+        <div className="my-6 flex items-center gap-4">
+          <div className="h-px flex-1 bg-stone-200" />
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-stone-400">
+            or
+          </span>
+          <div className="h-px flex-1 bg-stone-200" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
