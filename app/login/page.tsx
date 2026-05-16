@@ -36,7 +36,7 @@ export default function LoginPage() {
             <div className="flex items-center gap-2 mb-2">
               <Leaf className="text-brand-green" size={24} />
               <span className="text-xl font-sans text-brand-brown tracking-[0.35em] uppercase font-light">
-                Organica
+                Amritya Organics
               </span>
             </div>
           </Link>

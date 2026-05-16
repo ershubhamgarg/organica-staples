@@ -6,6 +6,19 @@ import { supabase } from "@/utils/supabase";
 import { User, AuthError } from "@supabase/supabase-js";
 import { useCartStore } from "./cartStore";
 
+const getSiteUrl = () => {
+  let url =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.NEXT_PUBLIC_VERCEL_URL ??
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+
+  if (!url.startsWith("http")) {
+    url = `https://${url}`;
+  }
+
+  return url.endsWith("/") ? url : `${url}/`;
+};
+
 interface UserState {
   user: User | null;
   isLoading: boolean;
@@ -52,7 +65,7 @@ export const useUserStore = create<UserState>()(
           const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: `${window.location.origin}/`,
+              redirectTo: getSiteUrl(),
             },
           });
           if (error) throw error;

@@ -121,3 +121,5 @@ yarn-error.*
 #android
 
 .next
+
+.env.local

@@ -2,7 +2,7 @@
 
 import { CartItem, useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { useAddressStore } from "@/store/addressStore";
+import { Address, useAddressStore } from "@/store/addressStore";
 import { useOrderStore } from "@/store/orderStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -39,10 +39,17 @@ export default function CheckoutPage() {
   );
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const [guestAddress, setGuestAddress] = useState<Address | null>(null);
+  const checkoutAddresses = user
+    ? addresses
+    : guestAddress
+      ? [guestAddress]
+      : [];
 
   const [newAddress, setNewAddress] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
     city: "",
     state: "",
@@ -50,7 +57,7 @@ export default function CheckoutPage() {
   });
 
   // Payment state
-  const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<string | null>("cod");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -173,10 +180,10 @@ export default function CheckoutPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/profile"
+              href={user ? "/profile" : "/"}
               className="inline-block bg-stone-100 hover:bg-stone-200 text-stone-800 font-medium px-8 py-3 rounded-xl transition-colors"
             >
-              View Orders
+              {user ? "View Orders" : "Shop More"}
             </Link>
             <Link
               href="/"
@@ -224,9 +231,16 @@ export default function CheckoutPage() {
 
               {!addressConfirmed ? (
                 <div>
-                  {addresses.length > 0 && !showNewAddressForm && (
+                  {!user && !showNewAddressForm && !guestAddress && (
+                    <p className="text-sm text-stone-500 mb-6">
+                      Continue as a guest by adding your delivery details. Email
+                      and contact number are required for order updates.
+                    </p>
+                  )}
+
+                  {checkoutAddresses.length > 0 && !showNewAddressForm && (
                     <div className="space-y-4 mb-6">
-                      {addresses.map((addr) => (
+                      {checkoutAddresses.map((addr) => (
                         <label
                           key={addr.id}
                           className={`flex items-start gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${
@@ -280,12 +294,23 @@ export default function CheckoutPage() {
                       className="space-y-4 mb-6 border border-stone-200 p-4 rounded-xl bg-stone-50/50"
                       onSubmit={async (e) => {
                         e.preventDefault();
+                        const addressToSave = {
+                          name: newAddress.name,
+                          phone: newAddress.phone,
+                          email: user ? undefined : newAddress.email,
+                          address: newAddress.address,
+                          city: newAddress.city,
+                          state: newAddress.state,
+                          zipCode: newAddress.zipCode,
+                        };
+
                         if (user) {
-                          await addAddress(user.id, newAddress);
+                          await addAddress(user.id, addressToSave);
                           setShowNewAddressForm(false);
                           setNewAddress({
                             name: "",
                             phone: "",
+                            email: "",
                             address: "",
                             city: "",
                             state: "",
@@ -294,7 +319,14 @@ export default function CheckoutPage() {
                           // Select the newest address if available (this is optimistic, exact ID depends on DB update)
                           // For a real app, `addAddress` might return the created address, but for now we just close the form.
                         } else {
-                          router.push("/login");
+                          const localAddress = {
+                            id: crypto.randomUUID(),
+                            user_id: null,
+                            ...addressToSave,
+                          };
+                          setGuestAddress(localAddress);
+                          setSelectedAddressId(localAddress.id);
+                          setShowNewAddressForm(false);
                         }
                       }}
                     >
@@ -334,6 +366,25 @@ export default function CheckoutPage() {
                           />
                         </div>
                       </div>
+                      {!user && (
+                        <div>
+                          <label className="block text-sm font-medium text-stone-700 mb-1">
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={newAddress.email}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                email: e.target.value,
+                              })
+                            }
+                            className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:ring-2 focus:ring-emerald-600 focus:border-transparent outline-none"
+                          />
+                        </div>
+                      )}
                       <div>
                         <label className="block text-sm font-medium text-stone-700 mb-1">
                           Flat, House no., Building, Company, Apartment
@@ -396,7 +447,12 @@ export default function CheckoutPage() {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setShowNewAddressForm(false)}
+                          onClick={() => {
+                            setShowNewAddressForm(false);
+                            if (!user && !guestAddress) {
+                              setSelectedAddressId(null);
+                            }
+                          }}
                           className="px-6 py-2 rounded-lg font-medium text-stone-600 hover:bg-stone-200 transition-colors"
                         >
                           Cancel
@@ -419,7 +475,7 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <div className="text-stone-600 text-sm">
-                  {addresses
+                  {checkoutAddresses
                     .filter((a) => a.id === selectedAddressId)
                     .map((addr) => (
                       <div key={addr.id}>
@@ -431,6 +487,7 @@ export default function CheckoutPage() {
                           {addr.city}, {addr.state} {addr.zipCode}
                         </p>
                         <p className="mt-1">Phone: {addr.phone}</p>
+                        {addr.email && <p>Email: {addr.email}</p>}
                       </div>
                     ))}
                 </div>
@@ -472,117 +529,121 @@ export default function CheckoutPage() {
                   </div>
                 </label>
 
-                {/* Card Payment */}
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${
-                    selectedPayment === "card"
-                      ? "border-emerald-600 bg-emerald-50/30"
-                      : "border-stone-200 hover:border-emerald-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="card"
-                    checked={selectedPayment === "card"}
-                    onChange={() => setSelectedPayment("card")}
-                    className="w-4 h-4 text-emerald-600 border-stone-300 focus:ring-emerald-600"
-                  />
-                  <div className="w-full">
-                    <span className="font-medium text-stone-900 block">
-                      Credit / Debit Card
-                    </span>
-                    {selectedPayment === "card" && (
-                      <div className="mt-4 space-y-3">
-                        <input
-                          type="text"
-                          placeholder="Card Number"
-                          className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
-                        />
-                        <div className="flex gap-3">
+                {/*
+                  Card Payment
+                  <label
+                    className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${
+                      selectedPayment === "card"
+                        ? "border-emerald-600 bg-emerald-50/30"
+                        : "border-stone-200 hover:border-emerald-300"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="card"
+                      checked={selectedPayment === "card"}
+                      onChange={() => setSelectedPayment("card")}
+                      className="w-4 h-4 text-emerald-600 border-stone-300 focus:ring-emerald-600"
+                    />
+                    <div className="w-full">
+                      <span className="font-medium text-stone-900 block">
+                        Credit / Debit Card
+                      </span>
+                      {selectedPayment === "card" && (
+                        <div className="mt-4 space-y-3">
                           <input
                             type="text"
-                            placeholder="MM/YY"
+                            placeholder="Card Number"
                             className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
                           />
-                          <input
-                            type="text"
-                            placeholder="CVV"
-                            className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </label>
-
-                {/* UPI Payment */}
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${
-                    selectedPayment === "upi"
-                      ? "border-emerald-600 bg-emerald-50/30"
-                      : "border-stone-200 hover:border-emerald-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="upi"
-                    checked={selectedPayment === "upi"}
-                    onChange={() => setSelectedPayment("upi")}
-                    className="w-4 h-4 text-emerald-600 border-stone-300 focus:ring-emerald-600"
-                  />
-                  <div className="w-full">
-                    <span className="font-medium text-stone-900 block">
-                      UPI
-                    </span>
-                    {selectedPayment === "upi" && (
-                      <div className="mt-4">
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            placeholder="Enter UPI ID (e.g. username@upi)"
-                            value={upiId}
-                            onChange={(e) => {
-                              setUpiId(e.target.value);
-                              setUpiVerificationResult(null); // Reset on typing
-                            }}
-                            className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              verifyUpiId();
-                            }}
-                            disabled={
-                              !upiId ||
-                              isVerifyingUpi ||
-                              upiVerificationResult?.success
-                            }
-                            className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-                          >
-                            {isVerifyingUpi
-                              ? "..."
-                              : upiVerificationResult?.success
-                                ? "Verified"
-                                : "Verify"}
-                          </button>
-                        </div>
-
-                        {upiVerificationResult && (
-                          <div
-                            className={`mt-2 text-xs font-medium ${upiVerificationResult.success ? "text-emerald-600" : "text-red-500"}`}
-                          >
-                            {upiVerificationResult.success
-                              ? `✓ Verified: ${upiVerificationResult.name}`
-                              : `✗ ${upiVerificationResult.error}`}
+                          <div className="flex gap-3">
+                            <input
+                              type="text"
+                              placeholder="MM/YY"
+                              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
+                            />
+                            <input
+                              type="text"
+                              placeholder="CVV"
+                              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
+                            />
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </label>
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                */}
+
+                {/*
+                  UPI Payment
+                  <label
+                    className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-colors ${
+                      selectedPayment === "upi"
+                        ? "border-emerald-600 bg-emerald-50/30"
+                        : "border-stone-200 hover:border-emerald-300"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="upi"
+                      checked={selectedPayment === "upi"}
+                      onChange={() => setSelectedPayment("upi")}
+                      className="w-4 h-4 text-emerald-600 border-stone-300 focus:ring-emerald-600"
+                    />
+                    <div className="w-full">
+                      <span className="font-medium text-stone-900 block">
+                        UPI
+                      </span>
+                      {selectedPayment === "upi" && (
+                        <div className="mt-4">
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Enter UPI ID (e.g. username@upi)"
+                              value={upiId}
+                              onChange={(e) => {
+                                setUpiId(e.target.value);
+                                setUpiVerificationResult(null);
+                              }}
+                              className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-600 outline-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                verifyUpiId();
+                              }}
+                              disabled={
+                                !upiId ||
+                                isVerifyingUpi ||
+                                upiVerificationResult?.success
+                              }
+                              className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                            >
+                              {isVerifyingUpi
+                                ? "..."
+                                : upiVerificationResult?.success
+                                  ? "Verified"
+                                  : "Verify"}
+                            </button>
+                          </div>
+
+                          {upiVerificationResult && (
+                            <div
+                              className={`mt-2 text-xs font-medium ${upiVerificationResult.success ? "text-emerald-600" : "text-red-500"}`}
+                            >
+                              {upiVerificationResult.success
+                                ? `✓ Verified: ${upiVerificationResult.name}`
+                                : `✗ ${upiVerificationResult.error}`}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                */}
               </div>
 
               <div className="mt-8 pt-6 border-t border-stone-100">
@@ -594,15 +655,15 @@ export default function CheckoutPage() {
                       !upiVerificationResult?.success)
                   }
                   onClick={async () => {
-                    if (!user || !selectedAddressId || !selectedPayment) return;
-                    const address = addresses.find(
+                    if (!selectedAddressId || !selectedPayment) return;
+                    const address = checkoutAddresses.find(
                       (a) => a.id === selectedAddressId,
                     );
                     if (!address) return;
 
                     try {
                       const placedOrder = await placeOrder(
-                        user.id,
+                        user?.id ?? null,
                         items,
                         address,
                         selectedPayment,
@@ -617,11 +678,15 @@ export default function CheckoutPage() {
                         paymentMethod: selectedPayment,
                       });
 
-                      clearCart(user.id);
+                      clearCart(user?.id);
                       setOrderPlaced(true);
                     } catch (error) {
                       console.error("Failed to place order", error);
-                      alert("Failed to place order. Please try again.");
+                      alert(
+                        error instanceof Error
+                          ? error.message
+                          : "Failed to place order. Please try again.",
+                      );
                     }
                   }}
                   className="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center gap-2"

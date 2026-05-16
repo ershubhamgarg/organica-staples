@@ -6,14 +6,18 @@ import { supabase } from "@/utils/supabase";
 
 export interface Address {
   id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   phone: string;
+  email?: string;
   address: string;
   city: string;
   state: string;
   zipCode: string;
 }
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Something went wrong";
 
 interface AddressState {
   addresses: Address[];
@@ -52,8 +56,8 @@ export const useAddressStore = create<AddressState>()(
           }
 
           set({ addresses: data || [], isLoading: false });
-        } catch (error: any) {
-          set({ error: error.message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error), isLoading: false });
         }
       },
 
@@ -89,8 +93,8 @@ export const useAddressStore = create<AddressState>()(
             addresses: [data, ...get().addresses],
             isLoading: false,
           });
-        } catch (error: any) {
-          set({ error: error.message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error), isLoading: false });
         }
       },
 
@@ -108,8 +112,8 @@ export const useAddressStore = create<AddressState>()(
             addresses: get().addresses.filter((a) => a.id !== addressId),
             isLoading: false,
           });
-        } catch (error: any) {
-          set({ error: error.message, isLoading: false });
+        } catch (error) {
+          set({ error: getErrorMessage(error), isLoading: false });
         }
       },
 
