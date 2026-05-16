@@ -8,6 +8,7 @@ import {
   Check,
   ShieldCheck,
   Truck,
+  Clock,
   Leaf,
   Minus,
   Plus,
@@ -20,7 +21,7 @@ import {
 import { useEffect, useState, use, useMemo } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import QuickAddButton from "@/components/QuickAddButton";
-import { Product } from "@/lib/data";
+import { isProductAvailable, Product } from "@/lib/data";
 import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
@@ -239,8 +240,10 @@ export default function ProductPage({
   const hasHighDiscount = hasHighProductDiscount(product);
   const discountPercent = getDiscountPercent(product);
   const discountedPrice = getDiscountedPrice(product);
+  const available = isProductAvailable(product);
 
   const handleAddToCart = () => {
+    if (!available) return;
     addToCart(product, quantity, user?.id);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -304,6 +307,11 @@ export default function ProductPage({
                     }`}
                   >
                     {hasHighDiscount ? "Mega Deal" : `${discountPercent}% Off`}
+                  </div>
+                )}
+                {!available && (
+                  <div className="absolute bottom-6 left-6 bg-brand-brown text-white shadow-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.2em]">
+                    Available soon
                   </div>
                 )}
               </div>
@@ -436,47 +444,68 @@ export default function ProductPage({
               </div>
 
               <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex items-center border border-brand-brown/10 rounded-2xl bg-brand-cream/10 h-14 p-1">
+                {available ? (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex items-center border border-brand-brown/10 rounded-2xl bg-brand-cream/10 h-14 p-1">
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="w-12 h-full text-stone-400 hover:text-brand-green hover:bg-white rounded-xl transition-all flex items-center justify-center"
+                      >
+                        <Minus size={18} />
+                      </button>
+                      <span className="w-12 text-center text-lg font-bold text-stone-900">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="w-12 h-full text-stone-400 hover:text-brand-green hover:bg-white rounded-xl transition-all flex items-center justify-center"
+                      >
+                        <Plus size={18} />
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-12 h-full text-stone-400 hover:text-brand-green hover:bg-white rounded-xl transition-all flex items-center justify-center"
+                      onClick={handleAddToCart}
+                      className={`flex-1 font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-3 h-14 uppercase tracking-widest text-xs ${
+                        added
+                          ? "bg-brand-green text-white shadow-brand-green/20"
+                          : "bg-brand-brown hover:bg-brand-brown-light text-white shadow-lg shadow-brand-brown/20 hover:shadow-xl"
+                      }`}
                     >
-                      <Minus size={18} />
-                    </button>
-                    <span className="w-12 text-center text-lg font-bold text-stone-900">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="w-12 h-full text-stone-400 hover:text-brand-green hover:bg-white rounded-xl transition-all flex items-center justify-center"
-                    >
-                      <Plus size={18} />
+                      {added ? (
+                        <>
+                          <Check size={20} /> Added to Cart
+                        </>
+                      ) : (
+                        "Add to Cart"
+                      )}
                     </button>
                   </div>
+                ) : (
+                  <div className="rounded-2xl border border-brand-gold/30 bg-brand-gold/10 p-5">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-brand-brown shadow-sm">
+                        <Clock size={20} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-brown">
+                          Available soon
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                          We are getting this product ready for launch. Ordering
+                          will open shortly.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                  <button
-                    onClick={handleAddToCart}
-                    className={`flex-1 font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-3 h-14 uppercase tracking-widest text-xs ${
-                      added
-                        ? "bg-brand-green text-white shadow-brand-green/20"
-                        : "bg-brand-brown hover:bg-brand-brown-light text-white shadow-lg shadow-brand-brown/20 hover:shadow-xl"
-                    }`}
-                  >
-                    {added ? (
-                      <>
-                        <Check size={20} /> Added to Cart
-                      </>
-                    ) : (
-                      "Add to Cart"
-                    )}
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400 bg-stone-50 rounded-2xl py-4 border border-stone-100">
-                  <Truck size={18} className="text-brand-green" /> Free shipping
-                  on orders over ₹500
-                </div>
+                {available && (
+                  <div className="flex items-center justify-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400 bg-stone-50 rounded-2xl py-4 border border-stone-100">
+                    <Truck size={18} className="text-brand-green" /> Free
+                    shipping on orders over ₹500
+                  </div>
+                )}
               </div>
             </div>
 

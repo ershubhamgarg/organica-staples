@@ -12,7 +12,7 @@ import {
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
-import { getProductThumbnail } from "@/lib/data";
+import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -37,6 +37,7 @@ export default function CartPage() {
   const totalDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
   const shipping = effectiveSubtotal > 0 && effectiveSubtotal <= 500 ? 50 : 0;
   const totalPayable = effectiveSubtotal + shipping;
+  const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
 
   useEffect(() => {
     if (user) {
@@ -144,6 +145,11 @@ export default function CartPage() {
                                 {itemHasHighDiscount
                                   ? "Mega Deal"
                                   : `${discountPercent}% Off`}
+                              </span>
+                            )}
+                            {!isProductAvailable(item) && (
+                              <span className="bg-brand-cream text-brand-brown px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em]">
+                                Available soon
                               </span>
                             )}
                           </div>
@@ -255,12 +261,23 @@ export default function CartPage() {
                     Including taxes
                   </p>
                 </div>
-                <Link
-                  href="/checkout"
-                  className="w-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors"
-                >
-                  Proceed to Checkout
-                </Link>
+                {hasUnavailableItems ? (
+                  <>
+                    <div className="w-full flex items-center justify-center bg-stone-200 text-stone-500 font-medium py-3 rounded-xl cursor-not-allowed">
+                      Available soon
+                    </div>
+                    <p className="mt-3 text-center text-xs text-stone-500">
+                      Remove unavailable products to continue checkout.
+                    </p>
+                  </>
+                ) : (
+                  <Link
+                    href="/checkout"
+                    className="w-full flex items-center justify-center bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-xl transition-colors"
+                  >
+                    Proceed to Checkout
+                  </Link>
+                )}
               </div>
             </div>
           </div>

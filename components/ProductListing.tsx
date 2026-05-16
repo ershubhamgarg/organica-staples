@@ -7,7 +7,7 @@ import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 
 import { supabase } from "@/utils/supabase";
-import { Product } from "@/lib/data";
+import { isProductAvailable, Product } from "@/lib/data";
 import {
   getDiscountedPrice,
   getDiscountPercent,
@@ -120,6 +120,7 @@ export default function ProductListing() {
           const hasHighDiscount = hasHighProductDiscount(product);
           const discountPercent = getDiscountPercent(product);
           const discountedPrice = getDiscountedPrice(product);
+          const available = isProductAvailable(product);
 
           return (
             <Link
@@ -137,6 +138,11 @@ export default function ProductListing() {
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
                   {product.category}
                 </div>
+                {!available && (
+                  <div className="absolute bottom-4 left-4 bg-brand-brown text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">
+                    Available soon
+                  </div>
+                )}
                 {hasDiscount && (
                   <div
                     className={`absolute left-4 top-4 text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${

@@ -2,8 +2,8 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { Product } from "@/lib/data";
-import { Plus, Minus } from "lucide-react";
+import { isProductAvailable, Product } from "@/lib/data";
+import { Clock, Plus, Minus } from "lucide-react";
 
 export default function QuickAddButton({ product }: { product: Product }) {
   const { items, addToCart, updateQuantity } = useCartStore();
@@ -11,10 +11,12 @@ export default function QuickAddButton({ product }: { product: Product }) {
 
   const cartItem = items.find((item) => item.id === product.id);
   const quantity = cartItem?.quantity || 0;
+  const available = isProductAvailable(product);
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!available) return;
     addToCart(product, 1, user?.id);
   };
 
@@ -29,6 +31,20 @@ export default function QuickAddButton({ product }: { product: Product }) {
     e.stopPropagation();
     updateQuantity(product.id, quantity - 1, user?.id);
   };
+
+  if (!available) {
+    return (
+      <div
+        aria-label={`${product.name} will be available soon`}
+        className="mt-auto inline-flex items-center justify-center gap-2 border border-brand-brown/20 bg-brand-cream/40 px-4 py-2 w-max mx-auto text-brand-brown z-10 relative"
+      >
+        <Clock size={14} />
+        <span className="text-xs uppercase tracking-widest font-bold">
+          Available soon
+        </span>
+      </div>
+    );
+  }
 
   if (quantity > 0) {
     return (

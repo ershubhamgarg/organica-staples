@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getDiscountedPrice } from "@/lib/pricing";
-import { getProductThumbnail } from "@/lib/data";
+import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 
 interface PlacedOrderDetails {
   id: string;
@@ -32,6 +32,7 @@ export default function CheckoutPage() {
   const totalPrice = getTotalPrice();
   const finalTotal =
     totalPrice + (totalPrice > 0 && totalPrice <= 500 ? 50 : 0);
+  const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
 
   // Address state
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -192,6 +193,27 @@ export default function CheckoutPage() {
               Continue Shopping
             </Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasUnavailableItems) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center py-24 px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8 md:p-12 max-w-2xl w-full text-center">
+          <h2 className="text-2xl font-serif text-stone-900 mb-3">
+            Some products will be available soon
+          </h2>
+          <p className="text-stone-500 mb-8">
+            Please remove unavailable products from your cart before checkout.
+          </p>
+          <Link
+            href="/cart"
+            className="inline-block bg-brand-brown hover:bg-brand-brown-light text-white font-medium px-8 py-3 rounded-xl transition-colors"
+          >
+            Review Cart
+          </Link>
         </div>
       </div>
     );

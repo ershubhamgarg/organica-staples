@@ -12,6 +12,7 @@ export interface Product {
   discount?: number | null;
   rating?: number;
   review_count?: number;
+  available?: boolean | null;
 }
 
 export function getProductThumbnail(product: Product): string {
@@ -19,4 +20,8 @@ export function getProductThumbnail(product: Product): string {
     return product.images[0];
   }
   return product.image;
+}
+
+export function isProductAvailable(product: Pick<Product, "available">): boolean {
+  return product.available !== false;
 }
