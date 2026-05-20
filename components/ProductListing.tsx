@@ -178,7 +178,25 @@ export default function ProductListing() {
                   {product.name}
                 </h3>
                 <div className="mb-4 flex flex-col items-center gap-1">
-                  {hasDiscount ? (
+                  {!available ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg text-brand-green">₹</span>
+                      <div className="relative">
+                        <span className="text-lg text-brand-green opacity-40 select-none">
+                          {product.price.toFixed(2)}
+                        </span>
+                        {/* Tape Overlay */}
+                        <div 
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] h-5 bg-brand-gold/90 shadow-sm rotate-[-4deg] border-y border-white/20"
+                          style={{
+                            clipPath: "polygon(0% 15%, 5% 0%, 10% 15%, 15% 0%, 20% 15%, 25% 0%, 30% 15%, 35% 0%, 40% 15%, 45% 0%, 50% 15%, 55% 0%, 60% 15%, 65% 0%, 70% 15%, 75% 0%, 80% 15%, 85% 0%, 90% 15%, 95% 0%, 100% 15%, 100% 85%, 95% 100%, 90% 85%, 85% 100%, 80% 85%, 75% 100%, 70% 85%, 65% 100%, 60% 85%, 55% 100%, 50% 85%, 45% 100%, 40% 85%, 35% 100%, 30% 85%, 25% 100%, 20% 85%, 15% 100%, 10% 85%, 5% 100%, 0% 85%)"
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_8px,rgba(0,0,0,0.05)_8px,rgba(0,0,0,0.05)_16px)] opacity-20" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : hasDiscount ? (
                     <>
                       <span className="text-sm text-stone-400 line-through">
                         ₹{product.price.toFixed(2)}

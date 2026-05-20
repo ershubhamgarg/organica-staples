@@ -193,20 +193,43 @@ export default function CartPage() {
                           </button>
                         </div>
                         <div className="text-right">
-                          {itemHasDiscount && (
-                            <div className="text-sm text-stone-400 line-through">
-                              ₹{actualLinePrice.toFixed(2)}
+                          {!isProductAvailable(item) ? (
+                            <div className="flex items-center gap-0.5">
+                              <span className="text-sm font-medium text-stone-900">
+                                ₹
+                              </span>
+                              <div className="relative">
+                                <span className="text-sm font-medium text-stone-900 opacity-30 select-none">
+                                  {(item.price * item.quantity).toFixed(2)}
+                                </span>
+                                {/* Tape Design */}
+                                <div
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-3.5 bg-brand-gold rotate-[-3deg] border-y border-white/20 shadow-sm"
+                                  style={{
+                                    clipPath:
+                                      "polygon(0% 20%, 5% 0%, 10% 20%, 15% 0%, 20% 20%, 25% 0%, 30% 20%, 35% 0%, 40% 20%, 45% 0%, 50% 20%, 55% 0%, 60% 20%, 65% 0%, 70% 20%, 75% 0%, 80% 20%, 85% 0%, 90% 20%, 95% 0%, 100% 20%, 100% 80%, 95% 100%, 90% 80%, 85% 100%, 80% 80%, 75% 100%, 70% 80%, 65% 100%, 60% 80%, 55% 100%, 50% 80%, 45% 100%, 40% 80%, 35% 100%, 30% 80%, 25% 100%, 20% 80%, 15% 100%, 10% 80%, 5% 100%, 0% 80%)",
+                                  }}
+                                />
+                              </div>
                             </div>
+                          ) : (
+                            <>
+                              {itemHasDiscount && (
+                                <div className="text-sm text-stone-400 line-through">
+                                  ₹{actualLinePrice.toFixed(2)}
+                                </div>
+                              )}
+                              <div
+                                className={`text-xl ${
+                                  itemHasDiscount
+                                    ? "font-bold text-brand-green"
+                                    : "font-medium text-stone-900"
+                                }`}
+                              >
+                                ₹{discountedLinePrice.toFixed(2)}
+                              </div>
+                            </>
                           )}
-                          <div
-                            className={`text-xl ${
-                              itemHasDiscount
-                                ? "font-bold text-brand-green"
-                                : "font-medium text-stone-900"
-                            }`}
-                          >
-                            ₹{discountedLinePrice.toFixed(2)}
-                          </div>
                         </div>
                       </div>
                     </div>

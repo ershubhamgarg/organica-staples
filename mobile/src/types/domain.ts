@@ -12,6 +12,7 @@ export interface Product {
   discount?: number | null;
   rating?: number | null;
   review_count?: number | null;
+  available?: boolean | null;
 }
 
 export interface CartItem extends Product {

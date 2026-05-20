@@ -195,8 +195,7 @@ export default function ProductPage({
     } catch (err: unknown) {
       setSubmitMessage({
         type: "error",
-        text:
-          err instanceof Error ? err.message : "Failed to submit feedback.",
+        text: err instanceof Error ? err.message : "Failed to submit feedback.",
       });
     } finally {
       setIsSubmitting(false);
@@ -388,7 +387,28 @@ export default function ProductPage({
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
-                  {hasDiscount ? (
+                  {!available ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-4xl font-bold text-brand-green">
+                        ₹
+                      </span>
+                      <div className="relative">
+                        <p className="text-4xl font-bold text-brand-green opacity-30 select-none">
+                          {product.price.toFixed(2)}
+                        </p>
+                        {/* Tape Design */}
+                        <div
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] h-8 bg-brand-gold shadow-md rotate-[-2deg] border-y border-white/30"
+                          style={{
+                            clipPath:
+                              "polygon(0% 10%, 2% 0%, 4% 10%, 6% 0%, 8% 10%, 10% 0%, 12% 10%, 14% 0%, 16% 10%, 18% 0%, 20% 10%, 22% 0%, 24% 10%, 26% 0%, 28% 10%, 30% 0%, 32% 10%, 34% 0%, 36% 10%, 38% 0%, 40% 10%, 42% 0%, 44% 10%, 46% 0%, 48% 10%, 50% 0%, 52% 10%, 54% 0%, 56% 10%, 58% 0%, 60% 10%, 62% 0%, 64% 10%, 66% 0%, 68% 10%, 70% 0%, 72% 10%, 74% 0%, 76% 10%, 78% 0%, 80% 10%, 82% 0%, 84% 10%, 86% 0%, 88% 10%, 90% 0%, 92% 10%, 94% 0%, 96% 10%, 98% 0%, 100% 10%, 100% 90%, 98% 100%, 96% 90%, 94% 100%, 92% 90%, 90% 100%, 88% 90%, 86% 100%, 84% 90%, 82% 100%, 80% 90%, 78% 100%, 76% 90%, 74% 100%, 72% 90%, 70% 100%, 68% 90%, 66% 100%, 64% 90%, 62% 100%, 60% 90%, 58% 100%, 56% 90%, 54% 100%, 52% 90%, 50% 100%, 48% 90%, 46% 100%, 44% 90%, 42% 100%, 40% 90%, 38% 100%, 36% 90%, 34% 100%, 32% 90%, 30% 100%, 28% 90%, 26% 100%, 24% 90%, 22% 100%, 20% 90%, 18% 100%, 16% 90%, 14% 100%, 12% 90%, 10% 100%, 8% 90%, 6% 100%, 4% 90%, 2% 100%, 0% 90%)",
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_12px,rgba(0,0,0,0.08)_12px,rgba(0,0,0,0.08)_24px)] opacity-30" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : hasDiscount ? (
                     <div className="flex items-baseline gap-4">
                       <span className="text-4xl font-bold text-brand-green">
                         ₹{discountedPrice.toFixed(2)}
