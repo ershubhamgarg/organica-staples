@@ -14,7 +14,7 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
@@ -24,8 +24,33 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const totalItems = getTotalItems();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Initialize audio - Ultra-soft, minimal muffled click (Almost no treble)
+    audioRef.current = new Audio(
+      "https://assets.mixkit.co/active_storage/sfx/2351/2351-preview.mp3",
+    );
+    audioRef.current.volume = 0.1;
+  }, []);
+
+  useEffect(() => {
+    if (mounted && totalItems > 0) {
+      setIsAnimating(true);
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {
+          // Ignore audio play errors (usually due to user interaction policies)
+        });
+      }
+      const timer = setTimeout(() => setIsAnimating(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [totalItems, mounted]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -181,9 +206,15 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <ShoppingCart size={24} strokeWidth={1.5} />
-              {mounted && getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-terracotta text-white text-[10px] font-black min-w-[20px] h-[20px] rounded-full flex items-center justify-center shadow-lg border-2 border-brand-cream z-50 group-hover:scale-110 transition-transform">
-                  {getTotalItems()}
+              {mounted && totalItems > 0 && (
+                <span
+                  className={`absolute -top-1 -right-1 bg-brand-terracotta text-white text-[10px] font-black min-w-[20px] h-[20px] rounded-full flex items-center justify-center shadow-lg border-2 border-brand-cream z-50 transition-all duration-300 ${
+                    isAnimating
+                      ? "scale-125 bg-brand-green shadow-brand-green/20"
+                      : "scale-100"
+                  }`}
+                >
+                  {totalItems}
                 </span>
               )}
             </Link>

@@ -195,12 +195,12 @@ export default function ProductListing() {
                 </div>
 
                 <Link href={`/product/${product.id}`}>
-                  <h3 className="text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-0.5 tracking-tight">
+                  <h3 className="text-base font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight leading-tight line-clamp-1">
                     {product.name}
                   </h3>
                 </Link>
 
-                <p className="text-[10px] text-brand-brown/40 uppercase tracking-widest font-bold mb-2">
+                <p className="text-[9px] text-brand-brown/40 uppercase tracking-[0.2em] font-black mb-3">
                   {product.weight}
                 </p>
 
@@ -234,10 +234,7 @@ export default function ProductListing() {
                 </div>
 
                 <div className="mt-auto pt-2">
-                  <QuickAddButton
-                    product={product}
-                    className="w-full bg-brand-cream hover:bg-brand-brown text-brand-brown hover:text-brand-cream border border-brand-brown py-4 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 hover:shadow-2xl hover:translate-y-[-2px]"
-                  />
+                  <QuickAddButton product={product} className="w-full" />
                 </div>
               </div>
             </div>
