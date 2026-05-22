@@ -16,6 +16,8 @@ export interface Address {
   zipCode: string;
 }
 
+type SavedAddressPayload = Omit<Address, "id" | "user_id">;
+
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Something went wrong";
 
@@ -24,7 +26,7 @@ interface AddressState {
   isLoading: boolean;
   error: string | null;
   fetchAddresses: (userId: string) => Promise<void>;
-  addAddress: (userId: string, addressData: Omit<Address, "id" | "user_id">) => Promise<void>;
+  addAddress: (userId: string, addressData: SavedAddressPayload) => Promise<void>;
   removeAddress: (addressId: string) => Promise<void>;
   clearAddresses: () => void;
 }
@@ -61,15 +63,23 @@ export const useAddressStore = create<AddressState>()(
         }
       },
 
-      addAddress: async (userId: string, addressData: Omit<Address, "id" | "user_id">) => {
+      addAddress: async (userId: string, addressData: SavedAddressPayload) => {
         set({ isLoading: true, error: null });
         try {
           // Generate a temporary ID for optimistic UI update, or let DB generate
           const tempId = crypto.randomUUID();
+          const persistedAddressData = {
+            name: addressData.name,
+            phone: addressData.phone,
+            address: addressData.address,
+            city: addressData.city,
+            state: addressData.state,
+            zipCode: addressData.zipCode,
+          };
           
           const newAddress = {
             user_id: userId,
-            ...addressData,
+            ...persistedAddressData,
           };
 
           const { data, error } = await supabase

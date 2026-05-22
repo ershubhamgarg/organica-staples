@@ -2,6 +2,7 @@ import type { CartItem } from "@/store/cartStore";
 import type { Address } from "@/store/addressStore";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import type { PaymentDetails } from "@/store/orderStore";
 
 type OrderPayload = {
   userId: string | null;
@@ -9,6 +10,7 @@ type OrderPayload = {
   deliveryAddress: Address;
   paymentMethod: string;
   totalAmount: number;
+  paymentDetails?: PaymentDetails;
 };
 
 const getSupabaseAdmin = () => {
@@ -41,7 +43,14 @@ export async function POST(request: Request) {
   }
 
   const payload = (await request.json()) as Partial<OrderPayload>;
-  const { userId, items, deliveryAddress, paymentMethod, totalAmount } = payload;
+  const {
+    userId,
+    items,
+    deliveryAddress,
+    paymentMethod,
+    totalAmount,
+    paymentDetails,
+  } = payload;
 
   if (!items?.length || !deliveryAddress || !paymentMethod || !totalAmount) {
     return NextResponse.json(
@@ -65,6 +74,7 @@ export async function POST(request: Request) {
         items,
         delivery_address: deliveryAddress,
         payment_method: paymentMethod,
+        payment_details: paymentDetails ?? null,
         total_amount: totalAmount,
         status: "pending",
       },

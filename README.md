@@ -22,6 +22,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Build: `npm run build`
 - Lint: `npm run lint`
 
+## Environment
+
+Razorpay checkout runs in test mode when you use keys generated from the
+Razorpay Dashboard test-mode toggle:
+
+```bash
+NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_...
+RAZORPAY_KEY_SECRET=...
+# Optional: saved Razorpay Dashboard payment configuration ID with UPI enabled.
+RAZORPAY_CHECKOUT_CONFIG_ID=config_...
+```
+
 ## Stack
 
 - TypeScript strict, path alias `@/*`
@@ -34,7 +46,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `/`: hero + product listing
 - `/product/[id]`: product detail
 - `/cart`: cart with free shipping over ₹500
-- `/checkout`: address, mocked UPI verify, order placement
+- `/checkout`: address, Razorpay test checkout, order placement
 - `/login`: Supabase email/password auth
 - `/profile`: user profile/orders/addresses
 - `/our-story`: brand content

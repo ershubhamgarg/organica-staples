@@ -12,10 +12,22 @@ export interface Order {
   items: CartItem[];
   delivery_address: Address;
   payment_method: string;
+  payment_details?: PaymentDetails | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   created_at: string;
 }
+
+export type PaymentDetails = {
+  provider: "razorpay";
+  provider_order_id: string;
+  provider_payment_id: string;
+  provider_signature: string;
+  amount: number;
+  currency: string;
+  status: "verified";
+  verified_at: string;
+};
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Something went wrong";
@@ -31,6 +43,7 @@ interface OrderState {
     deliveryAddress: Address,
     paymentMethod: string,
     totalAmount: number,
+    paymentDetails?: PaymentDetails,
   ) => Promise<Order>;
   clearOrders: () => void;
 }
@@ -72,6 +85,7 @@ export const useOrderStore = create<OrderState>()(
         deliveryAddress: Address,
         paymentMethod: string,
         totalAmount: number,
+        paymentDetails?: PaymentDetails,
       ) => {
         set({ isLoading: true, error: null });
         const saveLocalOrder = (
@@ -92,6 +106,7 @@ export const useOrderStore = create<OrderState>()(
             items,
             delivery_address: deliveryAddress,
             payment_method: paymentMethod,
+            payment_details: paymentDetails ?? null,
             total_amount: totalAmount,
             status: "pending" as const,
           };
@@ -106,6 +121,7 @@ export const useOrderStore = create<OrderState>()(
                 deliveryAddress,
                 paymentMethod,
                 totalAmount,
+                paymentDetails,
               }),
             });
 
