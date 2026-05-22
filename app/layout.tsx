@@ -84,7 +84,7 @@ export default function RootLayout({
                 </li>
                 <li>
                   <a
-                    href="mailto:bilonanaturals@gmail.com"
+                    href="mailto:amrityaorganics@gmail.com"
                     className="hover:text-white transition-colors"
                   >
                     Contact Us
