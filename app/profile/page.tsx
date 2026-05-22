@@ -296,7 +296,7 @@ export default function ProfilePage() {
                             {addr.name}
                           </h4>
                           <button
-                            onClick={() => removeAddress(addr.id, user.id)}
+                            onClick={() => removeAddress(addr.id)}
                             className="text-brand-brown/20 hover:text-brand-terracotta transition-all opacity-0 group-hover:opacity-100"
                           >
                             <Trash2 size={16} strokeWidth={1.5} />
@@ -378,7 +378,7 @@ export default function ProfilePage() {
                             {order.status}
                           </span>
                           <p className="text-xl font-medium text-brand-brown tracking-tighter">
-                            ₹{order.total.toFixed(0)}
+                            ₹{order.total_amount.toFixed(0)}
                           </p>
                         </div>
                       </div>
