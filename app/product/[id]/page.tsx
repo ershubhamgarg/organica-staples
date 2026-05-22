@@ -205,7 +205,7 @@ export default function ProductPage({
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 organic-border bg-brand-gold/20" />
+          <div className="w-16 h-16 rounded-full bg-brand-gold/20" />
           <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
             Loading...
           </p>
@@ -217,7 +217,7 @@ export default function ProductPage({
   if (!product) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center p-12 bg-white organic-border-alt shadow-2xl">
+        <div className="max-w-md w-full text-center p-12 bg-white rounded-3xl shadow-2xl">
           <h1 className="text-3xl font-serif text-brand-brown mb-4">
             Grain not found
           </h1>
@@ -284,12 +284,8 @@ export default function ProductPage({
                 </div>
               </div>
 
-              {/* Decorative Rings */}
-              <div className="absolute -inset-8 z-[-1] border border-brand-gold/10 organic-border animate-float-slow" />
-              <div
-                className="absolute -inset-16 z-[-1] border border-brand-green/5 organic-border-alt animate-float"
-                style={{ animationDelay: "2s" }}
-              />
+              {/* Decorative Ring */}
+              <div className="absolute -inset-4 z-[-1] border border-brand-gold/10 rounded-[30%_70%_70%_30%/30%_30%_70%_70%] animate-float-slow" />
             </div>
 
             {/* Right: Product Info */}
@@ -309,10 +305,18 @@ export default function ProductPage({
                   Shop
                 </Link>
                 <span>/</span>
+                <span className="text-brand-brown/60">{product.category}</span>
+                <span>/</span>
                 <span className="text-brand-gold">{product.name}</span>
               </nav>
 
               <div className="mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-gold/5 rounded-full mb-4 border border-brand-gold/10">
+                  <span className="w-1 h-1 rounded-full bg-brand-gold" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                    {product.category}
+                  </span>
+                </div>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
@@ -376,7 +380,7 @@ export default function ProductPage({
               </div>
 
               {/* Cart Actions */}
-              <div className="p-6 bg-brand-cream organic-border border border-brand-gold/10 shadow-xl shadow-brand-brown/5 mb-8">
+              <div className="p-6 bg-brand-cream rounded-3xl border border-brand-gold/10 shadow-xl shadow-brand-brown/5 mb-8">
                 {!available ? (
                   <div className="flex flex-col items-center text-center p-2">
                     <Clock className="text-brand-gold mb-3" size={28} />
@@ -428,7 +432,7 @@ export default function ProductPage({
               {/* Trust Features */}
               <div className="grid grid-cols-2 gap-6 pt-6 border-t border-brand-gold/10">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 organic-border bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
                     <ShieldCheck size={16} />
                   </div>
                   <div>
@@ -441,7 +445,7 @@ export default function ProductPage({
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 organic-border bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
                     <Award size={16} />
                   </div>
                   <div>
@@ -504,7 +508,7 @@ export default function ProductPage({
             {/* Review List */}
             <div className="space-y-12">
               {reviews.length === 0 ? (
-                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 organic-border">
+                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl">
                   <p className="text-brand-brown/40 font-light italic">
                     Be the first to share your experience.
                   </p>
@@ -518,7 +522,7 @@ export default function ProductPage({
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 organic-border bg-brand-sand flex items-center justify-center text-brand-brown font-serif text-lg">
+                          <div className="w-10 h-10 rounded-full bg-brand-sand flex items-center justify-center text-brand-brown font-serif text-lg">
                             {review.user_name?.[0].toUpperCase() || "A"}
                           </div>
                           <div>
@@ -560,7 +564,7 @@ export default function ProductPage({
                           setCurrentPage(Math.max(1, currentPage - 1))
                         }
                         disabled={currentPage === 1}
-                        className="w-10 h-10 organic-border border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        className="w-10 h-10 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
                       >
                         <ChevronLeft size={16} />
                       </button>
@@ -573,7 +577,7 @@ export default function ProductPage({
                           setCurrentPage(Math.min(totalPages, currentPage + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className="w-10 h-10 organic-border border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        className="w-10 h-10 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
                       >
                         <ChevronRight size={16} />
                       </button>
@@ -587,7 +591,7 @@ export default function ProductPage({
             <div className="sticky top-32 h-max">
               <form
                 onSubmit={handleSubmitReview}
-                className="bg-white p-10 organic-border shadow-2xl shadow-brand-brown/5 border border-brand-gold/5"
+                className="bg-white p-10 rounded-3xl shadow-2xl shadow-brand-brown/5 border border-brand-gold/5"
               >
                 <h3 className="text-2xl font-serif text-brand-brown mb-2">
                   Write a Review
@@ -701,7 +705,7 @@ export default function ProductPage({
                 >
                   <Link
                     href={`/product/${p.id}`}
-                    className="relative block w-full aspect-square organic-border bg-brand-sand overflow-hidden mb-4 shadow-xl shadow-brand-brown/5 transition-transform duration-700 hover:scale-[1.02]"
+                    className="relative block w-full aspect-square rounded-3xl bg-brand-sand overflow-hidden mb-4 shadow-xl shadow-brand-brown/5 transition-transform duration-700 hover:scale-[1.02]"
                   >
                     <ProductImageCarousel
                       product={p}

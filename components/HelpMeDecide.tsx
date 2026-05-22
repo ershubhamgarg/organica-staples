@@ -197,9 +197,9 @@ export default function HelpMeDecide() {
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSubmit}
-              className="h-full bg-white organic-border border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5 relative overflow-hidden"
+              className="h-full bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5 relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 organic-border-alt translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full translate-x-1/2 -translate-y-1/2" />
 
               <h3 className="text-2xl font-serif text-brand-brown mb-10 pb-4 border-b border-brand-gold/5 relative z-10">
                 Wellness Profile
@@ -338,8 +338,8 @@ export default function HelpMeDecide() {
           {/* Right Column - Results */}
           <div className="lg:col-span-7">
             {!hasSubmitted ? (
-              <div className="h-full bg-white/40 organic-border-alt border-2 border-dashed border-brand-gold/10 flex flex-col items-center justify-center p-16 text-center">
-                <div className="w-20 h-20 organic-border bg-brand-sand flex items-center justify-center mb-8 text-brand-gold/30">
+              <div className="h-full bg-white/40 rounded-3xl border-2 border-dashed border-brand-gold/10 flex flex-col items-center justify-center p-16 text-center">
+                <div className="w-20 h-20 rounded-full bg-brand-sand flex items-center justify-center mb-8 text-brand-gold/30">
                   <Scale size={32} strokeWidth={1} />
                 </div>
                 <h4 className="text-2xl font-serif text-brand-brown/40 mb-4 tracking-tight">
@@ -357,12 +357,12 @@ export default function HelpMeDecide() {
                   {summary.map((point) => (
                     <span
                       key={point}
-                      className="px-5 py-2 bg-brand-gold/5 border border-brand-gold/10 organic-border-alt text-[9px] font-black uppercase tracking-widest text-brand-gold"
+                      className="px-5 py-2 bg-brand-gold/5 border border-brand-gold/10 rounded-full text-[9px] font-black uppercase tracking-widest text-brand-gold"
                     >
                       {point}
                     </span>
                   ))}
-                  <span className="px-5 py-2 bg-brand-green/5 border border-brand-green/10 organic-border-alt text-[9px] font-black uppercase tracking-widest text-brand-green">
+                  <span className="px-5 py-2 bg-brand-green/5 border border-brand-green/10 rounded-full text-[9px] font-black uppercase tracking-widest text-brand-green">
                     Activity: {profile.activityLevel}
                   </span>
                 </div>
@@ -371,11 +371,11 @@ export default function HelpMeDecide() {
                   {insights.map((rec) => (
                     <div
                       key={rec.id}
-                      className="group bg-white organic-border border border-brand-gold/5 p-10 shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px] relative overflow-hidden"
+                      className="group bg-white rounded-2xl border border-brand-gold/5 p-10 shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px] relative overflow-hidden"
                     >
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-brand-green/5 organic-border-alt translate-x-1/2 -translate-y-1/2" />
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-brand-green/5 rounded-full translate-x-1/2 -translate-y-1/2" />
 
-                      <div className="w-12 h-12 organic-border-alt bg-brand-sand flex items-center justify-center mb-8 text-brand-brown group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
+                      <div className="w-12 h-12 rounded-full bg-brand-sand flex items-center justify-center mb-8 text-brand-brown group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
                         <Wheat size={20} strokeWidth={1.5} />
                       </div>
 
@@ -400,7 +400,7 @@ export default function HelpMeDecide() {
                   ))}
                 </div>
 
-                <div className="bg-brand-brown p-8 organic-border-alt flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+                <div className="bg-brand-brown p-8 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
                   <div className="text-center md:text-left">
                     <p className="text-brand-cream/60 text-[10px] uppercase tracking-[0.3em] font-black mb-2">
                       Ready to transform?

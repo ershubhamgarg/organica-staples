@@ -71,7 +71,6 @@ Message: ${formData.message}
 
       {/* Values Section */}
       <section className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <div className="absolute inset-0 bg-jute opacity-5 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 items-center">
@@ -114,11 +113,9 @@ Message: ${formData.message}
                 return (
                   <div
                     key={item.title}
-                    className={`group p-10 bg-white border border-brand-gold/10 shadow-2xl shadow-brand-brown/5 transition-all duration-700 hover:translate-y-[-8px] ${
-                      idx % 2 === 0 ? "organic-border" : "organic-border-alt"
-                    }`}
+                    className="group p-10 bg-white border border-brand-gold/10 shadow-2xl shadow-brand-brown/5 transition-all duration-700 hover:translate-y-[-8px] rounded-2xl"
                   >
-                    <div className="w-14 h-14 organic-border-alt bg-brand-sand flex items-center justify-center mb-10 text-brand-gold group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
+                    <div className="w-14 h-14 rounded-full bg-brand-sand flex items-center justify-center mb-10 text-brand-gold group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
                       <Icon size={24} strokeWidth={1.5} />
                     </div>
                     <h3 className="text-xl font-serif text-brand-brown mb-4 tracking-tight">
@@ -160,7 +157,7 @@ Message: ${formData.message}
             </p>
 
             <div className="space-y-3 max-w-md">
-              <div className="flex items-center gap-6 p-4 bg-white organic-border border border-brand-gold/10 shadow-xl shadow-brand-brown/5 transition-transform hover:scale-[1.02]">
+              <div className="flex items-center gap-6 p-4 bg-white rounded-xl border border-brand-gold/10 shadow-xl shadow-brand-brown/5 transition-transform hover:scale-[1.02]">
                 <ShieldCheck
                   className="text-brand-gold"
                   size={20}
@@ -170,7 +167,7 @@ Message: ${formData.message}
                   Support for products, orders, and gifting.
                 </p>
               </div>
-              <div className="flex items-center gap-6 p-4 bg-white organic-border-alt border border-brand-gold/10 shadow-xl shadow-brand-brown/5 transition-transform hover:scale-[1.02]">
+              <div className="flex items-center gap-6 p-4 bg-white rounded-xl border border-brand-gold/10 shadow-xl shadow-brand-brown/5 transition-transform hover:scale-[1.02]">
                 <Leaf className="text-brand-green" size={20} strokeWidth={1} />
                 <p className="text-[9px] uppercase tracking-widest font-black text-brand-brown/60 leading-relaxed">
                   Premium support, delivered with care.
@@ -181,9 +178,9 @@ Message: ${formData.message}
 
           <form
             onSubmit={handleSubmit}
-            className="bg-white organic-border border border-brand-gold/10 p-8 md:p-10 shadow-[0_50px_100px_-30px_rgba(60,54,42,0.15)] relative overflow-hidden"
+            className="bg-white rounded-3xl border border-brand-gold/10 p-8 md:p-10 shadow-[0_50px_100px_-30px_rgba(60,54,42,0.15)] relative overflow-hidden"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full translate-x-1/2 -translate-y-1/2" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 relative z-10">
               <div>

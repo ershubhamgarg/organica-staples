@@ -95,10 +95,10 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-16 items-start">
           {/* Left: Profile Info */}
-          <div className="bg-white organic-border border border-brand-gold/10 p-10 shadow-2xl shadow-brand-brown/5 text-center">
-            <div className="w-32 h-32 organic-border-alt bg-brand-sand mx-auto mb-8 flex items-center justify-center text-brand-gold shadow-xl shadow-brand-brown/5 relative">
+          <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 shadow-2xl shadow-brand-brown/5 text-center">
+            <div className="w-32 h-32 rounded-full bg-brand-sand mx-auto mb-8 flex items-center justify-center text-brand-gold shadow-xl shadow-brand-brown/5 relative">
               <UserCircle size={64} strokeWidth={1} />
-              <div className="absolute -bottom-2 -right-2 w-10 h-10 organic-border bg-brand-green flex items-center justify-center text-white border-4 border-white">
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-brand-green flex items-center justify-center text-white border-4 border-white">
                 <ShieldCheck size={18} />
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function ProfilePage() {
           {/* Right: Activities & Addresses */}
           <div className="space-y-12">
             {/* Saved Addresses */}
-            <div className="bg-white organic-border-alt border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-4">
                   <MapPin size={24} className="text-brand-gold" />
@@ -160,7 +160,7 @@ export default function ProfilePage() {
 
               {showAddForm && (
                 <form
-                  className="mb-12 bg-brand-cream/50 organic-border border border-brand-gold/10 p-8 animate-fade-in"
+                  className="mb-12 bg-brand-cream/50 rounded-3xl border border-brand-gold/10 p-8 animate-fade-in"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (user) {
@@ -288,7 +288,7 @@ export default function ProfilePage() {
                   {addresses.slice(0, visibleAddressesCount).map((addr) => (
                     <div
                       key={addr.id}
-                      className="bg-brand-cream/30 organic-border-alt border border-brand-gold/10 p-8 flex flex-col justify-between group hover:bg-brand-cream hover:border-brand-gold/30 transition-all duration-500"
+                      className="bg-brand-cream/30 rounded-3xl border border-brand-gold/10 p-8 flex flex-col justify-between group hover:bg-brand-cream hover:border-brand-gold/30 transition-all duration-500"
                     >
                       <div>
                         <div className="flex items-center justify-between mb-4">
@@ -316,7 +316,7 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 organic-border-alt">
+                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl">
                   <p className="text-brand-brown/40 font-light italic">
                     No addresses saved yet.
                   </p>
@@ -334,7 +334,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Order History */}
-            <div className="bg-white organic-border border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
               <div className="flex items-center gap-4 mb-10">
                 <Package size={24} className="text-brand-gold" />
                 <h3 className="text-3xl font-serif text-brand-brown tracking-tight">
@@ -347,7 +347,7 @@ export default function ProfilePage() {
                   {orders.slice(0, visibleOrdersCount).map((order) => (
                     <div
                       key={order.id}
-                      className="bg-brand-cream/30 organic-border-alt border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
+                      className="bg-brand-cream/30 rounded-3xl border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
                     >
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-brand-gold/10">
                         <div>
@@ -387,7 +387,7 @@ export default function ProfilePage() {
                         {order.items.map((item, idx) => (
                           <div
                             key={idx}
-                            className="relative shrink-0 w-16 h-12 organic-border-alt bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
+                            className="relative shrink-0 w-16 h-12 rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
                           >
                             <ImageWithFallback
                               src={getProductThumbnail(item)}
@@ -408,8 +408,8 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="p-16 text-center border-2 border-dashed border-brand-gold/10 organic-border flex flex-col items-center gap-6">
-                  <div className="w-20 h-20 bg-brand-gold/5 organic-border flex items-center justify-center text-brand-gold/20">
+                <div className="p-16 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl flex flex-col items-center gap-6">
+                  <div className="w-20 h-20 bg-brand-gold/5 rounded-full flex items-center justify-center text-brand-gold/20">
                     <ShoppingBag size={32} strokeWidth={1} />
                   </div>
                   <p className="text-brand-brown/40 font-light italic">

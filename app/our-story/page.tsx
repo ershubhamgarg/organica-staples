@@ -6,8 +6,8 @@ export default function OurStory() {
   return (
     <div className="flex flex-col min-h-screen bg-brand-cream py-24 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
       {/* Decorative Background */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/5 organic-border-alt -translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 rounded-full translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/5 rounded-full -translate-x-1/2 translate-y-1/2" />
 
       {/* Header Section */}
       <div className="max-w-[95rem] mx-auto w-full relative z-10">
@@ -36,7 +36,7 @@ export default function OurStory() {
           {/* Story Block 1 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="relative group">
-              <div className="relative aspect-square w-full organic-border bg-brand-sand overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
+              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
                 <Image
                   src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=1000"
                   alt="Two friends examining crops"
@@ -46,7 +46,7 @@ export default function OurStory() {
                 <div className="absolute inset-0 bg-brand-brown/10 group-hover:bg-brand-brown/0 transition-colors duration-700" />
               </div>
               {/* Decorative SVG */}
-              <div className="absolute -bottom-10 -right-10 w-32 h-32 organic-border-alt bg-brand-gold/20 backdrop-blur-md flex items-center justify-center text-brand-brown animate-float">
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-brand-gold/20 backdrop-blur-md flex items-center justify-center text-brand-brown animate-float">
                 <Heart size={40} strokeWidth={1} />
               </div>
             </div>
@@ -78,7 +78,7 @@ export default function OurStory() {
           {/* Story Block 2 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="lg:order-2 relative group">
-              <div className="relative aspect-square w-full organic-border-alt bg-brand-sand overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
+              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">
                 <Image
                   src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000"
                   alt="Organic farming fields"
@@ -88,7 +88,7 @@ export default function OurStory() {
                 <div className="absolute inset-0 bg-brand-brown/10 group-hover:bg-brand-brown/0 transition-colors duration-700" />
               </div>
               {/* Decorative SVG */}
-              <div className="absolute -top-10 -left-10 w-32 h-32 organic-border bg-brand-green/20 backdrop-blur-md flex items-center justify-center text-brand-green animate-float-slow">
+              <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-brand-green/20 backdrop-blur-md flex items-center justify-center text-brand-green animate-float-slow">
                 <Wheat size={40} strokeWidth={1} />
               </div>
             </div>
@@ -118,9 +118,9 @@ export default function OurStory() {
           </div>
 
           {/* Values Callout */}
-          <div className="relative py-24 px-12 md:px-24 bg-brand-brown text-brand-cream organic-border shadow-[0_50px_100px_-20px_rgba(60,54,42,0.4)] text-center overflow-hidden group">
+          <div className="relative py-24 px-12 md:px-24 bg-brand-brown text-brand-cream rounded-3xl shadow-[0_50px_100px_-20px_rgba(60,54,42,0.4)] text-center overflow-hidden group">
             <div className="absolute inset-0 bg-jute opacity-5 pointer-events-none" />
-            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-gold/10 organic-border -translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-1000" />
+            <div className="absolute top-0 left-0 w-64 h-64 bg-brand-gold/10 rounded-full -translate-x-1/2 -translate-y-1/2 group-hover:scale-150 transition-transform duration-1000" />
 
             <div className="relative z-10 max-w-3xl mx-auto">
               <h2 className="text-4xl md:text-7xl font-serif mb-10 tracking-tight leading-[0.9]">

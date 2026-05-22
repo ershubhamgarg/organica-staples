@@ -60,8 +60,8 @@ export default function ProductListing() {
       className="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
     >
       {/* Background Decorative Elements */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-brand-gold/5 organic-border -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-green/5 organic-border-alt translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-72 h-72 bg-brand-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-green/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
       <div className="relative flex flex-col items-center text-center mb-16">
         <div className="inline-flex items-center gap-4 mb-4">
@@ -136,7 +136,7 @@ export default function ProductListing() {
                 href={`/product/${product.id}`}
                 className="block relative mb-6"
               >
-                <div className="relative aspect-square w-full overflow-hidden organic-border bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
+                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
                   <ProductImageCarousel
                     product={product}
                     imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"

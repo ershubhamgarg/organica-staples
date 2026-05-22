@@ -57,7 +57,7 @@ export default function CartPage() {
   if (!mounted) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="animate-pulse w-12 h-12 organic-border bg-brand-gold/20" />
+        <div className="animate-pulse w-12 h-12 rounded-full bg-brand-gold/20" />
       </div>
     );
   }
@@ -86,8 +86,8 @@ export default function CartPage() {
         </div>
 
         {items.length === 0 ? (
-          <div className="bg-white organic-border-alt border border-brand-gold/10 p-10 md:p-12 text-center shadow-2xl shadow-brand-brown/5 max-w-xl mx-auto">
-            <div className="w-14 h-14 bg-brand-sand organic-border flex items-center justify-center mx-auto mb-4 text-brand-brown/20">
+          <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 text-center shadow-2xl shadow-brand-brown/5 max-w-xl mx-auto">
+            <div className="w-14 h-14 bg-brand-sand rounded-full flex items-center justify-center mx-auto mb-4 text-brand-brown/20">
               <ShoppingBag size={28} strokeWidth={1} />
             </div>
             <h2 className="text-xl font-serif text-brand-brown mb-2">
@@ -119,9 +119,9 @@ export default function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="group bg-white organic-border-alt border border-brand-gold/10 p-4 md:p-6 flex flex-col md:flex-row gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
+                    className="group bg-white rounded-2xl border border-brand-gold/10 p-4 md:p-6 flex flex-col md:flex-row gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
                   >
-                    <div className="relative w-full md:w-32 aspect-square organic-border bg-brand-sand overflow-hidden shrink-0">
+                    <div className="relative w-full md:w-32 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0">
                       <ImageWithFallback
                         src={getProductThumbnail(item)}
                         alt={item.name}
@@ -226,7 +226,7 @@ export default function CartPage() {
             </div>
 
             <div className="sticky top-32">
-              <div className="bg-white organic-border border border-brand-gold/10 p-8 shadow-2xl shadow-brand-brown/10">
+              <div className="bg-white rounded-3xl border border-brand-gold/10 p-8 shadow-2xl shadow-brand-brown/10">
                 <h3 className="text-xl font-serif text-brand-brown mb-6 tracking-tight">
                   Summary
                 </h3>
@@ -314,7 +314,7 @@ export default function CartPage() {
               </div>
 
               {shipping > 0 && (
-                <div className="mt-4 p-4 bg-brand-green/5 organic-border border border-brand-green/10 text-center">
+                <div className="mt-4 p-4 bg-brand-green/5 rounded-xl border border-brand-green/10 text-center">
                   <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green">
                     Add ₹{(500 - effectiveSubtotal).toFixed(0)} more for{" "}
                     <span className="italic">Free</span> delivery

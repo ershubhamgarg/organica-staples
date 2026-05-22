@@ -128,7 +128,7 @@ export default function CheckoutPage() {
   if (!mounted) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="animate-pulse w-12 h-12 organic-border bg-brand-gold/20" />
+        <div className="animate-pulse w-12 h-12 rounded-full bg-brand-gold/20" />
       </div>
     );
   }
@@ -136,12 +136,12 @@ export default function CheckoutPage() {
   if (orderPlaced && placedOrderDetails) {
     return (
       <div className="min-h-screen bg-brand-cream py-24 px-4 sm:px-6 lg:px-12 flex items-center justify-center">
-        <div className="max-w-4xl w-full bg-white organic-border-alt shadow-2xl border border-brand-gold/10 p-12 md:p-20 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-green/5 organic-border -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-gold/5 organic-border-alt translate-x-1/2 translate-y-1/2" />
+        <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl border border-brand-gold/10 p-12 md:p-20 text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-green/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full translate-x-1/2 translate-y-1/2" />
 
           <div className="relative">
-            <div className="w-24 h-24 bg-brand-green organic-border flex items-center justify-center mx-auto mb-10 text-brand-cream shadow-xl shadow-brand-green/20 animate-float">
+            <div className="w-24 h-24 bg-brand-green rounded-full flex items-center justify-center mx-auto mb-10 text-brand-cream shadow-xl shadow-brand-green/20 animate-float">
               <CheckCircle2 size={48} strokeWidth={1} />
             </div>
             <h1 className="text-5xl lg:text-7xl font-serif text-brand-brown tracking-tight mb-4">
@@ -158,14 +158,14 @@ export default function CheckoutPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left mb-16">
-              <div className="p-8 bg-brand-cream/50 organic-border border border-brand-gold/5">
+              <div className="p-8 bg-brand-cream/50 rounded-2xl border border-brand-gold/5">
                 <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold mb-6">
                   Order Summary
                 </h3>
                 <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-4">
                   {placedOrderDetails.items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-4 group">
-                      <div className="w-16 h-12 organic-border bg-brand-sand overflow-hidden shrink-0">
+                      <div className="w-16 h-12 rounded-xl bg-brand-sand overflow-hidden shrink-0">
                         <ImageWithFallback
                           src={getProductThumbnail(item)}
                           alt={item.name}
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
                     <span>{placedOrderDetails.paymentMethod}</span>
                   </div>
                 </div>
-                <div className="p-6 bg-brand-green/5 organic-border-alt border border-brand-green/10 flex items-center gap-4">
+                <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10 flex items-center gap-4">
                   <ShieldCheck
                     className="text-brand-green"
                     size={24}
@@ -241,8 +241,8 @@ export default function CheckoutPage() {
   if (hasUnavailableItems) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center p-12 bg-white organic-border-alt shadow-2xl border border-brand-gold/10">
-          <div className="w-20 h-20 bg-brand-gold/10 organic-border flex items-center justify-center mx-auto mb-8 text-brand-gold">
+        <div className="max-w-md w-full text-center p-12 bg-white rounded-3xl shadow-2xl border border-brand-gold/10">
+          <div className="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-gold">
             <Clock size={32} />
           </div>
           <h2 className="text-3xl font-serif text-brand-brown mb-4 tracking-tight">
@@ -290,10 +290,10 @@ export default function CheckoutPage() {
           {/* Left Column - Steps */}
           <div className="space-y-8">
             {/* Step 1: Shipping Address */}
-            <div className="bg-white organic-border-alt border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5">
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-6 h-6 organic-border bg-brand-brown text-brand-cream flex items-center justify-center text-[10px] font-black">
+                  <div className="w-6 h-6 rounded-full bg-brand-brown text-brand-cream flex items-center justify-center text-[10px] font-black">
                     1
                   </div>
                   <h2 className="text-xl font-serif text-brand-brown tracking-tight">
@@ -318,7 +318,7 @@ export default function CheckoutPage() {
                         <button
                           key={addr.id}
                           onClick={() => setSelectedAddressId(addr.id)}
-                          className={`p-6 text-left organic-border-alt border transition-all duration-500 relative group ${
+                          className={`p-6 text-left rounded-2xl border transition-all duration-500 relative group ${
                             selectedAddressId === addr.id
                               ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
                               : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                       ))}
                       <button
                         onClick={() => setShowNewAddressForm(true)}
-                        className="p-6 text-left organic-border-alt border border-dashed border-brand-gold/30 hover:border-brand-gold/60 text-brand-brown/40 hover:text-brand-brown transition-all group flex flex-col items-center justify-center text-center gap-3"
+                        className="p-6 text-left rounded-2xl border border-dashed border-brand-gold/30 hover:border-brand-gold/60 text-brand-brown/40 hover:text-brand-brown transition-all group flex flex-col items-center justify-center text-center gap-3"
                       >
                         <div className="w-10 h-10 rounded-full border border-current flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Plus size={20} strokeWidth={1} />
@@ -361,7 +361,7 @@ export default function CheckoutPage() {
                   )}
 
                   {(checkoutAddresses.length === 0 || showNewAddressForm) && (
-                    <div className="p-6 bg-brand-cream/50 organic-border border border-brand-gold/5">
+                    <div className="p-6 bg-brand-cream/50 rounded-2xl border border-brand-gold/5">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -523,9 +523,9 @@ export default function CheckoutPage() {
                   )}
                 </div>
               ) : (
-                <div className="p-6 bg-brand-green/5 organic-border border border-brand-green/10 flex items-center justify-between">
+                <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 organic-border bg-brand-green text-brand-cream flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-brand-green text-brand-cream flex items-center justify-center">
                       <MapPin size={20} strokeWidth={1} />
                     </div>
                     <div>
@@ -552,10 +552,10 @@ export default function CheckoutPage() {
 
             {/* Step 2: Payment Method */}
             <div
-              className={`bg-white organic-border-alt border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5 transition-opacity duration-500 ${!addressConfirmed ? "opacity-30 pointer-events-none" : ""}`}
+              className={`bg-white rounded-3xl border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5 transition-opacity duration-500 ${!addressConfirmed ? "opacity-30 pointer-events-none" : ""}`}
             >
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-6 h-6 organic-border bg-brand-brown text-brand-cream flex items-center justify-center text-[10px] font-black">
+                <div className="w-6 h-6 rounded-full bg-brand-brown text-brand-cream flex items-center justify-center text-[10px] font-black">
                   2
                 </div>
                 <h2 className="text-xl font-serif text-brand-brown tracking-tight">
@@ -567,13 +567,13 @@ export default function CheckoutPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <button
                     onClick={() => setSelectedPayment("cod")}
-                    className={`p-8 text-left organic-border-alt border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
+                    className={`p-8 text-left rounded-2xl border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
                       selectedPayment === "cod"
                         ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
                         : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
                     }`}
                   >
-                    <div className="w-12 h-12 organic-border bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                       <CreditCard
                         size={24}
                         strokeWidth={1}
@@ -601,13 +601,13 @@ export default function CheckoutPage() {
 
                   <button
                     onClick={() => setSelectedPayment("upi")}
-                    className={`p-8 text-left organic-border-alt border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
+                    className={`p-8 text-left rounded-2xl border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
                       selectedPayment === "upi"
                         ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
                         : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
                     }`}
                   >
-                    <div className="w-12 h-12 organic-border bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
                       <svg
                         width="24"
                         height="24"
@@ -643,7 +643,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {selectedPayment === "upi" && (
-                  <div className="p-8 bg-brand-cream organic-border border border-brand-gold/10 animate-fade-in">
+                  <div className="p-8 bg-brand-cream rounded-2xl border border-brand-gold/10 animate-fade-in">
                     <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-3">
                       UPI ID
                     </label>
@@ -733,8 +733,8 @@ export default function CheckoutPage() {
 
           {/* Right Column - Order Summary */}
           <div className="sticky top-32">
-            <div className="bg-white organic-border border border-brand-gold/10 p-8 shadow-2xl shadow-brand-brown/10 overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-8 shadow-2xl shadow-brand-brown/10 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full translate-x-1/2 -translate-y-1/2" />
 
               <h3 className="text-xl font-serif text-brand-brown mb-8 tracking-tight relative z-10">
                 Order <span className="italic">Review</span>
@@ -748,7 +748,7 @@ export default function CheckoutPage() {
                       key={item.id}
                       className="flex gap-4 items-center group"
                     >
-                      <div className="w-16 h-16 organic-border bg-brand-sand overflow-hidden shrink-0 relative">
+                      <div className="w-16 h-16 rounded-xl bg-brand-sand overflow-hidden shrink-0 relative">
                         <ImageWithFallback
                           src={getProductThumbnail(item)}
                           alt={item.name}
