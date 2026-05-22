@@ -2,6 +2,7 @@
 
 import { ArrowRight, MessageCircle } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const DesiHero = () => {
   return (
@@ -179,15 +180,15 @@ const DesiHero = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <a
-                href="#products"
+              <Link
+                href="#shop"
                 className="group relative inline-flex items-center gap-3 px-6 py-3 bg-brand-green text-brand-cream rounded-full transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20"
               >
                 <span className="font-medium tracking-wide text-sm">
                   Shop Now
                 </span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" />
-              </a>
+              </Link>
 
               <button
                 onClick={() =>

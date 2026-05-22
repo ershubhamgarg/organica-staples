@@ -255,8 +255,8 @@ export default function ProductPage({
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Product Images */}
-            <div className="relative sticky top-32">
-              <div className="relative aspect-square w-full organic-border bg-brand-sand overflow-hidden shadow-2xl shadow-brand-brown/10">
+            <div className="relative lg:sticky lg:top-32">
+              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden shadow-2xl shadow-brand-brown/10">
                 <ProductImageCarousel
                   product={product}
                   imageClassName="object-cover transition-transform duration-1000"
@@ -698,32 +698,49 @@ export default function ProductPage({
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-              {recommendedProducts.map((p) => (
-                <div
-                  key={p.id}
-                  className="group flex flex-col items-center text-center"
-                >
-                  <Link
-                    href={`/product/${p.id}`}
-                    className="relative block w-full aspect-square rounded-3xl bg-brand-sand overflow-hidden mb-4 shadow-xl shadow-brand-brown/5 transition-transform duration-700 hover:scale-[1.02]"
+              {recommendedProducts.map((p) => {
+                const available = isProductAvailable(p);
+                return (
+                  <div
+                    key={p.id}
+                    className="group flex flex-col items-center text-center"
                   >
-                    <ProductImageCarousel
-                      product={p}
-                      imageClassName="object-cover"
-                      sizes="25vw"
-                    />
-                    <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors" />
-                  </Link>
-                  <Link href={`/product/${p.id}`}>
-                    <h4 className="text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight">
-                      {p.name}
-                    </h4>
-                  </Link>
-                  <p className="text-base text-brand-brown font-medium">
-                    ₹{p.price.toFixed(0)}
-                  </p>
-                </div>
-              ))}
+                    <Link
+                      href={`/product/${p.id}`}
+                      className="relative block w-full aspect-square rounded-3xl bg-brand-sand overflow-hidden mb-4 shadow-xl shadow-brand-brown/5 transition-transform duration-700 hover:scale-[1.02]"
+                    >
+                      <ProductImageCarousel
+                        product={p}
+                        imageClassName={`object-cover ${!available ? "blur-[2px] opacity-60" : ""}`}
+                        sizes="25vw"
+                      />
+                      <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors" />
+
+                      {!available && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
+                          <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
+                            Available Soon
+                          </span>
+                        </div>
+                      )}
+                    </Link>
+                    <Link href={`/product/${p.id}`}>
+                      <h4
+                        className={`text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight ${!available ? "opacity-40" : ""}`}
+                      >
+                        {p.name}
+                      </h4>
+                    </Link>
+                    {available ? (
+                      <p className="text-base text-brand-brown font-medium">
+                        ₹{p.price.toFixed(0)}
+                      </p>
+                    ) : (
+                      <div className="h-6" /> // Spacer for layout consistency
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

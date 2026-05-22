@@ -134,8 +134,12 @@ export default function ProductListing() {
             <div key={product.id} className="group flex flex-col">
               <Link
                 href={`/product/${product.id}`}
-                className="block relative mb-6"
+                className="block relative mb-6 group/image"
               >
+                {/* Decorative Organic Outline */}
+                <div className="absolute -inset-2 border border-brand-gold/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] group-hover/image:scale-105 group-hover/image:border-brand-gold/30 transition-all duration-700 pointer-events-none" />
+                <div className="absolute -inset-1.5 border border-brand-green/5 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] group-hover/image:scale-105 group-hover/image:border-brand-green/10 transition-all duration-700 pointer-events-none delay-100" />
+
                 <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
                   <ProductImageCarousel
                     product={product}
