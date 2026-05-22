@@ -3,9 +3,17 @@
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { isProductAvailable, Product } from "@/lib/data";
-import { Clock, Plus, Minus } from "lucide-react";
+import { Clock, Plus, Minus, ShoppingBag } from "lucide-react";
 
-export default function QuickAddButton({ product }: { product: Product }) {
+interface QuickAddButtonProps {
+  product: Product;
+  className?: string;
+}
+
+export default function QuickAddButton({
+  product,
+  className,
+}: QuickAddButtonProps) {
   const { items, addToCart, updateQuantity } = useCartStore();
   const { user } = useUserStore();
 
@@ -36,11 +44,11 @@ export default function QuickAddButton({ product }: { product: Product }) {
     return (
       <div
         aria-label={`${product.name} will be available soon`}
-        className="mt-auto inline-flex items-center justify-center gap-2 border border-brand-brown/20 bg-brand-cream/40 px-4 py-2 w-max mx-auto text-brand-brown z-10 relative"
+        className={`inline-flex items-center justify-center gap-2 border border-brand-gold/10 bg-brand-cream/40 px-6 py-4 rounded-full text-brand-brown/40 z-10 relative cursor-not-allowed ${className}`}
       >
         <Clock size={14} />
-        <span className="text-xs uppercase tracking-widest font-bold">
-          Available soon
+        <span className="text-[10px] uppercase tracking-[0.2em] font-black">
+          Available Soon
         </span>
       </div>
     );
@@ -49,7 +57,7 @@ export default function QuickAddButton({ product }: { product: Product }) {
   if (quantity > 0) {
     return (
       <div
-        className="mt-auto flex items-center justify-between w-full max-w-[120px] mx-auto border border-brand-brown/30 rounded-full px-3 py-1 z-10 relative bg-white shadow-sm"
+        className={`flex items-center justify-between w-full max-w-[160px] mx-auto border border-brand-brown/20 rounded-full px-5 py-3.5 z-10 relative bg-white shadow-xl shadow-brand-brown/5 ${className}`}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -57,31 +65,33 @@ export default function QuickAddButton({ product }: { product: Product }) {
       >
         <button
           onClick={handleDecrease}
-          className="text-brand-brown hover:text-brand-green transition-colors p-1"
+          className="text-brand-brown hover:text-brand-terracotta transition-all p-1 hover:scale-110"
         >
-          <Minus size={14} strokeWidth={2.5} />
+          <Minus size={14} strokeWidth={3} />
         </button>
-        <span className="text-brand-brown text-sm font-medium w-6 text-center">
+        <span className="text-brand-brown text-[12px] font-black w-8 text-center">
           {quantity}
         </span>
         <button
           onClick={handleIncrease}
-          className="text-brand-brown hover:text-brand-green transition-colors p-1"
+          className="text-brand-brown hover:text-brand-green transition-all p-1 hover:scale-110"
         >
-          <Plus size={14} strokeWidth={2.5} />
+          <Plus size={14} strokeWidth={3} />
         </button>
       </div>
     );
   }
 
   return (
-    <div
+    <button
       onClick={handleAdd}
-      className="mt-auto border-b border-brand-brown/20 pb-1 w-max mx-auto hover:border-brand-brown transition-colors cursor-pointer z-10 relative group-hover:border-brand-brown"
+      className={`group relative inline-flex items-center justify-center gap-3 overflow-hidden bg-brand-cream border border-brand-brown/20 text-brand-brown px-6 py-4 rounded-full transition-all duration-500 hover:border-brand-brown hover:translate-y-[-2px] shadow-sm hover:shadow-xl hover:shadow-brand-brown/5 ${className}`}
     >
-      <span className="text-brand-brown text-sm uppercase tracking-widest font-medium">
-        Quick Add
+      <span className="relative z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black group-hover:text-brand-cream transition-colors duration-500">
+        <ShoppingBag size={14} strokeWidth={2.5} />
+        Add to Cart
       </span>
-    </div>
+      <div className="absolute inset-0 bg-brand-brown translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
+    </button>
   );
 }

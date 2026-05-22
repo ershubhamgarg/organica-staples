@@ -13,9 +13,15 @@ import {
   Trash2,
   Plus,
   Package,
+  ShieldCheck,
+  ChevronRight,
+  ArrowRight,
+  ShoppingBag,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { getProductThumbnail } from "@/lib/data";
+import { getDiscountedPrice } from "@/lib/pricing";
 
 export default function ProfilePage() {
   const { user, signOut } = useUserStore();
@@ -50,51 +56,111 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 pt-12 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-700 transition-colors mb-8 text-sm font-medium"
-        >
-          <ArrowLeft size={16} /> Back to Home
-        </Link>
+    <div className="min-h-screen bg-brand-cream py-24 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
+      {/* Decorative Elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/5 organic-border-alt -translate-x-1/2 translate-y-1/2" />
 
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8">
-          <div className="flex items-center gap-6 mb-8 pb-8 border-b border-stone-100">
-            <div className="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center text-brand-green">
-              <UserCircle size={48} />
+      <div className="max-w-[85rem] mx-auto relative z-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+          <div>
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold">
+                Member Account
+              </span>
             </div>
-            <div>
-              <h1 className="text-2xl font-serif text-stone-900">
-                {user.email}
-              </h1>
-              <p className="text-stone-500 text-sm">
-                Member since {new Date(user.created_at).toLocaleDateString()}
-              </p>
+            <h1 className="text-5xl lg:text-7xl font-serif text-brand-brown tracking-tight">
+              My <span className="italic">Profile</span>
+            </h1>
+          </div>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 text-brand-brown/60 hover:text-brand-brown transition-all text-[10px] uppercase tracking-[0.2em] font-black"
+            >
+              <ArrowLeft size={14} /> Back to Shop
+            </Link>
+            <button
+              onClick={async () => {
+                await signOut();
+                router.push("/");
+              }}
+              className="inline-flex items-center gap-3 text-brand-terracotta hover:text-brand-terracotta/80 transition-all text-[10px] uppercase tracking-[0.2em] font-black border border-brand-terracotta/20 px-6 py-3 rounded-full hover:bg-brand-terracotta/5"
+            >
+              <LogOut size={14} /> Sign Out
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-16 items-start">
+          {/* Left: Profile Info */}
+          <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 shadow-2xl shadow-brand-brown/5 text-center">
+            <div className="w-32 h-32 rounded-full bg-brand-sand mx-auto mb-8 flex items-center justify-center text-brand-gold shadow-xl shadow-brand-brown/5 relative">
+              <UserCircle size={64} strokeWidth={1} />
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-brand-green flex items-center justify-center text-white border-4 border-white">
+                <ShieldCheck size={18} />
+              </div>
+            </div>
+            <h2 className="text-2xl font-serif text-brand-brown mb-2 break-all px-4">
+              {user.email}
+            </h2>
+            <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/40 mb-8">
+              Member since{" "}
+              {new Date(user.created_at).toLocaleDateString("en-IN", {
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+
+            <div className="pt-8 border-t border-brand-gold/10 grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-serif text-brand-brown">
+                  {orders.length}
+                </p>
+                <p className="text-[8px] uppercase tracking-widest font-black text-brand-brown/40">
+                  Orders
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-serif text-brand-brown">
+                  {addresses.length}
+                </p>
+                <p className="text-[8px] uppercase tracking-widest font-black text-brand-brown/40">
+                  Addresses
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            {/* Addresses Section */}
-            <div className="bg-stone-50 rounded-xl p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-serif text-stone-900 flex items-center gap-2">
-                  <MapPin size={20} />
-                  Saved Addresses
-                </h2>
+          {/* Right: Activities & Addresses */}
+          <div className="space-y-12">
+            {/* Saved Addresses */}
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+              <div className="flex justify-between items-center mb-10">
+                <div className="flex items-center gap-4">
+                  <MapPin size={24} className="text-brand-gold" />
+                  <h3 className="text-3xl font-serif text-brand-brown tracking-tight">
+                    Saved <span className="italic">Addresses</span>
+                  </h3>
+                </div>
                 {!showAddForm && (
                   <button
                     onClick={() => setShowAddForm(true)}
-                    className="text-sm text-emerald-700 hover:text-emerald-800 font-medium flex items-center gap-1"
+                    className="group flex items-center gap-3 text-[10px] uppercase tracking-widest font-black text-brand-brown hover:text-brand-gold transition-colors"
                   >
-                    <Plus size={16} /> Add New
+                    <Plus
+                      size={16}
+                      className="group-hover:rotate-90 transition-transform duration-500"
+                    />{" "}
+                    Add New
                   </button>
                 )}
               </div>
 
               {showAddForm && (
                 <form
-                  className="mb-6 bg-white p-4 rounded-xl border border-stone-200"
+                  className="mb-12 bg-brand-cream/50 rounded-3xl border border-brand-gold/10 p-8 animate-fade-in"
                   onSubmit={async (e) => {
                     e.preventDefault();
                     if (user) {
@@ -111,10 +177,10 @@ export default function ProfilePage() {
                     }
                   }}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div>
-                      <label className="block text-xs font-medium text-stone-700 mb-1">
-                        Full Name
+                      <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
+                        Address Name
                       </label>
                       <input
                         type="text"
@@ -123,11 +189,12 @@ export default function ProfilePage() {
                         onChange={(e) =>
                           setNewAddress({ ...newAddress, name: e.target.value })
                         }
-                        className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                        placeholder="Home / Work"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-stone-700 mb-1">
+                      <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                         Phone Number
                       </label>
                       <input
@@ -140,13 +207,14 @@ export default function ProfilePage() {
                             phone: e.target.value,
                           })
                         }
-                        className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                        placeholder="+91"
                       />
                     </div>
                   </div>
-                  <div className="mb-4">
-                    <label className="block text-xs font-medium text-stone-700 mb-1">
-                      Address (House No, Building, Street, Area)
+                  <div className="mb-8">
+                    <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
+                      Street Address
                     </label>
                     <input
                       type="text"
@@ -158,70 +226,56 @@ export default function ProfilePage() {
                           address: e.target.value,
                         })
                       }
-                      className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      placeholder="Street, Building, House No."
                     />
                   </div>
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div>
-                      <label className="block text-xs font-medium text-stone-700 mb-1">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newAddress.city}
-                        onChange={(e) =>
-                          setNewAddress({ ...newAddress, city: e.target.value })
-                        }
-                        className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-stone-700 mb-1">
-                        State
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newAddress.state}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            state: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-stone-700 mb-1">
-                        Pincode
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newAddress.zipCode}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            zipCode: e.target.value,
-                          })
-                        }
-                        className="w-full px-3 py-2 border border-stone-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-600 outline-none"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                    <input
+                      type="text"
+                      required
+                      value={newAddress.city}
+                      onChange={(e) =>
+                        setNewAddress({ ...newAddress, city: e.target.value })
+                      }
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      placeholder="City"
+                    />
+                    <input
+                      type="text"
+                      required
+                      value={newAddress.state}
+                      onChange={(e) =>
+                        setNewAddress({ ...newAddress, state: e.target.value })
+                      }
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      placeholder="State"
+                    />
+                    <input
+                      type="text"
+                      required
+                      value={newAddress.zipCode}
+                      onChange={(e) =>
+                        setNewAddress({
+                          ...newAddress,
+                          zipCode: e.target.value,
+                        })
+                      }
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      placeholder="Pin Code"
+                    />
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-6">
                     <button
                       type="submit"
-                      className="bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-800 transition-colors"
+                      className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light"
                     >
                       Save Address
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddForm(false)}
-                      className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-100 transition-colors"
+                      className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors"
                     >
                       Cancel
                     </button>
@@ -230,176 +284,155 @@ export default function ProfilePage() {
               )}
 
               {addresses.length > 0 ? (
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {addresses.slice(0, visibleAddressesCount).map((addr) => (
                     <div
                       key={addr.id}
-                      className="bg-white p-4 rounded-xl border border-stone-200 flex justify-between items-start"
+                      className="bg-brand-cream/30 rounded-3xl border border-brand-gold/10 p-8 flex flex-col justify-between group hover:bg-brand-cream hover:border-brand-gold/30 transition-all duration-500"
                     >
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-stone-900">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xl font-serif text-brand-brown tracking-tight">
                             {addr.name}
-                          </span>
-                          <span className="text-xs text-stone-500">
-                            {addr.phone}
-                          </span>
+                          </h4>
+                          <button
+                            onClick={() => removeAddress(addr.id)}
+                            className="text-brand-brown/20 hover:text-brand-terracotta transition-all opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 size={16} strokeWidth={1.5} />
+                          </button>
                         </div>
-                        <p className="text-sm text-stone-600">{addr.address}</p>
-                        <p className="text-sm text-stone-600">
-                          {addr.city}, {addr.state} {addr.zipCode}
+                        <p className="text-xs font-light text-brand-brown/60 leading-relaxed mb-1">
+                          {addr.address}
+                        </p>
+                        <p className="text-xs font-light text-brand-brown/60 leading-relaxed">
+                          {addr.city}, {addr.state} - {addr.zipCode}
                         </p>
                       </div>
-                      <button
-                        onClick={() => removeAddress(addr.id)}
-                        className="text-stone-400 hover:text-red-500 transition-colors p-1"
-                        aria-label="Remove address"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      <p className="text-[10px] font-bold tracking-widest text-brand-gold mt-6 uppercase">
+                        {addr.phone}
+                      </p>
                     </div>
                   ))}
-
-                  {visibleAddressesCount < addresses.length && (
-                    <button
-                      onClick={() =>
-                        setVisibleAddressesCount((prev) => prev + 3)
-                      }
-                      className="w-full py-2 mt-2 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
-                    >
-                      Show More Addresses
-                    </button>
-                  )}
                 </div>
               ) : (
-                !showAddForm && (
-                  <p className="text-stone-500 text-sm">
-                    No saved addresses yet.
+                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl">
+                  <p className="text-brand-brown/40 font-light italic">
+                    No addresses saved yet.
                   </p>
-                )
+                </div>
+              )}
+
+              {addresses.length > visibleAddressesCount && (
+                <button
+                  onClick={() => setVisibleAddressesCount(addresses.length)}
+                  className="mt-10 w-full py-4 text-[10px] uppercase tracking-widest font-black text-brand-gold border-t border-brand-gold/10 hover:text-brand-brown transition-colors"
+                >
+                  View All Addresses
+                </button>
               )}
             </div>
 
-            {/* My Orders Section */}
-            <div className="bg-stone-50 rounded-xl p-6">
-              <h2 className="text-lg font-serif text-stone-900 flex items-center gap-2 mb-6">
-                <Package size={20} />
-                My Orders
-              </h2>
+            {/* Order History */}
+            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+              <div className="flex items-center gap-4 mb-10">
+                <Package size={24} className="text-brand-gold" />
+                <h3 className="text-3xl font-serif text-brand-brown tracking-tight">
+                  Order <span className="italic">History</span>
+                </h3>
+              </div>
 
               {orders.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-8">
                   {orders.slice(0, visibleOrdersCount).map((order) => (
                     <div
                       key={order.id}
-                      className="bg-white p-6 rounded-xl border border-stone-200"
+                      className="bg-brand-cream/30 rounded-3xl border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
                     >
-                      <div className="flex flex-wrap gap-4 justify-between items-start mb-4 pb-4 border-b border-stone-100">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-brand-gold/10">
                         <div>
-                          <p className="text-xs text-stone-500 mb-1">
+                          <p className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold mb-2">
                             Order #{order.id.slice(0, 8).toUpperCase()}
                           </p>
-                          <p className="text-sm font-medium text-stone-900">
+                          <p className="text-xs font-light text-brand-brown/60">
                             {new Date(order.created_at).toLocaleDateString(
                               "en-IN",
                               {
                                 day: "numeric",
-                                month: "short",
+                                month: "long",
                                 year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
                               },
                             )}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="flex items-center gap-4">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider mb-2 ${
+                            className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${
                               order.status === "delivered"
-                                ? "bg-emerald-100 text-emerald-700"
+                                ? "bg-brand-green/10 text-brand-green border-brand-green/20"
                                 : order.status === "cancelled"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-amber-100 text-amber-700"
+                                  ? "bg-brand-terracotta/10 text-brand-terracotta border-brand-terracotta/20"
+                                  : "bg-brand-gold/10 text-brand-gold border-brand-gold/20"
                             }`}
                           >
                             {order.status}
                           </span>
-                          <p className="text-sm font-bold text-stone-900">
-                            ₹{order.total_amount.toFixed(2)}
+                          <p className="text-xl font-medium text-brand-brown tracking-tighter">
+                            ₹{order.total_amount.toFixed(0)}
                           </p>
                         </div>
                       </div>
 
-                      <div className="space-y-3">
+                      <div className="flex items-center gap-4 overflow-x-auto pb-2 custom-scrollbar">
                         {order.items.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <div className="relative w-12 h-12 bg-stone-100 rounded-lg overflow-hidden shrink-0">
-                              <ImageWithFallback
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                className="object-cover"
-                                sizes="48px"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-stone-900 line-clamp-1">
-                                {item.name}
-                              </p>
-                              <p className="text-xs text-stone-500">
-                                Qty: {item.quantity} × ₹{item.price.toFixed(2)}
-                              </p>
-                            </div>
+                          <div
+                            key={idx}
+                            className="relative shrink-0 w-16 h-12 rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
+                          >
+                            <ImageWithFallback
+                              src={getProductThumbnail(item)}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
                           </div>
                         ))}
-                      </div>
-
-                      <div className="mt-4 pt-4 border-t border-stone-100 text-xs text-stone-500 flex justify-between">
-                        <span>
-                          Paid via: {order.payment_method.toUpperCase()}
-                        </span>
-                        <span className="truncate max-w-[200px] text-right">
-                          Delivered to: {order.delivery_address.name},{" "}
-                          {order.delivery_address.city}
-                        </span>
+                        {order.items.length > 4 && (
+                          <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-[10px] font-black text-brand-gold">
+                            +{order.items.length - 4}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
-
-                  {visibleOrdersCount < orders.length && (
-                    <button
-                      onClick={() => setVisibleOrdersCount((prev) => prev + 3)}
-                      className="w-full py-3 mt-4 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors"
-                    >
-                      Show More Orders
-                    </button>
-                  )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Package className="mx-auto h-12 w-12 text-stone-300 mb-3" />
-                  <p className="text-stone-500 text-sm">
-                    You haven't placed any orders yet.
+                <div className="p-16 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl flex flex-col items-center gap-6">
+                  <div className="w-20 h-20 bg-brand-gold/5 rounded-full flex items-center justify-center text-brand-gold/20">
+                    <ShoppingBag size={32} strokeWidth={1} />
+                  </div>
+                  <p className="text-brand-brown/40 font-light italic">
+                    You haven&apos;t placed any orders yet.
                   </p>
                   <Link
                     href="/#shop"
-                    className="text-emerald-700 font-medium text-sm hover:underline mt-2 inline-block"
+                    className="inline-flex items-center gap-3 text-[10px] uppercase tracking-widest font-black text-brand-gold hover:text-brand-brown transition-colors"
                   >
-                    Start Shopping
+                    Explore Shop <ArrowRight size={14} />
                   </Link>
                 </div>
               )}
-            </div>
 
-            <button
-              onClick={async () => {
-                await signOut();
-                router.push("/");
-              }}
-              className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-            >
-              <LogOut size={18} /> Sign Out
-            </button>
+              {orders.length > visibleOrdersCount && (
+                <button
+                  onClick={() => setVisibleOrdersCount(orders.length)}
+                  className="mt-10 w-full py-4 text-[10px] uppercase tracking-widest font-black text-brand-gold border-t border-brand-gold/10 hover:text-brand-brown transition-colors"
+                >
+                  View All Orders
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Leaf, Star, ChevronDown } from "lucide-react";
+import { Star, ChevronDown } from "lucide-react";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 
@@ -23,8 +23,6 @@ export default function ProductListing() {
       const { data: products } = await supabase.from("products").select("*");
 
       if (products) {
-        console.log("Data successfully fetched from Supabase:", products);
-
         setProducts(products);
       }
     }
@@ -35,22 +33,18 @@ export default function ProductListing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
 
-  // Extract unique categories
   const categories: string[] = [
     "All",
     ...Array.from(new Set(products.map((p: Product) => p.category))),
   ];
 
-  // Filter and sort products
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Filter by category
     if (selectedCategory !== "All") {
       result = result.filter((p) => p.category === selectedCategory);
     }
 
-    // Sort
     if (sortOrder === "price-asc") {
       result.sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
     } else if (sortOrder === "price-desc") {
@@ -63,58 +57,72 @@ export default function ProductListing() {
   return (
     <section
       id="shop"
-      className="pt-32 pb-12 px-4 sm:px-6 lg:px-8 max-w-[90rem] mx-auto"
+      className="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden"
     >
-      <div className="flex flex-col items-center text-center mb-16">
-        <Leaf className="text-brand-green mb-4 fill-brand-green/20" size={32} />
-        <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-4">
-          Our Essentials
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-brand-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-green/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+      <div className="relative flex flex-col items-center text-center mb-16">
+        <div className="inline-flex items-center gap-4 mb-4">
+          <span className="h-[1px] w-8 bg-brand-gold" />
+          <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+            Purely Curated
+          </span>
+          <span className="h-[1px] w-8 bg-brand-gold" />
+        </div>
+        <h2 className="text-3xl md:text-4xl font-serif text-brand-brown mb-4 tracking-tight">
+          Our <span className="italic text-brand-terracotta">Organic</span>{" "}
+          Collection
         </h2>
-        <p className="text-stone-600 max-w-lg mx-auto font-light leading-relaxed">
-          The foundation of a wholesome pantry. Each product is carefully
-          selected to bring the highest nutritional value to your table.
+        <p className="text-brand-brown/60 max-w-lg mx-auto font-light leading-relaxed text-base text-balance">
+          A selection of India&apos;s finest staples, harvested with respect for
+          the earth and delivered with uncompromising purity.
         </p>
       </div>
 
       {/* Filters & Sorting */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 border-b border-brand-brown/10 pb-6">
+      <div className="relative flex flex-col lg:flex-row justify-between items-center mb-20 gap-8">
         {/* Categories */}
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-4">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-colors ${
+              className={`group relative px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden ${
                 selectedCategory === category
-                  ? "bg-brand-brown text-white"
-                  : "bg-transparent text-brand-brown hover:bg-brand-brown/10"
+                  ? "bg-brand-brown text-brand-cream shadow-xl shadow-brand-brown/20"
+                  : "bg-brand-cream text-brand-brown border border-brand-gold/20 hover:border-brand-gold/40"
               }`}
             >
-              {category}
+              <span className="relative z-10">{category}</span>
+              {selectedCategory !== category && (
+                <div className="absolute inset-0 bg-brand-gold/5 translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
+              )}
             </button>
           ))}
         </div>
 
         {/* Sort Dropdown */}
-        <div className="relative group">
+        <div className="relative min-w-[240px]">
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            className="appearance-none bg-transparent border border-brand-brown/30 text-brand-brown text-xs font-medium uppercase tracking-widest py-2 pl-4 pr-10 rounded-full focus:outline-none focus:ring-1 focus:ring-brand-brown cursor-pointer"
+            className="w-full appearance-none bg-brand-cream border border-brand-gold/20 text-brand-brown text-[10px] font-bold uppercase tracking-[0.2em] py-4 pl-6 pr-12 rounded-full focus:outline-none focus:border-brand-gold transition-all cursor-pointer shadow-sm"
           >
             <option value="default">Sort by: Default</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
           </select>
           <ChevronDown
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-brown pointer-events-none"
-            size={16}
+            className="absolute right-5 top-1/2 -translate-y-1/2 text-brand-gold pointer-events-none"
+            size={14}
           />
         </div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
           const hasHighDiscount = hasHighProductDiscount(product);
@@ -123,115 +131,116 @@ export default function ProductListing() {
           const available = isProductAvailable(product);
 
           return (
-            <Link
-              href={`/product/${product.id}`}
-              key={product.id}
-              className="group flex flex-col"
-            >
-              <div className="relative aspect-video w-full overflow-hidden bg-stone-100 mb-6 group-hover:shadow-xl transition-shadow duration-500">
-                <ProductImageCarousel
-                  product={product}
-                  imageClassName="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors duration-500" />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-[10px] uppercase tracking-widest font-bold px-3 py-1 text-brand-brown shadow-sm">
-                  {product.category}
+            <div key={product.id} className="group flex flex-col">
+              <Link
+                href={`/product/${product.id}`}
+                className="block relative mb-6"
+              >
+                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
+                  <ProductImageCarousel
+                    product={product}
+                    imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/10 transition-colors duration-700" />
+
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    <div className="bg-brand-cream/90 backdrop-blur-md text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 text-brand-brown rounded-full shadow-lg border border-brand-gold/10">
+                      {product.category}
+                    </div>
+                    {available && hasDiscount && (
+                      <div
+                        className={`text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20 text-white ${
+                          hasHighDiscount
+                            ? "bg-brand-terracotta"
+                            : "bg-brand-green"
+                        }`}
+                      >
+                        {hasHighDiscount
+                          ? "Exclusive"
+                          : `${discountPercent}% Off`}
+                      </div>
+                    )}
+                  </div>
+
+                  {!available && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/40 backdrop-blur-[2px]">
+                      <span className="bg-brand-cream text-brand-brown px-6 py-2 text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl">
+                        Available Soon
+                      </span>
+                    </div>
+                  )}
                 </div>
-                {!available && (
-                  <div className="absolute bottom-4 left-4 bg-brand-brown text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">
-                    Available soon
-                  </div>
-                )}
-                {hasDiscount && (
-                  <div
-                    className={`absolute left-4 top-4 text-white shadow-sm px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
-                      hasHighDiscount
-                        ? "bg-brand-gold text-stone-950 ring-2 ring-white/80"
-                        : "bg-brand-green"
-                    }`}
-                  >
-                    {hasHighDiscount ? "Mega Deal" : `${discountPercent}% Off`}
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col flex-grow text-center">
+              </Link>
+
+              <div className="flex flex-col flex-grow text-center px-4">
                 <div className="flex justify-center items-center gap-2 mb-2">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        size={12}
+                        size={10}
                         className={
                           i < Math.round(product.rating || 0)
                             ? "fill-brand-gold text-brand-gold"
-                            : "text-stone-200"
+                            : "text-brand-gold/20"
                         }
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] text-stone-400 font-medium">
-                    {product.rating ? product.rating.toFixed(1) : "0.0"} ({(product.review_count || 0)})
+                  <span className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold">
+                    {product.review_count || 0} Reviews
                   </span>
                 </div>
-                <h3 className="text-xl font-serif text-stone-900 group-hover:text-brand-brown transition-colors mb-2">
-                  {product.name}
-                </h3>
+
+                <Link href={`/product/${product.id}`}>
+                  <h3 className="text-base font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight leading-tight line-clamp-1">
+                    {product.name}
+                  </h3>
+                </Link>
+
+                <p className="text-[9px] text-brand-brown/40 uppercase tracking-[0.2em] font-black mb-3">
+                  {product.weight}
+                </p>
+
                 <div className="mb-4 flex flex-col items-center gap-1">
                   {!available ? (
-                    <div className="flex items-center gap-1">
-                      <span className="text-lg text-brand-green">₹</span>
-                      <div className="relative">
-                        <span className="text-lg text-brand-green opacity-40 select-none">
-                          {product.price.toFixed(2)}
-                        </span>
-                        {/* Tape Overlay */}
-                        <div 
-                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115%] h-5 bg-brand-gold/90 shadow-sm rotate-[-4deg] border-y border-white/20"
-                          style={{
-                            clipPath: "polygon(0% 15%, 5% 0%, 10% 15%, 15% 0%, 20% 15%, 25% 0%, 30% 15%, 35% 0%, 40% 15%, 45% 0%, 50% 15%, 55% 0%, 60% 15%, 65% 0%, 70% 15%, 75% 0%, 80% 15%, 85% 0%, 90% 15%, 95% 0%, 100% 15%, 100% 85%, 95% 100%, 90% 85%, 85% 100%, 80% 85%, 75% 100%, 70% 85%, 65% 100%, 60% 85%, 55% 100%, 50% 85%, 45% 100%, 40% 85%, 35% 100%, 30% 85%, 25% 100%, 20% 85%, 15% 100%, 10% 85%, 5% 100%, 0% 85%)"
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_8px,rgba(0,0,0,0.05)_8px,rgba(0,0,0,0.05)_16px)] opacity-20" />
-                        </div>
-                      </div>
-                    </div>
-                  ) : hasDiscount ? (
-                    <>
-                      <span className="text-sm text-stone-400 line-through">
-                        ₹{product.price.toFixed(2)}
-                      </span>
-                      <span className="text-xl font-bold text-brand-green">
-                        ₹{discountedPrice.toFixed(2)}{" "}
-                        <span className="text-sm text-stone-400 font-light">
-                          / {product.weight}
-                        </span>
-                      </span>
-                    </>
+                    <div className="h-6" /> // Placeholder to keep spacing
                   ) : (
-                    <span className="text-lg text-brand-green">
-                      ₹{product.price.toFixed(2)}{" "}
-                      <span className="text-sm text-stone-400 font-light">
-                        / {product.weight}
-                      </span>
-                    </span>
+                    <>
+                      {hasDiscount ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-brand-brown/40 line-through font-light">
+                            ₹{product.price.toFixed(0)}
+                          </span>
+                          <span className="text-lg text-brand-brown font-medium">
+                            ₹{discountedPrice.toFixed(0)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-lg text-brand-brown font-medium">
+                          ₹{product.price.toFixed(0)}
+                        </span>
+                      )}
+                      {product.stock_quantity !== undefined &&
+                        product.stock_quantity !== null && (
+                          <span className="text-[8px] uppercase tracking-widest font-black text-brand-green/60">
+                            {product.stock_quantity} units available
+                          </span>
+                        )}
+                    </>
                   )}
                 </div>
-                <p className="text-sm text-stone-500 mb-6 line-clamp-2 font-light px-4">
-                  {product.description}
-                </p>
-                <QuickAddButton product={product} />
+
+                <div className="mt-auto pt-2">
+                  <QuickAddButton product={product} className="w-full" />
+                </div>
               </div>
-            </Link>
+            </div>
           );
         })}
       </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center py-20 text-brand-brown">
-          No products found matching your selection.
-        </div>
-      )}
     </section>
   );
 }

@@ -12,19 +12,45 @@ import {
   LogOut,
   ChevronDown,
   UserCircle,
+  X,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { items } = useCartStore();
+  const { items, getTotalItems } = useCartStore();
   const { user, signOut, fetchUser } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const totalItems = getTotalItems();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Initialize audio - Ultra-soft, minimal muffled click (Almost no treble)
+    audioRef.current = new Audio(
+      "https://assets.mixkit.co/active_storage/sfx/2351/2351-preview.mp3",
+    );
+    audioRef.current.volume = 0.1;
+  }, []);
+
+  useEffect(() => {
+    if (mounted && totalItems > 0) {
+      setIsAnimating(true);
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {
+          // Ignore audio play errors (usually due to user interaction policies)
+        });
+      }
+      const timer = setTimeout(() => setIsAnimating(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [totalItems, mounted]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -76,84 +102,80 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-brand-cream/95 backdrop-blur-md shadow-sm py-2" : "bg-brand-cream py-3"}`}
+        className={`sticky top-0 w-full z-50 transition-all duration-500 ${
+          isScrolled
+            ? "bg-brand-cream/80 backdrop-blur-xl border-b border-brand-gold/10 py-2 shadow-[0_10px_30px_-15px_rgba(60,54,42,0.1)]"
+            : "bg-transparent py-6"
+        }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 md:h-14">
-          {/* Logo - Static and contained within header */}
-          <div className="flex items-center flex-1">
+        <div className="max-w-[95rem] mx-auto px-6 sm:px-10 flex items-center justify-between">
+          {/* Desktop Navigation - Left */}
+          <nav className="hidden lg:flex items-center gap-12 flex-1">
             <Link
               href="/"
-              className="relative z-50 transition-transform duration-300 hover:scale-105"
+              className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+            >
+              Home
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+            </Link>
+            <Link
+              href="/#shop"
+              className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+            >
+              Shop
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+            </Link>
+          </nav>
+
+          {/* Logo - Center */}
+          <div className="flex justify-center">
+            <Link
+              href="/"
+              className="relative z-50 transition-all duration-700 hover:scale-105"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <div>
+              <div className="p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
                 <Image
                   src="/logo-horizon.png"
                   alt="Amritya Organics"
-                  width={175}
-                  height={200}
+                  width={110}
+                  height={130}
                   className="object-contain"
                   priority
-                  style={{
-                    border: "none",
-                    flex: 1,
-                  }}
                 />
               </div>
             </Link>
           </div>
 
-          {/* Desktop Navigation - Centered */}
-          <nav className="hidden md:flex items-center gap-10">
-            <Link
-              href="/"
-              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="/#shop"
-              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
-            >
-              Shop
-            </Link>
+          {/* Actions & Navigation - Right */}
+          <div className="flex items-center justify-end gap-6 lg:gap-10 flex-1">
             <Link
               href="/our-story"
-              className="text-stone-800 hover:text-brand-green transition-colors text-xs uppercase tracking-[0.2em] font-medium"
+              className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Our Story
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
             </Link>
-          </nav>
 
-          {/* Actions - Right Aligned */}
-          <div className="flex items-center justify-end gap-5 md:gap-8 flex-1">
+            <div className="h-4 w-[1px] bg-brand-gold/20 hidden lg:block" />
+
             {user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-stone-800 hover:text-brand-green transition-colors flex items-center gap-2"
+                  className="text-brand-brown hover:text-brand-green transition-all hover:scale-110"
                 >
-                  <UserCircle size={22} />
-                  <ChevronDown
-                    size={14}
-                    className={
-                      isDropdownOpen
-                        ? "rotate-180 transition-transform"
-                        : "transition-transform"
-                    }
-                  />
+                  <UserCircle size={24} strokeWidth={1.2} />
                 </button>
                 {isDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-2 z-50">
+                  <div className="absolute right-0 top-full mt-4 w-56 bg-brand-cream/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-brand-gold/10 py-3 z-50 animate-fade-in overflow-hidden">
+                    <div className="absolute inset-0 bg-jute opacity-5 pointer-events-none" />
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 text-sm text-stone-700 hover:bg-stone-100 hover:text-brand-brown transition-colors"
+                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
                       onClick={() => setIsDropdownOpen(false)}
                     >
-                      <div className="flex items-center gap-2">
-                        <User size={16} />
-                        Account
-                      </div>
+                      My Profile
                     </Link>
                     <button
                       onClick={async () => {
@@ -161,12 +183,9 @@ export default function Header() {
                         setIsDropdownOpen(false);
                         router.push("/");
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                      className="relative w-full text-left px-5 py-3 text-[10px] uppercase tracking-widest text-brand-terracotta font-bold hover:bg-brand-terracotta/5 transition-colors"
                     >
-                      <div className="flex items-center gap-2">
-                        <LogOut size={16} />
-                        Sign Out
-                      </div>
+                      Sign Out
                     </button>
                   </div>
                 )}
@@ -174,35 +193,42 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-stone-800 hover:text-brand-green transition-colors flex items-center gap-2"
+                className="text-brand-brown hover:text-brand-green transition-all hover:scale-110"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <User size={20} />
-                <span className="hidden md:block text-xs uppercase tracking-[0.2em] font-medium">
-                  Sign In
-                </span>
+                <User size={22} strokeWidth={1.2} />
               </Link>
             )}
+
             <Link
               href="/cart"
-              className="text-stone-800 hover:text-brand-green relative flex items-center justify-center transition-colors"
+              className="text-brand-brown hover:text-brand-green relative flex items-center justify-center transition-all hover:scale-110 p-2 group"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <ShoppingCart size={22} strokeWidth={1.5} />
-              {mounted && items.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-brand-green text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
-                  {items.reduce((acc, item) => acc + item.quantity, 0)}
+              <ShoppingCart size={24} strokeWidth={1.5} />
+              {mounted && totalItems > 0 && (
+                <span
+                  className={`absolute -top-1 -right-1 bg-brand-terracotta text-white text-[10px] font-black min-w-[20px] h-[20px] rounded-full flex items-center justify-center shadow-lg border-2 border-brand-cream z-50 transition-all duration-300 ${
+                    isAnimating
+                      ? "scale-125 bg-brand-green shadow-brand-green/20"
+                      : "scale-100"
+                  }`}
+                >
+                  {totalItems}
                 </span>
               )}
             </Link>
 
             {/* Mobile Menu Toggle */}
             <button
+              className="lg:hidden text-brand-brown hover:text-brand-green transition-all"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-stone-800 hover:text-brand-green transition-colors md:hidden"
-              aria-label="Toggle menu"
             >
-              <Menu size={22} />
+              {isMobileMenuOpen ? (
+                <X size={24} strokeWidth={1.2} />
+              ) : (
+                <Menu size={24} strokeWidth={1.2} />
+              )}
             </button>
           </div>
         </div>
@@ -210,38 +236,45 @@ export default function Header() {
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 bg-brand-cream z-40 transition-transform duration-300 ease-in-out md:hidden ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
-        style={{ top: "64px" }} // Start below header
+        className={`fixed inset-0 bg-brand-cream z-40 transition-all duration-500 ease-in-out lg:hidden ${
+          isMobileMenuOpen
+            ? "translate-x-0 opacity-100"
+            : "-translate-x-full opacity-0"
+        }`}
       >
-        <div className="flex flex-col p-8 gap-8">
+        <div className="absolute inset-0 bg-jute opacity-10 pointer-events-none" />
+        <div className="flex flex-col h-full justify-center p-12 gap-10">
           <Link
             href="/"
-            className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
+            className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Home
           </Link>
           <Link
             href="/#shop"
-            className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
+            className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Shop
           </Link>
           <Link
             href="/our-story"
-            className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
+            className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Our Story
           </Link>
-          {/* <Link 
-            href="#" 
-            className="text-2xl font-serif text-brand-brown hover:text-brand-gold transition-colors"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Journal
-          </Link> */}
+
+          <div className="mt-12 pt-12 border-t border-brand-gold/20">
+            <Link
+              href="/profile"
+              className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-brown/60 hover:text-brand-brown"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Account
+            </Link>
+          </div>
         </div>
       </div>
     </>

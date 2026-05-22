@@ -1,21 +1,57 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
   
-  --color-brand-brown: #4A533E; /* Deep Olive Green */
-  --color-brand-brown-light: #5E6950;
-  --color-brand-green: #4A533E; /* Deep Olive Green */
-  --color-brand-green-light: #5E6950;
-  --color-brand-gold: #C29F64; /* Soft Gold */
-  --color-brand-cream: #F8F5F0;
+  --color-brand-brown: #3C362A; /* Deep Earthy Umber */
+  --color-brand-brown-light: #5C5446;
+  --color-brand-green: #2D3A26; /* Deep Forest Green */
+  --color-brand-green-light: #4A5D3F;
+  --color-brand-gold: #D4AF37; /* Rich Metallic Gold */
+  --color-brand-cream: #FDFBF7; /* Pure Off-White */
+  --color-brand-terracotta: #A65D47; /* Earthy Red */
+  --color-brand-sand: #E6DFD1;
 }
 
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   background-color: var(--color-brand-cream);
-  color: #2D2420;
+  color: #1A1814;
+  letter-spacing: -0.01em;
+}
+
+/* Desi Premium Utilities */
+.text-balance {
+  text-wrap: balance;
+}
+
+.organic-border {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+.organic-border-alt {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+}
+
+.glass-morphism {
+  background: rgba(253, 251, 247, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.desi-shadow {
+  box-shadow: 0 20px 40px -20px rgba(60, 54, 42, 0.15);
+}
+
+.bg-jute {
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+}
+
+.bg-stone-texture {
+  background-image: url("https://www.transparenttextures.com/patterns/black-linen.png");
+  opacity: 0.03;
 }
 
 /* Subtle animations for premium feel */
@@ -24,13 +60,41 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes float-slow {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
 }
 
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.bg-organic-texture {
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
 }
 
 /* Custom Scrollbar for Order Summary Items */
