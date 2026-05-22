@@ -76,7 +76,7 @@ export default function RootLayout({
               <ul className="space-y-2 text-sm">
                 <li>
                   <a
-                    href="https://www.instagram.com/organicastaples/"
+                    href="https://www.instagram.com/amritya_organics/"
                     className="hover:text-white transition-colors"
                   >
                     Instagram

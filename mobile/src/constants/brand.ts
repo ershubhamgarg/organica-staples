@@ -2,7 +2,7 @@ export const BRAND = {
   name: "Amritya Organics",
   whatsappPhone: "918295433041",
   supportEmail: "bilonanaturals@gmail.com",
-  instagramUrl: "https://www.instagram.com/organicastaples/",
+  instagramUrl: "https://www.instagram.com/amritya_organics/",
   freeShippingThreshold: 500,
   shippingFee: 50,
   heroImage:
