@@ -52,6 +52,7 @@ export default function CheckoutPage() {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [guestAddress, setGuestAddress] = useState<Address | null>(null);
+  const [addressErrors, setAddressErrors] = useState<{[key:string]: string}>({});
   const checkoutAddresses = user
     ? addresses
     : guestAddress
@@ -61,6 +62,7 @@ export default function CheckoutPage() {
   const [newAddress, setNewAddress] = useState({
     name: "",
     phone: "",
+    email: "",
     address: "",
     city: "",
     state: "",
@@ -135,104 +137,35 @@ export default function CheckoutPage() {
 
   if (orderPlaced && placedOrderDetails) {
     return (
-      <div className="min-h-screen bg-brand-cream py-24 px-4 sm:px-6 lg:px-12 flex items-center justify-center">
-        <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl border border-brand-gold/10 p-12 md:p-20 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-brand-green/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full translate-x-1/2 translate-y-1/2" />
+      <div className="min-h-screen bg-brand-cream py-12 px-4 sm:px-6 flex items-center justify-center">
+        <div className="max-w-xl w-full bg-white rounded-3xl p-8 md:p-12 text-center shadow-sm border border-brand-gold/10">
+          <div className="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-green">
+            <CheckCircle2 size={40} strokeWidth={1.5} />
+          </div>
+          <h1 className="text-3xl font-serif text-brand-brown mb-2 tracking-tight">
+            Order Received
+          </h1>
+          <p className="text-brand-brown/60 mb-8 font-light">
+            Thank you for your order! We are preparing your package.
+          </p>
 
-          <div className="relative">
-            <div className="w-24 h-24 bg-brand-green rounded-full flex items-center justify-center mx-auto mb-10 text-brand-cream shadow-xl shadow-brand-green/20 animate-float">
-              <CheckCircle2 size={48} strokeWidth={1} />
+          <div className="bg-brand-cream/50 p-6 rounded-2xl mb-8 border border-brand-gold/10 text-left">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">Order ID</span>
+              <span className="text-xs font-medium text-brand-brown">#{placedOrderDetails.id.slice(0, 8).toUpperCase()}</span>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-serif text-brand-brown tracking-tight mb-4">
-              Order <span className="italic">Confirmed</span>
-            </h1>
-            <p className="text-brand-brown/60 mb-10 font-light text-lg">
-              Thank you for shopping with Amritya Organics.
-            </p>
-
-            <div className="inline-block px-8 py-3 bg-brand-sand/50 rounded-full border border-brand-gold/10 mb-16">
-              <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-brown">
-                Order Number #{placedOrderDetails.id.slice(0, 8).toUpperCase()}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 text-left mb-16">
-              <div className="p-8 bg-brand-cream/50 rounded-2xl border border-brand-gold/5">
-                <h3 className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold mb-6">
-                  Order Summary
-                </h3>
-                <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-4">
-                  {placedOrderDetails.items.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-4 group">
-                      <div className="w-16 h-12 rounded-xl bg-brand-sand overflow-hidden shrink-0">
-                        <ImageWithFallback
-                          src={getProductThumbnail(item)}
-                          alt={item.name}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                          sizes="64px"
-                        />
-                      </div>
-                      <div className="flex-grow">
-                        <p className="text-xs font-serif text-brand-brown line-clamp-1">
-                          {item.name}
-                        </p>
-                        <p className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold mt-1">
-                          Qty: {item.quantity}
-                        </p>
-                      </div>
-                      <p className="text-xs font-bold text-brand-brown">
-                        ₹{(getDiscountedPrice(item) * item.quantity).toFixed(0)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-center">
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-brand-brown/40 font-light">
-                      Total Paid
-                    </span>
-                    <span className="text-2xl font-medium text-brand-brown tracking-tighter">
-                      ₹{placedOrderDetails.total.toFixed(0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-black text-brand-gold">
-                    <span>Payment Method</span>
-                    <span>{placedOrderDetails.paymentMethod}</span>
-                  </div>
-                </div>
-                <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10 flex items-center gap-4">
-                  <ShieldCheck
-                    className="text-brand-green"
-                    size={24}
-                    strokeWidth={1}
-                  />
-                  <p className="text-[10px] text-brand-green font-bold uppercase tracking-widest leading-relaxed">
-                    A confirmation email has been sent to your inbox.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Link
-                href={user ? "/profile" : "/"}
-                className="inline-flex items-center justify-center gap-3 bg-brand-cream border border-brand-brown text-brand-brown px-10 py-5 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown hover:text-brand-cream"
-              >
-                {user ? "View Orders" : "Back to Home"}
-              </Link>
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center gap-3 bg-brand-brown text-brand-cream px-10 py-5 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light shadow-xl shadow-brand-brown/20"
-              >
-                Continue Shopping <ArrowRight size={14} />
-              </Link>
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">Total Amount</span>
+              <span className="text-lg font-medium text-brand-brown">₹{placedOrderDetails.total.toFixed(0)}</span>
             </div>
           </div>
+
+          <Link
+            href="/"
+            className="block w-full py-4 rounded-xl bg-brand-brown text-brand-cream text-[10px] font-black uppercase tracking-[0.2em] hover:bg-brand-brown-light transition-colors"
+          >
+            Continue Shopping
+          </Link>
         </div>
       </div>
     );
@@ -376,9 +309,10 @@ export default function CheckoutPage() {
                                 name: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                            className={`w-full bg-transparent border-b ${addressErrors.name ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="Full Name"
                           />
+                          {addressErrors.name && <p className="text-xs text-red-500 mt-1">{addressErrors.name}</p>}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -393,9 +327,28 @@ export default function CheckoutPage() {
                                 phone: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                            className={`w-full bg-transparent border-b ${addressErrors.phone ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="+91"
                           />
+                          {addressErrors.phone && <p className="text-xs text-red-500 mt-1">{addressErrors.phone}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
+                            Email Address
+                          </label>
+                          <input
+                            type="email"
+                            value={newAddress.email}
+                            onChange={(e) =>
+                              setNewAddress({
+                                ...newAddress,
+                                email: e.target.value,
+                              })
+                            }
+                            className={`w-full bg-transparent border-b ${addressErrors.email ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            placeholder="you@example.com"
+                          />
+                          {addressErrors.email && <p className="text-xs text-red-500 mt-1">{addressErrors.email}</p>}
                         </div>
                       </div>
                       <div className="mb-6">
@@ -411,9 +364,10 @@ export default function CheckoutPage() {
                               address: e.target.value,
                             })
                           }
-                          className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/10 font-light px-2"
+                          className={`w-full bg-transparent border-b ${addressErrors.address ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/10 font-light px-2`}
                           placeholder="Complete Address"
                         />
+                        {addressErrors.address && <p className="text-xs text-red-500 mt-1">{addressErrors.address}</p>}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
@@ -429,9 +383,10 @@ export default function CheckoutPage() {
                                 city: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                            className={`w-full bg-transparent border-b ${addressErrors.city ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="City"
                           />
+                          {addressErrors.city && <p className="text-xs text-red-500 mt-1">{addressErrors.city}</p>}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -446,9 +401,10 @@ export default function CheckoutPage() {
                                 state: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                            className={`w-full bg-transparent border-b ${addressErrors.state ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="State"
                           />
+                          {addressErrors.state && <p className="text-xs text-red-500 mt-1">{addressErrors.state}</p>}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -463,21 +419,34 @@ export default function CheckoutPage() {
                                 zipCode: e.target.value,
                               })
                             }
-                            className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                            className={`w-full bg-transparent border-b ${addressErrors.zipCode ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="Pin Code"
                           />
+                          {addressErrors.zipCode && <p className="text-xs text-red-500 mt-1">{addressErrors.zipCode}</p>}
                         </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-4 mt-8">
                         <button
                           onClick={async () => {
-                            if (
-                              !newAddress.name ||
-                              !newAddress.address ||
-                              !newAddress.zipCode
-                            )
+                            setAddressErrors({});
+                            const errors: {[key:string]: string} = {};
+                            if (!newAddress.name) errors.name = "Name is required";
+        if (!newAddress.address) errors.address = "Address is required";
+        if (!newAddress.city) errors.city = "City is required";
+        if (!newAddress.state) errors.state = "State is required";
+        if (!newAddress.zipCode) errors.zipCode = "Pin Code is required";
+        if (!user) {
+          if (!newAddress.email) errors.email = "Email is required for guest checkout";
+          if (!newAddress.phone) errors.phone = "Phone is required for guest checkout";
+        } else {
+          if (!newAddress.email) errors.email = "Email is required";
+          if (!newAddress.phone) errors.phone = "Phone is required";
+        }
+                            if (Object.keys(errors).length > 0) {
+                              setAddressErrors(errors);
                               return;
+                            }
                             if (user) {
                               await addAddress(user.id, newAddress);
                               setShowNewAddressForm(false);
@@ -487,6 +456,7 @@ export default function CheckoutPage() {
                                 user_id: null,
                                 name: newAddress.name,
                                 phone: newAddress.phone,
+                                email: newAddress.email,
                                 address: newAddress.address,
                                 city: newAddress.city,
                                 state: newAddress.state,
@@ -523,29 +493,43 @@ export default function CheckoutPage() {
                   )}
                 </div>
               ) : (
-                <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-brand-green text-brand-cream flex items-center justify-center">
-                      <MapPin size={20} strokeWidth={1} />
-                    </div>
-                    <div>
-                      <p className="text-base font-serif text-brand-brown">
-                        {
-                          checkoutAddresses.find(
-                            (a) => a.id === selectedAddressId,
-                          )?.name
-                        }
-                      </p>
-                      <p className="text-[10px] text-brand-green uppercase tracking-widest font-bold mt-0.5">
+                <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-brand-green text-brand-cream flex items-center justify-center">
+                        <MapPin size={20} strokeWidth={1} />
+                      </div>
+                      <p className="text-[10px] text-brand-green uppercase tracking-widest font-bold">
                         Confirmed for Delivery
                       </p>
                     </div>
+                    <CheckCircle2
+                      className="text-brand-green"
+                      size={20}
+                      strokeWidth={1}
+                    />
                   </div>
-                  <CheckCircle2
-                    className="text-brand-green"
-                    size={20}
-                    strokeWidth={1}
-                  />
+                  {(() => {
+                    const addr = checkoutAddresses.find(
+                      (a) => a.id === selectedAddressId,
+                    );
+                    if (!addr) return null;
+                    return (
+                      <div className="ml-[52px]">
+                        <p className="text-base font-serif text-brand-brown tracking-tight">
+                          {addr.name}
+                        </p>
+                        <p className="text-[11px] font-light text-brand-brown/70 leading-relaxed mt-1">
+                          {addr.address}, {addr.city}, {addr.state} - {addr.zipCode}
+                        </p>
+                        {addr.phone && (
+                          <p className="text-[10px] font-bold text-brand-brown/50 tracking-widest mt-1.5">
+                            {addr.phone}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -564,120 +548,26 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <button
-                    onClick={() => setSelectedPayment("cod")}
-                    className={`p-8 text-left rounded-2xl border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
-                      selectedPayment === "cod"
-                        ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
-                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                      <CreditCard
-                        size={24}
-                        strokeWidth={1}
-                        className={
-                          selectedPayment === "cod"
-                            ? "text-brand-gold"
-                            : "text-brand-brown/40"
-                        }
-                      />
-                    </div>
-                    <div className="relative z-10">
-                      <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1">
-                        Standard
-                      </h4>
-                      <p className="text-lg font-serif tracking-tight">
-                        Cash on Delivery
-                      </p>
-                    </div>
-                    {selectedPayment === "cod" && (
-                      <div className="absolute top-4 right-4">
-                        <CheckCircle2 size={20} strokeWidth={1} />
-                      </div>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => setSelectedPayment("upi")}
-                    className={`p-8 text-left rounded-2xl border transition-all duration-500 flex flex-col items-center text-center gap-4 relative group overflow-hidden ${
-                      selectedPayment === "upi"
-                        ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
-                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        className={
-                          selectedPayment === "upi"
-                            ? "text-brand-gold"
-                            : "text-brand-brown/40"
-                        }
-                        stroke="currentColor"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                      </svg>
-                    </div>
-                    <div className="relative z-10">
-                      <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1">
-                        Instant
-                      </h4>
-                      <p className="text-lg font-serif tracking-tight">
-                        UPI Payment
-                      </p>
-                    </div>
-                    {selectedPayment === "upi" && (
-                      <div className="absolute top-4 right-4">
-                        <CheckCircle2 size={20} strokeWidth={1} />
-                      </div>
-                    )}
-                  </button>
-                </div>
-
-                {selectedPayment === "upi" && (
-                  <div className="p-8 bg-brand-cream rounded-2xl border border-brand-gold/10 animate-fade-in">
-                    <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-3">
-                      UPI ID
-                    </label>
-                    <div className="flex gap-4">
-                      <input
-                        type="text"
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        className="flex-1 bg-white border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-4"
-                        placeholder="username@bank"
-                      />
-                      <button
-                        onClick={verifyUpiId}
-                        disabled={isVerifyingUpi || !upiId}
-                        className="px-8 py-2 bg-brand-gold text-brand-cream rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown shadow-xl disabled:opacity-50"
-                      >
-                        {isVerifyingUpi ? "Verifying..." : "Verify"}
-                      </button>
-                    </div>
-                    {upiVerificationResult && (
-                      <div
-                        className={`mt-4 p-3 rounded-xl text-[9px] uppercase tracking-widest font-black ${
-                          upiVerificationResult.success
-                            ? "bg-brand-green/10 text-brand-green"
-                            : "bg-brand-terracotta/10 text-brand-terracotta"
-                        }`}
-                      >
-                        {upiVerificationResult.success
-                          ? `Verified: ${upiVerificationResult.name}`
-                          : upiVerificationResult.error}
-                      </div>
-                    )}
+                <div className="p-6 bg-brand-brown text-brand-cream rounded-2xl border border-brand-brown shadow-xl flex items-center gap-5 relative">
+                  <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
+                    <CreditCard
+                      size={24}
+                      strokeWidth={1}
+                      className="text-brand-gold"
+                    />
                   </div>
-                )}
+                  <div>
+                    <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
+                      Payment Method
+                    </h4>
+                    <p className="text-lg font-serif tracking-tight">
+                      Cash on Delivery
+                    </p>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <CheckCircle2 size={20} strokeWidth={1} />
+                  </div>
+                </div>
 
                 <button
                   onClick={async () => {
@@ -685,12 +575,6 @@ export default function CheckoutPage() {
                       (a) => a.id === selectedAddressId,
                     );
                     if (!deliveryAddress || !selectedPayment) return;
-                    if (
-                      selectedPayment === "upi" &&
-                      !upiVerificationResult?.success
-                    )
-                      return;
-
                     const result = await placeOrder(
                       user?.id || null,
                       items,
@@ -712,9 +596,7 @@ export default function CheckoutPage() {
                   }}
                   disabled={
                     isPlacingOrder ||
-                    !selectedPayment ||
-                    (selectedPayment === "upi" &&
-                      !upiVerificationResult?.success)
+                    !selectedPayment
                   }
                   className="w-full bg-brand-brown text-brand-cream py-5 rounded-full text-[12px] uppercase tracking-[0.4em] font-black transition-all hover:bg-brand-brown-light shadow-2xl shadow-brand-brown/20 flex items-center justify-center gap-6 disabled:opacity-50 mt-8 group overflow-hidden relative"
                 >
