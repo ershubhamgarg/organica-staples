@@ -28,6 +28,7 @@ import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
   getDiscountPercent,
+  getUnitPriceInfo,
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
@@ -240,6 +241,7 @@ export default function ProductPage({
   const discountPercent = getDiscountPercent(product);
   const discountedPrice = getDiscountedPrice(product);
   const available = isProductAvailable(product);
+  const unitPrice = product ? getUnitPriceInfo(product) : null;
 
   const handleAddToCart = () => {
     if (!available) return;
@@ -347,17 +349,31 @@ export default function ProductPage({
                 <div className="flex items-baseline gap-6 mb-6">
                   {available && hasDiscount ? (
                     <>
-                      <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                        ₹{discountedPrice.toFixed(0)}
-                      </span>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
+                          ₹{discountedPrice.toFixed(0)}
+                        </span>
+                        {unitPrice && (
+                          <span className="text-sm text-brand-brown/30 font-light">
+                            ({unitPrice})
+                          </span>
+                        )}
+                      </div>
                       <span className="text-lg text-brand-brown/30 line-through font-light">
                         ₹{product.price.toFixed(0)}
                       </span>
                     </>
                   ) : available ? (
-                    <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                      ₹{product.price.toFixed(0)}
-                    </span>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
+                        ₹{product.price.toFixed(0)}
+                      </span>
+                      {unitPrice && (
+                        <span className="text-sm text-brand-brown/30 font-light">
+                          ({unitPrice})
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <div className="h-8" /> // Placeholder if out of stock
                   )}
@@ -551,9 +567,11 @@ export default function ProductPage({
                           ))}
                         </div>
                       </div>
-                      <p className="text-brand-brown/70 font-light leading-relaxed text-balance pl-14">
-                        &quot;{review.comment}&quot;
-                      </p>
+                      {review.comment && review.comment.trim() && (
+                        <p className="text-brand-brown/70 font-light leading-relaxed text-balance pl-14">
+                          &quot;{review.comment}&quot;
+                        </p>
+                      )}
                     </div>
                   ))}
 
@@ -700,6 +718,7 @@ export default function ProductPage({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {recommendedProducts.map((p) => {
                 const available = isProductAvailable(p);
+                const unitPrice = getUnitPriceInfo(p);
                 return (
                   <div
                     key={p.id}
@@ -724,19 +743,31 @@ export default function ProductPage({
                         </div>
                       )}
                     </Link>
-                    <Link href={`/product/${p.id}`}>
+                    <Link href={`/product/${p.id}`} className="mb-2">
                       <h4
-                        className={`text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight ${!available ? "opacity-40" : ""}`}
+                        className={`text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center ${!available ? "opacity-40" : ""}`}
                       >
                         {p.name}
                       </h4>
                     </Link>
                     {available ? (
-                      <p className="text-base text-brand-brown font-medium">
-                        ₹{p.price.toFixed(0)}
-                      </p>
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                          {p.weight}
+                        </p>
+                        <div className="flex items-baseline gap-1.5">
+                          <p className="text-2xl font-medium text-brand-brown tracking-tighter">
+                            ₹{p.price.toFixed(0)}
+                          </p>
+                          {unitPrice && (
+                            <span className="text-[10px] text-brand-brown/30 font-light">
+                              ({unitPrice})
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     ) : (
-                      <div className="h-6" /> // Spacer for layout consistency
+                      <div className="h-10" /> // Spacer for layout consistency
                     )}
                   </div>
                 );

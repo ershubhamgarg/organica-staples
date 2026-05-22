@@ -11,6 +11,7 @@ import { isProductAvailable, Product } from "@/lib/data";
 import {
   getDiscountedPrice,
   getDiscountPercent,
+  getUnitPriceInfo,
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
@@ -129,6 +130,7 @@ export default function ProductListing() {
           const discountPercent = getDiscountPercent(product);
           const discountedPrice = getDiscountedPrice(product);
           const available = isProductAvailable(product);
+          const unitPrice = getUnitPriceInfo(product);
 
           return (
             <div key={product.id} className="group flex flex-col">
@@ -179,7 +181,7 @@ export default function ProductListing() {
               </Link>
 
               <div className="flex flex-col flex-grow text-center px-4">
-                <div className="flex justify-center items-center gap-2 mb-2">
+                <div className="flex justify-center items-center gap-3 mb-3">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -193,47 +195,61 @@ export default function ProductListing() {
                       />
                     ))}
                   </div>
-                  <span className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold">
+                  <span className="text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
                     {product.review_count || 0} Reviews
                   </span>
                 </div>
 
-                <Link href={`/product/${product.id}`}>
-                  <h3 className="text-base font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors mb-1 tracking-tight leading-tight line-clamp-1">
+                <Link href={`/product/${product.id}`} className="mb-2">
+                  <h3 className="text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center">
                     {product.name}
                   </h3>
                 </Link>
 
-                <p className="text-[9px] text-brand-brown/40 uppercase tracking-[0.2em] font-black mb-3">
-                  {product.weight}
-                </p>
+                <div className="flex flex-col items-center gap-1.5 mb-6">
+                  <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                    {product.weight}
+                  </p>
 
-                <div className="mb-4 flex flex-col items-center gap-1">
                   {!available ? (
-                    <div className="h-6" /> // Placeholder to keep spacing
+                    <div className="h-8" />
                   ) : (
-                    <>
+                    <div className="flex flex-col items-center">
                       {hasDiscount ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-brand-brown/40 line-through font-light">
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-brand-brown/20 line-through font-light">
                             ₹{product.price.toFixed(0)}
                           </span>
-                          <span className="text-lg text-brand-brown font-medium">
-                            ₹{discountedPrice.toFixed(0)}
-                          </span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                              ₹{discountedPrice.toFixed(0)}
+                            </span>
+                            {unitPrice && (
+                              <span className="text-[10px] text-brand-brown/30 font-light">
+                                ({unitPrice})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       ) : (
-                        <span className="text-lg text-brand-brown font-medium">
-                          ₹{product.price.toFixed(0)}
-                        </span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                            ₹{product.price.toFixed(0)}
+                          </span>
+                          {unitPrice && (
+                            <span className="text-[10px] text-brand-brown/30 font-light">
+                              ({unitPrice})
+                            </span>
+                          )}
+                        </div>
                       )}
                       {product.stock_quantity !== undefined &&
                         product.stock_quantity !== null && (
-                          <span className="text-[8px] uppercase tracking-widest font-black text-brand-green/60">
-                            {product.stock_quantity} units available
+                          <span className="text-[7px] uppercase tracking-[0.2em] font-black text-brand-green/40 mt-1">
+                            {product.stock_quantity} units left
                           </span>
                         )}
-                    </>
+                    </div>
                   )}
                 </div>
 

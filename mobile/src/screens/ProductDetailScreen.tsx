@@ -125,9 +125,14 @@ export function ProductDetailScreen({ navigation, route }: Props) {
           <View style={styles.priceRow}>
             {isAvailable ? (
               <>
-                <AppText variant="price" style={{ color: colors.primary }}>₹{price.toFixed(2)}</AppText>
+                <AppText variant="price" style={{ color: colors.primary }}>
+                  ₹{price.toFixed(2)}
+                </AppText>
                 {hasProductDiscount(product) && (
-                  <AppText variant="small" style={{ color: colors.gold, fontWeight: "800" }}>
+                  <AppText
+                    variant="small"
+                    style={{ color: colors.gold, fontWeight: "800" }}
+                  >
                     {getDiscountPercent(product)}% off
                   </AppText>
                 )}
@@ -138,10 +143,15 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                   ₹
                 </AppText>
                 <View style={styles.tapeContainerLarge}>
-                  <AppText variant="price" style={{ color: colors.primary, opacity: 0.15 }}>
+                  <AppText
+                    variant="price"
+                    style={{ color: colors.primary, opacity: 0.15 }}
+                  >
                     {product.price.toFixed(2)}
                   </AppText>
-                  <View style={[styles.tapeLarge, { backgroundColor: colors.gold }]} />
+                  <View
+                    style={[styles.tapeLarge, { backgroundColor: colors.gold }]}
+                  />
                 </View>
               </View>
             )}
@@ -257,7 +267,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                 <AppText style={{ fontWeight: "800" }}>
                   {review.user_name || "Anonymous"}
                 </AppText>
-                {review.comment && (
+                {review.comment && review.comment.trim() && (
                   <AppText variant="small">"{review.comment}"</AppText>
                 )}
               </View>
@@ -281,6 +291,7 @@ const styles = StyleSheet.create({
   ratingRow: { flexDirection: "row", alignItems: "center", gap: 5 },
   panel: { gap: 14 },
   priceRow: { flexDirection: "row", alignItems: "baseline", gap: 12 },
+  tapeWrapperLarge: { flexDirection: "row", alignItems: "baseline", gap: 4 },
   tapeContainerLarge: {
     position: "relative",
     alignItems: "center",
