@@ -61,7 +61,7 @@ export default function RootLayout({
                 </li>
                 <li>
                   <a href="#" className="hover:text-white transition-colors">
-                    Pantry
+                    Store
                   </a>
                 </li>
                 <li>

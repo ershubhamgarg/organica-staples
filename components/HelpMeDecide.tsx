@@ -139,11 +139,11 @@ export default function HelpMeDecide() {
     const totalCholesterol = toNumber(profile.totalCholesterol);
 
     if (bmi !== null) {
-      points.push(`BMI estimate: ${bmi.toFixed(1)}`);
+      points.push(`BMI: ${bmi.toFixed(1)}`);
     }
 
     if (fastingSugar > 0) {
-      points.push(`Fasting sugar: ${fastingSugar} mg/dL`);
+      points.push(`Sugar: ${fastingSugar}`);
     }
 
     if (hba1c > 0) {
@@ -151,7 +151,7 @@ export default function HelpMeDecide() {
     }
 
     if (totalCholesterol > 0) {
-      points.push(`Total cholesterol: ${totalCholesterol} mg/dL`);
+      points.push(`Cholesterol: ${totalCholesterol}`);
     }
 
     return points;
@@ -173,40 +173,41 @@ export default function HelpMeDecide() {
   };
 
   return (
-    <section className="bg-brand-cream/30 pt-12 pb-24 px-4 sm:px-6 lg:px-8 border-y border-brand-cream/50">
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header - Now Centered and Full Width */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <div className="flex items-center justify-center gap-3 text-brand-green mb-4">
-            <HeartPulse size={24} strokeWidth={1.5} />
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">
-              Pantry Guidance
+    <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-brand-sand/30 overflow-hidden">
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="inline-flex items-center justify-center gap-3 text-brand-gold mb-3">
+            <span className="h-px w-8 bg-brand-gold/30" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">
+              Shopping Guide
             </span>
+            <span className="h-px w-8 bg-brand-gold/30" />
           </div>
-          <h2 className="text-4xl md:text-5xl font-serif text-brand-brown mb-6">
-            Help me decide
+          <h2 className="text-2xl md:text-4xl font-serif text-brand-brown mb-4 tracking-tight">
+            Help Me <span className="italic text-brand-terracotta">Decide</span>
           </h2>
-          <p className="text-stone-600 font-light leading-relaxed">
-            Share a few wellness markers for a personalized Amritya pantry
-            guide. Simple swaps designed for your journey. This is a shopping
-            guide, not a medical diagnosis.
+          <p className="text-xs text-brand-brown/60 font-light leading-relaxed text-balance max-w-xl">
+            Share your wellness markers for a personalized Amritya guide. Simple
+            swaps designed for your unique health needs.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Left Column - Compact Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* Left Column - Form */}
           <div className="lg:col-span-5">
             <form
               onSubmit={handleSubmit}
-              className="h-full bg-white border border-brand-brown/5 p-6 md:p-10 rounded-3xl shadow-[0_4px_20px_-4px_rgba(74,83,62,0.05)]"
+              className="h-full bg-white organic-border border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5 relative overflow-hidden"
             >
-              <h3 className="text-xl font-serif text-brand-brown mb-8 pb-4 border-b border-brand-cream">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 organic-border-alt translate-x-1/2 -translate-y-1/2" />
+
+              <h3 className="text-2xl font-serif text-brand-brown mb-10 pb-4 border-b border-brand-gold/5 relative z-10">
                 Wellness Profile
               </h3>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-10 relative z-10">
                 <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3">
                     Age
                   </label>
                   <input
@@ -216,21 +217,21 @@ export default function HelpMeDecide() {
                     max="110"
                     value={profile.age}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                     placeholder="e.g. 34"
                     required
                   />
                 </div>
 
                 <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3">
                     Activity
                   </label>
                   <select
                     name="activityLevel"
                     value={profile.activityLevel}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all appearance-none"
+                    className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors appearance-none cursor-pointer px-2"
                   >
                     <option value="low">Low</option>
                     <option value="moderate">Moderate</option>
@@ -239,7 +240,7 @@ export default function HelpMeDecide() {
                 </div>
 
                 <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3">
                     Height (cm)
                   </label>
                   <input
@@ -249,183 +250,174 @@ export default function HelpMeDecide() {
                     max="240"
                     value={profile.height}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
-                    placeholder="170"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                    placeholder="e.g. 175"
                     required
                   />
                 </div>
 
                 <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3">
                     Weight (kg)
                   </label>
                   <input
                     type="number"
                     name="weight"
-                    min="25"
-                    max="250"
+                    min="30"
+                    max="300"
                     value={profile.weight}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
-                    placeholder="68"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                    placeholder="e.g. 70"
                     required
                   />
                 </div>
 
-                <div className="col-span-2 mt-4 pt-4 border-t border-brand-cream">
-                  <p className="text-[10px] text-stone-400 uppercase tracking-widest mb-6 font-bold">
-                    Optional Markers
-                  </p>
-                </div>
-
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
-                    Total Chol.
-                  </label>
-                  <input
-                    type="number"
-                    name="totalCholesterol"
-                    value={profile.totalCholesterol}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
-                    placeholder="mg/dL"
-                  />
-                </div>
-
-                <div className="col-span-1">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
-                    Fasting Sugar
-                  </label>
-                  <input
-                    type="number"
-                    name="fastingSugar"
-                    value={profile.fastingSugar}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
-                    placeholder="mg/dL"
-                  />
-                </div>
-
                 <div className="col-span-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-2">
-                    HbA1c (%)
-                  </label>
-                  <input
-                    type="number"
-                    name="hba1c"
-                    step="0.1"
-                    value={profile.hba1c}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-brand-cream/20 border border-stone-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-green/20 transition-all"
-                    placeholder="e.g. 5.6"
-                  />
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-gold mb-8 mt-4 flex items-center gap-3">
+                    Optional Bio-Markers
+                    <span className="h-px flex-grow bg-brand-gold/10" />
+                  </h4>
+                  <div className="grid grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                        Sugar
+                      </label>
+                      <input
+                        type="number"
+                        name="fastingSugar"
+                        value={profile.fastingSugar}
+                        onChange={handleChange}
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        placeholder="mg/dL"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                        HbA1c
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        name="hba1c"
+                        value={profile.hba1c}
+                        onChange={handleChange}
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        placeholder="%"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                        Chol.
+                      </label>
+                      <input
+                        type="number"
+                        name="totalCholesterol"
+                        value={profile.totalCholesterol}
+                        onChange={handleChange}
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        placeholder="mg/dL"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="mt-10 w-full group relative overflow-hidden bg-brand-brown text-white px-8 py-5 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                className="w-full group relative mt-16 flex items-center justify-center gap-4 bg-brand-brown text-brand-cream py-5 rounded-full text-[11px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px]"
               >
-                <div className="relative z-10 flex items-center justify-center gap-3 font-bold uppercase tracking-[0.2em] text-xs">
-                  Reveal Suggestions{" "}
-                  <ArrowRight
-                    size={16}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </div>
+                <span className="relative z-10 flex items-center gap-3">
+                  See Recommendations <ArrowRight size={14} />
+                </span>
+                <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
               </button>
             </form>
           </div>
 
-          {/* Right Column - Results Area */}
+          {/* Right Column - Results */}
           <div className="lg:col-span-7">
-            <div className="h-full min-h-[500px] flex flex-col bg-white border border-brand-brown/5 rounded-3xl overflow-hidden shadow-[0_4px_20px_-4px_rgba(74,83,62,0.05)]">
-              {!hasSubmitted ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-gradient-to-b from-white to-brand-cream/10">
-                  <div className="w-20 h-20 bg-brand-cream rounded-full flex items-center justify-center mb-8 text-brand-gold animate-pulse">
-                    <Wheat size={40} strokeWidth={1} />
-                  </div>
-                  <h3 className="text-2xl font-serif text-brand-brown mb-4">
-                    Awaiting your details
-                  </h3>
-                  <p className="text-stone-500 font-light leading-relaxed max-w-sm mx-auto">
-                    Once you provide your wellness markers, we will analyze and
-                    suggest the most suitable Amritya pantry essentials tailored
-                    to your needs.
-                  </p>
+            {!hasSubmitted ? (
+              <div className="h-full bg-white/40 organic-border-alt border-2 border-dashed border-brand-gold/10 flex flex-col items-center justify-center p-16 text-center">
+                <div className="w-20 h-20 organic-border bg-brand-sand flex items-center justify-center mb-8 text-brand-gold/30">
+                  <Scale size={32} strokeWidth={1} />
                 </div>
-              ) : (
-                <div className="flex-1 flex flex-col p-8 md:p-10">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-brand-cream">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-brand-green/10 rounded-xl flex items-center justify-center text-brand-green">
-                        <Scale size={24} />
+                <h4 className="text-2xl font-serif text-brand-brown/40 mb-4 tracking-tight">
+                  Awaiting Your Profile
+                </h4>
+                <p className="text-brand-brown/30 font-light max-w-sm text-balance">
+                  Fill your wellness profile to receive a tailored selection of
+                  Amritya products for your home.
+                </p>
+              </div>
+            ) : (
+              <div className="h-full animate-fade-in space-y-8">
+                {/* Profile Summary Badges */}
+                <div className="flex flex-wrap gap-3">
+                  {summary.map((point) => (
+                    <span
+                      key={point}
+                      className="px-5 py-2 bg-brand-gold/5 border border-brand-gold/10 organic-border-alt text-[9px] font-black uppercase tracking-widest text-brand-gold"
+                    >
+                      {point}
+                    </span>
+                  ))}
+                  <span className="px-5 py-2 bg-brand-green/5 border border-brand-green/10 organic-border-alt text-[9px] font-black uppercase tracking-widest text-brand-green">
+                    Activity: {profile.activityLevel}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {insights.map((rec) => (
+                    <div
+                      key={rec.id}
+                      className="group bg-white organic-border border border-brand-gold/5 p-10 shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px] relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-brand-green/5 organic-border-alt translate-x-1/2 -translate-y-1/2" />
+
+                      <div className="w-12 h-12 organic-border-alt bg-brand-sand flex items-center justify-center mb-8 text-brand-brown group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
+                        <Wheat size={20} strokeWidth={1.5} />
                       </div>
-                      <div>
-                        <h3 className="font-serif text-2xl text-brand-brown">
-                          Your Pantry Match
-                        </h3>
-                        <p className="text-xs text-stone-400 uppercase tracking-widest font-bold mt-1">
-                          Based on your profile
+
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-terracotta mb-3">
+                        {rec.title}
+                      </h4>
+                      <h5 className="text-2xl font-serif text-brand-brown mb-6 tracking-tight">
+                        {rec.product}
+                      </h5>
+                      <p className="text-sm text-brand-brown/60 font-light leading-relaxed mb-6 text-balance">
+                        {rec.reason}
+                      </p>
+                      <div className="pt-6 border-t border-brand-gold/5">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-2">
+                          How to use
+                        </p>
+                        <p className="text-xs text-brand-brown/80 font-light leading-relaxed">
+                          {rec.action}
                         </p>
                       </div>
                     </div>
-
-                    {summary.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {summary.slice(0, 3).map((point) => (
-                          <span
-                            key={point}
-                            className="text-[9px] font-bold uppercase tracking-wider bg-brand-cream text-brand-brown px-3 py-1.5 rounded-full border border-brand-brown/5"
-                          >
-                            {point}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-                    {insights.map((item) => (
-                      <article
-                        key={item.id}
-                        className="group flex flex-col bg-brand-cream/20 hover:bg-white border border-brand-brown/5 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                      >
-                        <div className="flex items-start justify-between mb-4">
-                          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-green bg-brand-green/5 px-2 py-1 rounded">
-                            {item.title.split(" ")[0]}
-                          </span>
-                        </div>
-                        <h4 className="text-lg font-serif text-brand-brown mb-2 group-hover:text-brand-gold transition-colors">
-                          {item.product}
-                        </h4>
-                        <p className="text-xs text-stone-500 font-light leading-relaxed mb-4 flex-1">
-                          {item.reason}
-                        </p>
-                        <div className="pt-4 border-t border-brand-brown/5 mt-auto">
-                          <p className="text-[11px] text-stone-700 font-medium italic leading-relaxed">
-                            "{item.action}"
-                          </p>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-
-                  <div className="mt-10 pt-8 border-t border-brand-cream flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <p className="text-[10px] text-stone-400 leading-relaxed max-w-md italic">
-                      *Consult a healthcare professional before making
-                      significant dietary changes.
-                    </p>
-                    <a
-                      href="#shop"
-                      className="inline-flex items-center gap-2 bg-brand-green text-white px-6 py-3 rounded-xl text-[11px] font-bold uppercase tracking-widest hover:bg-brand-brown transition-all shadow-md hover:shadow-lg"
-                    >
-                      Shop Matches <ArrowRight size={14} />
-                    </a>
-                  </div>
+                  ))}
                 </div>
-              )}
-            </div>
+
+                <div className="bg-brand-brown p-8 organic-border-alt flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+                  <div className="text-center md:text-left">
+                    <p className="text-brand-cream/60 text-[10px] uppercase tracking-[0.3em] font-black mb-2">
+                      Ready to transform?
+                    </p>
+                    <p className="text-brand-cream font-serif text-2xl tracking-tight">
+                      Your personalized store awaits.
+                    </p>
+                  </div>
+                  <a
+                    href="#shop"
+                    className="inline-flex items-center gap-4 bg-brand-cream text-brand-brown px-10 py-5 rounded-full text-[11px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-gold"
+                  >
+                    View Selection <ArrowRight size={14} />
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ export interface Product {
   rating?: number;
   review_count?: number;
   available?: boolean | null;
+  stock_quantity?: number | null;
 }
 
 export function getProductThumbnail(product: Product): string {
