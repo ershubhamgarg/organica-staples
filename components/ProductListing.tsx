@@ -42,6 +42,9 @@ export default function ProductListing() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
+    // Exclude products that are not visible
+    result = result.filter((p) => p.isVisible !== false);
+
     if (selectedCategory !== "All") {
       result = result.filter((p) => p.category === selectedCategory);
     }
@@ -142,10 +145,10 @@ export default function ProductListing() {
                 <div className="absolute -inset-2 border border-brand-gold/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] group-hover/image:scale-105 group-hover/image:border-brand-gold/30 transition-all duration-700 pointer-events-none" />
                 <div className="absolute -inset-1.5 border border-brand-green/5 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] group-hover/image:scale-105 group-hover/image:border-brand-green/10 transition-all duration-700 pointer-events-none delay-100" />
 
-                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-transparent transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
+                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
                   <ProductImageCarousel
                     product={product}
-                    imageClassName="object-contain transition-transform duration-1000 group-hover:scale-110"
+                    imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                   
@@ -169,37 +172,10 @@ export default function ProductListing() {
                       </div>
                     )}
                   </div>
-
-                  {!available && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/40 backdrop-blur-[2px]">
-                      <span className="bg-brand-cream text-brand-brown px-6 py-2 text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl">
-                        Available Soon
-                      </span>
-                    </div>
-                  )}
                 </div>
               </Link>
 
               <div className="flex flex-col flex-grow text-center px-4">
-                <div className="flex justify-center items-center gap-3 mb-3">
-                  <div className="flex items-center gap-0.5 text-brand-gold">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={10}
-                        className={
-                          i < Math.round(product.rating || 0)
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-brand-gold/20"
-                        }
-                      />
-                    ))}
-                  </div>
-                  <span className="text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
-                    {product.review_count || 0} Reviews
-                  </span>
-                </div>
-
                 <Link href={`/product/${product.id}`} className="mb-2">
                   <h3 className="text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center">
                     {product.name}
@@ -255,6 +231,25 @@ export default function ProductListing() {
 
                 <div className="mt-auto pt-2">
                   <QuickAddButton product={product} className="w-full" />
+                </div>
+
+                <div className="flex justify-center items-center gap-3 mt-4">
+                  <div className="flex items-center gap-0.5 text-brand-gold">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={10}
+                        className={
+                          i < Math.round(product.rating || 0)
+                            ? "fill-brand-gold text-brand-gold"
+                            : "text-brand-gold/20"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
+                    {product.review_count || 0} Reviews
+                  </span>
                 </div>
               </div>
             </div>

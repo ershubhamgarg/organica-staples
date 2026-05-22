@@ -1,163 +1,12 @@
 "use client";
 
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, MessageCircle, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 const DesiHero = () => {
   return (
-    <section className="relative min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream bg-organic-texture">
-      {/* Background Decorative Elements */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-        {/* Floating Organic Shapes */}
-        <div className="absolute top-20 left-[10%] w-64 h-64 bg-brand-gold/20 rounded-full blur-3xl animate-pulse-slow" />
-        <div
-          className="absolute bottom-40 right-[15%] w-96 h-96 bg-brand-green/10 rounded-full blur-3xl animate-pulse-slow"
-          style={{ animationDelay: "2s" }}
-        />
-      </div>
-
-      {/* Floating Illustrations */}
-      <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-        {/* Wheat Stalk 1 */}
-        <div className="absolute top-1/4 right-[8%] animate-float-slow opacity-40">
-          <svg
-            width="100"
-            height="200"
-            viewBox="0 0 100 200"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M50 200V50M50 50C50 50 20 40 10 20M50 70C50 70 80 60 90 40M50 90C50 90 20 80 10 60M50 110C50 110 80 100 90 80M50 130C50 130 20 120 10 100"
-              stroke="#C29F64"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <circle cx="10" cy="20" r="3" fill="#C29F64" />
-            <circle cx="90" cy="40" r="3" fill="#C29F64" />
-            <circle cx="10" cy="60" r="3" fill="#C29F64" />
-            <circle cx="90" cy="80" r="3" fill="#C29F64" />
-            <circle cx="10" cy="100" r="3" fill="#C29F64" />
-          </svg>
-        </div>
-
-        {/* Earthen Pot (Matka) */}
-        <div className="absolute bottom-[15%] left-[8%] animate-float opacity-30">
-          <svg
-            width="140"
-            height="140"
-            viewBox="0 0 100 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20 50C20 20 80 20 80 50C80 85 20 85 20 50Z"
-              fill="#8B4513"
-              fillOpacity="0.2"
-              stroke="#8B4513"
-              strokeWidth="1.5"
-            />
-            <path
-              d="M35 25C35 20 65 20 65 25"
-              stroke="#8B4513"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M30 35H70"
-              stroke="#8B4513"
-              strokeWidth="1"
-              strokeDasharray="2 2"
-            />
-          </svg>
-        </div>
-
-        {/* Mortar & Pestle */}
-        <div
-          className="absolute top-20 left-[20%] animate-float-slow opacity-20"
-          style={{ animationDelay: "1s" }}
-        >
-          <svg
-            width="80"
-            height="80"
-            viewBox="0 0 100 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20 40C20 40 20 80 50 80C80 80 80 40 80 40H20Z"
-              fill="#5E6950"
-              fillOpacity="0.1"
-              stroke="#4A533E"
-              strokeWidth="2"
-            />
-            <path
-              d="M45 20L55 50"
-              stroke="#4A533E"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-          </svg>
-        </div>
-
-        {/* Tulsi/Basil Leaf */}
-        <div
-          className="absolute top-[15%] left-[45%] animate-float opacity-30"
-          style={{ animationDelay: "4s" }}
-        >
-          <svg
-            width="60"
-            height="60"
-            viewBox="0 0 100 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M50 80C50 80 85 60 85 35C85 20 70 15 50 35C30 15 15 20 15 35C15 60 50 80 50 80Z"
-              fill="#4A533E"
-              fillOpacity="0.1"
-              stroke="#4A533E"
-              strokeWidth="1.5"
-            />
-            <path d="M50 35V80" stroke="#4A533E" strokeWidth="1" />
-            <path
-              d="M50 50C50 50 65 45 75 40"
-              stroke="#4A533E"
-              strokeWidth="0.5"
-            />
-            <path
-              d="M50 60C50 60 35 55 25 50"
-              stroke="#4A533E"
-              strokeWidth="0.5"
-            />
-          </svg>
-        </div>
-
-        {/* Leaf */}
-        <div
-          className="absolute bottom-1/4 right-[20%] animate-float opacity-50"
-          style={{ animationDelay: "3s" }}
-        >
-          <svg
-            width="80"
-            height="80"
-            viewBox="0 0 100 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M50 90C50 90 90 60 90 30C90 10 70 10 50 30C30 10 10 10 10 30C10 60 50 90 50 90Z"
-              fill="#4A533E"
-              fillOpacity="0.1"
-              stroke="#4A533E"
-              strokeWidth="1.5"
-            />
-            <path d="M50 30V90" stroke="#4A533E" strokeWidth="1" />
-          </svg>
-        </div>
-      </div>
-
+    <section className="relative min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream">
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
           <div className="max-w-xl">
@@ -205,20 +54,17 @@ const DesiHero = () => {
 
             {/* Trust Badges */}
             <div className="mt-16 flex flex-wrap gap-8 opacity-60">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-brand-gold rounded-full" />
+              <div className="flex items-center">
                 <span className="text-[10px] uppercase tracking-widest font-bold">
                   100% Organic
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-brand-gold rounded-full" />
+              <div className="flex items-center">
                 <span className="text-[10px] uppercase tracking-widest font-bold">
                   Farm to Table
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-1 bg-brand-gold rounded-full" />
+              <div className="flex items-center">
                 <span className="text-[10px] uppercase tracking-widest font-bold">
                   Zero Chemicals
                 </span>
@@ -250,18 +96,7 @@ const DesiHero = () => {
               <div className="absolute -right-8 bottom-20 z-30 bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-brand-cream animate-float-slow">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold">
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    </svg>
+                    <ShieldCheck size={24} strokeWidth={1.8} />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-green uppercase tracking-tighter">

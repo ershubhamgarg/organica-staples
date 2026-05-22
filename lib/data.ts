@@ -14,6 +14,7 @@ export interface Product {
   review_count?: number;
   available?: boolean | null;
   stock_quantity?: number | null;
+  isVisible?: boolean | null;
 }
 
 export function getProductThumbnail(product: Product): string {

@@ -630,7 +630,7 @@ export default function CheckoutPage() {
                       key={item.id}
                       className="flex gap-4 items-center group"
                     >
-                      <div className="w-16 h-16 rounded-xl bg-brand-sand overflow-hidden shrink-0 relative">
+                      <div className="w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0 relative">
                         <ImageWithFallback
                           src={getProductThumbnail(item)}
                           alt={item.name}

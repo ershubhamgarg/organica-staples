@@ -387,7 +387,7 @@ export default function ProfilePage() {
                         {order.items.map((item, idx) => (
                           <div
                             key={idx}
-                            className="relative shrink-0 w-16 h-12 rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
+                            className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
                           >
                             <ImageWithFallback
                               src={getProductThumbnail(item)}

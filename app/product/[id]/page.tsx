@@ -258,7 +258,7 @@ export default function ProductPage({
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Product Images */}
             <div className="relative lg:sticky lg:top-32">
-              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden shadow-2xl shadow-brand-brown/10">
+              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden">
                 <ProductImageCarousel
                   product={product}
                   imageClassName="object-cover transition-transform duration-1000"
