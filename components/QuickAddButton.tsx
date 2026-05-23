@@ -4,6 +4,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { isProductAvailable, Product } from "@/lib/data";
 import { Clock, Plus, Minus, ShoppingBag } from "lucide-react";
+import { isPreorderProduct } from "@/lib/preorder";
 
 interface QuickAddButtonProps {
   product: Product;
@@ -20,11 +21,13 @@ export default function QuickAddButton({
   const cartItem = items.find((item) => item.id === product.id);
   const quantity = cartItem?.quantity || 0;
   const available = isProductAvailable(product);
+  const preorder = isPreorderProduct(product);
+  const canReserve = available || preorder;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!available) return;
+    if (!canReserve) return;
     addToCart(product, 1, user?.id);
   };
 
@@ -40,7 +43,7 @@ export default function QuickAddButton({
     updateQuantity(product.id, quantity - 1, user?.id);
   };
 
-  if (!available) {
+  if (!canReserve) {
     return (
       <div
         aria-label={`${product.name} will be available soon`}
@@ -89,7 +92,7 @@ export default function QuickAddButton({
     >
       <span className="relative z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-black group-hover:text-brand-cream transition-colors duration-500">
         <ShoppingBag size={14} strokeWidth={2.5} />
-        Add to Cart
+        {preorder ? "Pre-Order" : "Add to Cart"}
       </span>
       <div className="absolute inset-0 bg-brand-brown translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
     </button>

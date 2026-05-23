@@ -16,6 +16,14 @@ import {
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
+import {
+  formatPreorderDate,
+  getPreorderDepositAmount,
+  getPreorderPrice,
+  getPreorderRemainingQuantity,
+  getPreorderShipBy,
+  isPreorderProduct,
+} from "@/lib/preorder";
 
 export default function ProductListing() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,13 +62,13 @@ export default function ProductListing() {
     }
 
     if (sortOrder === "price-asc") {
-      result.sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
+      result.sort((a, b) => getPreorderPrice(a) - getPreorderPrice(b));
     } else if (sortOrder === "price-desc") {
-      result.sort((a, b) => getDiscountedPrice(b) - getDiscountedPrice(a));
+      result.sort((a, b) => getPreorderPrice(b) - getPreorderPrice(a));
     }
 
     return result;
-  }, [selectedCategory, sortOrder, products]);
+  }, [selectedCategory, sortOrder, visibleProducts]);
 
   return (
     <section
@@ -142,6 +150,11 @@ export default function ProductListing() {
           const discountedPrice = getDiscountedPrice(product);
           const available = isProductAvailable(product);
           const unitPrice = getUnitPriceInfo(product);
+          const preorder = isPreorderProduct(product);
+          const preorderPrice = getPreorderPrice(product);
+          const preorderDeposit = getPreorderDepositAmount(product);
+          const preorderRemaining = getPreorderRemainingQuantity(product);
+          const displayPrice = preorder ? preorderPrice : discountedPrice;
 
           return (
             <div
@@ -168,6 +181,11 @@ export default function ProductListing() {
                     <div className="bg-brand-cream/90 backdrop-blur-md text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 text-brand-brown rounded-full shadow-lg border border-brand-gold/10">
                       {product.category}
                     </div>
+                    {preorder && (
+                      <div className="text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-brand-gold/20 text-brand-brown bg-brand-gold/90">
+                        Pre-Order
+                      </div>
+                    )}
                     {available && hasDiscount && (
                       <div
                         className={`text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20 text-white ${
@@ -197,11 +215,30 @@ export default function ProductListing() {
                     {product.weight}
                   </p>
 
-                  {!available ? (
+                  {!available && !preorder ? (
                     <div className="h-8" />
                   ) : (
                     <div className="flex flex-col items-center">
-                      {hasDiscount ? (
+                      {preorder ? (
+                        <div className="flex flex-col items-center">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
+                              Pre-order
+                            </span>
+                            <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                              ₹{displayPrice.toFixed(0)}
+                            </span>
+                            {unitPrice && (
+                              <span className="text-[10px] text-brand-brown/30 font-light">
+                                ({unitPrice})
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
+                            Deposit today ₹{preorderDeposit.toFixed(0)}
+                          </p>
+                        </div>
+                      ) : hasDiscount ? (
                         <div className="flex flex-col items-center">
                           <div className="flex items-center gap-3">
                             <span className="text-sm text-brand-brown/20 line-through font-light">
@@ -240,6 +277,17 @@ export default function ProductListing() {
                             {product.stock_quantity} units left
                           </span>
                         )}
+                      {preorder && (
+                        <div className="mt-2 flex flex-col items-center gap-1">
+                          <span className="text-[7px] uppercase tracking-[0.2em] font-black text-brand-brown/40">
+                            Ships by{" "}
+                            {formatPreorderDate(getPreorderShipBy(product))}
+                          </span>
+                          <span className="text-[7px] uppercase tracking-[0.2em] font-black text-brand-green/50">
+                            {preorderRemaining} reserve slots left
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

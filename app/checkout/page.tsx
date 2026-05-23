@@ -21,18 +21,31 @@ import {
   Plus,
   Lock,
   Banknote,
+  CalendarClock,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
+import {
+  calculatePreorderCart,
+  formatPreorderDate,
+  getPreorderFullPaymentDue,
+  getPreorderLinePricing,
+  getPreorderShipBy,
+  isPreorderProduct,
+  isShippingEligibleForPreorder,
+} from "@/lib/preorder";
 
 interface PlacedOrderDetails {
   id: string;
   items: CartItem[];
   paymentMethod: string;
   total: number;
+  dueToday?: number;
+  balanceDue?: number;
+  isPreorder?: boolean;
 }
 
 type RazorpayOrderResponse = {
@@ -137,6 +150,8 @@ export default function CheckoutPage() {
   const totalPrice = orderSummary?.actualSubtotal ?? getTotalPrice();
   const actualSubtotal = orderSummary?.actualSubtotal ?? totalPrice;
   const productDiscount = orderSummary?.productDiscount ?? 0;
+  const hasPreorderItems = items.some((item) => isPreorderProduct(item));
+  const preorderCart = calculatePreorderCart(items);
 
   // Fallback calculation if orderSummary is missing
   const fallbackCartDiscount = calculateDiscount(
@@ -172,7 +187,9 @@ export default function CheckoutPage() {
       }
     : fallbackCartDiscount;
 
-  const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+  const hasUnavailableItems = items.some(
+    (item) => !isProductAvailable(item) && !isPreorderProduct(item),
+  );
 
   // Address state
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -189,6 +206,16 @@ export default function CheckoutPage() {
     : guestAddress
       ? [guestAddress]
       : [];
+  const selectedAddress = checkoutAddresses.find(
+    (address) => address.id === selectedAddressId,
+  );
+  const preorderShippingEligible =
+    !hasPreorderItems || isShippingEligibleForPreorder(selectedAddress?.zipCode);
+  const preorderPaymentDueAt =
+    orderSummary?.preorderBalanceDue !== undefined && items[0]
+      ? getPreorderFullPaymentDue(items[0])
+      : null;
+  const preorderShipBy = hasPreorderItems && items[0] ? getPreorderShipBy(items[0]) : null;
 
   const [newAddress, setNewAddress] = useState({
     name: "",
@@ -206,11 +233,24 @@ export default function CheckoutPage() {
   );
 
   const codCharge = 15;
-  const currentCodFee = selectedPayment === "cod" ? codCharge : 0;
+  const currentCodFee =
+    selectedPayment === "cod" && !hasPreorderItems ? codCharge : 0;
 
-  const finalTotal =
+  const standardFinalTotal =
     (orderSummary?.totalPayable ??
       subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
+  const preorderDueToday =
+    orderSummary?.preorderDueToday ??
+    preorderCart.preorderDepositDue + convenienceFee;
+  const preorderBalanceDue =
+    orderSummary?.preorderBalanceDue ??
+    preorderCart.preorderBalanceDue + shipping - cartDiscount.amount;
+  const preorderOrderTotal =
+    preorderCart.preorderSubtotal + shipping + convenienceFee - cartDiscount.amount;
+  const finalTotal = hasPreorderItems ? preorderDueToday : standardFinalTotal;
+  const orderTotalForRecord = hasPreorderItems
+    ? preorderOrderTotal
+    : standardFinalTotal;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -277,10 +317,14 @@ export default function CheckoutPage() {
             <CheckCircle2 size={40} strokeWidth={1.5} />
           </div>
           <h1 className="text-3xl font-serif text-brand-brown mb-2 tracking-tight">
-            Order Received
+            {placedOrderDetails.isPreorder
+              ? "Pre-order Reserved"
+              : "Order Received"}
           </h1>
           <p className="text-brand-brown/60 mb-8 font-light">
-            Thank you for your order! We are preparing your package.
+            {placedOrderDetails.isPreorder
+              ? "Your deposit is confirmed. We will remind you before the remaining balance is due."
+              : "Thank you for your order! We are preparing your package."}
           </p>
 
           <div className="bg-brand-cream/50 p-6 rounded-2xl mb-8 border border-brand-gold/10 text-left">
@@ -294,13 +338,45 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
-                Total Amount
+                {placedOrderDetails.isPreorder ? "Pre-order Value" : "Total Amount"}
               </span>
               <span className="text-lg font-medium text-brand-brown">
                 ₹{placedOrderDetails.total.toFixed(0)}
               </span>
             </div>
+            {placedOrderDetails.isPreorder && (
+              <>
+                <div className="mt-4 flex justify-between items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                    Deposit Paid
+                  </span>
+                  <span className="text-lg font-medium text-brand-green-fresh">
+                    ₹{(placedOrderDetails.dueToday ?? 0).toFixed(0)}
+                  </span>
+                </div>
+                <div className="mt-4 flex justify-between items-center">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                    Balance Due
+                  </span>
+                  <span className="text-lg font-medium text-brand-brown">
+                    ₹{(placedOrderDetails.balanceDue ?? 0).toFixed(0)}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
+
+          {placedOrderDetails.isPreorder && (
+            <div className="mb-8 rounded-2xl border border-brand-gold/15 bg-brand-gold/5 p-5 text-left">
+              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-gold">
+                Next steps
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-brand-brown/60">
+                Watch your profile dashboard for milestone updates, balance
+                reminders, and eligible self-service changes.
+              </p>
+            </div>
+          )}
 
           <Link
             href="/"
@@ -348,7 +424,7 @@ export default function CheckoutPage() {
       items,
       deliveryAddress,
       paymentMethod,
-      finalTotal,
+      orderTotalForRecord,
       paymentDetails,
       {
         subtotalAmount: totalPrice,
@@ -358,6 +434,16 @@ export default function CheckoutPage() {
         shippingAmount: shipping,
         convenienceFeeAmount: convenienceFee,
         codAmount: currentCodFee,
+        purchaseMode: hasPreorderItems ? "preorder" : "standard",
+        preorderSubtotal: hasPreorderItems
+          ? preorderCart.preorderSubtotal
+          : undefined,
+        preorderDepositAmount: hasPreorderItems ? preorderDueToday : undefined,
+        preorderBalanceAmount: hasPreorderItems
+          ? preorderBalanceDue
+          : undefined,
+        preorderPaymentDueAt: preorderPaymentDueAt,
+        preorderShipBy: preorderShipBy,
       },
     );
 
@@ -366,7 +452,10 @@ export default function CheckoutPage() {
         id: result.id,
         items,
         paymentMethod,
-        total: finalTotal,
+        total: orderTotalForRecord,
+        dueToday: hasPreorderItems ? preorderDueToday : undefined,
+        balanceDue: hasPreorderItems ? preorderBalanceDue : undefined,
+        isPreorder: hasPreorderItems,
       });
       setOrderPlaced(true);
       clearCart(user?.id);
@@ -374,6 +463,10 @@ export default function CheckoutPage() {
   };
 
   const handleCODPayment = async () => {
+    if (hasPreorderItems) {
+      setPaymentError("Pre-order deposits must be paid online.");
+      return;
+    }
     if (!selectedAddressId) return;
 
     const deliveryAddress = checkoutAddresses.find(
@@ -398,6 +491,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!preorderShippingEligible) {
+      setPaymentError("Pre-orders require a valid 6-digit delivery PIN code.");
+      return;
+    }
+
     setPaymentError(null);
     setIsStartingPayment(true);
 
@@ -419,6 +517,11 @@ export default function CheckoutPage() {
               : "",
             discount_amount: cartDiscount.amount.toFixed(2),
             convenience_fee: convenienceFee.toFixed(2),
+            purchase_mode: hasPreorderItems ? "preorder" : "standard",
+            payment_phase: hasPreorderItems ? "deposit" : "full",
+            balance_due: hasPreorderItems
+              ? preorderBalanceDue.toFixed(2)
+              : "0.00",
           },
         }),
       });
@@ -443,7 +546,9 @@ export default function CheckoutPage() {
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "Amritya Organics",
-        description: "Organic pantry order",
+        description: hasPreorderItems
+          ? "Organic pantry pre-order deposit"
+          : "Organic pantry order",
         order_id: orderData.order.id,
         prefill: {
           name: deliveryAddress.name,
@@ -504,6 +609,8 @@ export default function CheckoutPage() {
               currency: orderData.order.currency,
               status: "verified",
               verified_at: new Date().toISOString(),
+              payment_phase: hasPreorderItems ? "deposit" : "full",
+              remaining_balance: hasPreorderItems ? preorderBalanceDue : 0,
             });
           } catch (error) {
             setPaymentError(
@@ -930,6 +1037,33 @@ export default function CheckoutPage() {
               )}
             </div>
 
+            {hasPreorderItems && (
+              <div className="bg-white rounded-3xl border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center shrink-0">
+                    <CalendarClock size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-serif text-brand-brown tracking-tight">
+                      Pre-order <span className="italic">Schedule</span>
+                    </h2>
+                    <p className="mt-2 text-xs leading-relaxed text-brand-brown/60">
+                      Deposit is collected today through Razorpay. Balance is
+                      due by{" "}
+                      {formatPreorderDate(preorderPaymentDueAt)} and dispatch
+                      is estimated by {formatPreorderDate(preorderShipBy)}.
+                    </p>
+                    {selectedAddress && !preorderShippingEligible && (
+                      <p className="mt-3 rounded-xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-3 text-[10px] font-black uppercase tracking-widest text-brand-terracotta">
+                        Enter a valid 6-digit PIN code to reserve pre-order
+                        shipping.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Step 2: Payment Method */}
             <div
               className={`bg-white rounded-3xl border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5 transition-opacity duration-500 ${!addressConfirmed ? "opacity-30 pointer-events-none" : ""}`}
@@ -984,14 +1118,16 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    if (hasPreorderItems) return;
                     setSelectedPayment("cod");
                     setPaymentError(null);
                   }}
+                  disabled={hasPreorderItems}
                   className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
                     selectedPayment === "cod"
                       ? "bg-brand-brown text-brand-cream border-brand-brown"
                       : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                  }`}
+                  } ${hasPreorderItems ? "opacity-45 cursor-not-allowed" : ""}`}
                 >
                   <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                     <Banknote
@@ -1008,7 +1144,9 @@ export default function CheckoutPage() {
                       Cash on Delivery
                     </p>
                     <p className="text-[10px] font-light opacity-70 mt-1">
-                      Pay at your doorstep (Extra ₹15 charge)
+                      {hasPreorderItems
+                        ? "Unavailable for pre-order deposits"
+                        : "Pay at your doorstep (Extra ₹15 charge)"}
                     </p>
                   </div>
                   {selectedPayment === "cod" && (
@@ -1032,7 +1170,10 @@ export default function CheckoutPage() {
                         : handleCODPayment
                     }
                     disabled={
-                      isPlacingOrder || isStartingPayment || !selectedPayment
+                      isPlacingOrder ||
+                      isStartingPayment ||
+                      !selectedPayment ||
+                      !preorderShippingEligible
                     }
                     className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-4 lg:py-6 rounded-xl lg:rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
                   >
@@ -1048,7 +1189,9 @@ export default function CheckoutPage() {
                       {isPlacingOrder || isStartingPayment
                         ? "Verifying Securely..."
                         : selectedPayment === "razorpay"
-                          ? `Pay ₹${finalTotal.toFixed(0)}`
+                          ? hasPreorderItems
+                            ? `Pay Deposit ₹${finalTotal.toFixed(0)}`
+                            : `Pay ₹${finalTotal.toFixed(0)}`
                           : `Confirm Order ₹${finalTotal.toFixed(0)}`}
                       <ArrowRight
                         size={20}
@@ -1081,6 +1224,8 @@ export default function CheckoutPage() {
               <div className="space-y-6 mb-8 pb-8 border-b border-brand-gold/10 relative z-10 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                 {items.map((item) => {
                   const available = isProductAvailable(item);
+                  const preorder = isPreorderProduct(item);
+                  const preorderLine = getPreorderLinePricing(item);
                   return (
                     <Link
                       key={item.id}
@@ -1103,9 +1248,17 @@ export default function CheckoutPage() {
                         <p className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold mt-1">
                           Qty: {item.quantity}
                         </p>
+                        {preorder && (
+                          <p className="mt-1 text-[8px] uppercase tracking-widest font-black text-brand-gold">
+                            Pre-order · Deposit ₹
+                            {preorderLine.depositDue.toFixed(0)}
+                          </p>
+                        )}
                       </div>
                       <p className="text-[11px] font-bold text-brand-brown shrink-0">
-                        {available
+                        {preorder
+                          ? `₹${preorderLine.lineTotal.toFixed(0)}`
+                          : available
                           ? `₹${(getDiscountedPrice(item) * item.quantity).toFixed(0)}`
                           : "Coming Soon"}
                       </p>
@@ -1176,11 +1329,31 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                 )}
+                {hasPreorderItems && (
+                  <>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-green-fresh font-light italic">
+                        Deposit due today
+                      </span>
+                      <span className="text-brand-green-fresh font-bold tracking-tight">
+                        ₹{preorderDueToday.toFixed(0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-brown/60 font-light">
+                        Balance due later
+                      </span>
+                      <span className="text-brand-brown font-bold tracking-tight">
+                        ₹{preorderBalanceDue.toFixed(0)}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="flex justify-between items-baseline mb-8 relative z-10 pt-8 border-t border-brand-gold/5">
                 <span className="text-base font-serif text-brand-brown">
-                  Final Total
+                  {hasPreorderItems ? "Due Today" : "Final Total"}
                 </span>
                 <span className="text-3xl font-medium text-brand-brown tracking-tighter">
                   ₹{finalTotal.toFixed(0)}

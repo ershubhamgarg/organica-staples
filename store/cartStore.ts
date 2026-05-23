@@ -25,6 +25,11 @@ export interface OrderSummary {
   convenienceFee: number;
   codFee?: number;
   totalPayable: number;
+  preorderSubtotal?: number;
+  preorderDepositDue?: number;
+  preorderBalanceDue?: number;
+  preorderDueToday?: number;
+  purchaseMode?: "standard" | "preorder";
 }
 
 interface CartState {

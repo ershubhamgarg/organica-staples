@@ -15,6 +15,7 @@ import {
   ArrowRight,
   X,
   Sparkles,
+  CalendarClock,
 } from "lucide-react";
 import {
   useCallback,
@@ -33,6 +34,15 @@ import {
   hasProductDiscount,
 } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
+import {
+  calculatePreorderCart,
+  formatPreorderDate,
+  getPreorderDepositAmount,
+  getPreorderPrice,
+  getPreorderRemainingQuantity,
+  getPreorderShipBy,
+  isPreorderProduct,
+} from "@/lib/preorder";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -66,16 +76,25 @@ export default function CartPage() {
   );
 
   const effectiveSubtotal = getTotalPrice();
+  const hasPreorderItems = items.some((item) => isPreorderProduct(item));
+  const preorderCart = useMemo(() => calculatePreorderCart(items), [items]);
   const actualSubtotal = useMemo(
-    () => items.reduce((total, item) => total + item.price * item.quantity, 0),
-    [items],
+    () =>
+      hasPreorderItems
+        ? preorderCart.preorderSubtotal
+        : items.reduce((total, item) => total + item.price * item.quantity, 0),
+    [hasPreorderItems, items, preorderCart.preorderSubtotal],
   );
-  const productDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
+  const productDiscount = hasPreorderItems
+    ? 0
+    : Math.max(actualSubtotal - effectiveSubtotal, 0);
   const cartDiscount = calculateDiscount(
-    effectiveSubtotal,
+    hasPreorderItems ? preorderCart.preorderSubtotal : effectiveSubtotal,
     appliedDiscountCoupon,
   );
-  const subtotalAfterDiscount = cartDiscount.subtotalAfterDiscount;
+  const subtotalAfterDiscount = hasPreorderItems
+    ? preorderCart.preorderSubtotal
+    : cartDiscount.subtotalAfterDiscount;
   const shipping =
     subtotalAfterDiscount >= 1500
       ? 0
@@ -87,13 +106,19 @@ export default function CartPage() {
             ? 149
             : 0;
   const convenienceFee = 10;
-  const totalPayable = subtotalAfterDiscount + convenienceFee + shipping;
+  const standardTotalPayable = subtotalAfterDiscount + convenienceFee + shipping;
+  const preorderDueToday = preorderCart.preorderDepositDue + convenienceFee;
+  const preorderBalanceDue =
+    preorderCart.preorderBalanceDue + shipping - cartDiscount.amount;
+  const totalPayable = hasPreorderItems ? preorderDueToday : standardTotalPayable;
   const freeShippingThreshold = 1500;
   const shippingShortfall = Math.max(
     freeShippingThreshold - subtotalAfterDiscount,
     0,
   );
-  const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+  const hasUnavailableItems = items.some(
+    (item) => !isProductAvailable(item) && !isPreorderProduct(item),
+  );
 
   // Sync summary to store for checkout page
   useEffect(() => {
@@ -111,6 +136,11 @@ export default function CartPage() {
       shipping,
       convenienceFee,
       totalPayable,
+      preorderSubtotal: preorderCart.preorderSubtotal,
+      preorderDepositDue: preorderCart.preorderDepositDue,
+      preorderBalanceDue,
+      preorderDueToday,
+      purchaseMode: hasPreorderItems ? "preorder" : "standard",
     });
   }, [
     mounted,
@@ -121,6 +151,11 @@ export default function CartPage() {
     shipping,
     convenienceFee,
     totalPayable,
+    preorderCart.preorderSubtotal,
+    preorderCart.preorderDepositDue,
+    preorderBalanceDue,
+    preorderDueToday,
+    hasPreorderItems,
     setOrderSummary,
   ]);
 
@@ -311,6 +346,11 @@ export default function CartPage() {
                 const actualLinePrice = item.price * item.quantity;
                 const discountedLinePrice = discountedUnitPrice * item.quantity;
                 const available = isProductAvailable(item);
+                const preorder = isPreorderProduct(item);
+                const preorderUnitPrice = getPreorderPrice(item);
+                const preorderDeposit = getPreorderDepositAmount(item);
+                const preorderLinePrice = preorderUnitPrice * item.quantity;
+                const preorderLineDeposit = preorderDeposit * item.quantity;
 
                 return (
                   <div
@@ -359,7 +399,19 @@ export default function CartPage() {
                                   : `${discountPercent}% Off`}
                               </span>
                             )}
+                            {preorder && (
+                              <span className="px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-brand-gold/20 text-brand-brown bg-brand-gold/20">
+                                Pre-order
+                              </span>
+                            )}
                           </div>
+                          {preorder && (
+                            <p className="mt-2 text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
+                              Ships by{" "}
+                              {formatPreorderDate(getPreorderShipBy(item))} ·{" "}
+                              {getPreorderRemainingQuantity(item)} slots left
+                            </p>
+                          )}
                         </Link>
                         <button
                           onClick={() => removeFromCart(item.id, user?.id)}
@@ -403,7 +455,7 @@ export default function CartPage() {
                         </div>
 
                         <div className="text-right shrink-0">
-                          {!available ? (
+                          {!available && !preorder ? (
                             <div className="relative inline-block">
                               <span className="text-sm md:text-lg font-light text-brand-brown/20 tracking-tight">
                                 Available Soon
@@ -411,13 +463,22 @@ export default function CartPage() {
                             </div>
                           ) : (
                             <div className="flex flex-col">
+                              {preorder && (
+                                <span className="text-[9px] text-brand-green-fresh font-black uppercase tracking-widest">
+                                  Deposit ₹{preorderLineDeposit.toFixed(0)}
+                                </span>
+                              )}
                               {itemHasDiscount && (
                                 <span className="text-[9px] text-brand-brown/30 line-through font-bold">
                                   ₹{actualLinePrice.toFixed(0)}
                                 </span>
                               )}
                               <span className="text-lg md:text-xl font-medium text-brand-brown tracking-tight">
-                                ₹{discountedLinePrice.toFixed(0)}
+                                ₹
+                                {(preorder
+                                  ? preorderLinePrice
+                                  : discountedLinePrice
+                                ).toFixed(0)}
                               </span>
                             </div>
                           )}
@@ -434,6 +495,26 @@ export default function CartPage() {
                 <h3 className="text-xl font-serif text-brand-brown mb-6 tracking-tight">
                   Summary
                 </h3>
+
+                {hasPreorderItems && (
+                  <div className="mb-6 rounded-2xl border border-brand-gold/15 bg-brand-gold/5 p-4">
+                    <div className="flex items-start gap-3">
+                      <CalendarClock
+                        size={16}
+                        className="mt-0.5 shrink-0 text-brand-gold"
+                      />
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-gold">
+                          Pre-order deposit checkout
+                        </p>
+                        <p className="mt-1 text-[11px] leading-relaxed text-brand-brown/60">
+                          Pay the deposit now to reserve stock. The remaining
+                          balance is collected before dispatch.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-4 mb-8 relative z-10">
                   <div className="flex justify-between text-xs">
@@ -487,6 +568,26 @@ export default function CartPage() {
                         ₹{convenienceFee}
                       </span>
                     </div>
+                  )}
+                  {hasPreorderItems && (
+                    <>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-brand-green-fresh font-light italic">
+                          Deposit due today
+                        </span>
+                        <span className="text-brand-green-fresh font-bold tracking-tight">
+                          ₹{preorderCart.preorderDepositDue.toFixed(0)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-brand-brown/60 font-light">
+                          Balance due later
+                        </span>
+                        <span className="text-brand-brown font-bold tracking-tight">
+                          ₹{preorderBalanceDue.toFixed(0)}
+                        </span>
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -586,7 +687,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-baseline mb-8">
                   <span className="text-base font-serif text-brand-brown">
-                    To Pay
+                    {hasPreorderItems ? "Due Today" : "To Pay"}
                   </span>
                   <span className="text-3xl font-medium text-brand-brown tracking-tighter">
                     ₹{totalPayable.toFixed(0)}

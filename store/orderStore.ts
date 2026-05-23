@@ -21,6 +21,21 @@ export interface Order {
   convenience_fee_amount?: number | null;
   cod_amount?: number | null;
   total_amount: number;
+  preorder_status?:
+    | "reserved"
+    | "deposit_paid"
+    | "balance_due"
+    | "paid"
+    | "packing"
+    | "fulfilled"
+    | "cancelled"
+    | null;
+  preorder_payment_due_at?: string | null;
+  preorder_ship_by?: string | null;
+  preorder_deposit_amount?: number | null;
+  preorder_balance_amount?: number | null;
+  preorder_milestones?: PreorderMilestone[] | null;
+  preorder_notifications?: PreorderNotification[] | null;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   created_at: string;
 }
@@ -35,6 +50,8 @@ export type PaymentDetails = {
   status: "verified";
   verified_at: string;
   method?: string;
+  payment_phase?: "deposit" | "balance" | "full";
+  remaining_balance?: number;
 };
 
 export type OrderPricingDetails = {
@@ -45,6 +62,28 @@ export type OrderPricingDetails = {
   shippingAmount: number;
   convenienceFeeAmount: number;
   codAmount?: number;
+  purchaseMode?: "standard" | "preorder";
+  preorderSubtotal?: number;
+  preorderDepositAmount?: number;
+  preorderBalanceAmount?: number;
+  preorderPaymentDueAt?: string | null;
+  preorderShipBy?: string | null;
+};
+
+export type PreorderMilestone = {
+  key: "reserved" | "deposit_paid" | "balance_due" | "packing" | "fulfilled";
+  label: string;
+  date: string | null;
+  completed: boolean;
+};
+
+export type PreorderNotification = {
+  id: string;
+  type: "email" | "in_app";
+  title: string;
+  message: string;
+  scheduled_for: string;
+  sent_at: string | null;
 };
 
 const getErrorMessage = (error: unknown) =>
@@ -136,6 +175,77 @@ export const useOrderStore = create<OrderState>()(
               pricingDetails?.convenienceFeeAmount ?? null,
             cod_amount: pricingDetails?.codAmount ?? null,
             total_amount: totalAmount,
+            preorder_status:
+              pricingDetails?.purchaseMode === "preorder"
+                ? ("deposit_paid" as const)
+                : null,
+            preorder_payment_due_at:
+              pricingDetails?.preorderPaymentDueAt ?? null,
+            preorder_ship_by: pricingDetails?.preorderShipBy ?? null,
+            preorder_deposit_amount:
+              pricingDetails?.preorderDepositAmount ?? null,
+            preorder_balance_amount:
+              pricingDetails?.preorderBalanceAmount ?? null,
+            preorder_milestones:
+              pricingDetails?.purchaseMode === "preorder"
+                ? [
+                    {
+                      key: "reserved" as const,
+                      label: "Stock reserved",
+                      date: new Date().toISOString(),
+                      completed: true,
+                    },
+                    {
+                      key: "deposit_paid" as const,
+                      label: "Deposit paid",
+                      date: new Date().toISOString(),
+                      completed: true,
+                    },
+                    {
+                      key: "balance_due" as const,
+                      label: "Balance payment due",
+                      date: pricingDetails?.preorderPaymentDueAt ?? null,
+                      completed: false,
+                    },
+                    {
+                      key: "packing" as const,
+                      label: "Packing starts",
+                      date: null,
+                      completed: false,
+                    },
+                    {
+                      key: "fulfilled" as const,
+                      label: "Ships by",
+                      date: pricingDetails?.preorderShipBy ?? null,
+                      completed: false,
+                    },
+                  ]
+                : null,
+            preorder_notifications:
+              pricingDetails?.purchaseMode === "preorder"
+                ? [
+                    {
+                      id: crypto.randomUUID(),
+                      type: "email" as const,
+                      title: "Pre-order confirmed",
+                      message:
+                        "Your deposit is received. We will remind you before the balance payment is due.",
+                      scheduled_for: new Date().toISOString(),
+                      sent_at: new Date().toISOString(),
+                    },
+                    {
+                      id: crypto.randomUUID(),
+                      type: "in_app" as const,
+                      title: "Balance payment reminder",
+                      message:
+                        "Your remaining pre-order balance is due soon.",
+                      scheduled_for:
+                        pricingDetails?.preorderPaymentDueAt ??
+                        new Date().toISOString(),
+                      sent_at: null,
+                    },
+                  ]
+                : null,
             status: "pending" as const,
           };
           const legacyOrderData = {
@@ -182,6 +292,40 @@ export const useOrderStore = create<OrderState>()(
             });
 
             return result.order;
+          }
+
+          if (pricingDetails?.purchaseMode === "preorder") {
+            const response = await fetch("/api/orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId,
+                items,
+                deliveryAddress,
+                paymentMethod,
+                totalAmount,
+                paymentDetails,
+                pricingDetails,
+              }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+              set({
+                orders: [result.order, ...get().orders],
+                isLoading: false,
+              });
+
+              return result.order;
+            }
+
+            if (
+              result.code !== "42P01" &&
+              !String(result.error ?? "").includes("SUPABASE_SERVICE_ROLE_KEY")
+            ) {
+              throw new Error(result.error || "Failed to place pre-order.");
+            }
           }
 
           const { data, error } = await supabase

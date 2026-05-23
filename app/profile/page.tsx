@@ -17,10 +17,13 @@ import {
   ChevronRight,
   ArrowRight,
   ShoppingBag,
+  CalendarClock,
+  CreditCard,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getProductThumbnail } from "@/lib/data";
+import { formatPreorderDate } from "@/lib/preorder";
 
 export default function ProfilePage() {
   const { user, signOut } = useUserStore();
@@ -41,6 +44,7 @@ export default function ProfilePage() {
 
   const [visibleAddressesCount, setVisibleAddressesCount] = useState(3);
   const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
+  const preorderOrders = orders.filter((order) => order.preorder_status);
 
   useEffect(() => {
     if (user) {
@@ -115,10 +119,10 @@ export default function ProfilePage() {
             <div className="pt-8 border-t border-brand-gold/10 grid grid-cols-2 gap-4">
               <div className="text-center">
                 <p className="text-2xl font-serif text-brand-brown">
-                  {orders.length}
+                  {preorderOrders.length}
                 </p>
                 <p className="text-[8px] uppercase tracking-widest font-black text-brand-brown/40">
-                  Orders
+                  Pre-orders
                 </p>
               </div>
               <div className="text-center">
@@ -134,6 +138,110 @@ export default function ProfilePage() {
 
           {/* Right: Activities & Addresses */}
           <div className="space-y-12">
+            {preorderOrders.length > 0 && (
+              <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+                <div className="flex items-center gap-4 mb-10">
+                  <CalendarClock size={24} className="text-brand-gold" />
+                  <h3 className="text-3xl font-serif text-brand-brown tracking-tight">
+                    Pre-order <span className="italic">Management</span>
+                  </h3>
+                </div>
+
+                <div className="space-y-6">
+                  {preorderOrders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="rounded-3xl border border-brand-gold/10 bg-brand-cream/30 p-6 md:p-8"
+                    >
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold mb-2">
+                            Pre-order #{order.id.slice(0, 8).toUpperCase()}
+                          </p>
+                          <h4 className="text-xl font-serif text-brand-brown">
+                            {order.items.map((item) => item.name).join(", ")}
+                          </h4>
+                          <p className="mt-2 text-xs text-brand-brown/60">
+                            Ships by {formatPreorderDate(order.preorder_ship_by)}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-right">
+                          <div className="rounded-2xl bg-white/70 p-4">
+                            <p className="text-[8px] uppercase tracking-widest font-black text-brand-brown/40">
+                              Deposit paid
+                            </p>
+                            <p className="mt-1 text-lg font-bold text-brand-green-fresh">
+                              ₹
+                              {(order.preorder_deposit_amount ?? 0).toFixed(0)}
+                            </p>
+                          </div>
+                          <div className="rounded-2xl bg-white/70 p-4">
+                            <p className="text-[8px] uppercase tracking-widest font-black text-brand-brown/40">
+                              Balance
+                            </p>
+                            <p className="mt-1 text-lg font-bold text-brand-brown">
+                              ₹
+                              {(order.preorder_balance_amount ?? 0).toFixed(0)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-5">
+                        {(order.preorder_milestones ?? []).map((milestone) => (
+                          <div
+                            key={milestone.key}
+                            className={`rounded-2xl border p-4 ${
+                              milestone.completed
+                                ? "border-brand-green/20 bg-brand-green/5"
+                                : "border-brand-gold/10 bg-white/60"
+                            }`}
+                          >
+                            <p
+                              className={`text-[8px] uppercase tracking-widest font-black ${
+                                milestone.completed
+                                  ? "text-brand-green-fresh"
+                                  : "text-brand-brown/40"
+                              }`}
+                            >
+                              {milestone.label}
+                            </p>
+                            <p className="mt-2 text-[10px] font-bold text-brand-brown/60">
+                              {formatPreorderDate(milestone.date)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-center">
+                        <div className="rounded-2xl border border-brand-gold/10 bg-white/60 p-4">
+                          <p className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                            Payment calendar
+                          </p>
+                          <p className="mt-1 text-xs text-brand-brown/60">
+                            Balance due by{" "}
+                            {formatPreorderDate(order.preorder_payment_due_at)}.
+                            Reminder notifications are scheduled in app and by
+                            email.
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          <button className="inline-flex items-center gap-2 rounded-full border border-brand-gold/20 px-5 py-3 text-[9px] font-black uppercase tracking-widest text-brand-brown/60">
+                            <MapPin size={13} />
+                            Modify address
+                          </button>
+                          <button className="inline-flex items-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-[9px] font-black uppercase tracking-widest text-brand-cream">
+                            <CreditCard size={13} />
+                            Pay balance
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Saved Addresses */}
             <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
               <div className="flex justify-between items-center mb-10">

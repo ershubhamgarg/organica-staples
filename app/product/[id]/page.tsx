@@ -7,22 +7,19 @@ import Link from "next/link";
 import {
   Check,
   ShieldCheck,
-  Truck,
   Clock,
-  Leaf,
   Minus,
   Plus,
   Star,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
   ArrowRight,
   ShoppingBag,
   Award,
+  CalendarClock,
 } from "lucide-react";
 import { useEffect, useState, use, useMemo } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
-import QuickAddButton from "@/components/QuickAddButton";
 import { isProductAvailable, Product } from "@/lib/data";
 import { supabase } from "@/utils/supabase";
 import {
@@ -32,6 +29,19 @@ import {
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
+import {
+  formatPreorderDate,
+  getPreorderCancellationPolicy,
+  getPreorderDeadline,
+  getPreorderDepositAmount,
+  getPreorderFullPaymentDue,
+  getPreorderPrice,
+  getPreorderRefundPolicy,
+  getPreorderRemainingQuantity,
+  getPreorderShipBy,
+  getPreorderTerms,
+  isPreorderProduct,
+} from "@/lib/preorder";
 
 const REVIEWS_PER_PAGE = 3;
 
@@ -55,7 +65,6 @@ export default function ProductPage({
   const products = useProductStore((state) => state.products);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const isLoading = useProductStore((state) => state.isLoading);
-  const error = useProductStore((state) => state.error);
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
@@ -242,9 +251,14 @@ export default function ProductPage({
   const discountedPrice = getDiscountedPrice(product);
   const available = isProductAvailable(product);
   const unitPrice = product ? getUnitPriceInfo(product) : null;
+  const preorder = isPreorderProduct(product);
+  const preorderPrice = getPreorderPrice(product);
+  const preorderDeposit = getPreorderDepositAmount(product);
+  const preorderBalance = Math.max(preorderPrice - preorderDeposit, 0);
+  const preorderRemaining = getPreorderRemainingQuantity(product);
 
   const handleAddToCart = () => {
-    if (!available) return;
+    if (!available && !preorder) return;
     addToCart(product, quantity, user?.id);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -281,6 +295,11 @@ export default function ProductPage({
                       {hasHighDiscount
                         ? "Special Edition"
                         : `${discountPercent}% Off`}
+                    </div>
+                  )}
+                  {preorder && (
+                    <div className="px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown bg-brand-gold shadow-xl">
+                      Pre-Order Open
                     </div>
                   )}
                 </div>
@@ -347,7 +366,28 @@ export default function ProductPage({
                 </p>
 
                 <div className="flex items-center gap-6 mb-6">
-                  {available && hasDiscount ? (
+                  {preorder ? (
+                    <div className="flex flex-col">
+                      <div className="flex flex-wrap items-baseline gap-3">
+                        <span className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                          Pre-order price
+                        </span>
+                        <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
+                          ₹{preorderPrice.toFixed(0)}
+                        </span>
+                        {unitPrice && (
+                          <span className="text-sm text-brand-brown/30 font-light">
+                            ({unitPrice})
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-2">
+                        Deposit ₹{preorderDeposit.toFixed(0)} today · Balance ₹
+                        {preorderBalance.toFixed(0)} due by{" "}
+                        {formatPreorderDate(getPreorderFullPaymentDue(product))}
+                      </p>
+                    </div>
+                  ) : available && hasDiscount ? (
                     <div className="flex flex-col">
                       <div className="flex items-baseline gap-6">
                         <div className="flex items-baseline gap-3">
@@ -384,7 +424,15 @@ export default function ProductPage({
                     <div className="h-8" /> // Placeholder if out of stock
                   )}
 
-                  {available &&
+                  {preorder ? (
+                    <div className="flex items-center gap-2 px-3 py-1 bg-brand-gold/10 rounded-full">
+                      <div className="w-1.5 h-1.5 rounded-full bg-brand-gold animate-pulse" />
+                      <span className="text-[10px] uppercase tracking-widest font-black text-brand-gold">
+                        {preorderRemaining} reserve slots left
+                      </span>
+                    </div>
+                  ) : (
+                    available &&
                     product.stock_quantity !== undefined &&
                     product.stock_quantity !== null && (
                       <div className="flex items-center gap-2 px-3 py-1 bg-brand-green/10 rounded-full">
@@ -393,7 +441,8 @@ export default function ProductPage({
                           {product.stock_quantity} in stock
                         </span>
                       </div>
-                    )}
+                    )
+                  )}
                 </div>
 
                 <p className="text-base text-brand-brown/60 font-light leading-relaxed max-w-xl text-balance">
@@ -401,9 +450,64 @@ export default function ProductPage({
                 </p>
               </div>
 
+              {preorder && (
+                <div className="mb-8 rounded-3xl border border-brand-gold/15 bg-white p-6 shadow-xl shadow-brand-brown/5">
+                  <div className="mb-5 flex items-center gap-3">
+                    <CalendarClock size={18} className="text-brand-gold" />
+                    <h2 className="text-xl font-serif text-brand-brown tracking-tight">
+                      Pre-order <span className="italic">Terms</span>
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      ["Ships by", formatPreorderDate(getPreorderShipBy(product))],
+                      [
+                        "Reserve before",
+                        formatPreorderDate(getPreorderDeadline(product)),
+                      ],
+                      [
+                        "Full payment due",
+                        formatPreorderDate(getPreorderFullPaymentDue(product)),
+                      ],
+                      [
+                        "Deposit required",
+                        `₹${preorderDeposit.toFixed(0)} per unit`,
+                      ],
+                    ].map(([label, value]) => (
+                      <div
+                        key={label}
+                        className="rounded-2xl border border-brand-gold/10 bg-brand-cream/50 p-4"
+                      >
+                        <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                          {label}
+                        </p>
+                        <p className="mt-1 text-sm font-bold text-brand-brown">
+                          {value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-5 space-y-3 text-xs leading-relaxed text-brand-brown/60">
+                    <p>{getPreorderTerms(product)}</p>
+                    <p>
+                      <span className="font-black text-brand-brown">
+                        Cancellation:
+                      </span>{" "}
+                      {getPreorderCancellationPolicy(product)}
+                    </p>
+                    <p>
+                      <span className="font-black text-brand-brown">
+                        Refunds:
+                      </span>{" "}
+                      {getPreorderRefundPolicy(product)}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Cart Actions */}
               <div className="p-6 bg-brand-cream rounded-3xl border border-brand-gold/10 shadow-xl shadow-brand-brown/5 mb-8">
-                {!available ? (
+                {!available && !preorder ? (
                   <div className="flex flex-col items-center text-center p-2">
                     <Clock className="text-brand-gold mb-3" size={28} />
                     <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown">
@@ -443,7 +547,13 @@ export default function ProductPage({
                         ) : (
                           <ShoppingBag size={18} />
                         )}
-                        {added ? "Added" : "Add to Cart"}
+                        {added
+                          ? preorder
+                            ? "Reserved"
+                            : "Added"
+                          : preorder
+                            ? "Pre-Order"
+                            : "Add to Cart"}
                       </span>
                       <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                     </button>
