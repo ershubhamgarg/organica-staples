@@ -23,7 +23,7 @@ import {
 import { useEffect, useState, use, useMemo } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import QuickAddButton from "@/components/QuickAddButton";
-import { isProductAvailable, Product } from "@/lib/data";
+import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
@@ -246,6 +246,7 @@ export default function ProductPage({
   const discountPercent = getDiscountPercent(product);
   const discountedPrice = getDiscountedPrice(product);
   const available = isProductAvailable(product);
+  const lowStock = isProductLowStock(product);
   const unitPrice = product ? getUnitPriceInfo(product) : null;
 
   const handleAddToCart = () => {
@@ -287,7 +288,7 @@ export default function ProductPage({
               <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden">
                 <ProductImageCarousel
                   product={product}
-                  imageClassName="object-cover transition-transform duration-1000"
+                  imageClassName={`object-cover transition-transform duration-1000 ${!available ? "blur-[2px] opacity-60" : ""}`}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
 
@@ -309,7 +310,19 @@ export default function ProductPage({
                         : `${discountPercent}% Off`}
                     </div>
                   )}
+                  {available && lowStock && (
+                    <div className="px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-white shadow-xl bg-brand-terracotta">
+                      Few Left
+                    </div>
+                  )}
                 </div>
+                {!available && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
+                    <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
+                      Available Soon
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Decorative Ring */}
@@ -420,9 +433,19 @@ export default function ProductPage({
                     product.stock_quantity !== undefined &&
                     product.stock_quantity !== null && (
                       <div className="flex items-center gap-2 px-3 py-1 bg-brand-green/10 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-widest font-black text-brand-green">
-                          {product.stock_quantity} in stock
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                            lowStock ? "bg-brand-terracotta" : "bg-brand-green"
+                          }`}
+                        />
+                        <span
+                          className={`text-[10px] uppercase tracking-widest font-black ${
+                            lowStock ? "text-brand-terracotta" : "text-brand-green"
+                          }`}
+                        >
+                          {lowStock
+                            ? `Only ${product.stock_quantity} left`
+                            : `${product.stock_quantity} in stock`}
                         </span>
                       </div>
                     )}
@@ -458,8 +481,18 @@ export default function ProductPage({
                         {quantity}
                       </span>
                       <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        onClick={() =>
+                          setQuantity(
+                            typeof product.stock_quantity === "number"
+                              ? Math.min(product.stock_quantity, quantity + 1)
+                              : quantity + 1,
+                          )
+                        }
+                        disabled={
+                          typeof product.stock_quantity === "number" &&
+                          quantity >= product.stock_quantity
+                        }
+                        className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-25"
                       >
                         <Plus size={16} strokeWidth={3} />
                       </button>
@@ -776,6 +809,7 @@ export default function ProductPage({
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               {recommendedProducts.map((p) => {
                 const available = isProductAvailable(p);
+                const lowStock = isProductLowStock(p);
                 const unitPrice = getUnitPriceInfo(p);
                 return (
                   <div
@@ -798,6 +832,11 @@ export default function ProductPage({
                           <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
                             Available Soon
                           </span>
+                        </div>
+                      )}
+                      {available && lowStock && (
+                        <div className="absolute top-3 left-3 bg-brand-terracotta text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-white/20">
+                          Few Left
                         </div>
                       )}
                     </Link>
@@ -823,6 +862,20 @@ export default function ProductPage({
                             </span>
                           )}
                         </div>
+                        {p.stock_quantity !== undefined &&
+                          p.stock_quantity !== null && (
+                            <span
+                              className={`text-[7px] uppercase tracking-[0.2em] font-black ${
+                                lowStock
+                                  ? "text-brand-terracotta"
+                                  : "text-brand-green/40"
+                              }`}
+                            >
+                              {lowStock
+                                ? `Only ${p.stock_quantity} left`
+                                : `${p.stock_quantity} in stock`}
+                            </span>
+                          )}
                       </div>
                     ) : (
                       <div className="h-10" /> // Spacer for layout consistency

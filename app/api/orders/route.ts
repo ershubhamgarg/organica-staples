@@ -3,6 +3,7 @@ import type { Address } from "@/store/addressStore";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
+import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 
 type OrderPayload = {
   userId: string | null;
@@ -30,6 +31,8 @@ const getSupabaseAdmin = () => {
   });
 };
 
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
 export async function POST(request: Request) {
   const supabaseAdmin = getSupabaseAdmin();
 
@@ -53,6 +56,18 @@ export async function POST(request: Request) {
     paymentDetails,
     pricingDetails,
   } = payload;
+  const authHeader = request.headers.get("authorization");
+  const bearerToken = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length)
+    : null;
+  const {
+    data: { user },
+  } = bearerToken
+    ? await supabaseAdmin.auth.getUser(bearerToken)
+    : { data: { user: null } };
+  const isLaunchOfferOrder =
+    pricingDetails?.discountCode === LAUNCH_OFFER_CODE ||
+    paymentMethod === "instagram_story_verification";
 
   if (
     !items?.length ||
@@ -67,6 +82,31 @@ export async function POST(request: Request) {
     );
   }
 
+  const launchOffer = getLaunchOfferState(items);
+
+  if (isLaunchOfferOrder) {
+    if (!user?.email) {
+      return NextResponse.json(
+        { error: "Please sign in to claim the launch offer." },
+        { status: 401 },
+      );
+    }
+
+    if (!launchOffer.isEligible) {
+      return NextResponse.json(
+        { error: launchOffer.message },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (userId && user?.id !== userId) {
+    return NextResponse.json(
+      { error: "Authenticated user does not match this order." },
+      { status: 403 },
+    );
+  }
+
   if (!userId && (!deliveryAddress.email || !deliveryAddress.phone)) {
     return NextResponse.json(
       { error: "Guest orders require email and contact number." },
@@ -74,8 +114,13 @@ export async function POST(request: Request) {
     );
   }
 
+  const orderUserId = user?.id ?? userId ?? null;
+  const launchOfferEmail = isLaunchOfferOrder
+    ? normalizeEmail(user?.email ?? "")
+    : null;
+
   const orderData = {
-    user_id: userId ?? null,
+    user_id: orderUserId,
     items,
     delivery_address: deliveryAddress,
     payment_method: paymentMethod,
@@ -95,16 +140,32 @@ export async function POST(request: Request) {
     status: "pending",
   };
 
-  const { data, error } = await supabaseAdmin
-    .from("orders")
-    .insert([orderData])
-    .select()
-    .single();
+  const { data, error } = await supabaseAdmin.rpc(
+    "place_order_with_inventory",
+    {
+      p_order_data: orderData,
+      p_items: items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      p_launch_offer_email: launchOfferEmail,
+    },
+  );
 
   if (error) {
+    const status =
+      error.code === "23505"
+        ? 409
+        : error.code === "23514" || error.code === "P0002"
+          ? 409
+          : error.code === "42P01" || error.code === "42883"
+            ? 500
+            : 500;
+
     return NextResponse.json(
       { error: error.message, code: error.code },
-      { status: error.code === "42P01" ? 404 : 500 },
+      { status },
     );
   }
 

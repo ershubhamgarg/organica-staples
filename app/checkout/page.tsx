@@ -447,6 +447,12 @@ export default function CheckoutPage() {
   const handleLaunchOfferOrder = async () => {
     if (!selectedAddressId || !launchOffer.isEligible) return;
 
+    if (!user?.email) {
+      setPaymentError("Please sign in to claim the launch offer.");
+      router.push("/login");
+      return;
+    }
+
     const deliveryAddress = checkoutAddresses.find(
       (a) => a.id === selectedAddressId,
     );
@@ -501,6 +507,10 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: finalTotal,
+          items: items.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
           receipt: `amritya_${Date.now().toString(36)}`,
           notes: {
             customer_name: deliveryAddress.name,
@@ -1237,7 +1247,9 @@ export default function CheckoutPage() {
                           {isPlacingOrder || isStartingPayment
                             ? "Verifying..."
                             : launchOffer.isEligible
-                              ? "Place Order"
+                              ? user
+                                ? "Place Order"
+                                : "Sign In"
                               : selectedPayment === "razorpay"
                               ? "Pay Securely"
                               : "Place Order"}
@@ -1289,7 +1301,9 @@ export default function CheckoutPage() {
                       {isPlacingOrder || isStartingPayment
                         ? "Verifying Securely..."
                         : launchOffer.isEligible
-                          ? "Place Launch Offer Order"
+                          ? user
+                            ? "Place Launch Offer Order"
+                            : "Sign In To Claim Offer"
                           : selectedPayment === "razorpay"
                           ? `Pay ₹${finalTotal.toFixed(0)}`
                           : `Confirm Order ₹${finalTotal.toFixed(0)}`}

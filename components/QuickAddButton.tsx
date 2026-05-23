@@ -20,6 +20,9 @@ export default function QuickAddButton({
   const cartItem = items.find((item) => item.id === product.id);
   const quantity = cartItem?.quantity || 0;
   const available = isProductAvailable(product);
+  const hasReachedStockLimit =
+    typeof product.stock_quantity === "number" &&
+    quantity >= product.stock_quantity;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -31,6 +34,7 @@ export default function QuickAddButton({
   const handleIncrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (hasReachedStockLimit) return;
     updateQuantity(product.id, quantity + 1, user?.id);
   };
 
@@ -74,7 +78,13 @@ export default function QuickAddButton({
         </span>
         <button
           onClick={handleIncrease}
-          className="text-brand-brown hover:text-brand-green transition-all p-1 hover:scale-110"
+          disabled={hasReachedStockLimit}
+          className="text-brand-brown hover:text-brand-green transition-all p-1 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-25"
+          aria-label={
+            hasReachedStockLimit
+              ? `${product.name} stock limit reached`
+              : "Increase quantity"
+          }
         >
           <Plus size={14} strokeWidth={3} />
         </button>

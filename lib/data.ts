@@ -14,6 +14,7 @@ export interface Product {
   review_count?: number;
   available?: boolean | null;
   stock_quantity?: number | null;
+  low_stock_threshold?: number | null;
   isVisible?: boolean | null;
 }
 
@@ -24,6 +25,28 @@ export function getProductThumbnail(product: Product): string {
   return product.image;
 }
 
-export function isProductAvailable(product: Pick<Product, "available">): boolean {
+export function isProductAvailable(
+  product: Pick<Product, "available" | "stock_quantity">,
+): boolean {
+  if (typeof product.stock_quantity === "number") {
+    return product.stock_quantity > 0;
+  }
+
   return product.available !== false;
+}
+
+export function isProductLowStock(
+  product: Pick<Product, "stock_quantity" | "low_stock_threshold">,
+): boolean {
+  if (
+    typeof product.stock_quantity !== "number" ||
+    typeof product.low_stock_threshold !== "number"
+  ) {
+    return false;
+  }
+
+  return (
+    product.stock_quantity > 0 &&
+    product.stock_quantity <= product.low_stock_threshold
+  );
 }

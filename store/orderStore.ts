@@ -113,98 +113,49 @@ export const useOrderStore = create<OrderState>()(
         pricingDetails?: OrderPricingDetails,
       ) => {
         set({ isLoading: true, error: null });
-        const saveLocalOrder = (
-          newOrderData: Omit<Order, "id" | "created_at">,
-        ) => {
-          const localOrder = {
-            id: crypto.randomUUID(),
-            ...newOrderData,
-            created_at: new Date().toISOString(),
-          };
-          set({ orders: [localOrder, ...get().orders], isLoading: false });
-          return localOrder;
-        };
 
         try {
-          const newOrderData = {
-            user_id: userId,
-            items,
-            delivery_address: deliveryAddress,
-            payment_method: paymentMethod,
-            payment_details: paymentDetails ?? null,
-            subtotal_amount: pricingDetails?.subtotalAmount ?? 0,
-            discount_code: pricingDetails?.discountCode ?? null,
-            discount_percent: pricingDetails?.discountPercent ?? null,
-            product_discount_amount:
-              pricingDetails?.productDiscountAmount ?? 0,
-            coupon_discount_amount:
-              pricingDetails?.couponDiscountAmount ?? 0,
-            discount_amount:
-              (pricingDetails?.productDiscountAmount ?? 0) +
-              (pricingDetails?.couponDiscountAmount ?? 0),
-            shipping_amount: pricingDetails?.shippingAmount ?? 0,
-            convenience_fee_amount:
-              pricingDetails?.convenienceFeeAmount ?? 0,
-            cod_amount: pricingDetails?.codAmount ?? 0,
-            total_amount: totalAmount,
-            status: "pending" as const,
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token
+                ? { Authorization: `Bearer ${session.access_token}` }
+                : {}),
+            },
+            body: JSON.stringify({
+              userId,
+              items,
+              deliveryAddress,
+              paymentMethod,
+              totalAmount,
+              paymentDetails,
+              pricingDetails,
+            }),
+          });
+
+          const result = (await response.json()) as {
+            order?: Order;
+            error?: string;
+            code?: string;
           };
-          if (!userId) {
-            const response = await fetch("/api/orders", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId,
-                items,
-                deliveryAddress,
-                paymentMethod,
-                totalAmount,
-                paymentDetails,
-                pricingDetails,
-              }),
-            });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-              if (result.code === "42P01") {
-                console.warn(
-                  "Orders table missing. Saving to local state only.",
-                );
-                return saveLocalOrder(newOrderData);
-              }
-
-              throw new Error(result.error || "Failed to place guest order.");
-            }
-
-            set({
-              orders: [result.order, ...get().orders],
-              isLoading: false,
-            });
-
-            return result.order;
-          }
-
-          const { data, error } = await supabase
-            .from("orders")
-            .insert([newOrderData])
-            .select()
-            .single();
-
-          if (error) {
-            if (error.code === "42P01") {
-              console.warn("Orders table missing. Saving to local state only.");
-              return saveLocalOrder(newOrderData);
-            }
-            throw error;
+          if (!response.ok || !result.order) {
+            throw new Error(result.error || "Failed to place order.");
           }
 
           set({
-            orders: [data, ...get().orders],
+            orders: [result.order, ...get().orders],
             isLoading: false,
           });
 
-          return data;
+          const { useProductStore } = await import("./productStore");
+          await useProductStore.getState().fetchProducts();
+
+          return result.order;
         } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
           throw error; // Re-throw to handle it in the component if necessary

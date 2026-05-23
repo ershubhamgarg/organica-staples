@@ -37,7 +37,11 @@ import {
   hasHighProductDiscount,
   hasProductDiscount,
 } from "@/lib/pricing";
-import { getProductThumbnail, isProductAvailable } from "@/lib/data";
+import {
+  getProductThumbnail,
+  isProductAvailable,
+  isProductLowStock,
+} from "@/lib/data";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -363,6 +367,10 @@ export default function CartPage() {
                 const actualLinePrice = item.price * item.quantity;
                 const discountedLinePrice = discountedUnitPrice * item.quantity;
                 const available = isProductAvailable(item);
+                const lowStock = isProductLowStock(item);
+                const hasReachedStockLimit =
+                  typeof item.stock_quantity === "number" &&
+                  item.quantity >= item.stock_quantity;
 
                 return (
                   <div
@@ -410,6 +418,11 @@ export default function CartPage() {
                                   : `${discountPercent}% Off`}
                               </span>
                             )}
+                            {available && lowStock && (
+                              <span className="px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-brand-terracotta/20 bg-brand-terracotta/10 text-brand-terracotta">
+                                Only {item.stock_quantity} left
+                              </span>
+                            )}
                           </div>
                         </Link>
                         <button
@@ -446,7 +459,8 @@ export default function CartPage() {
                                 user?.id,
                               )
                             }
-                            className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-green transition-all rounded-full hover:bg-brand-cream"
+                            disabled={hasReachedStockLimit}
+                            className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-green transition-all rounded-full hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-25"
                             aria-label="Increase quantity"
                           >
                             <Plus size={12} strokeWidth={3} />

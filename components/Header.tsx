@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import LaunchOfferBanner from "@/components/LaunchOfferBanner";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/utils/supabase";
@@ -290,6 +291,7 @@ export default function Header() {
           </div>
         </div>
       </header>
+      <LaunchOfferBanner />
 
       {/* Mobile Menu Overlay */}
       <div

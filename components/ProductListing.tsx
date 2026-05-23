@@ -7,8 +7,7 @@ import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
 
-import { supabase } from "@/utils/supabase";
-import { isProductAvailable, Product } from "@/lib/data";
+import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import {
   getDiscountedPrice,
   getDiscountPercent,
@@ -17,15 +16,20 @@ import {
   hasProductDiscount,
 } from "@/lib/pricing";
 
+type ProductsResponse = {
+  products?: Product[];
+};
+
 export default function ProductListing() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function getProducts() {
-      const { data: products } = await supabase.from("products").select("*");
+      const response = await fetch("/api/products", { cache: "no-store" });
+      const result = (await response.json()) as ProductsResponse;
 
-      if (products) {
-        setProducts(products);
+      if (response.ok && result.products) {
+        setProducts(result.products);
       }
     }
 
@@ -141,6 +145,7 @@ export default function ProductListing() {
           const discountPercent = getDiscountPercent(product);
           const discountedPrice = getDiscountedPrice(product);
           const available = isProductAvailable(product);
+          const lowStock = isProductLowStock(product);
           const unitPrice = getUnitPriceInfo(product);
 
           return (
@@ -159,7 +164,7 @@ export default function ProductListing() {
                 <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
                   <ProductImageCarousel
                     product={product}
-                    imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"
+                    imageClassName={`object-cover transition-transform duration-1000 group-hover:scale-110 ${!available ? "blur-[2px] opacity-60" : ""}`}
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
 
@@ -181,7 +186,19 @@ export default function ProductListing() {
                           : `${discountPercent}% Off`}
                       </div>
                     )}
+                    {available && lowStock && (
+                      <div className="bg-brand-terracotta text-white text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20">
+                        Few Left
+                      </div>
+                    )}
                   </div>
+                  {!available && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
+                      <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
+                        Available Soon
+                      </span>
+                    </div>
+                  )}
                 </div>
               </Link>
 
@@ -236,8 +253,16 @@ export default function ProductListing() {
                       )}
                       {product.stock_quantity !== undefined &&
                         product.stock_quantity !== null && (
-                          <span className="text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-black text-brand-green/40 mt-0.5 sm:mt-1">
-                            {product.stock_quantity} units left
+                          <span
+                            className={`text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
+                              lowStock
+                                ? "text-brand-terracotta"
+                                : "text-brand-green/40"
+                            }`}
+                          >
+                            {lowStock
+                              ? `Only ${product.stock_quantity} left`
+                              : `${product.stock_quantity} units left`}
                           </span>
                         )}
                     </div>

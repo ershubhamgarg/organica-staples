@@ -2,7 +2,12 @@
 
 import { create } from "zustand";
 import { Product } from "@/lib/data";
-import { supabase } from "@/utils/supabase";
+
+type ProductsResponse = {
+  products?: Product[];
+  product?: Product | null;
+  error?: string;
+};
 
 interface ProductState {
   products: Product[];
@@ -19,37 +24,43 @@ export const useProductStore = create<ProductState>()((set) => ({
 
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
-    const { data, error } = await supabase.from("products").select("*");
+    const response = await fetch("/api/products", { cache: "no-store" });
+    const result = (await response.json()) as ProductsResponse;
 
-    if (error) {
-      set({ error: error.message, isLoading: false });
+    if (!response.ok) {
+      set({
+        error: result.error ?? "Unable to fetch products.",
+        isLoading: false,
+      });
       return;
     }
 
-    set({ products: data || [], isLoading: false });
+    set({ products: result.products ?? [], isLoading: false });
   },
 
   fetchProductById: async (id: string) => {
     set({ isLoading: true, error: null });
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const response = await fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+      cache: "no-store",
+    });
+    const result = (await response.json()) as ProductsResponse;
 
-    if (error) {
-      set({ error: error.message, isLoading: false });
+    if (!response.ok || !result.product) {
+      set({
+        error: result.error ?? "Unable to fetch product.",
+        isLoading: false,
+      });
       return null;
     }
 
     set((state) => ({
       products: [
-        data,
-        ...state.products.filter((product) => product.id !== data.id),
+        result.product as Product,
+        ...state.products.filter((product) => product.id !== result.product?.id),
       ],
       isLoading: false,
     }));
 
-    return data;
+    return result.product;
   },
 }));
