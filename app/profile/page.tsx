@@ -65,8 +65,13 @@ export default function ProfilePage() {
     }
   }, [user, fetchAddresses, fetchOrders]);
 
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    }
+  }, [user, router]);
+
   if (!user) {
-    router.push("/login");
     return null;
   }
 
