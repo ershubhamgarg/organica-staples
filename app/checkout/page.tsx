@@ -21,10 +21,15 @@ import {
   Plus,
   Lock,
   Banknote,
+  Share2,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
+import {
+  LAUNCH_OFFER_CODE,
+  getLaunchOfferState,
+} from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 
@@ -140,43 +145,59 @@ export default function CheckoutPage() {
     0,
   );
   const fallbackEffectiveSubtotal = getTotalPrice();
+  const launchOffer = getLaunchOfferState(items);
+  const launchOfferDiscount = launchOffer.isEligible
+    ? fallbackActualSubtotal
+    : 0;
   const totalPrice = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
   const actualSubtotal = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
   const productDiscount =
-    orderSummary?.productDiscount ??
-    Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0);
+    launchOffer.isEligible
+      ? launchOfferDiscount
+      : (orderSummary?.productDiscount ??
+        Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0));
 
   // Fallback calculation if orderSummary is missing
   const fallbackCartDiscount = calculateDiscount(
-    fallbackEffectiveSubtotal,
-    appliedDiscountCoupon,
+    launchOffer.isEligible ? 0 : fallbackEffectiveSubtotal,
+    launchOffer.isEligible ? null : appliedDiscountCoupon,
   );
 
   const subtotalAfterDiscount =
-    orderSummary?.subtotalAfterDiscount ??
-    fallbackCartDiscount.subtotalAfterDiscount;
-  const shipping =
-    orderSummary?.shipping ??
-    (subtotalAfterDiscount >= 1500
+    launchOffer.isEligible
       ? 0
-      : subtotalAfterDiscount >= 1000
-        ? 49
-        : subtotalAfterDiscount >= 500
-          ? 99
-          : subtotalAfterDiscount > 0
-            ? 149
-            : 0);
+      : (orderSummary?.subtotalAfterDiscount ??
+        fallbackCartDiscount.subtotalAfterDiscount);
+  const shipping =
+    launchOffer.isEligible
+      ? 0
+      : (orderSummary?.shipping ??
+        (subtotalAfterDiscount >= 1500
+          ? 0
+          : subtotalAfterDiscount >= 1000
+            ? 49
+            : subtotalAfterDiscount >= 500
+              ? 99
+              : subtotalAfterDiscount > 0
+                ? 149
+                : 0));
   const convenienceFee =
-    orderSummary?.convenienceFee ?? 10;
+    launchOffer.isEligible ? 0 : (orderSummary?.convenienceFee ?? 10);
 
   const cartDiscount = orderSummary
     ? {
-        amount: orderSummary.couponDiscount.amount,
-        percent: orderSummary.couponDiscount.percent,
-        code: orderSummary.couponDiscount.code,
+        amount: launchOffer.isEligible ? 0 : orderSummary.couponDiscount.amount,
+        percent: launchOffer.isEligible
+          ? 100
+          : orderSummary.couponDiscount.percent,
+        code: launchOffer.isEligible
+          ? LAUNCH_OFFER_CODE
+          : orderSummary.couponDiscount.code,
         isEligible: true, // If it's in orderSummary, it was eligible on cart page
         shortfall: 0,
-        subtotalAfterDiscount: orderSummary.subtotalAfterDiscount,
+        subtotalAfterDiscount: launchOffer.isEligible
+          ? 0
+          : orderSummary.subtotalAfterDiscount,
       }
     : fallbackCartDiscount;
 
@@ -214,11 +235,14 @@ export default function CheckoutPage() {
   );
 
   const codCharge = 15;
-  const currentCodFee = selectedPayment === "cod" ? codCharge : 0;
+  const currentCodFee =
+    selectedPayment === "cod" && !launchOffer.isEligible ? codCharge : 0;
 
   const finalTotal =
-    (orderSummary?.totalPayable ??
-      subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
+    launchOffer.isEligible
+      ? 0
+      : (orderSummary?.totalPayable ??
+        subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -244,7 +268,8 @@ export default function CheckoutPage() {
   }, [user, newAddress.email]);
 
   useEffect(() => {
-    if (!appliedDiscountCode || appliedDiscountCoupon) return;
+    if (launchOffer.isEligible || !appliedDiscountCode || appliedDiscountCoupon)
+      return;
 
     const fetchAppliedCoupon = async () => {
       try {
@@ -277,6 +302,7 @@ export default function CheckoutPage() {
     applyDiscountCode,
     removeDiscountCode,
     totalPrice,
+    launchOffer.isEligible,
     user?.id,
   ]);
 
@@ -299,7 +325,10 @@ export default function CheckoutPage() {
             Order Received
           </h1>
           <p className="text-brand-brown/60 mb-8 font-light">
-            Thank you for your order! We are preparing your package.
+            {placedOrderDetails.paymentMethod ===
+            "instagram_story_verification"
+              ? "Take a screenshot of this confirmation, upload it to your Instagram Story, and tag @amritya_organics. We will verify it before processing your order."
+              : "Thank you for your order! We are preparing your package."}
           </p>
 
           <div className="bg-brand-cream/50 p-6 rounded-2xl mb-8 border border-brand-gold/10 text-left">
@@ -320,6 +349,20 @@ export default function CheckoutPage() {
               </span>
             </div>
           </div>
+
+          {placedOrderDetails.paymentMethod ===
+            "instagram_story_verification" && (
+            <div className="mb-8 rounded-2xl border border-brand-green/15 bg-brand-green/5 p-5 text-left">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
+                Instagram Verification Needed
+              </p>
+              <p className="mt-2 text-xs font-light leading-relaxed text-brand-brown/70">
+                Share this order confirmation on Instagram Story and tag
+                @amritya_organics. Offer is limited and orders are processed
+                after story verification.
+              </p>
+            </div>
+          )}
 
           <Link
             href="/"
@@ -372,9 +415,17 @@ export default function CheckoutPage() {
       {
         subtotalAmount: totalPrice,
         productDiscountAmount: productDiscount,
-        discountCode: cartDiscount.isEligible ? cartDiscount.code : null,
-        discountPercent: cartDiscount.isEligible ? cartDiscount.percent : 0,
-        couponDiscountAmount: cartDiscount.amount,
+        discountCode: launchOffer.isEligible
+          ? LAUNCH_OFFER_CODE
+          : cartDiscount.isEligible
+            ? cartDiscount.code
+            : null,
+        discountPercent: launchOffer.isEligible
+          ? 100
+          : cartDiscount.isEligible
+            ? cartDiscount.percent
+            : 0,
+        couponDiscountAmount: launchOffer.isEligible ? 0 : cartDiscount.amount,
         shippingAmount: shipping,
         convenienceFeeAmount: convenienceFee,
         codAmount: currentCodFee,
@@ -390,6 +441,27 @@ export default function CheckoutPage() {
       });
       setOrderPlaced(true);
       clearCart(user?.id);
+    }
+  };
+
+  const handleLaunchOfferOrder = async () => {
+    if (!selectedAddressId || !launchOffer.isEligible) return;
+
+    const deliveryAddress = checkoutAddresses.find(
+      (a) => a.id === selectedAddressId,
+    );
+    if (!deliveryAddress) return;
+
+    try {
+      setPaymentError(null);
+      await completeOrder(
+        deliveryAddress,
+        "instagram_story_verification",
+        undefined,
+      );
+    } catch (error) {
+      console.error("Launch offer placement error:", error);
+      setPaymentError("Failed to place launch offer order. Please try again.");
     }
   };
 
@@ -575,6 +647,30 @@ export default function CheckoutPage() {
             <ArrowLeft size={12} /> Back to Cart
           </Link>
         </div>
+
+        {launchOffer.isEligible && (
+          <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
+            <div className="flex items-start gap-4">
+              <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                <Share2 size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
+                  Launch Story Offer Unlocked
+                </p>
+                <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
+                  Product cost is waived for this order.
+                </h2>
+                <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
+                  Place the order for ₹0, then upload the final order
+                  confirmation to your Instagram Story and tag
+                  @amritya_organics. We will process the order after
+                  verification.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1fr] gap-8 items-start">
           {/* Left Column - Steps */}
@@ -959,84 +1055,112 @@ export default function CheckoutPage() {
                   2
                 </div>
                 <h2 className="text-xl font-serif text-brand-brown tracking-tight">
-                  Payment <span className="italic">Method</span>
+                  {launchOffer.isEligible ? "Story" : "Payment"}{" "}
+                  <span className="italic">
+                    {launchOffer.isEligible ? "Verification" : "Method"}
+                  </span>
                 </h2>
               </div>
 
               <div className="space-y-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPayment("razorpay");
-                    setPaymentError(null);
-                  }}
-                  className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
-                    selectedPayment === "razorpay"
-                      ? "bg-brand-brown text-brand-cream border-brand-brown"
-                      : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
-                    <CreditCard
-                      size={24}
-                      strokeWidth={1}
-                      className="text-brand-gold"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
-                      Payment Method
-                    </h4>
-                    <p className="text-lg font-serif tracking-tight">
-                      Razorpay Checkout
-                    </p>
-                    <p className="text-[10px] font-light opacity-70 mt-1">
-                      Test mode cards, UPI, wallets, and netbanking
-                    </p>
-                  </div>
-                  {selectedPayment === "razorpay" && (
-                    <div className="absolute top-4 right-4">
-                      <CheckCircle2 size={20} strokeWidth={1} />
+                {launchOffer.isEligible ? (
+                  <div className="w-full rounded-2xl border border-brand-green/15 bg-brand-green/5 p-6 text-left shadow-xl">
+                    <div className="flex items-start gap-5">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                        <Share2 size={24} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-green-fresh mb-1">
+                          Verification Method
+                        </h4>
+                        <p className="text-lg font-serif tracking-tight text-brand-brown">
+                          Instagram Story Tag
+                        </p>
+                        <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
+                          No online payment is needed. Your order remains
+                          pending until you share the confirmation on Instagram
+                          Story and tag @amritya_organics.
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </button>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPayment("razorpay");
+                        setPaymentError(null);
+                      }}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
+                        selectedPayment === "razorpay"
+                          ? "bg-brand-brown text-brand-cream border-brand-brown"
+                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                      }`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
+                        <CreditCard
+                          size={24}
+                          strokeWidth={1}
+                          className="text-brand-gold"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
+                          Payment Method
+                        </h4>
+                        <p className="text-lg font-serif tracking-tight">
+                          Razorpay Checkout
+                        </p>
+                        <p className="text-[10px] font-light opacity-70 mt-1">
+                          Test mode cards, UPI, wallets, and netbanking
+                        </p>
+                      </div>
+                      {selectedPayment === "razorpay" && (
+                        <div className="absolute top-4 right-4">
+                          <CheckCircle2 size={20} strokeWidth={1} />
+                        </div>
+                      )}
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPayment("cod");
-                    setPaymentError(null);
-                  }}
-                  className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
-                    selectedPayment === "cod"
-                      ? "bg-brand-brown text-brand-cream border-brand-brown"
-                      : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
-                    <Banknote
-                      size={24}
-                      strokeWidth={1}
-                      className="text-brand-gold"
-                    />
-                  </div>
-                  <div>
-                    <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
-                      Payment Method
-                    </h4>
-                    <p className="text-lg font-serif tracking-tight">
-                      Cash on Delivery
-                    </p>
-                    <p className="text-[10px] font-light opacity-70 mt-1">
-                      Pay at your doorstep (Extra ₹15 charge)
-                    </p>
-                  </div>
-                  {selectedPayment === "cod" && (
-                    <div className="absolute top-4 right-4">
-                      <CheckCircle2 size={20} strokeWidth={1} />
-                    </div>
-                  )}
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPayment("cod");
+                        setPaymentError(null);
+                      }}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
+                        selectedPayment === "cod"
+                          ? "bg-brand-brown text-brand-cream border-brand-brown"
+                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                      }`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
+                        <Banknote
+                          size={24}
+                          strokeWidth={1}
+                          className="text-brand-gold"
+                        />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
+                          Payment Method
+                        </h4>
+                        <p className="text-lg font-serif tracking-tight">
+                          Cash on Delivery
+                        </p>
+                        <p className="text-[10px] font-light opacity-70 mt-1">
+                          Pay at your doorstep (Extra ₹15 charge)
+                        </p>
+                      </div>
+                      {selectedPayment === "cod" && (
+                        <div className="absolute top-4 right-4">
+                          <CheckCircle2 size={20} strokeWidth={1} />
+                        </div>
+                      )}
+                    </button>
+                  </>
+                )}
 
                 {paymentError && (
                   <div className="rounded-2xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-4 text-[10px] font-bold uppercase tracking-widest text-brand-terracotta">
@@ -1080,18 +1204,27 @@ export default function CheckoutPage() {
                     {/* Right Column: Place Order/Pay Action Button */}
                     <button
                       onClick={
-                        selectedPayment === "razorpay"
+                        launchOffer.isEligible
+                          ? handleLaunchOfferOrder
+                          : selectedPayment === "razorpay"
                           ? handleRazorpayPayment
                           : handleCODPayment
                       }
                       disabled={
-                        isPlacingOrder || isStartingPayment || !selectedPayment
+                        isPlacingOrder ||
+                        isStartingPayment ||
+                        (!launchOffer.isEligible && !selectedPayment)
                       }
                       className="flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
                         {isPlacingOrder || isStartingPayment ? (
                           <div className="w-3.5 h-3.5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                        ) : launchOffer.isEligible ? (
+                          <Share2
+                            size={12}
+                            className="text-brand-gold flex-shrink-0"
+                          />
                         ) : selectedPayment === "razorpay" ? (
                           <Lock size={12} className="text-brand-gold animate-pulse flex-shrink-0" />
                         ) : (
@@ -1103,7 +1236,9 @@ export default function CheckoutPage() {
                         <span className="whitespace-nowrap">
                           {isPlacingOrder || isStartingPayment
                             ? "Verifying..."
-                            : selectedPayment === "razorpay"
+                            : launchOffer.isEligible
+                              ? "Place Order"
+                              : selectedPayment === "razorpay"
                               ? "Pay Securely"
                               : "Place Order"}
                         </span>
@@ -1124,17 +1259,26 @@ export default function CheckoutPage() {
                 <div className="hidden lg:block lg:static lg:p-0 lg:border-none lg:shadow-none z-40">
                   <button
                     onClick={
-                      selectedPayment === "razorpay"
+                      launchOffer.isEligible
+                        ? handleLaunchOfferOrder
+                        : selectedPayment === "razorpay"
                         ? handleRazorpayPayment
                         : handleCODPayment
                     }
                     disabled={
-                      isPlacingOrder || isStartingPayment || !selectedPayment
+                      isPlacingOrder ||
+                      isStartingPayment ||
+                      (!launchOffer.isEligible && !selectedPayment)
                     }
                     className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-4 lg:py-6 rounded-xl lg:rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
                   >
                     <span className="relative z-10 flex items-center gap-4">
-                      {selectedPayment === "razorpay" ? (
+                      {launchOffer.isEligible ? (
+                        <Share2
+                          size={18}
+                          className="text-brand-green-fresh"
+                        />
+                      ) : selectedPayment === "razorpay" ? (
                         <Lock size={18} className="text-brand-green-fresh" />
                       ) : (
                         <Banknote
@@ -1144,7 +1288,9 @@ export default function CheckoutPage() {
                       )}
                       {isPlacingOrder || isStartingPayment
                         ? "Verifying Securely..."
-                        : selectedPayment === "razorpay"
+                        : launchOffer.isEligible
+                          ? "Place Launch Offer Order"
+                          : selectedPayment === "razorpay"
                           ? `Pay ₹${finalTotal.toFixed(0)}`
                           : `Confirm Order ₹${finalTotal.toFixed(0)}`}
                       <ArrowRight
@@ -1154,9 +1300,11 @@ export default function CheckoutPage() {
                     </span>
                     <span className="relative z-10 text-[8px] tracking-[0.3em] opacity-60 font-bold uppercase flex items-center gap-2">
                       <ShieldCheck size={10} />
-                      {selectedPayment === "razorpay"
-                        ? "Powered by Razorpay"
-                        : "Verified Cash on Delivery Order"}
+                      {launchOffer.isEligible
+                        ? "Pending Instagram Story Verification"
+                        : selectedPayment === "razorpay"
+                          ? "Powered by Razorpay"
+                          : "Verified Cash on Delivery Order"}
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
                     <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
@@ -1202,9 +1350,11 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                       <p className="text-[11px] font-bold text-brand-brown shrink-0">
-                        {available
-                          ? `₹${(getDiscountedPrice(item) * item.quantity).toFixed(0)}`
-                          : "Coming Soon"}
+                        {!available
+                          ? "Coming Soon"
+                          : launchOffer.isEligible
+                            ? "₹0"
+                            : `₹${(getDiscountedPrice(item) * item.quantity).toFixed(0)}`}
                       </p>
                     </Link>
                   );
@@ -1220,7 +1370,17 @@ export default function CheckoutPage() {
                     ₹{actualSubtotal.toFixed(0)}
                   </span>
                 </div>
-                {productDiscount > 0 && (
+                {launchOffer.isEligible && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-green-fresh font-light italic">
+                      Launch Story Offer ({LAUNCH_OFFER_CODE})
+                    </span>
+                    <span className="text-brand-green-fresh font-bold tracking-tight">
+                      -₹{launchOfferDiscount.toFixed(0)}
+                    </span>
+                  </div>
+                )}
+                {!launchOffer.isEligible && productDiscount > 0 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-green-fresh font-light italic">
                       Product Discount (
@@ -1232,7 +1392,7 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                 )}
-                {cartDiscount.amount > 0 && (
+                {!launchOffer.isEligible && cartDiscount.amount > 0 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-green-fresh font-light italic">
                       Coupon Discount ({cartDiscount.code}) (

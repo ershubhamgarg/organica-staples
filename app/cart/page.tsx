@@ -27,6 +27,11 @@ import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
 import {
+  LAUNCH_OFFER_CODE,
+  LAUNCH_OFFER_PACK_LIMIT,
+  getLaunchOfferState,
+} from "@/lib/launchOffer";
+import {
   getDiscountedPrice,
   getDiscountPercent,
   hasHighProductDiscount,
@@ -70,23 +75,31 @@ export default function CartPage() {
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
-  const productDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
+  const launchOffer = useMemo(() => getLaunchOfferState(items), [items]);
+  const launchOfferDiscount = launchOffer.isEligible ? actualSubtotal : 0;
+  const productDiscount = launchOffer.isEligible
+    ? launchOfferDiscount
+    : Math.max(actualSubtotal - effectiveSubtotal, 0);
   const cartDiscount = calculateDiscount(
-    effectiveSubtotal,
-    appliedDiscountCoupon,
+    launchOffer.isEligible ? 0 : effectiveSubtotal,
+    launchOffer.isEligible ? null : appliedDiscountCoupon,
   );
-  const subtotalAfterDiscount = cartDiscount.subtotalAfterDiscount;
+  const subtotalAfterDiscount = launchOffer.isEligible
+    ? 0
+    : cartDiscount.subtotalAfterDiscount;
   const shipping =
-    subtotalAfterDiscount >= 1500
+    launchOffer.isEligible
       ? 0
-      : subtotalAfterDiscount >= 1000
-        ? 49
-        : subtotalAfterDiscount >= 500
-          ? 99
-          : subtotalAfterDiscount > 0
-            ? 149
-            : 0;
-  const convenienceFee = 10;
+      : subtotalAfterDiscount >= 1500
+        ? 0
+        : subtotalAfterDiscount >= 1000
+          ? 49
+          : subtotalAfterDiscount >= 500
+            ? 99
+            : subtotalAfterDiscount > 0
+              ? 149
+              : 0;
+  const convenienceFee = launchOffer.isEligible ? 0 : 10;
   const totalPayable = subtotalAfterDiscount + convenienceFee + shipping;
   const freeShippingThreshold = 1500;
   const shippingShortfall = Math.max(
@@ -103,9 +116,9 @@ export default function CartPage() {
       actualSubtotal,
       productDiscount,
       couponDiscount: {
-        amount: cartDiscount.amount,
-        percent: cartDiscount.percent,
-        code: cartDiscount.code,
+        amount: launchOffer.isEligible ? 0 : cartDiscount.amount,
+        percent: launchOffer.isEligible ? 100 : cartDiscount.percent,
+        code: launchOffer.isEligible ? LAUNCH_OFFER_CODE : cartDiscount.code,
       },
       subtotalAfterDiscount,
       shipping,
@@ -121,6 +134,7 @@ export default function CartPage() {
     shipping,
     convenienceFee,
     totalPayable,
+    launchOffer.isEligible,
     setOrderSummary,
   ]);
 
@@ -281,6 +295,44 @@ export default function CartPage() {
           </Link>
         </div>
 
+        <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
+                Limited Launch Story Offer
+              </p>
+              <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
+                Get any 2 products at{" "}
+                <span className="italic text-brand-green-fresh">
+                  ₹0 product cost
+                </span>
+              </h2>
+              <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
+                Pick exactly 2 different products, 1 quantity each. Place your
+                order, upload the final order confirmation to your Instagram
+                Story, and tag @amritya_organics for verification.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">
+              <p className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
+                {launchOffer.isEligible ? "Unlocked" : "How to unlock"}
+              </p>
+              <p
+                className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${
+                  launchOffer.isEligible
+                    ? "text-brand-green-fresh"
+                    : "text-brand-brown/50"
+                }`}
+              >
+                {launchOffer.message}
+              </p>
+              <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
+                Only {LAUNCH_OFFER_PACK_LIMIT} packs per item available.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {items.length === 0 ? (
           <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 text-center shadow-2xl shadow-brand-brown/5 max-w-xl mx-auto">
             <div className="w-14 h-14 bg-brand-sand rounded-full flex items-center justify-center mx-auto mb-4 text-brand-brown/20">
@@ -408,6 +460,18 @@ export default function CartPage() {
                                 Available Soon
                               </span>
                             </div>
+                          ) : launchOffer.isEligible ? (
+                            <div className="flex flex-col">
+                              <span className="text-[9px] text-brand-brown/30 line-through font-bold">
+                                ₹{actualLinePrice.toFixed(0)}
+                              </span>
+                              <span className="text-lg md:text-xl font-medium text-brand-green-fresh tracking-tight">
+                                ₹0
+                              </span>
+                              <span className="text-[7px] uppercase tracking-widest font-black text-brand-green-fresh">
+                                Launch Offer
+                              </span>
+                            </div>
                           ) : (
                             <div className="flex flex-col">
                               {itemHasDiscount && (
@@ -443,7 +507,17 @@ export default function CartPage() {
                       ₹{actualSubtotal.toFixed(0)}
                     </span>
                   </div>
-                  {productDiscount > 0 && (
+                  {launchOffer.isEligible && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-green-fresh font-light italic">
+                        Launch Story Offer ({LAUNCH_OFFER_CODE})
+                      </span>
+                      <span className="text-brand-green-fresh font-bold tracking-tight">
+                        -₹{launchOfferDiscount.toFixed(0)}
+                      </span>
+                    </div>
+                  )}
+                  {!launchOffer.isEligible && productDiscount > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-brand-green-fresh font-light italic">
                         Product Discount (
@@ -455,7 +529,7 @@ export default function CartPage() {
                       </span>
                     </div>
                   )}
-                  {cartDiscount.amount > 0 && (
+                  {!launchOffer.isEligible && cartDiscount.amount > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-brand-green-fresh font-light italic">
                         Coupon Discount
@@ -506,7 +580,17 @@ export default function CartPage() {
                     </span>
                   </div>
 
-                  {appliedDiscountCoupon ? (
+                  {launchOffer.isEligible ? (
+                    <div className="rounded-xl border border-brand-green/15 bg-white px-4 py-3">
+                      <p className="text-xs font-black tracking-widest text-brand-green-fresh">
+                        {LAUNCH_OFFER_CODE}
+                      </p>
+                      <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-green-fresh">
+                        Product cost waived. Coupon codes are disabled for this
+                        launch offer.
+                      </p>
+                    </div>
+                  ) : appliedDiscountCoupon ? (
                     <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-green/15 bg-white px-4 py-3">
                       <div>
                         <p className="text-xs font-black tracking-widest text-brand-green-fresh">

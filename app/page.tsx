@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   ArrowRight,
   BadgeIndianRupee,
+  Share2,
   Leaf,
   MapPin,
   MessageCircle,
@@ -95,6 +97,35 @@ Message: ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in">
       <DesiHero />
+
+      <section className="bg-brand-green px-4 py-5 text-brand-cream sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-cream/10 text-brand-gold">
+              <Share2 size={20} strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-gold">
+                Limited Launch Story Offer
+              </p>
+              <h2 className="mt-1 text-2xl font-serif tracking-tight">
+                Any 2 products at ₹0 product cost
+              </h2>
+              <p className="mt-1 max-w-2xl text-xs font-light leading-relaxed text-brand-cream/70">
+                Add exactly 2 different products, 1 quantity each. Place the
+                order, share the confirmation on Instagram Story, and tag
+                @amritya_organics. Only 20 packs per item.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/#shop"
+            className="inline-flex items-center justify-center gap-3 rounded-full border border-brand-gold/30 px-6 py-3 text-[10px] font-black uppercase tracking-[0.25em] text-brand-gold transition-colors hover:bg-brand-cream hover:text-brand-green"
+          >
+            Claim Offer <ArrowRight size={14} />
+          </Link>
+        </div>
+      </section>
 
       {/* Farm & Origin Section */}
       <section className="relative py-24 bg-white overflow-hidden">

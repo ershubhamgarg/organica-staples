@@ -54,7 +54,13 @@ export async function POST(request: Request) {
     pricingDetails,
   } = payload;
 
-  if (!items?.length || !deliveryAddress || !paymentMethod || !totalAmount) {
+  if (
+    !items?.length ||
+    !deliveryAddress ||
+    !paymentMethod ||
+    typeof totalAmount !== "number" ||
+    !Number.isFinite(totalAmount)
+  ) {
     return NextResponse.json(
       { error: "Order payload is incomplete." },
       { status: 400 },
