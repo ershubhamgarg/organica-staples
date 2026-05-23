@@ -33,6 +33,7 @@ export type PaymentDetails = {
   currency: string;
   status: "verified";
   verified_at: string;
+  method?: string;
 };
 
 export type OrderPricingDetails = {

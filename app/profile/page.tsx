@@ -21,7 +21,6 @@ import {
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getProductThumbnail } from "@/lib/data";
-import { getDiscountedPrice } from "@/lib/pricing";
 
 export default function ProfilePage() {
   const { user, signOut } = useUserStore();
@@ -383,26 +382,162 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4 overflow-x-auto pb-2 custom-scrollbar">
-                        {order.items.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover:shadow-md transition-shadow"
-                          >
-                            <ImageWithFallback
-                              src={getProductThumbnail(item)}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                              sizes="64px"
-                            />
+                      <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
+                        <div className="flex flex-col gap-6 flex-1">
+                          <div className="space-y-4">
+                            {order.items.map((item, idx) => (
+                              <Link
+                                key={idx}
+                                href={`/product/${item.id}`}
+                                className="flex items-center gap-4 group/item hover:bg-brand-brown/[0.02] p-2 -m-2 rounded-2xl transition-all"
+                              >
+                                <div className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover/item:shadow-md transition-shadow">
+                                  <ImageWithFallback
+                                    src={getProductThumbnail(item)}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover group-hover/item:scale-110 transition-transform duration-500"
+                                    sizes="64px"
+                                  />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-sm font-serif text-brand-brown truncate group-hover/item:text-brand-terracotta transition-colors">
+                                    {item.name}
+                                  </h4>
+                                  <div className="flex items-center gap-3 mt-1">
+                                    <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                                      {item.weight}
+                                    </p>
+                                    <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
+                                    <p className="text-[10px] uppercase tracking-widest font-bold text-brand-brown/40">
+                                      Qty: {item.quantity}
+                                    </p>
+                                    <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
+                                    <p className="text-[10px] uppercase tracking-widest font-bold text-brand-gold">
+                                      ₹{(item.price * item.quantity).toFixed(0)}
+                                    </p>
+                                  </div>
+                                </div>
+                                <ChevronRight
+                                  size={14}
+                                  className="text-brand-gold/40 group-hover/item:text-brand-gold transition-colors group-hover/item:translate-x-1 transition-transform"
+                                />
+                              </Link>
+                            ))}
                           </div>
-                        ))}
-                        {order.items.length > 4 && (
-                          <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-[10px] font-black text-brand-gold">
-                            +{order.items.length - 4}
+
+                          {/* Order Summary Breakdown */}
+                          <div className="bg-brand-brown/[0.02] border border-brand-gold/5 rounded-2xl p-6 space-y-3">
+                            <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                              <span className="text-brand-brown/40 font-bold">
+                                Items Subtotal
+                              </span>
+                              <span className="text-brand-brown font-black">
+                                ₹{(order.subtotal_amount || 0).toFixed(0)}
+                              </span>
+                            </div>
+
+                            {order.discount_amount &&
+                              order.discount_amount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-green-fresh font-bold italic">
+                                    Discount
+                                    {order.discount_code
+                                      ? ` (${order.discount_code})`
+                                      : ""}
+                                  </span>
+                                  <span className="text-brand-green-fresh font-black">
+                                    -₹{order.discount_amount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+
+                            {order.shipping_amount !== undefined &&
+                              order.shipping_amount !== null &&
+                              order.shipping_amount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-brown/40 font-bold">
+                                    Shipping
+                                  </span>
+                                  <span className="text-brand-brown font-black">
+                                    ₹{order.shipping_amount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+
+                            {order.convenience_fee_amount !== undefined &&
+                              order.convenience_fee_amount !== null &&
+                              order.convenience_fee_amount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-brown/40 font-bold">
+                                    Convenience Fee
+                                  </span>
+                                  <span className="text-brand-brown font-black">
+                                    ₹{order.convenience_fee_amount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+
+                            <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-3 border-t border-brand-gold/10">
+                              <span className="text-brand-brown font-black">
+                                Total Paid
+                              </span>
+                              <span className="text-brand-brown font-black text-lg tracking-tighter">
+                                ₹{order.total_amount.toFixed(0)}
+                              </span>
+                            </div>
                           </div>
-                        )}
+                        </div>
+
+                        {order.payment_method === "razorpay" &&
+                          order.payment_details && (
+                            <div className="md:w-72 bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shrink-0 shadow-sm">
+                              <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
+                                  <ShieldCheck size={16} />
+                                </div>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
+                                  Verified Payment
+                                </p>
+                              </div>
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                    Provider
+                                  </span>
+                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                    Razorpay
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                    Payment ID
+                                  </span>
+                                  <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/5 px-2 py-1 rounded">
+                                    {order.payment_details.provider_payment_id.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                    Method
+                                  </span>
+                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                    {order.payment_details.method ||
+                                      "UPI / Card"}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                    Status
+                                  </span>
+                                  <span className="text-[9px] uppercase tracking-widest text-brand-green font-black flex items-center gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />
+                                    {order.payment_details.status}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                       </div>
                     </div>
                   ))}

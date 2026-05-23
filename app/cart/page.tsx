@@ -50,6 +50,7 @@ export default function CartPage() {
   const syncCartWithSupabase = useCartStore(
     (state) => state.syncCartWithSupabase,
   );
+  const setOrderSummary = useCartStore((state) => state.setOrderSummary);
   const { user } = useUserStore();
   const [discountInput, setDiscountInput] = useState("");
   const [discountError, setDiscountError] = useState<string | null>(null);
@@ -74,23 +75,54 @@ export default function CartPage() {
     effectiveSubtotal,
     appliedDiscountCoupon,
   );
+  const subtotalAfterDiscount = cartDiscount.subtotalAfterDiscount;
   const shipping =
-    cartDiscount.subtotalAfterDiscount > 0 &&
-    cartDiscount.subtotalAfterDiscount <= 500
-      ? 50
-      : 0;
-  const convenienceFee = Number((effectiveSubtotal * 0.01).toFixed(2));
-  const totalPayable =
-    cartDiscount.subtotalAfterDiscount + convenienceFee + shipping;
-  const freeShippingThreshold = 500;
+    subtotalAfterDiscount >= 1500
+      ? 0
+      : subtotalAfterDiscount >= 1000
+        ? 49
+        : subtotalAfterDiscount >= 500
+          ? 99
+          : subtotalAfterDiscount > 0
+            ? 149
+            : 0;
+  const convenienceFee = 10;
+  const totalPayable = subtotalAfterDiscount + convenienceFee + shipping;
+  const freeShippingThreshold = 1500;
   const shippingShortfall = Math.max(
-    freeShippingThreshold - cartDiscount.subtotalAfterDiscount,
+    freeShippingThreshold - subtotalAfterDiscount,
     0,
   );
-  const couponChangedShippingEligibility =
-    effectiveSubtotal > freeShippingThreshold &&
-    cartDiscount.subtotalAfterDiscount <= freeShippingThreshold;
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+
+  // Sync summary to store for checkout page
+  useEffect(() => {
+    if (!mounted) return;
+
+    setOrderSummary({
+      actualSubtotal,
+      productDiscount,
+      couponDiscount: {
+        amount: cartDiscount.amount,
+        percent: cartDiscount.percent,
+        code: cartDiscount.code,
+      },
+      subtotalAfterDiscount,
+      shipping,
+      convenienceFee,
+      totalPayable,
+    });
+  }, [
+    mounted,
+    actualSubtotal,
+    productDiscount,
+    cartDiscount,
+    subtotalAfterDiscount,
+    shipping,
+    convenienceFee,
+    totalPayable,
+    setOrderSummary,
+  ]);
 
   const getCouponShortfall = (coupon: DiscountCode) =>
     coupon.minOrderValue !== null
@@ -395,7 +427,7 @@ export default function CartPage() {
                   Summary
                 </h3>
 
-                <div className="space-y-4 mb-6 pb-6 border-b border-brand-gold/10">
+                <div className="space-y-4 mb-8 relative z-10">
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-brown/60 font-light">
                       Items subtotal
@@ -404,62 +436,55 @@ export default function CartPage() {
                       ₹{actualSubtotal.toFixed(0)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-brand-terracotta/60 font-light italic">
-                      Product Discount
-                    </span>
-                    <span className="text-brand-terracotta font-bold tracking-tight">
-                      -₹{productDiscount.toFixed(0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-brand-green/70 font-light italic">
-                      Coupon Discount
-                      {cartDiscount.code ? ` (${cartDiscount.code})` : ""}
-                    </span>
-                    <span className="text-brand-green font-bold tracking-tight">
-                      -₹{cartDiscount.amount.toFixed(0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <div>
-                      <span className="text-brand-brown/60 font-light">
-                        Convenience Fee
+                  {productDiscount > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-green-fresh font-light italic">
+                        Product Discount (
+                        {((productDiscount / actualSubtotal) * 100).toFixed(0)}
+                        %)
+                      </span>
+                      <span className="text-brand-green-fresh font-bold tracking-tight">
+                        -₹{productDiscount.toFixed(0)}
                       </span>
                     </div>
-                    <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{convenienceFee.toFixed(0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-xs">
-                    <div>
+                  )}
+                  {cartDiscount.amount > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-green-fresh font-light italic">
+                        Coupon Discount
+                        {cartDiscount.code ? ` (${cartDiscount.code})` : ""} (
+                        {cartDiscount.percent}%)
+                      </span>
+                      <span className="text-brand-green-fresh font-bold tracking-tight">
+                        -₹{cartDiscount.amount.toFixed(0)}
+                      </span>
+                    </div>
+                  )}
+                  {shipping > 0 && (
+                    <div className="flex justify-between text-xs">
                       <span className="text-brand-brown/60 font-light">
                         Shipping
                       </span>
-                      <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-brown/30">
-                        Free above ₹{freeShippingThreshold} after discounts
-                      </p>
-                    </div>
-                    <div className="text-right">
                       <span className="text-brand-brown font-bold tracking-tight">
-                        {shipping === 0 ? (
-                          <span className="text-brand-green italic">Free</span>
-                        ) : (
-                          `₹${shipping}`
-                        )}
+                        ₹{shipping}
                       </span>
-                      {couponChangedShippingEligibility && (
-                        <p className="mt-1 max-w-[150px] text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
-                          Coupon subtotal is below ₹{freeShippingThreshold}
-                        </p>
-                      )}
                     </div>
-                  </div>
+                  )}
+                  {convenienceFee > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-brown/60 font-light">
+                        Convenience Fee
+                      </span>
+                      <span className="text-brand-brown font-bold tracking-tight">
+                        ₹{convenienceFee}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {shipping > 0 && (
                   <div className="mb-8 rounded-2xl border border-brand-green/10 bg-brand-green/5 p-4 text-center">
-                    <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green">
+                    <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
                       Add ₹{shippingShortfall.toFixed(0)} more after discounts
                       for <span className="italic">free</span> delivery
                     </p>
@@ -477,13 +502,15 @@ export default function CartPage() {
                   {appliedDiscountCoupon ? (
                     <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-green/15 bg-white px-4 py-3">
                       <div>
-                        <p className="text-xs font-black tracking-widest text-brand-green">
+                        <p className="text-xs font-black tracking-widest text-brand-green-fresh">
                           {appliedDiscountCoupon.code}
                         </p>
-                        <p className="mt-1 text-[9px] font-light text-brand-brown/50">
+                        <p
+                          className={`mt-1 text-[9px] font-bold uppercase tracking-widest ${cartDiscount.isEligible ? "text-brand-green-fresh" : "text-brand-terracotta"}`}
+                        >
                           {cartDiscount.isEligible
-                            ? `${appliedDiscountCoupon.percent}% off applied`
-                            : `Add ₹${cartDiscount.shortfall.toFixed(0)} more to unlock`}
+                            ? `${appliedDiscountCoupon.percent}% OFF APPLIED`
+                            : `ADD ₹${cartDiscount.shortfall.toFixed(0)} MORE TO UNLOCK`}
                         </p>
                       </div>
                       <button
@@ -532,7 +559,7 @@ export default function CartPage() {
                       className="mt-3 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-brand-gold transition-colors hover:text-brand-brown"
                     >
                       <Sparkles size={12} />
-                      View public coupons
+                      View all coupons
                     </button>
                   )}
 
@@ -541,7 +568,7 @@ export default function CartPage() {
                       className={`mt-3 text-[9px] font-bold uppercase tracking-widest ${
                         discountError
                           ? "text-brand-terracotta"
-                          : "text-brand-green"
+                          : "text-brand-green-fresh"
                       }`}
                     >
                       {discountError || discountMessage}
@@ -568,16 +595,24 @@ export default function CartPage() {
 
                 <Link
                   href={hasUnavailableItems ? "#" : "/checkout"}
-                  className={`w-full group relative flex items-center justify-center gap-4 px-8 py-4 bg-brand-brown text-brand-cream rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px] ${
+                  className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.4)] ${
                     hasUnavailableItems
                       ? "opacity-40 cursor-not-allowed grayscale"
                       : ""
                   }`}
                 >
                   <span className="relative z-10 flex items-center gap-3">
-                    Checkout
-                    <ArrowRight size={14} />
+                    <ShieldCheck size={16} className="text-brand-green-fresh" />
+                    Secure Checkout
+                    <ArrowRight
+                      size={14}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
                   </span>
+                  <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
+                    100% Encrypted & Safe
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                 </Link>
 
@@ -632,38 +667,63 @@ export default function CartPage() {
                 publicCoupons.map((coupon) => {
                   const shortfall = getCouponShortfall(coupon);
                   const canApply = shortfall === 0 && !isApplyingDiscount;
+                  const savings = (effectiveSubtotal * coupon.percent) / 100;
 
                   return (
                     <div
                       key={coupon.code}
-                      className="rounded-2xl border border-brand-gold/10 bg-brand-cream/40 p-5"
+                      className={`rounded-2xl border transition-all p-5 ${
+                        canApply
+                          ? "border-brand-gold/10 bg-brand-cream/40"
+                          : "border-brand-brown/5 bg-brand-brown/[0.02] grayscale opacity-75"
+                      }`}
                     >
                       <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-black tracking-widest text-brand-brown">
-                            {coupon.code}
-                          </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-black tracking-widest text-brand-brown">
+                              {coupon.code}
+                            </p>
+                            {canApply && (
+                              <span className="text-[8px] font-black uppercase tracking-widest bg-brand-green/10 text-brand-green-fresh px-2 py-0.5 rounded-full">
+                                Save ₹{savings.toFixed(0)}
+                              </span>
+                            )}
+                          </div>
                           <p className="mt-1 text-xs font-light text-brand-brown/60">
                             {coupon.label} · {coupon.percent}% off
                           </p>
-                          <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
-                            {coupon.minOrderValue
-                              ? `Minimum order ₹${coupon.minOrderValue.toFixed(0)}`
-                              : "No minimum order"}
-                          </p>
-                          {shortfall > 0 && (
-                            <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
-                              Add ₹{shortfall.toFixed(0)} more to apply
+                          <div className="mt-2 space-y-1">
+                            <p
+                              className={`text-[9px] font-bold uppercase tracking-widest ${
+                                shortfall > 0
+                                  ? "text-brand-terracotta"
+                                  : "text-brand-brown/40"
+                              }`}
+                            >
+                              {coupon.minOrderValue
+                                ? `Minimum order ₹${coupon.minOrderValue.toFixed(0)}`
+                                : "No minimum order"}
                             </p>
-                          )}
+                            {shortfall > 0 && (
+                              <p className="text-[9px] font-bold uppercase tracking-widest text-brand-terracotta italic">
+                                Add ₹{shortfall.toFixed(0)} more to unlock this
+                                offer
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => handleApplyDiscount(coupon.code)}
                           disabled={!canApply}
-                          className="rounded-full bg-brand-brown px-5 py-3 text-[9px] font-black uppercase tracking-widest text-brand-cream transition-colors hover:bg-brand-brown-light disabled:cursor-not-allowed disabled:opacity-40"
+                          className={`rounded-full px-5 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${
+                            canApply
+                              ? "bg-brand-brown text-brand-cream hover:bg-brand-brown-light"
+                              : "bg-brand-brown/10 text-brand-brown/20 cursor-not-allowed"
+                          }`}
                         >
-                          Apply
+                          {canApply ? "Apply" : "Locked"}
                         </button>
                       </div>
                     </div>

@@ -8,7 +8,6 @@ import { supabase } from "@/utils/supabase";
 import {
   ShoppingCart,
   Menu,
-  User,
   LogOut,
   ChevronDown,
   UserCircle,
@@ -193,10 +192,10 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-brand-brown hover:text-brand-green transition-all hover:scale-110"
+                className="text-brand-brown hover:text-brand-green transition-all text-[10px] uppercase tracking-[0.3em] font-bold"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <User size={22} strokeWidth={1.2} />
+                Login
               </Link>
             )}
 
@@ -268,11 +267,11 @@ export default function Header() {
 
           <div className="mt-12 pt-12 border-t border-brand-gold/20">
             <Link
-              href="/profile"
+              href={user ? "/profile" : "/login"}
               className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-brown/60 hover:text-brand-brown"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Account
+              {user ? "Account" : "Login"}
             </Link>
           </div>
         </div>

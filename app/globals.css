@@ -8,6 +8,7 @@
   --color-brand-brown-light: #5C5446;
   --color-brand-green: #2D3A26; /* Deep Forest Green */
   --color-brand-green-light: #4A5D3F;
+  --color-brand-green-fresh: #7FB069; /* Lighter vibrant green for discounts */
   --color-brand-gold: #D4AF37; /* Rich Metallic Gold */
   --color-brand-cream: #FDFBF7; /* Pure Off-White */
   --color-brand-terracotta: #A65D47; /* Earthy Red */
@@ -77,6 +78,10 @@ body {
   50% { opacity: 0.7; transform: scale(1.05); }
 }
 
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
@@ -91,6 +96,10 @@ body {
 
 .animate-pulse-slow {
   animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }
 
 .bg-organic-texture {

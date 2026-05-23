@@ -275,7 +275,7 @@ export default function ProductPage({
                       className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-white shadow-xl ${
                         hasHighDiscount
                           ? "bg-brand-terracotta"
-                          : "bg-brand-green"
+                          : "bg-brand-green-fresh"
                       }`}
                     >
                       {hasHighDiscount
@@ -346,23 +346,29 @@ export default function ProductPage({
                   {product.weight}
                 </p>
 
-                <div className="flex items-baseline gap-6 mb-6">
+                <div className="flex items-center gap-6 mb-6">
                   {available && hasDiscount ? (
-                    <>
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                          ₹{discountedPrice.toFixed(0)}
-                        </span>
-                        {unitPrice && (
-                          <span className="text-sm text-brand-brown/30 font-light">
-                            ({unitPrice})
+                    <div className="flex flex-col">
+                      <div className="flex items-baseline gap-6">
+                        <div className="flex items-baseline gap-3">
+                          <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
+                            ₹{discountedPrice.toFixed(0)}
                           </span>
-                        )}
+                          {unitPrice && (
+                            <span className="text-sm text-brand-brown/30 font-light">
+                              ({unitPrice})
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-lg text-brand-brown/30 line-through font-light">
+                          ₹{product.price.toFixed(0)}
+                        </span>
                       </div>
-                      <span className="text-lg text-brand-brown/30 line-through font-light">
-                        ₹{product.price.toFixed(0)}
-                      </span>
-                    </>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-2">
+                        You Save ₹{(product.price - discountedPrice).toFixed(0)}{" "}
+                        ({discountPercent}% Off)
+                      </p>
+                    </div>
                   ) : available ? (
                     <div className="flex items-baseline gap-3">
                       <span className="text-2xl lg:text-3xl font-medium text-brand-brown">

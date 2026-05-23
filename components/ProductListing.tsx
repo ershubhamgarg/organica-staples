@@ -163,7 +163,7 @@ export default function ProductListing() {
                         className={`text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20 text-white ${
                           hasHighDiscount
                             ? "bg-brand-terracotta"
-                            : "bg-brand-green"
+                            : "bg-brand-green-fresh"
                         }`}
                       >
                         {hasHighDiscount
@@ -192,20 +192,25 @@ export default function ProductListing() {
                   ) : (
                     <div className="flex flex-col items-center">
                       {hasDiscount ? (
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm text-brand-brown/20 line-through font-light">
-                            ₹{product.price.toFixed(0)}
-                          </span>
-                          <div className="flex items-baseline gap-1.5">
-                            <span className="text-2xl font-medium text-brand-brown tracking-tighter">
-                              ₹{discountedPrice.toFixed(0)}
+                        <div className="flex flex-col items-center">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm text-brand-brown/20 line-through font-light">
+                              ₹{product.price.toFixed(0)}
                             </span>
-                            {unitPrice && (
-                              <span className="text-[10px] text-brand-brown/30 font-light">
-                                ({unitPrice})
+                            <div className="flex items-baseline gap-1.5">
+                              <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                                ₹{discountedPrice.toFixed(0)}
                               </span>
-                            )}
+                              {unitPrice && (
+                                <span className="text-[10px] text-brand-brown/30 font-light">
+                                  ({unitPrice})
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
+                             Save ₹{(product.price - discountedPrice).toFixed(0)}
+                           </p>
                         </div>
                       ) : (
                         <div className="flex items-baseline gap-1.5">

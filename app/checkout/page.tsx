@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Clock,
   Plus,
+  Lock,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
@@ -125,21 +126,54 @@ export default function CheckoutPage() {
   );
   const applyDiscountCode = useCartStore((state) => state.applyDiscountCode);
   const removeDiscountCode = useCartStore((state) => state.removeDiscountCode);
+  const orderSummary = useCartStore((state) => state.orderSummary);
   const { user } = useUserStore();
   const { addresses, addAddress } = useAddressStore();
   const { placeOrder, isLoading: isPlacingOrder } = useOrderStore();
   const [mounted, setMounted] = useState(false);
 
-  const totalPrice = getTotalPrice();
-  const cartDiscount = calculateDiscount(totalPrice, appliedDiscountCoupon);
+  // Use values from store (synced from cart) to avoid mismatch
+  const totalPrice = orderSummary?.actualSubtotal ?? getTotalPrice();
+  const actualSubtotal = orderSummary?.actualSubtotal ?? totalPrice;
+  const productDiscount = orderSummary?.productDiscount ?? 0;
+
+  // Fallback calculation if orderSummary is missing
+  const fallbackCartDiscount = calculateDiscount(
+    totalPrice,
+    appliedDiscountCoupon,
+  );
+
+  const subtotalAfterDiscount =
+    orderSummary?.subtotalAfterDiscount ??
+    fallbackCartDiscount.subtotalAfterDiscount;
   const shipping =
-    cartDiscount.subtotalAfterDiscount > 0 &&
-    cartDiscount.subtotalAfterDiscount <= 500
-      ? 50
-      : 0;
-  const convenienceFee = Number((totalPrice * 0.01).toFixed(2));
+    orderSummary?.shipping ??
+    (subtotalAfterDiscount >= 1500
+      ? 0
+      : subtotalAfterDiscount >= 1000
+        ? 49
+        : subtotalAfterDiscount >= 500
+          ? 99
+          : subtotalAfterDiscount > 0
+            ? 149
+            : 0);
+  const convenienceFee =
+    orderSummary?.convenienceFee ?? Number((totalPrice * 0.01).toFixed(2));
   const finalTotal =
-    cartDiscount.subtotalAfterDiscount + shipping + convenienceFee;
+    orderSummary?.totalPayable ??
+    subtotalAfterDiscount + shipping + convenienceFee;
+
+  const cartDiscount = orderSummary
+    ? {
+        amount: orderSummary.couponDiscount.amount,
+        percent: orderSummary.couponDiscount.percent,
+        code: orderSummary.couponDiscount.code,
+        isEligible: true, // If it's in orderSummary, it was eligible on cart page
+        shortfall: 0,
+        subtotalAfterDiscount: orderSummary.subtotalAfterDiscount,
+      }
+    : fallbackCartDiscount;
+
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
 
   // Address state
@@ -149,7 +183,9 @@ export default function CheckoutPage() {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [guestAddress, setGuestAddress] = useState<Address | null>(null);
-  const [addressErrors, setAddressErrors] = useState<{[key:string]: string}>({});
+  const [addressErrors, setAddressErrors] = useState<{ [key: string]: string }>(
+    {},
+  );
   const checkoutAddresses = user
     ? addresses
     : guestAddress
@@ -232,7 +268,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-brand-cream py-12 px-4 sm:px-6 flex items-center justify-center">
         <div className="max-w-xl w-full bg-white rounded-3xl p-8 md:p-12 text-center shadow-sm border border-brand-gold/10">
-          <div className="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-green">
+          <div className="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-green-fresh">
             <CheckCircle2 size={40} strokeWidth={1.5} />
           </div>
           <h1 className="text-3xl font-serif text-brand-brown mb-2 tracking-tight">
@@ -244,12 +280,20 @@ export default function CheckoutPage() {
 
           <div className="bg-brand-cream/50 p-6 rounded-2xl mb-8 border border-brand-gold/10 text-left">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">Order ID</span>
-              <span className="text-xs font-medium text-brand-brown">#{placedOrderDetails.id.slice(0, 8).toUpperCase()}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                Order ID
+              </span>
+              <span className="text-xs font-medium text-brand-brown">
+                #{placedOrderDetails.id.slice(0, 8).toUpperCase()}
+              </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">Total Amount</span>
-              <span className="text-lg font-medium text-brand-brown">₹{placedOrderDetails.total.toFixed(0)}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                Total Amount
+              </span>
+              <span className="text-lg font-medium text-brand-brown">
+                ₹{placedOrderDetails.total.toFixed(0)}
+              </span>
             </div>
           </div>
 
@@ -580,10 +624,14 @@ export default function CheckoutPage() {
                                 name: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.name ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.name ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="Full Name"
                           />
-                          {addressErrors.name && <p className="text-xs text-red-500 mt-1">{addressErrors.name}</p>}
+                          {addressErrors.name && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.name}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -598,10 +646,14 @@ export default function CheckoutPage() {
                                 phone: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.phone ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.phone ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="+91"
                           />
-                          {addressErrors.phone && <p className="text-xs text-red-500 mt-1">{addressErrors.phone}</p>}
+                          {addressErrors.phone && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.phone}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -616,10 +668,14 @@ export default function CheckoutPage() {
                                 email: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.email ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.email ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="you@example.com"
                           />
-                          {addressErrors.email && <p className="text-xs text-red-500 mt-1">{addressErrors.email}</p>}
+                          {addressErrors.email && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.email}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="mb-6">
@@ -635,10 +691,14 @@ export default function CheckoutPage() {
                               address: e.target.value,
                             })
                           }
-                          className={`w-full bg-transparent border-b ${addressErrors.address ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/10 font-light px-2`}
+                          className={`w-full bg-transparent border-b ${addressErrors.address ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/10 font-light px-2`}
                           placeholder="Complete Address"
                         />
-                        {addressErrors.address && <p className="text-xs text-red-500 mt-1">{addressErrors.address}</p>}
+                        {addressErrors.address && (
+                          <p className="text-xs text-red-500 mt-1">
+                            {addressErrors.address}
+                          </p>
+                        )}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
@@ -654,10 +714,14 @@ export default function CheckoutPage() {
                                 city: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.city ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.city ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="City"
                           />
-                          {addressErrors.city && <p className="text-xs text-red-500 mt-1">{addressErrors.city}</p>}
+                          {addressErrors.city && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.city}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -672,10 +736,14 @@ export default function CheckoutPage() {
                                 state: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.state ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.state ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="State"
                           />
-                          {addressErrors.state && <p className="text-xs text-red-500 mt-1">{addressErrors.state}</p>}
+                          {addressErrors.state && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.state}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
@@ -690,10 +758,14 @@ export default function CheckoutPage() {
                                 zipCode: e.target.value,
                               })
                             }
-                            className={`w-full bg-transparent border-b ${addressErrors.zipCode ? 'border-red-500' : 'border-brand-gold/20'} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
+                            className={`w-full bg-transparent border-b ${addressErrors.zipCode ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="Pin Code"
                           />
-                          {addressErrors.zipCode && <p className="text-xs text-red-500 mt-1">{addressErrors.zipCode}</p>}
+                          {addressErrors.zipCode && (
+                            <p className="text-xs text-red-500 mt-1">
+                              {addressErrors.zipCode}
+                            </p>
+                          )}
                         </div>
                       </div>
 
@@ -701,19 +773,30 @@ export default function CheckoutPage() {
                         <button
                           onClick={async () => {
                             setAddressErrors({});
-                            const errors: {[key:string]: string} = {};
-                            if (!newAddress.name) errors.name = "Name is required";
-        if (!newAddress.address) errors.address = "Address is required";
-        if (!newAddress.city) errors.city = "City is required";
-        if (!newAddress.state) errors.state = "State is required";
-        if (!newAddress.zipCode) errors.zipCode = "Pin Code is required";
-        if (!user) {
-          if (!newAddress.email) errors.email = "Email is required for guest checkout";
-          if (!newAddress.phone) errors.phone = "Phone is required for guest checkout";
-        } else {
-          if (!newAddress.email) errors.email = "Email is required";
-          if (!newAddress.phone) errors.phone = "Phone is required";
-        }
+                            const errors: { [key: string]: string } = {};
+                            if (!newAddress.name)
+                              errors.name = "Name is required";
+                            if (!newAddress.address)
+                              errors.address = "Address is required";
+                            if (!newAddress.city)
+                              errors.city = "City is required";
+                            if (!newAddress.state)
+                              errors.state = "State is required";
+                            if (!newAddress.zipCode)
+                              errors.zipCode = "Pin Code is required";
+                            if (!user) {
+                              if (!newAddress.email)
+                                errors.email =
+                                  "Email is required for guest checkout";
+                              if (!newAddress.phone)
+                                errors.phone =
+                                  "Phone is required for guest checkout";
+                            } else {
+                              if (!newAddress.email)
+                                errors.email = "Email is required";
+                              if (!newAddress.phone)
+                                errors.phone = "Phone is required";
+                            }
                             if (Object.keys(errors).length > 0) {
                               setAddressErrors(errors);
                               return;
@@ -757,9 +840,20 @@ export default function CheckoutPage() {
                   {selectedAddressId && !showNewAddressForm && (
                     <button
                       onClick={() => setAddressConfirmed(true)}
-                      className="w-full bg-brand-brown text-brand-cream py-4 rounded-full text-[10px] uppercase tracking-[0.4em] font-black transition-all hover:bg-brand-brown-light shadow-2xl shadow-brand-brown/20 flex items-center justify-center gap-4"
+                      className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-5 rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.4)]"
                     >
-                      Proceed to Payment <ChevronRight size={16} />
+                      <span className="relative z-10 flex items-center gap-3">
+                        Proceed to Payment
+                        <ChevronRight
+                          size={16}
+                          className="group-hover:translate-x-1 transition-transform"
+                        />
+                      </span>
+                      <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
+                        Select Payment Method Next
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                      <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                     </button>
                   )}
                 </div>
@@ -767,15 +861,15 @@ export default function CheckoutPage() {
                 <div className="p-6 bg-brand-green/5 rounded-2xl border border-brand-green/10">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-brand-green text-brand-cream flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-brand-green-fresh text-brand-cream flex items-center justify-center">
                         <MapPin size={20} strokeWidth={1} />
                       </div>
-                      <p className="text-[10px] text-brand-green uppercase tracking-widest font-bold">
+                      <p className="text-[10px] text-brand-green-fresh uppercase tracking-widest font-bold">
                         Confirmed for Delivery
                       </p>
                     </div>
                     <CheckCircle2
-                      className="text-brand-green"
+                      className="text-brand-green-fresh"
                       size={20}
                       strokeWidth={1}
                     />
@@ -791,7 +885,8 @@ export default function CheckoutPage() {
                           {addr.name}
                         </p>
                         <p className="text-[11px] font-light text-brand-brown/70 leading-relaxed mt-1">
-                          {addr.address}, {addr.city}, {addr.state} - {addr.zipCode}
+                          {addr.address}, {addr.city}, {addr.state} -{" "}
+                          {addr.zipCode}
                         </p>
                         {addr.phone && (
                           <p className="text-[10px] font-bold text-brand-brown/50 tracking-widest mt-1.5">
@@ -869,17 +964,23 @@ export default function CheckoutPage() {
                     isStartingPayment ||
                     selectedPayment !== "razorpay"
                   }
-                  className="w-full bg-brand-brown text-brand-cream py-5 rounded-full text-[12px] uppercase tracking-[0.4em] font-black transition-all hover:bg-brand-brown-light shadow-2xl shadow-brand-brown/20 flex items-center justify-center gap-6 disabled:opacity-50 mt-8 group overflow-hidden relative"
+                  className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-6 rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] hover:shadow-[0_40px_70px_-20px_rgba(60,54,42,0.5)] disabled:opacity-50 mt-8"
                 >
                   <span className="relative z-10 flex items-center gap-4">
+                    <Lock size={18} className="text-brand-green-fresh" />
                     {isPlacingOrder || isStartingPayment
-                      ? "Processing Payment..."
+                      ? "Verifying Securely..."
                       : `Pay ₹${finalTotal.toFixed(0)}`}
                     <ArrowRight
                       size={20}
                       className="group-hover:translate-x-2 transition-transform"
                     />
                   </span>
+                  <span className="relative z-10 text-[8px] tracking-[0.3em] opacity-60 font-bold uppercase flex items-center gap-2">
+                    <ShieldCheck size={10} />
+                    Secure SSL Encrypted Payment
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                 </button>
               </div>
@@ -936,48 +1037,50 @@ export default function CheckoutPage() {
                     Subtotal
                   </span>
                   <span className="text-brand-brown font-bold tracking-tight">
-                    ₹{totalPrice.toFixed(0)}
+                    ₹{actualSubtotal.toFixed(0)}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-brand-brown/60 font-light">
-                    Shipping
-                  </span>
-                  <span className="text-brand-brown font-bold tracking-tight">
-                    {shipping === 0 ? (
-                      <span className="text-brand-green italic">Free</span>
-                    ) : (
-                      `₹${shipping}`
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <div>
-                    <span className="text-brand-brown/60 font-light">
-                      Convenience Fee
-                    </span>
-                    <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-brown/30">
-                      ₹10 per ₹1000 subtotal
-                    </p>
-                  </div>
-                  <span className="text-brand-brown font-bold tracking-tight">
-                    ₹{convenienceFee.toFixed(0)}
-                  </span>
-                </div>
-                {appliedDiscountCoupon && cartDiscount.amount > 0 && (
+                {productDiscount > 0 && (
                   <div className="flex justify-between text-xs">
-                    <span className="text-brand-green/70 font-light italic">
-                      Coupon {appliedDiscountCoupon.code}
+                    <span className="text-brand-green-fresh font-light italic">
+                      Product Discount (
+                      {((productDiscount / actualSubtotal) * 100).toFixed(0)}
+                      %)
                     </span>
-                    <span className="text-brand-green font-bold tracking-tight">
+                    <span className="text-brand-green-fresh font-bold tracking-tight">
+                      -₹{productDiscount.toFixed(0)}
+                    </span>
+                  </div>
+                )}
+                {cartDiscount.amount > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-green-fresh font-light italic">
+                      Coupon Discount ({cartDiscount.code}) (
+                      {cartDiscount.percent}%)
+                    </span>
+                    <span className="text-brand-green-fresh font-bold tracking-tight">
                       -₹{cartDiscount.amount.toFixed(0)}
                     </span>
                   </div>
                 )}
-                {appliedDiscountCoupon && !cartDiscount.isEligible && (
-                  <div className="rounded-xl border border-brand-terracotta/10 bg-brand-terracotta/5 p-3 text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
-                    Add ₹{cartDiscount.shortfall.toFixed(0)} more to use{" "}
-                    {appliedDiscountCoupon.code}
+                {shipping > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-brown/60 font-light">
+                      Shipping
+                    </span>
+                    <span className="text-brand-brown font-bold tracking-tight">
+                      ₹{shipping}
+                    </span>
+                  </div>
+                )}
+                {convenienceFee > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-brown/60 font-light">
+                      Convenience Fee
+                    </span>
+                    <span className="text-brand-brown font-bold tracking-tight">
+                      ₹{convenienceFee.toFixed(0)}
+                    </span>
                   </div>
                 )}
               </div>

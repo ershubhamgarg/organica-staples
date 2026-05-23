@@ -20,33 +20,39 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 
 - `/`: hero + product listing
 - `/product/[id]`: product detail from `useProductStore`
-- `/cart`: cart quantity/remove + free shipping over ₹500
+- `/cart`: cart quantity/remove + tiered shipping (₹149 < ₹500, ₹99 < ₹1000, ₹49 < ₹1500, Free >= ₹1500)
 - `/checkout`: address, mocked UPI verify, order placement
 - `/login`: Supabase email/password auth
 - `/profile`: user profile/orders/addresses
 - `/our-story`: brand content
 - `/api/verify-vpa`: mocked VPA/UPI validation endpoint
 
-## Data Flow
+## Data Flow & Logic
 
-- Product type only: `lib/data.ts` (no static product array)
-- Listing fetches live products from Supabase table `products`: `components/ProductListing.tsx`
-- Product detail fetches by id from Supabase via `store/productStore.ts`.
-- Discounted pricing helpers live in `lib/pricing.ts`; cart stores discounted item prices.
-- Cart: `store/cartStore.ts`; syncs to Supabase `carts` by `user_id`, fallback is persisted local cart.
-- Auth: `store/userStore.ts`; on sign-in/fetch syncs cart, addresses, orders.
-- Addresses/orders: `store/addressStore.ts`, `store/orderStore.ts`; tolerate missing Supabase tables (`42P01`) with local fallback.
+- **Product Data**: Fetched from Supabase `products` table. Types in `lib/data.ts`.
+- **Pricing**: Helpers in `lib/pricing.ts` handle discounts and unit price calculations (e.g., `getUnitPriceInfo` for ₹/100g or ₹/100ml display).
+- **Cart Sync**: `store/cartStore.ts` syncs to Supabase `carts` for logged-in users; otherwise persists to localStorage.
+- **Availability**: Out-of-stock products (`is_available: false`) use `blur-[2px]`, "Available Soon" badge, and hidden prices.
+- **Reviews**: Only render review text if it contains non-whitespace content.
 
-## UI Conventions
+## Design System: "Desi Premium"
 
-- Brand colors/fonts live in `app/globals.css`; `layout.tsx` loads Inter + Playfair and wraps all pages with `Header` + footer.
-- Prefer existing components: `Header`, `ProductListing`, `QuickAddButton`, `ImageWithFallback`.
-- Many page components are client components because Zustand/localStorage/Supabase browser auth are used.
-- Currency is INR (`₹`); brand tone is premium organic pantry, restrained olive/gold/cream.
+- **Palette**: `brand-cream` (BG), `brand-brown` (text/primary), `brand-green` (accents), `brand-gold` (luxury highlights), `brand-terracotta` (earthy accents).
+- **Typography**: Inter (sans) for body, Playfair Display (serif) for headings.
+- **Textures**: `bg-jute`, `bg-organic-texture` (natural paper feel).
+- **Borders**: Layered, irregular organic borders for images (`organic-border`, `organic-border-alt`). Standard UI elements (cards/buttons) use `rounded-3xl` or `rounded-full`.
+- **Visuals**: Organic SVG illustrations (wheat stalks, matka, mortar & pestle, tulsi leaf).
+- **UX Details**:
+  - Cart count badge: scales and changes color on update.
+  - Sound: Soft, bass-heavy click (~10% volume) for cart actions.
+  - Discounts: All discount amounts and savings text MUST be displayed in `brand-green`.
+  - Order Summary: Hide any summary item (shipping, convenience fee, discount) if its value is zero.
+  - Navigation: Use Next.js `<Link>` for all internal routing, including hash IDs (e.g., `#shop`).
 
-## Gotchas
+## Gotchas & Constraints
 
-- Do not assume Supabase tables exist locally; code already has fallbacks for addresses/orders only.
-- `utils/supabase.ts` logs on import and uses non-null env assertions.
-- Remote image host additions require `next.config.ts`.
-- `next.config.ts` currently ends with `//test`; leave unrelated edits alone unless asked.
+- **Mobile Sticky**: Product detail images MUST use `lg:sticky` (not `sticky`) to prevent broken scrolling on mobile browsers.
+- **Supabase**: Do not assume tables exist; use fallbacks for addresses/orders.
+- **Linter**: Ensure all component props are typed; avoid `any`.
+- **Images**: Use `ImageWithFallback` for product images to handle remote loading errors gracefully.
+- **Unit Prices**: Always display unit price info (from `getUnitPriceInfo`) next to the main price in listing and detail pages.

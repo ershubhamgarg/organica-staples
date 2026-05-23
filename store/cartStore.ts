@@ -12,10 +12,25 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export interface OrderSummary {
+  actualSubtotal: number;
+  productDiscount: number;
+  couponDiscount: {
+    amount: number;
+    percent: number;
+    code: string | null;
+  };
+  subtotalAfterDiscount: number;
+  shipping: number;
+  convenienceFee: number;
+  totalPayable: number;
+}
+
 interface CartState {
   items: CartItem[];
   appliedDiscountCode: string | null;
   appliedDiscountCoupon: DiscountCode | null;
+  orderSummary: OrderSummary | null;
   addToCart: (product: Product, quantity?: number, userId?: string) => void;
   removeFromCart: (productId: string, userId?: string) => void;
   updateQuantity: (
@@ -27,6 +42,7 @@ interface CartState {
   applyDiscountCode: (coupon: DiscountCode, userId?: string) => void;
   removeDiscountCode: (userId?: string) => void;
   syncCartWithSupabase: (userId: string) => Promise<void>;
+  setOrderSummary: (summary: OrderSummary | null) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
@@ -71,6 +87,7 @@ export const useCartStore = create<CartState>()(
       items: [],
       appliedDiscountCode: null,
       appliedDiscountCoupon: null,
+      orderSummary: null,
 
       addToCart: (product: Product, quantity: number = 1, userId?: string) => {
         set((state) => {
@@ -133,6 +150,7 @@ export const useCartStore = create<CartState>()(
           items: [],
           appliedDiscountCode: null,
           appliedDiscountCoupon: null,
+          orderSummary: null,
         });
         if (userId) {
           syncCartToSupabase([], userId, null);
@@ -177,7 +195,10 @@ export const useCartStore = create<CartState>()(
               .single();
 
             if (fallbackError && fallbackError.code !== "PGRST116") {
-              console.error("Error fetching cart from Supabase:", fallbackError);
+              console.error(
+                "Error fetching cart from Supabase:",
+                fallbackError,
+              );
               return;
             }
 
@@ -204,6 +225,10 @@ export const useCartStore = create<CartState>()(
         } catch (error) {
           console.error("Error fetching cart from Supabase:", error);
         }
+      },
+
+      setOrderSummary: (summary: OrderSummary | null) => {
+        set({ orderSummary: summary });
       },
 
       getTotalItems: () => {
