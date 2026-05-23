@@ -15,6 +15,10 @@
   --color-brand-sand: #E6DFD1;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   background-color: var(--color-brand-cream);

@@ -233,6 +233,17 @@ export default function CheckoutPage() {
   }, [items.length, mounted, router, orderPlaced]);
 
   useEffect(() => {
+    if (user?.email && !newAddress.email) {
+      setTimeout(() => {
+        setNewAddress((prev) => ({
+          ...prev,
+          email: prev.email || user.email || "",
+        }));
+      }, 0);
+    }
+  }, [user, newAddress.email]);
+
+  useEffect(() => {
     if (!appliedDiscountCode || appliedDiscountCoupon) return;
 
     const fetchAppliedCoupon = async () => {

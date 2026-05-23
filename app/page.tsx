@@ -34,8 +34,16 @@ export default function Home() {
   useEffect(() => {
     if (user) {
       syncCartWithSupabase(user.id);
+      if (user.email && !formData.email) {
+        setTimeout(() => {
+          setFormData((prev) => ({
+            ...prev,
+            email: prev.email || user.email || "",
+          }));
+        }, 0);
+      }
     }
-  }, [user, syncCartWithSupabase]);
+  }, [user, syncCartWithSupabase, formData.email]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -372,7 +380,8 @@ Message: ${formData.message}
       {/* Contact Us Section */}
       <section
         id="contact"
-        className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10"
+        className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10 scroll-mt-28"
+        style={{ scrollMarginTop: "120px" }}
       >
         <div className="absolute inset-0 bg-stone-texture pointer-events-none" />
 

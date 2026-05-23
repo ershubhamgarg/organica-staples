@@ -124,6 +124,13 @@ export default function Header() {
             </Link>
             <Link
               href="/#shop"
+              onClick={(e) => {
+                const el = document.getElementById("shop");
+                if (el) {
+                  e.preventDefault();
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
               className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Shop
@@ -163,6 +170,13 @@ export default function Header() {
 
             <Link
               href="/#contact"
+              onClick={(e) => {
+                const el = document.getElementById("contact");
+                if (el) {
+                  e.preventDefault();
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
               className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Contact Us
@@ -266,7 +280,14 @@ export default function Header() {
           <Link
             href="/#shop"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={(e) => {
+              setIsMobileMenuOpen(false);
+              const el = document.getElementById("shop");
+              if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
             Shop
           </Link>
@@ -280,7 +301,14 @@ export default function Header() {
           <Link
             href="/#contact"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={(e) => {
+              setIsMobileMenuOpen(false);
+              const el = document.getElementById("contact");
+              if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
           >
             Contact Us
           </Link>

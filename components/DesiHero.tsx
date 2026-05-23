@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, MessageCircle, ShieldCheck } from "lucide-react";
+import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -39,17 +39,22 @@ const DesiHero = () => {
                 <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
               </Link>
 
-              <button
-                onClick={() =>
-                  window.open("https://wa.me/918295433041", "_blank")
-                }
+              <Link
+                href="/#contact"
+                onClick={(e) => {
+                  const el = document.getElementById("contact");
+                  if (el) {
+                    e.preventDefault();
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-brand-green/20 text-brand-green rounded-full transition-all duration-500 hover:bg-brand-green/5 hover:border-brand-green/40"
               >
-                <MessageCircle className="w-4 h-4" />
+                <Mail className="w-4 h-4" />
                 <span className="font-black uppercase tracking-widest text-[10px]">
-                  WhatsApp Us
+                  Write to Us
                 </span>
-              </button>
+              </Link>
             </div>
 
             {/* Trust Badges */}
