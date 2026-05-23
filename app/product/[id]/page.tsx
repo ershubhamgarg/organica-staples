@@ -255,6 +255,27 @@ export default function ProductPage({
       {/* Product Hero Section */}
       <section className="relative pt-8 lg:pt-16 pb-16 px-4 sm:px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
+          {/* Breadcrumb - Mobile (above image) */}
+          <nav className="flex lg:hidden items-center gap-2 mb-4 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-brown/40 flex-wrap">
+            <Link
+              href="/"
+              className="hover:text-brand-brown transition-colors"
+            >
+              Home
+            </Link>
+            <span className="text-brand-brown/20">/</span>
+            <Link
+              href="/#shop"
+              className="hover:text-brand-brown transition-colors"
+            >
+              Shop
+            </Link>
+            <span className="text-brand-brown/20">/</span>
+            <span className="text-brand-brown/50">{product.category}</span>
+            <span className="text-brand-brown/20">/</span>
+            <span className="text-brand-gold/80 truncate max-w-[120px]">{product.name}</span>
+          </nav>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Product Images */}
             <div className="relative lg:sticky lg:top-32">
@@ -292,7 +313,8 @@ export default function ProductPage({
 
             {/* Right: Product Info */}
             <div className="flex flex-col lg:pl-12">
-              <nav className="flex items-center gap-3 mb-8 text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
+              {/* Breadcrumb - Desktop (in right column) */}
+              <nav className="hidden lg:flex items-center gap-3 mb-8 text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
                 <Link
                   href="/"
                   className="hover:text-brand-brown transition-colors"

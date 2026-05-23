@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 export default function Header() {
   const { items, getTotalItems } = useCartStore();
   const { user, signOut, fetchUser } = useUserStore();
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
