@@ -133,7 +133,7 @@ export default function ProductListing() {
       <ScrollReveal
         animation="reveal-fade"
         threshold={0.05}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 min-h-[60vh] transition-all duration-500"
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12 min-h-[60vh] transition-all duration-500"
       >
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
@@ -150,21 +150,21 @@ export default function ProductListing() {
             >
               <Link
                 href={`/product/${product.id}`}
-                className="block relative mb-6 group/image"
+                className="block relative mb-3 sm:mb-6 group/image"
               >
                 {/* Decorative Organic Outline */}
-                <div className="absolute -inset-2 border border-brand-gold/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] group-hover/image:scale-105 group-hover/image:border-brand-gold/30 transition-all duration-700 pointer-events-none" />
-                <div className="absolute -inset-1.5 border border-brand-green/5 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] group-hover/image:scale-105 group-hover/image:border-brand-green/10 transition-all duration-700 pointer-events-none delay-100" />
+                <div className="absolute -inset-1 sm:-inset-2 border border-brand-gold/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] group-hover/image:scale-105 group-hover/image:border-brand-gold/30 transition-all duration-700 pointer-events-none" />
+                <div className="absolute -inset-0.5 sm:-inset-1.5 border border-brand-green/5 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] group-hover/image:scale-105 group-hover/image:border-brand-green/10 transition-all duration-700 pointer-events-none delay-100" />
 
                 <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
                   <ProductImageCarousel
                     product={product}
                     imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
 
                   {/* Badges */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 flex flex-col gap-1 sm:gap-2">
                     <div className="bg-brand-cream/90 backdrop-blur-md text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 text-brand-brown rounded-full shadow-lg border border-brand-gold/10">
                       {product.category}
                     </div>
@@ -185,15 +185,15 @@ export default function ProductListing() {
                 </div>
               </Link>
 
-              <div className="flex flex-col flex-grow text-center px-4">
-                <Link href={`/product/${product.id}`} className="mb-2">
-                  <h3 className="text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center">
+              <div className="flex flex-col flex-grow text-center px-1 sm:px-4">
+                <Link href={`/product/${product.id}`} className="mb-1 sm:mb-2">
+                  <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center">
                     {product.name}
                   </h3>
                 </Link>
 
-                <div className="flex flex-col items-center gap-1.5 mb-6">
-                  <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                <div className="flex flex-col items-center gap-1 mb-4 sm:mb-6">
+                  <p className="text-[8px] sm:text-[10px] text-brand-gold italic font-medium tracking-wide">
                     {product.weight}
                   </p>
 
@@ -204,15 +204,15 @@ export default function ProductListing() {
                       {hasDiscount ? (
                         <div className="flex flex-col items-center">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm text-brand-brown/20 line-through font-light">
+                            <span className="text-xs sm:text-sm text-brand-brown/20 line-through font-light">
                               ₹{product.price.toFixed(0)}
                             </span>
-                            <div className="flex items-baseline gap-1.5">
-                              <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                            <div className="flex items-baseline gap-1 sm:gap-1.5">
+                              <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
                                 ₹{discountedPrice.toFixed(0)}
                               </span>
                               {unitPrice && (
-                                <span className="text-[10px] text-brand-brown/30 font-light">
+                                <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">
                                   ({unitPrice})
                                 </span>
                               )}
@@ -223,12 +223,12 @@ export default function ProductListing() {
                           </p>
                         </div>
                       ) : (
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-2xl font-medium text-brand-brown tracking-tighter">
+                        <div className="flex items-baseline gap-1 sm:gap-1.5">
+                          <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
                             ₹{product.price.toFixed(0)}
                           </span>
                           {unitPrice && (
-                            <span className="text-[10px] text-brand-brown/30 font-light">
+                            <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">
                               ({unitPrice})
                             </span>
                           )}
@@ -236,7 +236,7 @@ export default function ProductListing() {
                       )}
                       {product.stock_quantity !== undefined &&
                         product.stock_quantity !== null && (
-                          <span className="text-[7px] uppercase tracking-[0.2em] font-black text-brand-green/40 mt-1">
+                          <span className="text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-black text-brand-green/40 mt-0.5 sm:mt-1">
                             {product.stock_quantity} units left
                           </span>
                         )}
@@ -248,12 +248,12 @@ export default function ProductListing() {
                   <QuickAddButton product={product} className="w-full" />
                 </div>
 
-                <div className="flex justify-center items-center gap-3 mt-4">
+                <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        size={10}
+                        size={8}
                         className={
                           i < Math.round(product.rating || 0)
                             ? "fill-brand-gold text-brand-gold"
@@ -262,7 +262,7 @@ export default function ProductListing() {
                       />
                     ))}
                   </div>
-                  <span className="text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
+                  <span className="text-[7px] sm:text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
                     {product.review_count || 0} Reviews
                   </span>
                 </div>

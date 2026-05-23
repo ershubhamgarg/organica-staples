@@ -218,7 +218,7 @@ export default function HelpMeDecide() {
                     max="110"
                     value={profile.age}
                     onChange={handleChange}
-                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                     placeholder="e.g. 34"
                     required
                   />
@@ -251,7 +251,7 @@ export default function HelpMeDecide() {
                     max="240"
                     value={profile.height}
                     onChange={handleChange}
-                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                     placeholder="e.g. 175"
                     required
                   />
@@ -268,7 +268,7 @@ export default function HelpMeDecide() {
                     max="300"
                     value={profile.weight}
                     onChange={handleChange}
-                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                     placeholder="e.g. 70"
                     required
                   />

@@ -194,7 +194,7 @@ Message: ${formData.message}
               </div>
 
               {/* Floating Farmer Badge */}
-              <div className="absolute -right-8 -bottom-8 bg-brand-cream p-8 rounded-3xl shadow-2xl border border-brand-gold/10 max-w-xs animate-float">
+              <div className="absolute right-4 sm:-right-8 -bottom-8 bg-brand-cream p-8 rounded-3xl shadow-2xl border border-brand-gold/10 max-w-xs animate-float">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="w-12 h-12 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
                     <Sprout size={24} />
@@ -345,17 +345,22 @@ Message: ${formData.message}
                   <ScrollReveal
                     key={item.title}
                     delay={idx * 150}
-                    className="group p-10 bg-white border border-brand-gold/10 shadow-2xl shadow-brand-brown/5 transition-all duration-700 hover:translate-y-[-8px] rounded-2xl"
+                    className="group p-5 sm:p-10 bg-white border border-brand-gold/10 shadow-2xl shadow-brand-brown/5 transition-all duration-700 hover:translate-y-[-8px] rounded-2xl"
                   >
-                    <div className="w-14 h-14 rounded-full bg-brand-sand flex items-center justify-center mb-10 text-brand-gold group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
-                      <Icon size={24} strokeWidth={1.5} />
+                    <div className="flex items-center gap-4 sm:block">
+                      <div className="w-10 h-10 sm:w-14 sm:h-14 shrink-0 rounded-full bg-brand-sand flex items-center justify-center sm:mb-10 text-brand-gold group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
+                        <Icon size={20} className="sm:hidden" strokeWidth={1.5} />
+                        <Icon size={24} className="hidden sm:block" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-xl font-serif text-brand-brown mb-1 sm:mb-4 tracking-tight">
+                          {item.title}
+                        </h3>
+                        <p className="text-brand-brown/60 font-light leading-relaxed text-xs sm:text-sm">
+                          {item.body}
+                        </p>
+                      </div>
                     </div>
-                    <h3 className="text-xl font-serif text-brand-brown mb-4 tracking-tight">
-                      {item.title}
-                    </h3>
-                    <p className="text-brand-brown/60 font-light leading-relaxed text-sm">
-                      {item.body}
-                    </p>
                   </ScrollReveal>
                 );
               })}
@@ -425,7 +430,7 @@ Message: ${formData.message}
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-4"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-4"
                     placeholder="Your Name"
                     required
                   />
@@ -439,7 +444,7 @@ Message: ${formData.message}
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-4"
+                    className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-4"
                     placeholder="your@email.com"
                     required
                   />
@@ -454,7 +459,7 @@ Message: ${formData.message}
                   name="subject"
                   value={formData.subject}
                   onChange={handleInputChange}
-                  className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-4"
+                  className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-4"
                   placeholder="How can we help?"
                   required
                 />
@@ -468,7 +473,7 @@ Message: ${formData.message}
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brown transition-colors resize-none placeholder:text-brand-brown/10 font-light px-4"
+                  className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/50 font-light px-4"
                   placeholder="Share your thoughts with us..."
                   required
                 ></textarea>
