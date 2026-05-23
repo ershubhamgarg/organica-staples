@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
 import Header from "@/components/Header";
 
-const inter = Inter({
-  variable: "--font-inter",
+const sans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const serif = Fraunces({
+  variable: "--font-serif",
   subsets: ["latin"],
+  axes: ["SOFT"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
+        className={`${sans.variable} ${serif.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
       >
         <Header />
 

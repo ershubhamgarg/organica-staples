@@ -19,6 +19,7 @@ export interface Order {
   discount_amount?: number | null;
   shipping_amount?: number | null;
   convenience_fee_amount?: number | null;
+  cod_amount?: number | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   created_at: string;
@@ -43,6 +44,7 @@ export type OrderPricingDetails = {
   discountAmount: number;
   shippingAmount: number;
   convenienceFeeAmount: number;
+  codAmount?: number;
 };
 
 const getErrorMessage = (error: unknown) =>
@@ -132,6 +134,7 @@ export const useOrderStore = create<OrderState>()(
             shipping_amount: pricingDetails?.shippingAmount ?? null,
             convenience_fee_amount:
               pricingDetails?.convenienceFeeAmount ?? null,
+            cod_amount: pricingDetails?.codAmount ?? null,
             total_amount: totalAmount,
             status: "pending" as const,
           };
@@ -164,7 +167,9 @@ export const useOrderStore = create<OrderState>()(
 
             if (!response.ok) {
               if (result.code === "42P01") {
-                console.warn("Orders table missing. Saving to local state only.");
+                console.warn(
+                  "Orders table missing. Saving to local state only.",
+                );
                 return saveLocalOrder(newOrderData);
               }
 

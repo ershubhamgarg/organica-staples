@@ -20,6 +20,7 @@ import {
   Clock,
   Plus,
   Lock,
+  Banknote,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
@@ -159,9 +160,6 @@ export default function CheckoutPage() {
             : 0);
   const convenienceFee =
     orderSummary?.convenienceFee ?? Number((totalPrice * 0.01).toFixed(2));
-  const finalTotal =
-    orderSummary?.totalPayable ??
-    subtotalAfterDiscount + shipping + convenienceFee;
 
   const cartDiscount = orderSummary
     ? {
@@ -206,6 +204,13 @@ export default function CheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState<string | null>(
     "razorpay",
   );
+
+  const codCharge = 15;
+  const currentCodFee = selectedPayment === "cod" ? codCharge : 0;
+
+  const finalTotal =
+    (orderSummary?.totalPayable ??
+      subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -352,6 +357,7 @@ export default function CheckoutPage() {
         discountAmount: cartDiscount.amount,
         shippingAmount: shipping,
         convenienceFeeAmount: convenienceFee,
+        codAmount: currentCodFee,
       },
     );
 
@@ -364,6 +370,22 @@ export default function CheckoutPage() {
       });
       setOrderPlaced(true);
       clearCart(user?.id);
+    }
+  };
+
+  const handleCODPayment = async () => {
+    if (!selectedAddressId) return;
+
+    const deliveryAddress = checkoutAddresses.find(
+      (a) => a.id === selectedAddressId,
+    );
+    if (!deliveryAddress) return;
+
+    try {
+      await completeOrder(deliveryAddress, "cod", undefined);
+    } catch (error) {
+      console.error("COD placement error:", error);
+      setPaymentError("Failed to place COD order. Please try again.");
     }
   };
 
@@ -951,6 +973,43 @@ export default function CheckoutPage() {
                   )}
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPayment("cod");
+                    setPaymentError(null);
+                  }}
+                  className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
+                    selectedPayment === "cod"
+                      ? "bg-brand-brown text-brand-cream border-brand-brown"
+                      : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
+                    <Banknote
+                      size={24}
+                      strokeWidth={1}
+                      className="text-brand-gold"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-1 opacity-60">
+                      Payment Method
+                    </h4>
+                    <p className="text-lg font-serif tracking-tight">
+                      Cash on Delivery
+                    </p>
+                    <p className="text-[10px] font-light opacity-70 mt-1">
+                      Pay at your doorstep (Extra ₹15 charge)
+                    </p>
+                  </div>
+                  {selectedPayment === "cod" && (
+                    <div className="absolute top-4 right-4">
+                      <CheckCircle2 size={20} strokeWidth={1} />
+                    </div>
+                  )}
+                </button>
+
                 {paymentError && (
                   <div className="rounded-2xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-4 text-[10px] font-bold uppercase tracking-widest text-brand-terracotta">
                     {paymentError}
@@ -958,19 +1017,27 @@ export default function CheckoutPage() {
                 )}
 
                 <button
-                  onClick={handleRazorpayPayment}
+                  onClick={
+                    selectedPayment === "razorpay"
+                      ? handleRazorpayPayment
+                      : handleCODPayment
+                  }
                   disabled={
-                    isPlacingOrder ||
-                    isStartingPayment ||
-                    selectedPayment !== "razorpay"
+                    isPlacingOrder || isStartingPayment || !selectedPayment
                   }
                   className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-6 rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] hover:shadow-[0_40px_70px_-20px_rgba(60,54,42,0.5)] disabled:opacity-50 mt-8"
                 >
                   <span className="relative z-10 flex items-center gap-4">
-                    <Lock size={18} className="text-brand-green-fresh" />
+                    {selectedPayment === "razorpay" ? (
+                      <Lock size={18} className="text-brand-green-fresh" />
+                    ) : (
+                      <Banknote size={18} className="text-brand-green-fresh" />
+                    )}
                     {isPlacingOrder || isStartingPayment
                       ? "Verifying Securely..."
-                      : `Pay ₹${finalTotal.toFixed(0)}`}
+                      : selectedPayment === "razorpay"
+                        ? `Pay ₹${finalTotal.toFixed(0)}`
+                        : `Confirm Order ₹${finalTotal.toFixed(0)}`}
                     <ArrowRight
                       size={20}
                       className="group-hover:translate-x-2 transition-transform"
@@ -978,7 +1045,9 @@ export default function CheckoutPage() {
                   </span>
                   <span className="relative z-10 text-[8px] tracking-[0.3em] opacity-60 font-bold uppercase flex items-center gap-2">
                     <ShieldCheck size={10} />
-                    Secure SSL Encrypted Payment
+                    {selectedPayment === "razorpay"
+                      ? "Powered by Razorpay"
+                      : "Verified Cash on Delivery Order"}
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
                   <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
@@ -1080,6 +1149,16 @@ export default function CheckoutPage() {
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
                       ₹{convenienceFee.toFixed(0)}
+                    </span>
+                  </div>
+                )}
+                {currentCodFee > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-brown/60 font-light">
+                      COD Charge
+                    </span>
+                    <span className="text-brand-brown font-bold tracking-tight">
+                      ₹{currentCodFee}
                     </span>
                   </div>
                 )}

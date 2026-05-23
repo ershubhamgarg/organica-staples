@@ -23,6 +23,7 @@ export interface OrderSummary {
   subtotalAfterDiscount: number;
   shipping: number;
   convenienceFee: number;
+  codFee?: number;
   totalPayable: number;
 }
 

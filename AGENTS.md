@@ -38,7 +38,7 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 ## Design System: "Desi Premium"
 
 - **Palette**: `brand-cream` (BG), `brand-brown` (text/primary), `brand-green` (accents), `brand-gold` (luxury highlights), `brand-terracotta` (earthy accents).
-- **Typography**: Inter (sans) for body, Playfair Display (serif) for headings.
+- **Typography**: Plus Jakarta Sans (sans) for body, Fraunces (soft-serif) for headings.
 - **Textures**: `bg-jute`, `bg-organic-texture` (natural paper feel).
 - **Borders**: Layered, irregular organic borders for images (`organic-border`, `organic-border-alt`). Standard UI elements (cards/buttons) use `rounded-3xl` or `rounded-full`.
 - **Visuals**: Organic SVG illustrations (wheat stalks, matka, mortar & pestle, tulsi leaf).

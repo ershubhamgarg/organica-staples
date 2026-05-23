@@ -478,6 +478,19 @@ export default function ProfilePage() {
                                 </div>
                               )}
 
+                            {order.cod_amount !== undefined &&
+                              order.cod_amount !== null &&
+                              order.cod_amount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-brown/40 font-bold">
+                                    COD Charge
+                                  </span>
+                                  <span className="text-brand-brown font-black">
+                                    ₹{order.cod_amount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+
                             <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-3 border-t border-brand-gold/10">
                               <span className="text-brand-brown font-black">
                                 Total Paid
