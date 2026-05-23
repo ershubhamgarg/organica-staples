@@ -133,14 +133,22 @@ export default function CheckoutPage() {
   const { placeOrder, isLoading: isPlacingOrder } = useOrderStore();
   const [mounted, setMounted] = useState(false);
 
-  // Use values from store (synced from cart) to avoid mismatch
-  const totalPrice = orderSummary?.actualSubtotal ?? getTotalPrice();
-  const actualSubtotal = orderSummary?.actualSubtotal ?? totalPrice;
-  const productDiscount = orderSummary?.productDiscount ?? 0;
+  // Use values from store (synced from cart) and keep a deterministic fallback
+  // so every new order stores explicit financial fields.
+  const fallbackActualSubtotal = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+  const fallbackEffectiveSubtotal = getTotalPrice();
+  const totalPrice = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
+  const actualSubtotal = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
+  const productDiscount =
+    orderSummary?.productDiscount ??
+    Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0);
 
   // Fallback calculation if orderSummary is missing
   const fallbackCartDiscount = calculateDiscount(
-    totalPrice,
+    fallbackEffectiveSubtotal,
     appliedDiscountCoupon,
   );
 
@@ -159,7 +167,7 @@ export default function CheckoutPage() {
             ? 149
             : 0);
   const convenienceFee =
-    orderSummary?.convenienceFee ?? Number((totalPrice * 0.01).toFixed(2));
+    orderSummary?.convenienceFee ?? 10;
 
   const cartDiscount = orderSummary
     ? {
@@ -352,9 +360,10 @@ export default function CheckoutPage() {
       paymentDetails,
       {
         subtotalAmount: totalPrice,
+        productDiscountAmount: productDiscount,
         discountCode: cartDiscount.isEligible ? cartDiscount.code : null,
         discountPercent: cartDiscount.isEligible ? cartDiscount.percent : 0,
-        discountAmount: cartDiscount.amount,
+        couponDiscountAmount: cartDiscount.amount,
         shippingAmount: shipping,
         convenienceFeeAmount: convenienceFee,
         codAmount: currentCodFee,

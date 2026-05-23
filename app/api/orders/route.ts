@@ -74,22 +74,17 @@ export async function POST(request: Request) {
     delivery_address: deliveryAddress,
     payment_method: paymentMethod,
     payment_details: paymentDetails ?? null,
-    subtotal_amount: pricingDetails?.subtotalAmount ?? null,
+    subtotal_amount: pricingDetails?.subtotalAmount ?? 0,
     discount_code: pricingDetails?.discountCode ?? null,
     discount_percent: pricingDetails?.discountPercent ?? null,
-    discount_amount: pricingDetails?.discountAmount ?? null,
-    shipping_amount: pricingDetails?.shippingAmount ?? null,
-    convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? null,
-    total_amount: totalAmount,
-    status: "pending",
-  };
-
-  const legacyOrderData = {
-    user_id: userId ?? null,
-    items,
-    delivery_address: deliveryAddress,
-    payment_method: paymentMethod,
-    payment_details: paymentDetails ?? null,
+    product_discount_amount: pricingDetails?.productDiscountAmount ?? 0,
+    coupon_discount_amount: pricingDetails?.couponDiscountAmount ?? 0,
+    discount_amount:
+      (pricingDetails?.productDiscountAmount ?? 0) +
+      (pricingDetails?.couponDiscountAmount ?? 0),
+    shipping_amount: pricingDetails?.shippingAmount ?? 0,
+    convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? 0,
+    cod_amount: pricingDetails?.codAmount ?? 0,
     total_amount: totalAmount,
     status: "pending",
   };
@@ -101,18 +96,6 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    if (error.code === "42703" || error.code === "PGRST204") {
-      const { data: legacyData, error: legacyError } = await supabaseAdmin
-        .from("orders")
-        .insert([legacyOrderData])
-        .select()
-        .single();
-
-      if (!legacyError) {
-        return NextResponse.json({ order: legacyData });
-      }
-    }
-
     return NextResponse.json(
       { error: error.message, code: error.code },
       { status: error.code === "42P01" ? 404 : 500 },

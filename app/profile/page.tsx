@@ -3,6 +3,7 @@
 import { useUserStore } from "@/store/userStore";
 import { useAddressStore } from "@/store/addressStore";
 import { useOrderStore } from "@/store/orderStore";
+import type { Order } from "@/store/orderStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,6 +22,21 @@ import {
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getProductThumbnail } from "@/lib/data";
+
+const getOrderAmount = (value: number | null | undefined) =>
+  typeof value === "number" && Number.isFinite(value) ? value : 0;
+
+const getOrderBreakdown = (order: Order) => {
+  return {
+    itemsSubtotal: getOrderAmount(order.subtotal_amount),
+    productDiscount: getOrderAmount(order.product_discount_amount),
+    couponDiscount: getOrderAmount(order.coupon_discount_amount),
+    shipping: getOrderAmount(order.shipping_amount),
+    convenienceFee: getOrderAmount(order.convenience_fee_amount),
+    codFee: getOrderAmount(order.cod_amount),
+    total: getOrderAmount(order.total_amount),
+  };
+};
 
 export default function ProfilePage() {
   const { user, signOut } = useUserStore();
@@ -350,11 +366,14 @@ export default function ProfilePage() {
 
               {orders.length > 0 ? (
                 <div className="space-y-8">
-                  {orders.slice(0, visibleOrdersCount).map((order) => (
-                    <div
-                      key={order.id}
-                      className="bg-brand-cream/30 rounded-3xl border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
-                    >
+                  {orders.slice(0, visibleOrdersCount).map((order) => {
+                    const breakdown = getOrderBreakdown(order);
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="bg-brand-cream/30 rounded-3xl border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
+                      >
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-brand-gold/10">
                         <div>
                           <p className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold mb-2">
@@ -440,70 +459,74 @@ export default function ProfilePage() {
                                 Items Subtotal
                               </span>
                               <span className="text-brand-brown font-black">
-                                ₹{(order.subtotal_amount || 0).toFixed(0)}
+                                ₹{breakdown.itemsSubtotal.toFixed(0)}
                               </span>
                             </div>
 
-                            {order.discount_amount &&
-                              order.discount_amount > 0 && (
-                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                                  <span className="text-brand-green-fresh font-bold italic">
-                                    Discount
-                                    {order.discount_code
-                                      ? ` (${order.discount_code})`
-                                      : ""}
-                                  </span>
-                                  <span className="text-brand-green-fresh font-black">
-                                    -₹{order.discount_amount.toFixed(0)}
-                                  </span>
-                                </div>
-                              )}
+                            {breakdown.productDiscount > 0 && (
+                              <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                <span className="text-brand-green-fresh font-bold italic">
+                                  Product Discount
+                                </span>
+                                <span className="text-brand-green-fresh font-black">
+                                  -₹{breakdown.productDiscount.toFixed(0)}
+                                </span>
+                              </div>
+                            )}
 
-                            {order.shipping_amount !== undefined &&
-                              order.shipping_amount !== null &&
-                              order.shipping_amount > 0 && (
+                            {breakdown.couponDiscount > 0 && (
+                              <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                <span className="text-brand-green-fresh font-bold italic">
+                                  Coupon Discount
+                                  {order.discount_code
+                                    ? ` (${order.discount_code})`
+                                    : ""}
+                                </span>
+                                <span className="text-brand-green-fresh font-black">
+                                  -₹{breakdown.couponDiscount.toFixed(0)}
+                                </span>
+                              </div>
+                            )}
+
+                            {breakdown.shipping > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     Shipping
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{order.shipping_amount.toFixed(0)}
+                                    ₹{breakdown.shipping.toFixed(0)}
                                   </span>
                                 </div>
                               )}
 
-                            {order.convenience_fee_amount !== undefined &&
-                              order.convenience_fee_amount !== null &&
-                              order.convenience_fee_amount > 0 && (
+                            {breakdown.convenienceFee > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     Convenience Fee
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{order.convenience_fee_amount.toFixed(0)}
+                                    ₹{breakdown.convenienceFee.toFixed(0)}
                                   </span>
                                 </div>
                               )}
 
-                            {order.cod_amount !== undefined &&
-                              order.cod_amount !== null &&
-                              order.cod_amount > 0 && (
+                            {breakdown.codFee > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     COD Charge
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{order.cod_amount.toFixed(0)}
+                                    ₹{breakdown.codFee.toFixed(0)}
                                   </span>
                                 </div>
                               )}
 
                             <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-3 border-t border-brand-gold/10">
                               <span className="text-brand-brown font-black">
-                                Total Paid
+                                Order Total
                               </span>
                               <span className="text-brand-brown font-black text-lg tracking-tighter">
-                                ₹{order.total_amount.toFixed(0)}
+                                ₹{breakdown.total.toFixed(0)}
                               </span>
                             </div>
                           </div>
@@ -559,8 +582,9 @@ export default function ProfilePage() {
                             </div>
                           )}
                       </div>
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="p-16 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl flex flex-col items-center gap-6">
