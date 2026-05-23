@@ -60,7 +60,7 @@ export default function CartPage() {
   const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
   const mounted = useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false,
   );
@@ -141,10 +141,10 @@ export default function CartPage() {
       });
       const result = (await response.json()) as
         | {
-            coupon: DiscountCode;
-            isEligible: boolean;
-            shortfall: number;
-          }
+          coupon: DiscountCode;
+          isEligible: boolean;
+          shortfall: number;
+        }
         | { error?: string };
 
       if (!response.ok || !("coupon" in result)) {
@@ -348,11 +348,10 @@ export default function CartPage() {
                             </p>
                             {available && itemHasDiscount && (
                               <span
-                                className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 text-white ${
-                                  itemHasHighDiscount
+                                className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 text-white ${itemHasHighDiscount
                                     ? "bg-brand-terracotta shadow-lg"
                                     : "bg-brand-green"
-                                }`}
+                                  }`}
                               >
                                 {itemHasHighDiscount
                                   ? "Reserve"
@@ -547,7 +546,7 @@ export default function CartPage() {
                           }
                         }}
                         className="min-w-0 flex-1 rounded-full border border-brand-gold/15 bg-white px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-brown outline-none transition-colors placeholder:text-brand-brown/20 focus:border-brand-brown"
-                        placeholder="WELCOME10"
+                        placeholder="ENTER CODE"
                       />
                       <button
                         type="button"
@@ -573,11 +572,10 @@ export default function CartPage() {
 
                   {(discountError || discountMessage) && (
                     <p
-                      className={`mt-3 text-[9px] font-bold uppercase tracking-widest ${
-                        discountError
+                      className={`mt-3 text-[9px] font-bold uppercase tracking-widest ${discountError
                           ? "text-brand-terracotta"
                           : "text-brand-green-fresh"
-                      }`}
+                        }`}
                     >
                       {discountError || discountMessage}
                     </p>
@@ -606,7 +604,7 @@ export default function CartPage() {
                   {/* Subtle Jute/Paper texture background overlay */}
                   <div className="absolute inset-0 bg-organic-texture opacity-25 pointer-events-none" />
                   <div className="absolute inset-0 bg-jute opacity-[0.03] pointer-events-none" />
-                  
+
                   {/* Background organic SVG Leaf/Vine illustration for luxury feel */}
                   <div className="absolute right-0 top-0 -translate-y-4 translate-x-4 opacity-[0.08] pointer-events-none text-brand-gold">
                     <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
@@ -640,11 +638,10 @@ export default function CartPage() {
                     {/* Right Column: Checkout Action Button */}
                     <Link
                       href={hasUnavailableItems ? "#" : "/checkout"}
-                      className={`flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 ${
-                        hasUnavailableItems
+                      className={`flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 ${hasUnavailableItems
                           ? "opacity-40 cursor-not-allowed grayscale"
                           : ""
-                      }`}
+                        }`}
                     >
                       <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
                         <ShieldCheck
@@ -669,11 +666,10 @@ export default function CartPage() {
                 <div className="hidden lg:block lg:static lg:p-0 lg:border-none lg:shadow-none z-40">
                   <Link
                     href={hasUnavailableItems ? "#" : "/checkout"}
-                    className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] ${
-                      hasUnavailableItems
+                    className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] ${hasUnavailableItems
                         ? "opacity-40 cursor-not-allowed grayscale"
                         : ""
-                    }`}
+                      }`}
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       <ShieldCheck
@@ -750,11 +746,10 @@ export default function CartPage() {
                   return (
                     <div
                       key={coupon.code}
-                      className={`rounded-2xl border transition-all p-5 ${
-                        canApply
+                      className={`rounded-2xl border transition-all p-5 ${canApply
                           ? "border-brand-gold/10 bg-brand-cream/40"
                           : "border-brand-brown/5 bg-brand-brown/[0.02] grayscale opacity-75"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
@@ -773,11 +768,10 @@ export default function CartPage() {
                           </p>
                           <div className="mt-2 space-y-1">
                             <p
-                              className={`text-[9px] font-bold uppercase tracking-widest ${
-                                shortfall > 0
+                              className={`text-[9px] font-bold uppercase tracking-widest ${shortfall > 0
                                   ? "text-brand-terracotta"
                                   : "text-brand-brown/40"
-                              }`}
+                                }`}
                             >
                               {coupon.minOrderValue
                                 ? `Minimum order ₹${coupon.minOrderValue.toFixed(0)}`
@@ -795,11 +789,10 @@ export default function CartPage() {
                           type="button"
                           onClick={() => handleApplyDiscount(coupon.code)}
                           disabled={!canApply}
-                          className={`rounded-full px-5 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${
-                            canApply
+                          className={`rounded-full px-5 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${canApply
                               ? "bg-brand-brown text-brand-cream hover:bg-brand-brown-light"
                               : "bg-brand-brown/10 text-brand-brown/20 cursor-not-allowed"
-                          }`}
+                            }`}
                         >
                           {canApply ? "Apply" : "Locked"}
                         </button>
