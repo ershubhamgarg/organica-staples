@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
 import Header from "@/components/Header";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -38,6 +39,8 @@ export default function RootLayout({
         <Header />
 
         <main className="flex-grow">{children}</main>
+
+        <WhatsAppButton />
 
         <footer className="bg-stone-900 text-stone-300 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">

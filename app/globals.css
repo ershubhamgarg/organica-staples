@@ -173,3 +173,15 @@ body {
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* Bulletproof responsive styles for the mobile floating WhatsApp button */
+.whatsapp-mobile-only {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
+  .whatsapp-mobile-only {
+    display: none !important;
+  }
+}
+
