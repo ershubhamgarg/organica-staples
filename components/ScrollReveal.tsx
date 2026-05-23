@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
+  id?: string;
   animation?: "reveal-up" | "reveal-down" | "reveal-fade";
   delay?: number;
   className?: string;
@@ -13,6 +14,7 @@ interface ScrollRevealProps {
 
 export default function ScrollReveal({
   children,
+  id,
   animation = "reveal-up",
   delay = 0,
   className = "",
@@ -55,6 +57,7 @@ export default function ScrollReveal({
 
   return (
     <div
+      id={id}
       ref={domRef}
       className={`${animationClass} ${className}`}
       style={{

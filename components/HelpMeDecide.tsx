@@ -3,6 +3,7 @@
 import { ArrowRight, HeartPulse, Scale, Wheat } from "lucide-react";
 import { useMemo, useState } from "react";
 import ScrollReveal from "./ScrollReveal";
+import Link from "next/link";
 
 type ActivityLevel = "low" | "moderate" | "high";
 
@@ -414,12 +415,12 @@ export default function HelpMeDecide() {
                       Your personalized store awaits.
                     </p>
                   </div>
-                  <a
+                  <Link
                     href="#shop"
                     className="inline-flex items-center gap-4 bg-brand-cream text-brand-brown px-10 py-5 rounded-full text-[11px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-gold"
                   >
                     View Selection <ArrowRight size={14} />
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}

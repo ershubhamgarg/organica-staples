@@ -30,7 +30,7 @@ const DesiHero = () => {
 
             <div className="flex flex-wrap items-center justify-start gap-4">
               <Link
-                href="#shop"
+                href="/#shop"
                 className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-green text-brand-cream rounded-full transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20"
               >
                 <span className="font-black uppercase tracking-widest text-[10px]">
@@ -41,13 +41,6 @@ const DesiHero = () => {
 
               <Link
                 href="/#contact"
-                onClick={(e) => {
-                  const el = document.getElementById("contact");
-                  if (el) {
-                    e.preventDefault();
-                    el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-brand-green/20 text-brand-green rounded-full transition-all duration-500 hover:bg-brand-green/5 hover:border-brand-green/40"
               >
                 <Mail className="w-4 h-4" />

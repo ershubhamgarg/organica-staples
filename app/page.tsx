@@ -45,6 +45,29 @@ export default function Home() {
     }
   }, [user, syncCartWithSupabase, formData.email]);
 
+  useEffect(() => {
+    const scrollToHash = () => {
+      const sectionId = window.location.hash.slice(1);
+
+      if (sectionId !== "shop" && sectionId !== "contact") {
+        return;
+      }
+
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById(sectionId)
+          ?.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+    };
+
+    scrollToHash();
+    window.addEventListener("hashchange", scrollToHash);
+
+    return () => {
+      window.removeEventListener("hashchange", scrollToHash);
+    };
+  }, []);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -378,16 +401,15 @@ Message: ${formData.message}
       </section>
 
       {/* Contact Us Section */}
-      <section
-        id="contact"
-        className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10 scroll-mt-28"
-        style={{ scrollMarginTop: "120px" }}
-      >
+      <section className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10">
         <div className="absolute inset-0 bg-stone-texture pointer-events-none" />
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 items-start relative z-10">
           <ScrollReveal className="lg:pt-4">
-            <div className="inline-flex items-center gap-4 mb-4">
+            <div
+              id="contact"
+              className="scroll-mt-32 lg:scroll-mt-40 inline-flex items-center gap-4 mb-4"
+            >
               <MessageCircle size={20} className="text-brand-gold" />
               <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-gold">
                 Customer Support

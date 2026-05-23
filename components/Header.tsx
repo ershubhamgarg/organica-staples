@@ -13,8 +13,9 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef, type MouseEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { scrollToHomeTop } from "@/utils/scrollToHomeTop";
 
 export default function Header() {
   const { getTotalItems } = useCartStore();
@@ -26,8 +27,35 @@ export default function Header() {
   const [isAnimating, setIsAnimating] = useState(false);
   const totalItems = getTotalItems();
   const router = useRouter();
+  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    setIsMobileMenuOpen(false);
+
+    if (pathname === "/") {
+      event.preventDefault();
+      scrollToHomeTop();
+    }
+  };
+
+  const handleSectionClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+  ) => {
+    setIsMobileMenuOpen(false);
+
+    if (pathname === "/") {
+      const target = document.getElementById(sectionId);
+
+      if (target) {
+        event.preventDefault();
+        window.history.pushState(null, "", `/#${sectionId}`);
+        target.scrollIntoView({ block: "start", behavior: "smooth" });
+      }
+    }
+  };
 
   useEffect(() => {
     // Initialize audio - Ultra-soft, minimal muffled click (Almost no treble)
@@ -117,6 +145,7 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-12 flex-1">
             <Link
               href="/"
+              onClick={handleHomeClick}
               className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Home
@@ -124,13 +153,7 @@ export default function Header() {
             </Link>
             <Link
               href="/#shop"
-              onClick={(e) => {
-                const el = document.getElementById("shop");
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              onClick={(event) => handleSectionClick(event, "shop")}
               className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Shop
@@ -143,7 +166,7 @@ export default function Header() {
             <Link
               href="/"
               className="relative z-50 transition-all duration-700 hover:scale-105"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={handleHomeClick}
             >
               <div className="p-1 sm:p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
                 <Image
@@ -170,13 +193,7 @@ export default function Header() {
 
             <Link
               href="/#contact"
-              onClick={(e) => {
-                const el = document.getElementById("contact");
-                if (el) {
-                  e.preventDefault();
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              onClick={(event) => handleSectionClick(event, "contact")}
               className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Contact Us
@@ -273,21 +290,14 @@ export default function Header() {
           <Link
             href="/"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={handleHomeClick}
           >
             Home
           </Link>
           <Link
             href="/#shop"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={(e) => {
-              setIsMobileMenuOpen(false);
-              const el = document.getElementById("shop");
-              if (el) {
-                e.preventDefault();
-                el.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
+            onClick={(event) => handleSectionClick(event, "shop")}
           >
             Shop
           </Link>
@@ -301,14 +311,7 @@ export default function Header() {
           <Link
             href="/#contact"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={(e) => {
-              setIsMobileMenuOpen(false);
-              const el = document.getElementById("contact");
-              if (el) {
-                e.preventDefault();
-                el.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
+            onClick={(event) => handleSectionClick(event, "contact")}
           >
             Contact Us
           </Link>
