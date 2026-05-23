@@ -1031,9 +1031,73 @@ export default function CheckoutPage() {
                   <div className="rounded-2xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-4 text-[10px] font-bold uppercase tracking-widest text-brand-terracotta">
                     {paymentError}
                   </div>
-                )}
+                )}                {/* Mobile Floating Checkout Bar - Redesigned to be "Wow" and Premium */}
+                <div className="lg:hidden fixed bottom-5 left-4 right-4 bg-brand-cream/95 backdrop-blur-xl border-2 border-brand-gold/15 shadow-[0_20px_50px_rgba(60,54,42,0.2)] z-40 rounded-[2rem] p-4 flex items-center justify-between gap-4 safe-bottom animate-fade-in bg-organic-texture">
+                  
+                  {/* Left Column: Premium Price & Payment state details */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[7px] uppercase tracking-[0.25em] font-black text-brand-brown/40">
+                      Total Payable
+                    </span>
+                    <span className="text-2xl font-semibold text-brand-brown font-serif tracking-tight">
+                      ₹{finalTotal.toFixed(0)}
+                    </span>
+                    {/* Payment Mode Badge - Premium UX verification */}
+                    {selectedPayment ? (
+                      <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/5 px-2 py-0.5 rounded-full border border-brand-gold/10 w-fit">
+                        <span>{selectedPayment === "razorpay" ? "Secure Online" : "Cash on Delivery"}</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-terracotta bg-brand-terracotta/5 px-2 py-0.5 rounded-full border border-brand-terracotta/10 w-fit">
+                        <span>Choose Payment</span>
+                      </span>
+                    )}
+                  </div>
 
-                <div className="lg:static fixed bottom-0 left-0 w-full bg-white lg:bg-transparent p-4 lg:p-0 border-t border-brand-gold/10 lg:border-none shadow-[0_-20px_40px_-10px_rgba(60,54,42,0.1)] lg:shadow-none z-40 safe-bottom">
+                  {/* Right Column: Place Order/Pay Action Button */}
+                  <button
+                    onClick={
+                      selectedPayment === "razorpay"
+                        ? handleRazorpayPayment
+                        : handleCODPayment
+                    }
+                    disabled={
+                      isPlacingOrder || isStartingPayment || !selectedPayment
+                    }
+                    className="flex-1 max-w-[210px] group relative flex items-center justify-center gap-2 py-3.5 px-5 bg-brand-green text-brand-cream rounded-2xl text-[9px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_8px_20px_rgba(45,58,38,0.25)] hover:shadow-[0_12px_28px_rgba(45,58,38,0.35)] active:scale-95 border border-brand-gold/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      {isPlacingOrder || isStartingPayment ? (
+                        <div className="w-3.5 h-3.5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" />
+                      ) : selectedPayment === "razorpay" ? (
+                        <Lock size={12} className="text-brand-gold animate-pulse" />
+                      ) : (
+                        <Banknote
+                          size={12}
+                          className="text-brand-gold"
+                        />
+                      )}
+                      <span>
+                        {isPlacingOrder || isStartingPayment
+                          ? "Verifying..."
+                          : selectedPayment === "razorpay"
+                            ? "Pay Securely"
+                            : "Place Order"}
+                      </span>
+                      <ArrowRight
+                        size={12}
+                        className="group-hover:translate-x-1.5 transition-transform duration-300"
+                      />
+                    </span>
+                    {/* Soft Shimmer Highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-cream/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                    {/* Elegant background overlay */}
+                    <div className="absolute inset-0 bg-[#3a4b32] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </button>
+                </div>
+
+                {/* Desktop Static Checkout Bar */}
+                <div className="hidden lg:block lg:static lg:p-0 lg:border-none lg:shadow-none z-40">
                   <button
                     onClick={
                       selectedPayment === "razorpay"

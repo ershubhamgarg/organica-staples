@@ -80,7 +80,7 @@ export default function ProductPage({
 
     async function loadData() {
       const fetchedProduct = await fetchProductById(id);
-      if (isActive && fetchedProduct) {
+      if (isActive && fetchedProduct && fetchedProduct.isVisible !== false) {
         setProduct(fetchedProduct);
         setHasFetched(true);
 
@@ -110,7 +110,12 @@ export default function ProductPage({
   const recommendedProducts = useMemo(() => {
     if (!product) return [];
     return products
-      .filter((p) => p.id !== product.id && p.category === product.category)
+      .filter(
+        (p) =>
+          p.id !== product.id &&
+          p.category === product.category &&
+          p.isVisible !== false,
+      )
       .slice(0, 4);
   }, [product, products]);
 
