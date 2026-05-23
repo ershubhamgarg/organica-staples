@@ -55,13 +55,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-cream py-24 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
+    <div className="min-h-screen bg-brand-cream py-12 lg:py-24 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
       {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-green/5 organic-border-alt -translate-x-1/2 translate-y-1/2" />
+      <div className="absolute top-0 right-0 w-64 lg:w-96 h-64 lg:h-96 bg-brand-gold/5 organic-border translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 left-0 w-48 lg:w-64 h-48 lg:h-64 bg-brand-green/5 organic-border-alt -translate-x-1/2 translate-y-1/2" />
 
       <div className="max-w-[85rem] mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-16">
           <div>
             <div className="inline-flex items-center gap-3 mb-4">
               <span className="h-[1px] w-8 bg-brand-gold" />
@@ -69,14 +69,14 @@ export default function ProfilePage() {
                 Member Account
               </span>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-serif text-brand-brown tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-serif text-brand-brown tracking-tight">
               My <span className="italic">Profile</span>
             </h1>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <Link
               href="/"
-              className="inline-flex items-center gap-3 text-brand-brown/60 hover:text-brand-brown transition-all text-[10px] uppercase tracking-[0.2em] font-black"
+              className="inline-flex items-center gap-3 text-brand-brown/60 hover:text-brand-brown transition-all text-[10px] uppercase tracking-[0.2em] font-black min-h-[48px]"
             >
               <ArrowLeft size={14} /> Back to Shop
             </Link>
@@ -85,7 +85,7 @@ export default function ProfilePage() {
                 await signOut();
                 router.push("/");
               }}
-              className="inline-flex items-center gap-3 text-brand-terracotta hover:text-brand-terracotta/80 transition-all text-[10px] uppercase tracking-[0.2em] font-black border border-brand-terracotta/20 px-6 py-3 rounded-full hover:bg-brand-terracotta/5"
+              className="inline-flex items-center gap-3 text-brand-terracotta hover:text-brand-terracotta/80 transition-all text-[10px] uppercase tracking-[0.2em] font-black border border-brand-terracotta/20 px-6 py-3 rounded-full hover:bg-brand-terracotta/5 min-h-[48px]"
             >
               <LogOut size={14} /> Sign Out
             </button>
@@ -176,28 +176,30 @@ export default function ProfilePage() {
                     }
                   }}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 mb-8">
+                    <div className="space-y-2">
                       <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                         Address Name
                       </label>
                       <input
                         type="text"
+                        autoComplete="organization"
                         required
                         value={newAddress.name}
                         onChange={(e) =>
                           setNewAddress({ ...newAddress, name: e.target.value })
                         }
-                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                         placeholder="Home / Work"
                       />
                     </div>
-                    <div>
+                    <div className="space-y-2">
                       <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                         Phone Number
                       </label>
                       <input
                         type="tel"
+                        autoComplete="tel"
                         required
                         value={newAddress.phone}
                         onChange={(e) =>
@@ -206,17 +208,18 @@ export default function ProfilePage() {
                             phone: e.target.value,
                           })
                         }
-                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                        className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                         placeholder="+91"
                       />
                     </div>
                   </div>
-                  <div className="mb-8">
+                  <div className="mb-8 space-y-2">
                     <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                       Street Address
                     </label>
                     <input
                       type="text"
+                      autoComplete="street-address"
                       required
                       value={newAddress.address}
                       onChange={(e) =>
@@ -225,33 +228,37 @@ export default function ProfilePage() {
                           address: e.target.value,
                         })
                       }
-                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                       placeholder="Street, Building, House No."
                     />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mb-12">
                     <input
                       type="text"
+                      autoComplete="address-level2"
                       required
                       value={newAddress.city}
                       onChange={(e) =>
                         setNewAddress({ ...newAddress, city: e.target.value })
                       }
-                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                       placeholder="City"
                     />
                     <input
                       type="text"
+                      autoComplete="address-level1"
                       required
                       value={newAddress.state}
                       onChange={(e) =>
                         setNewAddress({ ...newAddress, state: e.target.value })
                       }
-                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                       placeholder="State"
                     />
                     <input
                       type="text"
+                      autoComplete="postal-code"
+                      inputMode="numeric"
                       required
                       value={newAddress.zipCode}
                       onChange={(e) =>
@@ -260,21 +267,21 @@ export default function ProfilePage() {
                           zipCode: e.target.value,
                         })
                       }
-                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light"
+                      className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                       placeholder="Pin Code"
                     />
                   </div>
-                  <div className="flex gap-6">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <button
                       type="submit"
-                      className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light"
+                      className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-xl lg:rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light min-h-[48px]"
                     >
                       Save Address
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowAddForm(false)}
-                      className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors"
+                      className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors min-h-[48px]"
                     >
                       Cancel
                     </button>

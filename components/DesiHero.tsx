@@ -6,66 +6,66 @@ import Link from "next/link";
 
 const DesiHero = () => {
   return (
-    <section className="relative min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream">
-      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-10 items-center">
-          <div className="max-w-xl">
-            <div className="inline-flex items-center gap-3 mb-4 text-brand-green/80">
-              <span className="h-[1px] w-12 bg-brand-gold" />
-              <span className="uppercase tracking-[0.3em] text-[8px] sm:text-[9px] font-bold">
+    <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream pt-16 lg:pt-0">
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+          <div className="max-w-xl text-left">
+            <div className="inline-flex items-center justify-start gap-3 mb-6 text-brand-green/80">
+              <span className="h-[1px] w-8 sm:w-12 bg-brand-gold" />
+              <span className="uppercase tracking-[0.3em] text-[7px] sm:text-[9px] font-black">
                 Ethically Sourced Organic Staples
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-brand-brown font-medium mb-3 leading-[1.1] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-brand-brown font-medium mb-4 leading-[1.1] tracking-tight">
               Purity in <br />
               <span className="text-brand-gold italic">every grain.</span>
             </h1>
 
-            <p className="text-xs md:text-sm text-brand-brown/70 mb-6 max-w-md font-light leading-relaxed">
+            <p className="text-sm sm:text-base text-brand-brown/70 mb-8 max-w-md font-light leading-relaxed">
               Experience the authentic taste of tradition with our ethically
               sourced, 100% organic pantry staples. Pure, potent, and close to
               nature.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap items-center justify-start gap-4">
               <Link
                 href="#shop"
-                className="group relative inline-flex items-center gap-3 px-6 py-3 bg-brand-green text-brand-cream rounded-full transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20"
+                className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-green text-brand-cream rounded-full transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20"
               >
-                <span className="font-medium tracking-wide text-sm">
-                  Shop Now
+                <span className="font-black uppercase tracking-widest text-[10px]">
+                  Shop Collection
                 </span>
-                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-500 group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
               </Link>
 
               <button
                 onClick={() =>
                   window.open("https://wa.me/918295433041", "_blank")
                 }
-                className="inline-flex items-center gap-3 px-6 py-3 border border-brand-green/20 text-brand-green rounded-full transition-all duration-500 hover:bg-brand-green/5 hover:border-brand-green/40"
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 border border-brand-green/20 text-brand-green rounded-full transition-all duration-500 hover:bg-brand-green/5 hover:border-brand-green/40"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                <span className="font-medium tracking-wide text-sm">
-                  Talk to Us
+                <MessageCircle className="w-4 h-4" />
+                <span className="font-black uppercase tracking-widest text-[10px]">
+                  WhatsApp Us
                 </span>
               </button>
             </div>
 
             {/* Trust Badges */}
-            <div className="mt-16 flex flex-wrap gap-8 opacity-60">
+            <div className="mt-12 lg:mt-16 flex flex-wrap justify-start gap-6 sm:gap-10 opacity-40">
               <div className="flex items-center">
-                <span className="text-[10px] uppercase tracking-widest font-bold">
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black">
                   100% Organic
                 </span>
               </div>
               <div className="flex items-center">
-                <span className="text-[10px] uppercase tracking-widest font-bold">
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black">
                   Farm to Table
                 </span>
               </div>
               <div className="flex items-center">
-                <span className="text-[10px] uppercase tracking-widest font-bold">
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black">
                   Zero Chemicals
                 </span>
               </div>

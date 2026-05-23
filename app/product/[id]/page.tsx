@@ -415,10 +415,10 @@ export default function ProductPage({
                   </div>
                 ) : (
                   <div className="flex flex-col sm:flex-row items-center gap-8">
-                    <div className="flex items-center border border-brand-brown rounded-full px-6 py-4 bg-white shadow-inner">
+                    <div className="flex items-center border border-brand-brown rounded-full px-6 py-3 lg:py-4 bg-white shadow-inner w-full sm:w-auto justify-between sm:justify-start">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="text-brand-brown hover:text-brand-terracotta transition-all p-1"
+                        className="text-brand-brown hover:text-brand-terracotta transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
                       >
                         <Minus size={16} strokeWidth={3} />
                       </button>
@@ -427,7 +427,7 @@ export default function ProductPage({
                       </span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="text-brand-brown hover:text-brand-green transition-all p-1"
+                        className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
                       >
                         <Plus size={16} strokeWidth={3} />
                       </button>
@@ -435,7 +435,7 @@ export default function ProductPage({
 
                     <button
                       onClick={handleAddToCart}
-                      className={`flex-1 group relative flex items-center justify-center gap-4 px-10 py-5 bg-brand-brown text-brand-cream rounded-full text-[12px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px] ${added ? "bg-brand-green" : ""}`}
+                      className={`w-full sm:flex-1 group relative flex items-center justify-center gap-4 px-10 py-5 bg-brand-brown text-brand-cream rounded-xl lg:rounded-full text-[12px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px] min-h-[56px] ${added ? "bg-brand-green" : ""}`}
                     >
                       <span className="relative z-10 flex items-center gap-3">
                         {added ? (

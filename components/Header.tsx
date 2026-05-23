@@ -162,7 +162,7 @@ export default function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-brand-brown hover:text-brand-green transition-all hover:scale-110"
+                  className="text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 >
                   <UserCircle size={24} strokeWidth={1.2} />
                 </button>
@@ -192,7 +192,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-brand-brown hover:text-brand-green transition-all text-[10px] uppercase tracking-[0.3em] font-bold"
+                className="text-brand-brown hover:text-brand-green transition-all text-[10px] uppercase tracking-[0.3em] font-bold min-w-[48px] min-h-[48px] flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Login
@@ -201,7 +201,7 @@ export default function Header() {
 
             <Link
               href="/cart"
-              className="text-brand-brown hover:text-brand-green relative flex items-center justify-center transition-all hover:scale-110 p-2 group"
+              className="relative text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <ShoppingCart size={24} strokeWidth={1.5} />
@@ -220,7 +220,7 @@ export default function Header() {
 
             {/* Mobile Menu Toggle */}
             <button
-              className="lg:hidden text-brand-brown hover:text-brand-green transition-all"
+              className="lg:hidden text-brand-brown hover:text-brand-green transition-all min-w-[48px] min-h-[48px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (

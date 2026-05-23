@@ -259,9 +259,9 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-cream py-8 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div className="min-h-screen bg-brand-cream py-6 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto pb-32 lg:pb-0">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-3 mb-1">
               <span className="h-[1px] w-6 bg-brand-gold" />
@@ -315,25 +315,31 @@ export default function CartPage() {
                 return (
                   <div
                     key={item.id}
-                    className="group bg-white rounded-2xl border border-brand-gold/10 p-4 md:p-6 flex flex-col md:flex-row gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
+                    className="group bg-white rounded-2xl border border-brand-gold/10 p-4 md:p-6 flex gap-4 md:gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
                   >
-                    <div className="relative w-full md:w-32 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0">
+                    <Link
+                      href={`/product/${item.id}`}
+                      className="relative w-20 md:w-24 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0"
+                    >
                       <ImageWithFallback
                         src={getProductThumbnail(item)}
                         alt={item.name}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, 150px"
+                        sizes="(max-width: 768px) 80px, 100px"
                       />
-                    </div>
+                    </Link>
 
-                    <div className="flex-grow flex flex-col justify-between w-full">
+                    <div className="flex-grow flex flex-col justify-between w-full min-w-0">
                       <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
+                        <Link
+                          href={`/product/${item.id}`}
+                          className="flex-1 min-w-0 group/link"
+                        >
                           <span className="text-[8px] text-brand-gold mb-1 block uppercase tracking-[0.2em] font-black">
                             {item.category}
                           </span>
-                          <h3 className="text-xl font-serif text-brand-brown tracking-tight mb-1">
+                          <h3 className="text-base md:text-xl font-serif text-brand-brown tracking-tight mb-1 truncate md:whitespace-normal group-hover/link:text-brand-terracotta transition-colors">
                             {item.name}
                           </h3>
                           <div className="flex flex-wrap items-center gap-2 mt-0.5">
@@ -354,17 +360,17 @@ export default function CartPage() {
                               </span>
                             )}
                           </div>
-                        </div>
+                        </Link>
                         <button
                           onClick={() => removeFromCart(item.id, user?.id)}
-                          className="text-brand-brown/20 hover:text-brand-terracotta transition-all p-2 hover:scale-110"
+                          className="text-brand-brown/20 hover:text-brand-terracotta transition-all p-2 hover:scale-110 shrink-0"
                         >
                           <Trash2 size={18} strokeWidth={1.5} />
                         </button>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-4 pt-4 border-t border-brand-gold/10 gap-4">
-                        <div className="flex items-center border border-brand-brown rounded-full bg-brand-cream/50 p-0.5">
+                      <div className="flex flex-row items-center justify-between mt-4 pt-4 border-t border-brand-gold/10 gap-4">
+                        <div className="flex items-center border border-brand-brown rounded-full bg-brand-cream/50 p-0.5 scale-90 sm:scale-100 origin-left">
                           <button
                             onClick={() =>
                               updateQuantity(
@@ -374,6 +380,7 @@ export default function CartPage() {
                               )
                             }
                             className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-terracotta transition-all rounded-full hover:bg-brand-cream"
+                            aria-label="Decrease quantity"
                           >
                             <Minus size={12} strokeWidth={3} />
                           </button>
@@ -389,15 +396,16 @@ export default function CartPage() {
                               )
                             }
                             className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-green transition-all rounded-full hover:bg-brand-cream"
+                            aria-label="Increase quantity"
                           >
                             <Plus size={12} strokeWidth={3} />
                           </button>
                         </div>
 
-                        <div className="text-right">
+                        <div className="text-right shrink-0">
                           {!available ? (
                             <div className="relative inline-block">
-                              <span className="text-lg font-light text-brand-brown/20 tracking-tight">
+                              <span className="text-sm md:text-lg font-light text-brand-brown/20 tracking-tight">
                                 Available Soon
                               </span>
                             </div>
@@ -408,7 +416,7 @@ export default function CartPage() {
                                   ₹{actualLinePrice.toFixed(0)}
                                 </span>
                               )}
-                              <span className="text-xl font-medium text-brand-brown tracking-tight">
+                              <span className="text-lg md:text-xl font-medium text-brand-brown tracking-tight">
                                 ₹{discountedLinePrice.toFixed(0)}
                               </span>
                             </div>
@@ -593,28 +601,33 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <Link
-                  href={hasUnavailableItems ? "#" : "/checkout"}
-                  className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.4)] ${
-                    hasUnavailableItems
-                      ? "opacity-40 cursor-not-allowed grayscale"
-                      : ""
-                  }`}
-                >
-                  <span className="relative z-10 flex items-center gap-3">
-                    <ShieldCheck size={16} className="text-brand-green-fresh" />
-                    Secure Checkout
-                    <ArrowRight
-                      size={14}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
-                  </span>
-                  <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
-                    100% Encrypted & Safe
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                  <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
-                </Link>
+                <div className="lg:static fixed bottom-0 left-0 w-full bg-white lg:bg-transparent p-4 lg:p-0 border-t border-brand-gold/10 lg:border-none shadow-[0_-20px_40px_-10px_rgba(60,54,42,0.1)] lg:shadow-none z-40 safe-bottom">
+                  <Link
+                    href={hasUnavailableItems ? "#" : "/checkout"}
+                    className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-4 lg:py-5 bg-brand-brown text-brand-cream rounded-xl lg:rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] ${
+                      hasUnavailableItems
+                        ? "opacity-40 cursor-not-allowed grayscale"
+                        : ""
+                    }`}
+                  >
+                    <span className="relative z-10 flex items-center gap-3">
+                      <ShieldCheck
+                        size={16}
+                        className="text-brand-green-fresh"
+                      />
+                      Secure Checkout
+                      <ArrowRight
+                        size={14}
+                        className="group-hover:translate-x-1 transition-transform"
+                      />
+                    </span>
+                    <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
+                      100% Encrypted & Safe
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                    <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
+                  </Link>
+                </div>
 
                 {/* Trust Badges */}
                 <div className="mt-8 grid grid-cols-2 gap-4 pt-8 border-t border-brand-gold/5 opacity-40">

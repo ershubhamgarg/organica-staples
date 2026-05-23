@@ -534,8 +534,8 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream py-8 px-4 sm:px-6 lg:px-12">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-brand-cream py-6 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto pb-32 lg:pb-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-3 mb-2">
@@ -632,13 +632,14 @@ export default function CheckoutPage() {
 
                   {(checkoutAddresses.length === 0 || showNewAddressForm) && (
                     <div className="p-6 bg-brand-cream/50 rounded-2xl border border-brand-gold/5">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             Full Name
                           </label>
                           <input
                             type="text"
+                            autoComplete="name"
                             value={newAddress.name}
                             onChange={(e) =>
                               setNewAddress({
@@ -655,12 +656,13 @@ export default function CheckoutPage() {
                             </p>
                           )}
                         </div>
-                        <div>
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             Phone Number
                           </label>
                           <input
                             type="tel"
+                            autoComplete="tel"
                             value={newAddress.phone}
                             onChange={(e) =>
                               setNewAddress({
@@ -677,12 +679,13 @@ export default function CheckoutPage() {
                             </p>
                           )}
                         </div>
-                        <div>
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             Email Address
                           </label>
                           <input
                             type="email"
+                            autoComplete="email"
                             value={newAddress.email}
                             onChange={(e) =>
                               setNewAddress({
@@ -700,12 +703,13 @@ export default function CheckoutPage() {
                           )}
                         </div>
                       </div>
-                      <div className="mb-6">
+                      <div className="mb-6 space-y-2">
                         <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                           Complete Address
                         </label>
                         <textarea
                           rows={2}
+                          autoComplete="street-address"
                           value={newAddress.address}
                           onChange={(e) =>
                             setNewAddress({
@@ -723,12 +727,13 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             City
                           </label>
                           <input
                             type="text"
+                            autoComplete="address-level2"
                             value={newAddress.city}
                             onChange={(e) =>
                               setNewAddress({
@@ -745,12 +750,13 @@ export default function CheckoutPage() {
                             </p>
                           )}
                         </div>
-                        <div>
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             State
                           </label>
                           <input
                             type="text"
+                            autoComplete="address-level1"
                             value={newAddress.state}
                             onChange={(e) =>
                               setNewAddress({
@@ -767,12 +773,14 @@ export default function CheckoutPage() {
                             </p>
                           )}
                         </div>
-                        <div>
+                        <div className="space-y-2">
                           <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
                             Zip Code
                           </label>
                           <input
                             type="text"
+                            autoComplete="postal-code"
+                            inputMode="numeric"
                             value={newAddress.zipCode}
                             onChange={(e) =>
                               setNewAddress({
@@ -843,14 +851,14 @@ export default function CheckoutPage() {
                               setShowNewAddressForm(false);
                             }
                           }}
-                          className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light"
+                          className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-xl lg:rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light min-h-[48px]"
                         >
                           Confirm Address
                         </button>
                         {checkoutAddresses.length > 0 && (
                           <button
                             onClick={() => setShowNewAddressForm(false)}
-                            className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors"
+                            className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors min-h-[48px]"
                           >
                             Cancel
                           </button>
@@ -1016,42 +1024,47 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                <button
-                  onClick={
-                    selectedPayment === "razorpay"
-                      ? handleRazorpayPayment
-                      : handleCODPayment
-                  }
-                  disabled={
-                    isPlacingOrder || isStartingPayment || !selectedPayment
-                  }
-                  className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-6 rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] hover:shadow-[0_40px_70px_-20px_rgba(60,54,42,0.5)] disabled:opacity-50 mt-8"
-                >
-                  <span className="relative z-10 flex items-center gap-4">
-                    {selectedPayment === "razorpay" ? (
-                      <Lock size={18} className="text-brand-green-fresh" />
-                    ) : (
-                      <Banknote size={18} className="text-brand-green-fresh" />
-                    )}
-                    {isPlacingOrder || isStartingPayment
-                      ? "Verifying Securely..."
-                      : selectedPayment === "razorpay"
-                        ? `Pay ₹${finalTotal.toFixed(0)}`
-                        : `Confirm Order ₹${finalTotal.toFixed(0)}`}
-                    <ArrowRight
-                      size={20}
-                      className="group-hover:translate-x-2 transition-transform"
-                    />
-                  </span>
-                  <span className="relative z-10 text-[8px] tracking-[0.3em] opacity-60 font-bold uppercase flex items-center gap-2">
-                    <ShieldCheck size={10} />
-                    {selectedPayment === "razorpay"
-                      ? "Powered by Razorpay"
-                      : "Verified Cash on Delivery Order"}
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                  <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
-                </button>
+                <div className="lg:static fixed bottom-0 left-0 w-full bg-white lg:bg-transparent p-4 lg:p-0 border-t border-brand-gold/10 lg:border-none shadow-[0_-20px_40px_-10px_rgba(60,54,42,0.1)] lg:shadow-none z-40 safe-bottom">
+                  <button
+                    onClick={
+                      selectedPayment === "razorpay"
+                        ? handleRazorpayPayment
+                        : handleCODPayment
+                    }
+                    disabled={
+                      isPlacingOrder || isStartingPayment || !selectedPayment
+                    }
+                    className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-4 lg:py-6 rounded-xl lg:rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
+                  >
+                    <span className="relative z-10 flex items-center gap-4">
+                      {selectedPayment === "razorpay" ? (
+                        <Lock size={18} className="text-brand-green-fresh" />
+                      ) : (
+                        <Banknote
+                          size={18}
+                          className="text-brand-green-fresh"
+                        />
+                      )}
+                      {isPlacingOrder || isStartingPayment
+                        ? "Verifying Securely..."
+                        : selectedPayment === "razorpay"
+                          ? `Pay ₹${finalTotal.toFixed(0)}`
+                          : `Confirm Order ₹${finalTotal.toFixed(0)}`}
+                      <ArrowRight
+                        size={20}
+                        className="group-hover:translate-x-2 transition-transform"
+                      />
+                    </span>
+                    <span className="relative z-10 text-[8px] tracking-[0.3em] opacity-60 font-bold uppercase flex items-center gap-2">
+                      <ShieldCheck size={10} />
+                      {selectedPayment === "razorpay"
+                        ? "Powered by Razorpay"
+                        : "Verified Cash on Delivery Order"}
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                    <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1069,9 +1082,10 @@ export default function CheckoutPage() {
                 {items.map((item) => {
                   const available = isProductAvailable(item);
                   return (
-                    <div
+                    <Link
                       key={item.id}
-                      className="flex gap-4 items-center group"
+                      href={`/product/${item.id}`}
+                      className="flex gap-4 items-center group hover:bg-brand-brown/[0.02] -m-2 p-2 rounded-2xl transition-all"
                     >
                       <div className="w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0 relative">
                         <ImageWithFallback
@@ -1082,20 +1096,20 @@ export default function CheckoutPage() {
                           sizes="64px"
                         />
                       </div>
-                      <div className="flex-grow">
-                        <h4 className="text-[11px] font-serif text-brand-brown line-clamp-1">
+                      <div className="flex-grow min-w-0">
+                        <h4 className="text-[11px] font-serif text-brand-brown line-clamp-1 group-hover:text-brand-terracotta transition-colors">
                           {item.name}
                         </h4>
                         <p className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold mt-1">
                           Qty: {item.quantity}
                         </p>
                       </div>
-                      <p className="text-[11px] font-bold text-brand-brown">
+                      <p className="text-[11px] font-bold text-brand-brown shrink-0">
                         {available
                           ? `₹${(getDiscountedPrice(item) * item.quantity).toFixed(0)}`
                           : "Coming Soon"}
                       </p>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
