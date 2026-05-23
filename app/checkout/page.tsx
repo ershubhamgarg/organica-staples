@@ -1093,18 +1093,32 @@ export default function CheckoutPage() {
 
                   {selectedAddressId && !showNewAddressForm && (
                     <button
-                      onClick={() => setAddressConfirmed(true)}
+                      onClick={() => {
+                        setAddressConfirmed(true);
+                        window.setTimeout(() => {
+                          document
+                            .getElementById("checkout-payment-step")
+                            ?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                        }, 100);
+                      }}
                       className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-5 rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.4)]"
                     >
                       <span className="relative z-10 flex items-center gap-3">
-                        Proceed to Payment
+                        {launchOffer.isEligible
+                          ? "Proceed to Verification"
+                          : "Proceed to Payment"}
                         <ChevronRight
                           size={16}
                           className="group-hover:translate-x-1 transition-transform"
                         />
                       </span>
                       <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
-                        Select Payment Method Next
+                        {launchOffer.isEligible
+                          ? "Place Launch Order Next"
+                          : "Select Payment Method Next"}
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
                       <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
@@ -1156,6 +1170,7 @@ export default function CheckoutPage() {
 
             {/* Step 2: Payment Method */}
             <div
+              id="checkout-payment-step"
               className={`bg-white rounded-3xl border border-brand-gold/10 p-6 md:p-8 shadow-2xl shadow-brand-brown/5 transition-opacity duration-500 ${!addressConfirmed ? "opacity-30 pointer-events-none" : ""}`}
             >
               <div className="flex items-center gap-4 mb-6">
@@ -1172,12 +1187,12 @@ export default function CheckoutPage() {
 
               <div className="space-y-6">
                 {launchOffer.isEligible ? (
-                  <div className="w-full rounded-2xl border border-brand-green/15 bg-brand-green/5 p-6 text-left shadow-xl">
-                    <div className="flex items-start gap-5">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
-                        <Share2 size={24} strokeWidth={1.5} />
+                  <div className="w-full rounded-2xl border border-brand-green/15 bg-brand-green/5 p-5 text-left shadow-xl">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                        <Share2 size={22} strokeWidth={1.5} />
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <h4 className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-green-fresh mb-1">
                           Verification Method
                         </h4>
@@ -1191,6 +1206,23 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={handleLaunchOfferOrder}
+                      disabled={isPlacingOrder || isStartingPayment}
+                      className="mt-5 flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full bg-brand-brown px-6 text-[10px] font-black uppercase tracking-[0.22em] text-brand-cream shadow-xl shadow-brand-brown/15 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {isPlacingOrder || isStartingPayment ? (
+                        <div className="h-4 w-4 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
+                      ) : (
+                        <Share2 size={15} className="text-brand-gold" />
+                      )}
+                      {isPlacingOrder || isStartingPayment
+                        ? "Placing Order..."
+                        : user
+                          ? "Place ₹0 Launch Order"
+                          : "Sign In To Claim"}
+                    </button>
                   </div>
                 ) : (
                   <>
@@ -1296,7 +1328,11 @@ export default function CheckoutPage() {
                         ₹{finalTotal.toFixed(0)}
                       </span>
                       {/* Payment Mode Badge - Premium UX verification */}
-                      {selectedPayment ? (
+                      {launchOffer.isEligible ? (
+                        <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-green bg-brand-green/8 px-2.5 py-0.5 rounded-full border border-brand-green/20 w-fit mt-0.5">
+                          <span>Story Verification</span>
+                        </span>
+                      ) : selectedPayment ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
                           <span>{selectedPayment === "razorpay" ? "Secure Online" : "Cash on Delivery"}</span>
                         </span>
