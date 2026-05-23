@@ -220,6 +220,20 @@ export default function Header() {
                     >
                       My Profile
                     </Link>
+                    <Link
+                      href="/profile#orders"
+                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      My Orders
+                    </Link>
+                    <Link
+                      href="/profile#addresses"
+                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      My Addresses
+                    </Link>
                     <button
                       onClick={async () => {
                         await signOut();

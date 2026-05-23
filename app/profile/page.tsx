@@ -151,7 +151,10 @@ export default function ProfilePage() {
           {/* Right: Activities & Addresses */}
           <div className="space-y-12">
             {/* Saved Addresses */}
-            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+            <div
+              id="addresses"
+              className="scroll-mt-32 lg:scroll-mt-40 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
+            >
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-4">
                   <MapPin size={24} className="text-brand-gold" />
@@ -356,7 +359,10 @@ export default function ProfilePage() {
             </div>
 
             {/* Order History */}
-            <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5">
+            <div
+              id="orders"
+              className="scroll-mt-32 lg:scroll-mt-40 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
+            >
               <div className="flex items-center gap-4 mb-10">
                 <Package size={24} className="text-brand-gold" />
                 <h3 className="text-3xl font-serif text-brand-brown tracking-tight">
