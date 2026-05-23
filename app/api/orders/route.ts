@@ -2,7 +2,7 @@ import type { CartItem } from "@/store/cartStore";
 import type { Address } from "@/store/addressStore";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import type { PaymentDetails } from "@/store/orderStore";
+import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
 
 type OrderPayload = {
   userId: string | null;
@@ -11,6 +11,7 @@ type OrderPayload = {
   paymentMethod: string;
   totalAmount: number;
   paymentDetails?: PaymentDetails;
+  pricingDetails?: OrderPricingDetails;
 };
 
 const getSupabaseAdmin = () => {
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
     paymentMethod,
     totalAmount,
     paymentDetails,
+    pricingDetails,
   } = payload;
 
   if (!items?.length || !deliveryAddress || !paymentMethod || !totalAmount) {
@@ -66,23 +68,51 @@ export async function POST(request: Request) {
     );
   }
 
+  const orderData = {
+    user_id: userId ?? null,
+    items,
+    delivery_address: deliveryAddress,
+    payment_method: paymentMethod,
+    payment_details: paymentDetails ?? null,
+    subtotal_amount: pricingDetails?.subtotalAmount ?? null,
+    discount_code: pricingDetails?.discountCode ?? null,
+    discount_percent: pricingDetails?.discountPercent ?? null,
+    discount_amount: pricingDetails?.discountAmount ?? null,
+    shipping_amount: pricingDetails?.shippingAmount ?? null,
+    convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? null,
+    total_amount: totalAmount,
+    status: "pending",
+  };
+
+  const legacyOrderData = {
+    user_id: userId ?? null,
+    items,
+    delivery_address: deliveryAddress,
+    payment_method: paymentMethod,
+    payment_details: paymentDetails ?? null,
+    total_amount: totalAmount,
+    status: "pending",
+  };
+
   const { data, error } = await supabaseAdmin
     .from("orders")
-    .insert([
-      {
-        user_id: userId ?? null,
-        items,
-        delivery_address: deliveryAddress,
-        payment_method: paymentMethod,
-        payment_details: paymentDetails ?? null,
-        total_amount: totalAmount,
-        status: "pending",
-      },
-    ])
+    .insert([orderData])
     .select()
     .single();
 
   if (error) {
+    if (error.code === "42703" || error.code === "PGRST204") {
+      const { data: legacyData, error: legacyError } = await supabaseAdmin
+        .from("orders")
+        .insert([legacyOrderData])
+        .select()
+        .single();
+
+      if (!legacyError) {
+        return NextResponse.json({ order: legacyData });
+      }
+    }
+
     return NextResponse.json(
       { error: error.message, code: error.code },
       { status: error.code === "42P01" ? 404 : 500 },

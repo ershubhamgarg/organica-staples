@@ -21,6 +21,8 @@ import {
   Plus,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import type { DiscountCode } from "@/lib/discountCodes";
+import { calculateDiscount } from "@/lib/discountCodes";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 
@@ -115,14 +117,29 @@ export default function CheckoutPage() {
   const items = useCartStore((state) => state.items);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
   const clearCart = useCartStore((state) => state.clearCart);
+  const appliedDiscountCode = useCartStore(
+    (state) => state.appliedDiscountCode,
+  );
+  const appliedDiscountCoupon = useCartStore(
+    (state) => state.appliedDiscountCoupon,
+  );
+  const applyDiscountCode = useCartStore((state) => state.applyDiscountCode);
+  const removeDiscountCode = useCartStore((state) => state.removeDiscountCode);
   const { user } = useUserStore();
   const { addresses, addAddress } = useAddressStore();
   const { placeOrder, isLoading: isPlacingOrder } = useOrderStore();
   const [mounted, setMounted] = useState(false);
 
   const totalPrice = getTotalPrice();
+  const cartDiscount = calculateDiscount(totalPrice, appliedDiscountCoupon);
+  const shipping =
+    cartDiscount.subtotalAfterDiscount > 0 &&
+    cartDiscount.subtotalAfterDiscount <= 500
+      ? 50
+      : 0;
+  const convenienceFee = Number((totalPrice * 0.01).toFixed(2));
   const finalTotal =
-    totalPrice + (totalPrice > 0 && totalPrice <= 500 ? 50 : 0);
+    cartDiscount.subtotalAfterDiscount + shipping + convenienceFee;
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
 
   // Address state
@@ -165,6 +182,43 @@ export default function CheckoutPage() {
       router.push("/cart");
     }
   }, [items.length, mounted, router, orderPlaced]);
+
+  useEffect(() => {
+    if (!appliedDiscountCode || appliedDiscountCoupon) return;
+
+    const fetchAppliedCoupon = async () => {
+      try {
+        const response = await fetch("/api/discount-coupons", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code: appliedDiscountCode,
+            subtotal: totalPrice,
+          }),
+        });
+        const result = (await response.json()) as
+          | { coupon: DiscountCode }
+          | { error?: string };
+
+        if (!response.ok || !("coupon" in result)) {
+          throw new Error("Coupon is no longer available.");
+        }
+
+        applyDiscountCode(result.coupon, user?.id);
+      } catch {
+        removeDiscountCode(user?.id);
+      }
+    };
+
+    fetchAppliedCoupon();
+  }, [
+    appliedDiscountCode,
+    appliedDiscountCoupon,
+    applyDiscountCode,
+    removeDiscountCode,
+    totalPrice,
+    user?.id,
+  ]);
 
   if (!mounted) {
     return (
@@ -247,6 +301,14 @@ export default function CheckoutPage() {
       paymentMethod,
       finalTotal,
       paymentDetails,
+      {
+        subtotalAmount: totalPrice,
+        discountCode: cartDiscount.isEligible ? cartDiscount.code : null,
+        discountPercent: cartDiscount.isEligible ? cartDiscount.percent : 0,
+        discountAmount: cartDiscount.amount,
+        shippingAmount: shipping,
+        convenienceFeeAmount: convenienceFee,
+      },
     );
 
     if (result) {
@@ -286,6 +348,11 @@ export default function CheckoutPage() {
             customer_name: deliveryAddress.name,
             customer_phone: deliveryAddress.phone || "",
             customer_email: deliveryAddress.email || user?.email || "",
+            discount_code: cartDiscount.isEligible
+              ? (cartDiscount.code ?? "")
+              : "",
+            discount_amount: cartDiscount.amount.toFixed(2),
+            convenience_fee: convenienceFee.toFixed(2),
           },
         }),
       });
@@ -877,13 +944,42 @@ export default function CheckoutPage() {
                     Shipping
                   </span>
                   <span className="text-brand-brown font-bold tracking-tight">
-                    {totalPrice > 500 ? (
+                    {shipping === 0 ? (
                       <span className="text-brand-green italic">Free</span>
                     ) : (
-                      `₹50`
+                      `₹${shipping}`
                     )}
                   </span>
                 </div>
+                <div className="flex justify-between text-xs">
+                  <div>
+                    <span className="text-brand-brown/60 font-light">
+                      Convenience Fee
+                    </span>
+                    <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-brown/30">
+                      ₹10 per ₹1000 subtotal
+                    </p>
+                  </div>
+                  <span className="text-brand-brown font-bold tracking-tight">
+                    ₹{convenienceFee.toFixed(0)}
+                  </span>
+                </div>
+                {appliedDiscountCoupon && cartDiscount.amount > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-green/70 font-light italic">
+                      Coupon {appliedDiscountCoupon.code}
+                    </span>
+                    <span className="text-brand-green font-bold tracking-tight">
+                      -₹{cartDiscount.amount.toFixed(0)}
+                    </span>
+                  </div>
+                )}
+                {appliedDiscountCoupon && !cartDiscount.isEligible && (
+                  <div className="rounded-xl border border-brand-terracotta/10 bg-brand-terracotta/5 p-3 text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
+                    Add ₹{cartDiscount.shortfall.toFixed(0)} more to use{" "}
+                    {appliedDiscountCoupon.code}
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-between items-baseline mb-8 relative z-10 pt-8 border-t border-brand-gold/5">

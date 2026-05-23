@@ -10,11 +10,22 @@ import {
   Trash2,
   ShoppingBag,
   ShieldCheck,
+  BadgePercent,
   Truck,
   ArrowRight,
+  X,
+  Sparkles,
 } from "lucide-react";
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import type { DiscountCode } from "@/lib/discountCodes";
+import { calculateDiscount } from "@/lib/discountCodes";
 import {
   getDiscountedPrice,
   getDiscountPercent,
@@ -28,10 +39,25 @@ export default function CartPage() {
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const appliedDiscountCode = useCartStore(
+    (state) => state.appliedDiscountCode,
+  );
+  const appliedDiscountCoupon = useCartStore(
+    (state) => state.appliedDiscountCoupon,
+  );
+  const applyDiscountCode = useCartStore((state) => state.applyDiscountCode);
+  const removeDiscountCode = useCartStore((state) => state.removeDiscountCode);
   const syncCartWithSupabase = useCartStore(
     (state) => state.syncCartWithSupabase,
   );
   const { user } = useUserStore();
+  const [discountInput, setDiscountInput] = useState("");
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [discountMessage, setDiscountMessage] = useState<string | null>(null);
+  const [publicCoupons, setPublicCoupons] = useState<DiscountCode[]>([]);
+  const [showCoupons, setShowCoupons] = useState(false);
+  const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -43,16 +69,154 @@ export default function CartPage() {
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
-  const totalDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
-  const shipping = effectiveSubtotal > 0 && effectiveSubtotal <= 500 ? 50 : 0;
-  const totalPayable = effectiveSubtotal + shipping;
+  const productDiscount = Math.max(actualSubtotal - effectiveSubtotal, 0);
+  const cartDiscount = calculateDiscount(
+    effectiveSubtotal,
+    appliedDiscountCoupon,
+  );
+  const shipping =
+    cartDiscount.subtotalAfterDiscount > 0 &&
+    cartDiscount.subtotalAfterDiscount <= 500
+      ? 50
+      : 0;
+  const convenienceFee = Number((effectiveSubtotal * 0.01).toFixed(2));
+  const totalPayable =
+    cartDiscount.subtotalAfterDiscount + convenienceFee + shipping;
+  const freeShippingThreshold = 500;
+  const shippingShortfall = Math.max(
+    freeShippingThreshold - cartDiscount.subtotalAfterDiscount,
+    0,
+  );
+  const couponChangedShippingEligibility =
+    effectiveSubtotal > freeShippingThreshold &&
+    cartDiscount.subtotalAfterDiscount <= freeShippingThreshold;
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+
+  const getCouponShortfall = (coupon: DiscountCode) =>
+    coupon.minOrderValue !== null
+      ? Math.max(coupon.minOrderValue - effectiveSubtotal, 0)
+      : 0;
+
+  const validateCoupon = useCallback(
+    async (code: string) => {
+      const response = await fetch("/api/discount-coupons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          subtotal: effectiveSubtotal,
+        }),
+      });
+      const result = (await response.json()) as
+        | {
+            coupon: DiscountCode;
+            isEligible: boolean;
+            shortfall: number;
+          }
+        | { error?: string };
+
+      if (!response.ok || !("coupon" in result)) {
+        throw new Error(
+          "error" in result && result.error
+            ? result.error
+            : "This coupon code is not valid.",
+        );
+      }
+
+      return result;
+    },
+    [effectiveSubtotal],
+  );
+
+  const handleApplyDiscount = async (code = discountInput) => {
+    setDiscountError(null);
+    setDiscountMessage(null);
+
+    if (!code.trim()) {
+      setDiscountError("Enter a coupon code.");
+      return;
+    }
+
+    setIsApplyingDiscount(true);
+    try {
+      const result = await validateCoupon(code);
+
+      if (!result.isEligible) {
+        setDiscountError(
+          `Add ₹${result.shortfall.toFixed(0)} more to use ${result.coupon.code}.`,
+        );
+        return;
+      }
+
+      applyDiscountCode(result.coupon, user?.id);
+      setDiscountInput("");
+      setShowCoupons(false);
+      setDiscountMessage("Coupon applied.");
+    } catch (error) {
+      setDiscountError(
+        error instanceof Error
+          ? error.message
+          : "This coupon code is not valid.",
+      );
+    } finally {
+      setIsApplyingDiscount(false);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    removeDiscountCode(user?.id);
+    setDiscountInput("");
+    setDiscountError(null);
+    setDiscountMessage("Coupon removed.");
+  };
 
   useEffect(() => {
     if (user) {
       syncCartWithSupabase(user.id);
     }
   }, [user, syncCartWithSupabase]);
+
+  useEffect(() => {
+    const fetchPublicCoupons = async () => {
+      setIsLoadingCoupons(true);
+      try {
+        const response = await fetch("/api/discount-coupons");
+        const result = (await response.json()) as
+          | { coupons: DiscountCode[] }
+          | { error?: string };
+
+        if (response.ok && "coupons" in result) {
+          setPublicCoupons(result.coupons);
+        }
+      } finally {
+        setIsLoadingCoupons(false);
+      }
+    };
+
+    fetchPublicCoupons();
+  }, []);
+
+  useEffect(() => {
+    if (!appliedDiscountCode || appliedDiscountCoupon) return;
+
+    const fetchAppliedCoupon = async () => {
+      try {
+        const result = await validateCoupon(appliedDiscountCode);
+        applyDiscountCode(result.coupon, user?.id);
+      } catch {
+        removeDiscountCode(user?.id);
+      }
+    };
+
+    fetchAppliedCoupon();
+  }, [
+    appliedDiscountCode,
+    appliedDiscountCoupon,
+    applyDiscountCode,
+    removeDiscountCode,
+    user?.id,
+    validateCoupon,
+  ]);
 
   if (!mounted) {
     return (
@@ -231,42 +395,163 @@ export default function CartPage() {
                   Summary
                 </h3>
 
-                <div className="space-y-4 mb-8 pb-8 border-b border-brand-gold/10">
+                <div className="space-y-4 mb-6 pb-6 border-b border-brand-gold/10">
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-brown/60 font-light">
-                      Subtotal
+                      Items subtotal
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
                       ₹{actualSubtotal.toFixed(0)}
                     </span>
                   </div>
-                  {totalDiscount > 0 && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-brand-terracotta/60 font-light italic">
-                        Discount
-                      </span>
-                      <span className="text-brand-terracotta font-bold tracking-tight">
-                        -₹{totalDiscount.toFixed(0)}
-                      </span>
-                    </div>
-                  )}
                   <div className="flex justify-between text-xs">
-                    <span className="text-brand-brown/60 font-light">
-                      Shipping
+                    <span className="text-brand-terracotta/60 font-light italic">
+                      Product Discount
                     </span>
-                    <span className="text-brand-brown font-bold tracking-tight">
-                      {shipping === 0 ? (
-                        <span className="text-brand-green italic">Free</span>
-                      ) : (
-                        `₹${shipping}`
-                      )}
+                    <span className="text-brand-terracotta font-bold tracking-tight">
+                      -₹{productDiscount.toFixed(0)}
                     </span>
                   </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-brand-green/70 font-light italic">
+                      Coupon Discount
+                      {cartDiscount.code ? ` (${cartDiscount.code})` : ""}
+                    </span>
+                    <span className="text-brand-green font-bold tracking-tight">
+                      -₹{cartDiscount.amount.toFixed(0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>
+                      <span className="text-brand-brown/60 font-light">
+                        Convenience Fee
+                      </span>
+                    </div>
+                    <span className="text-brand-brown font-bold tracking-tight">
+                      ₹{convenienceFee.toFixed(0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <div>
+                      <span className="text-brand-brown/60 font-light">
+                        Shipping
+                      </span>
+                      <p className="mt-1 text-[9px] font-bold uppercase tracking-widest text-brand-brown/30">
+                        Free above ₹{freeShippingThreshold} after discounts
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-brand-brown font-bold tracking-tight">
+                        {shipping === 0 ? (
+                          <span className="text-brand-green italic">Free</span>
+                        ) : (
+                          `₹${shipping}`
+                        )}
+                      </span>
+                      {couponChangedShippingEligibility && (
+                        <p className="mt-1 max-w-[150px] text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
+                          Coupon subtotal is below ₹{freeShippingThreshold}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {shipping > 0 && (
+                  <div className="mb-8 rounded-2xl border border-brand-green/10 bg-brand-green/5 p-4 text-center">
+                    <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green">
+                      Add ₹{shippingShortfall.toFixed(0)} more after discounts
+                      for <span className="italic">free</span> delivery
+                    </p>
+                  </div>
+                )}
+
+                <div className="mb-8 rounded-2xl border border-brand-gold/10 bg-brand-cream/40 p-4">
+                  <div className="mb-3 flex items-center gap-2 text-brand-brown">
+                    <BadgePercent size={16} className="text-brand-gold" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.22em]">
+                      Coupon Code
+                    </span>
+                  </div>
+
+                  {appliedDiscountCoupon ? (
+                    <div className="flex items-center justify-between gap-3 rounded-xl border border-brand-green/15 bg-white px-4 py-3">
+                      <div>
+                        <p className="text-xs font-black tracking-widest text-brand-green">
+                          {appliedDiscountCoupon.code}
+                        </p>
+                        <p className="mt-1 text-[9px] font-light text-brand-brown/50">
+                          {cartDiscount.isEligible
+                            ? `${appliedDiscountCoupon.percent}% off applied`
+                            : `Add ₹${cartDiscount.shortfall.toFixed(0)} more to unlock`}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveDiscount}
+                        className="flex h-8 w-8 items-center justify-center rounded-full text-brand-brown/40 transition-colors hover:bg-brand-cream hover:text-brand-terracotta"
+                        aria-label="Remove coupon code"
+                      >
+                        <X size={14} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={discountInput}
+                        onChange={(event) => {
+                          setDiscountInput(event.target.value.toUpperCase());
+                          setDiscountError(null);
+                          setDiscountMessage(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            handleApplyDiscount();
+                          }
+                        }}
+                        className="min-w-0 flex-1 rounded-full border border-brand-gold/15 bg-white px-4 py-3 text-xs font-bold uppercase tracking-widest text-brand-brown outline-none transition-colors placeholder:text-brand-brown/20 focus:border-brand-brown"
+                        placeholder="WELCOME10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleApplyDiscount()}
+                        disabled={isApplyingDiscount}
+                        className="shrink-0 rounded-full bg-brand-brown px-5 py-3 text-[9px] font-black uppercase tracking-widest text-brand-cream transition-colors hover:bg-brand-brown-light"
+                      >
+                        {isApplyingDiscount ? "..." : "Apply"}
+                      </button>
+                    </div>
+                  )}
+
+                  {publicCoupons.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCoupons(true)}
+                      className="mt-3 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-brand-gold transition-colors hover:text-brand-brown"
+                    >
+                      <Sparkles size={12} />
+                      View public coupons
+                    </button>
+                  )}
+
+                  {(discountError || discountMessage) && (
+                    <p
+                      className={`mt-3 text-[9px] font-bold uppercase tracking-widest ${
+                        discountError
+                          ? "text-brand-terracotta"
+                          : "text-brand-green"
+                      }`}
+                    >
+                      {discountError || discountMessage}
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-baseline mb-8">
                   <span className="text-base font-serif text-brand-brown">
-                    Total
+                    To Pay
                   </span>
                   <span className="text-3xl font-medium text-brand-brown tracking-tighter">
                     ₹{totalPayable.toFixed(0)}
@@ -312,19 +597,83 @@ export default function CartPage() {
                   </div>
                 </div>
               </div>
-
-              {shipping > 0 && (
-                <div className="mt-4 p-4 bg-brand-green/5 rounded-xl border border-brand-green/10 text-center">
-                  <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green">
-                    Add ₹{(500 - effectiveSubtotal).toFixed(0)} more for{" "}
-                    <span className="italic">Free</span> delivery
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         )}
       </div>
+      {showCoupons && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-brand-brown/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-3xl border border-brand-gold/10 bg-white p-6 shadow-2xl shadow-brand-brown/20">
+            <div className="mb-6 flex items-start justify-between gap-6">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-gold">
+                  Public Coupons
+                </p>
+                <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
+                  Available <span className="italic">Offers</span>
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCoupons(false)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-brand-brown/40 transition-colors hover:bg-brand-cream hover:text-brand-brown"
+                aria-label="Close coupon popup"
+              >
+                <X size={16} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {isLoadingCoupons ? (
+                <div className="rounded-2xl border border-brand-gold/10 bg-brand-cream/40 p-5 text-center text-[9px] font-black uppercase tracking-widest text-brand-brown/40">
+                  Loading offers
+                </div>
+              ) : (
+                publicCoupons.map((coupon) => {
+                  const shortfall = getCouponShortfall(coupon);
+                  const canApply = shortfall === 0 && !isApplyingDiscount;
+
+                  return (
+                    <div
+                      key={coupon.code}
+                      className="rounded-2xl border border-brand-gold/10 bg-brand-cream/40 p-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-sm font-black tracking-widest text-brand-brown">
+                            {coupon.code}
+                          </p>
+                          <p className="mt-1 text-xs font-light text-brand-brown/60">
+                            {coupon.label} · {coupon.percent}% off
+                          </p>
+                          <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
+                            {coupon.minOrderValue
+                              ? `Minimum order ₹${coupon.minOrderValue.toFixed(0)}`
+                              : "No minimum order"}
+                          </p>
+                          {shortfall > 0 && (
+                            <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-terracotta">
+                              Add ₹{shortfall.toFixed(0)} more to apply
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleApplyDiscount(coupon.code)}
+                          disabled={!canApply}
+                          className="rounded-full bg-brand-brown px-5 py-3 text-[9px] font-black uppercase tracking-widest text-brand-cream transition-colors hover:bg-brand-brown-light disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,6 +13,12 @@ export interface Order {
   delivery_address: Address;
   payment_method: string;
   payment_details?: PaymentDetails | null;
+  subtotal_amount?: number | null;
+  discount_code?: string | null;
+  discount_percent?: number | null;
+  discount_amount?: number | null;
+  shipping_amount?: number | null;
+  convenience_fee_amount?: number | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   created_at: string;
@@ -27,6 +33,15 @@ export type PaymentDetails = {
   currency: string;
   status: "verified";
   verified_at: string;
+};
+
+export type OrderPricingDetails = {
+  subtotalAmount: number;
+  discountCode: string | null;
+  discountPercent: number;
+  discountAmount: number;
+  shippingAmount: number;
+  convenienceFeeAmount: number;
 };
 
 const getErrorMessage = (error: unknown) =>
@@ -44,6 +59,7 @@ interface OrderState {
     paymentMethod: string,
     totalAmount: number,
     paymentDetails?: PaymentDetails,
+    pricingDetails?: OrderPricingDetails,
   ) => Promise<Order>;
   clearOrders: () => void;
 }
@@ -86,6 +102,7 @@ export const useOrderStore = create<OrderState>()(
         paymentMethod: string,
         totalAmount: number,
         paymentDetails?: PaymentDetails,
+        pricingDetails?: OrderPricingDetails,
       ) => {
         set({ isLoading: true, error: null });
         const saveLocalOrder = (
@@ -107,6 +124,22 @@ export const useOrderStore = create<OrderState>()(
             delivery_address: deliveryAddress,
             payment_method: paymentMethod,
             payment_details: paymentDetails ?? null,
+            subtotal_amount: pricingDetails?.subtotalAmount ?? null,
+            discount_code: pricingDetails?.discountCode ?? null,
+            discount_percent: pricingDetails?.discountPercent ?? null,
+            discount_amount: pricingDetails?.discountAmount ?? null,
+            shipping_amount: pricingDetails?.shippingAmount ?? null,
+            convenience_fee_amount:
+              pricingDetails?.convenienceFeeAmount ?? null,
+            total_amount: totalAmount,
+            status: "pending" as const,
+          };
+          const legacyOrderData = {
+            user_id: userId,
+            items,
+            delivery_address: deliveryAddress,
+            payment_method: paymentMethod,
+            payment_details: paymentDetails ?? null,
             total_amount: totalAmount,
             status: "pending" as const,
           };
@@ -122,6 +155,7 @@ export const useOrderStore = create<OrderState>()(
                 paymentMethod,
                 totalAmount,
                 paymentDetails,
+                pricingDetails,
               }),
             });
 
@@ -154,6 +188,21 @@ export const useOrderStore = create<OrderState>()(
             if (error.code === "42P01") {
               console.warn("Orders table missing. Saving to local state only.");
               return saveLocalOrder(newOrderData);
+            }
+            if (error.code === "42703" || error.code === "PGRST204") {
+              const { data: legacyData, error: legacyError } = await supabase
+                .from("orders")
+                .insert([legacyOrderData])
+                .select()
+                .single();
+
+              if (!legacyError) {
+                set({
+                  orders: [legacyData, ...get().orders],
+                  isLoading: false,
+                });
+                return legacyData;
+              }
             }
             throw error;
           }
