@@ -518,7 +518,7 @@ export default function ProductPage({
       </section>
 
       {/* Customer Reviews */}
-      <section id="reviews" className="bg-brand-cream border-y border-brand-gold/10 py-10 md:py-16">
+      <section id="reviews" className="bg-brand-cream border-y border-brand-gold/10 py-10 md:py-16 scroll-mt-24">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 md:mb-12">
             <div>
@@ -569,20 +569,39 @@ export default function ProductPage({
                 </div>
               ) : (
                 <>
-                  {paginatedReviews.map((review) => (
+                  {paginatedReviews.map((review) => {
+                    const isOwnReview = user && review.user_id === user.id;
+                    return (
                     <div
                       key={review.id}
-                      className="group pb-6 md:pb-10 border-b border-brand-gold/10 last:border-0"
+                      className={`group pb-6 md:pb-10 border-b border-brand-gold/10 last:border-0 ${
+                        isOwnReview
+                          ? "bg-brand-green/[0.03] -mx-4 px-4 rounded-2xl border-brand-green/10"
+                          : ""
+                      }`}
                     >
                       <div className="flex items-center justify-between mb-3 md:mb-4">
                         <div className="flex items-center gap-3 md:gap-4">
-                          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-brand-sand flex items-center justify-center text-brand-brown font-serif text-base md:text-lg">
+                          <div
+                            className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center font-serif text-base md:text-lg ${
+                              isOwnReview
+                                ? "bg-brand-green/10 text-brand-green ring-2 ring-brand-green/30"
+                                : "bg-brand-sand text-brand-brown"
+                            }`}
+                          >
                             {review.user_name?.[0].toUpperCase() || "A"}
                           </div>
                           <div>
-                            <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
-                              {review.user_name || "Anonymous"}
-                            </h5>
+                            <div className="flex items-center gap-2">
+                              <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
+                                {review.user_name || "Anonymous"}
+                              </h5>
+                              {isOwnReview && (
+                                <span className="text-[7px] uppercase tracking-widest font-black text-brand-green bg-brand-green/10 px-2 py-0.5 rounded-full border border-brand-green/20">
+                                  You
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[9px] text-brand-brown/30 font-bold mt-1 uppercase tracking-tighter">
                               {new Date(review.created_at).toLocaleDateString(
                                 "en-IN",
@@ -611,7 +630,8 @@ export default function ProductPage({
                         </p>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
 
                   {totalPages > 1 && (
                     <div className="flex items-center gap-4 pl-0 md:pl-14 pt-6 md:pt-8">
