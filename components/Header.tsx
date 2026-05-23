@@ -13,7 +13,7 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef, type MouseEvent } from "react";
+import { useEffect, useState, useRef, type MouseEvent as ReactMouseEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { scrollToHomeTop } from "@/utils/scrollToHomeTop";
 
@@ -31,7 +31,7 @@ export default function Header() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
+  const handleHomeClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
     setIsMobileMenuOpen(false);
 
     if (pathname === "/") {
@@ -41,7 +41,7 @@ export default function Header() {
   };
 
   const handleSectionClick = (
-    event: MouseEvent<HTMLAnchorElement>,
+    event: ReactMouseEvent<HTMLAnchorElement>,
     sectionId: string,
   ) => {
     setIsMobileMenuOpen(false);
