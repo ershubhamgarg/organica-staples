@@ -602,53 +602,67 @@ export default function CartPage() {
                 )}
 
                 {/* Mobile Floating Checkout Bar - Redesigned to be "Wow" and Premium */}
-                <div className="lg:hidden fixed bottom-5 left-4 right-4 bg-brand-cream/95 backdrop-blur-xl border-2 border-brand-gold/15 shadow-[0_20px_50px_rgba(60,54,42,0.2)] z-40 rounded-[2rem] p-4 flex items-center justify-between gap-4 safe-bottom animate-fade-in bg-organic-texture">
+                <div className="lg:hidden fixed bottom-6 left-4 right-4 bg-brand-cream/95 backdrop-blur-xl border border-brand-gold/25 shadow-[0_20px_50px_rgba(60,54,42,0.22)] z-40 rounded-[2.2rem] p-1 safe-bottom animate-fade-in overflow-hidden">
+                  {/* Subtle Jute/Paper texture background overlay */}
+                  <div className="absolute inset-0 bg-organic-texture opacity-25 pointer-events-none" />
+                  <div className="absolute inset-0 bg-jute opacity-[0.03] pointer-events-none" />
                   
-                  {/* Left Column: Premium Price & Savings details */}
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[7px] uppercase tracking-[0.25em] font-black text-brand-brown/40">
-                      Total Payable
-                    </span>
-                    <span className="text-2xl font-semibold text-brand-brown font-serif tracking-tight">
-                      ₹{totalPayable.toFixed(0)}
-                    </span>
-                    {/* Dynamic Savings Tag - Premium UX touch */}
-                    {(cartDiscount.amount > 0 || productDiscount > 0) ? (
-                      <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-green bg-brand-green/5 px-2.5 py-0.5 rounded-full border border-brand-green/20 w-fit">
-                        <span>Save ₹{(cartDiscount.amount + productDiscount).toFixed(0)}</span>
-                      </span>
-                    ) : shipping === 0 ? (
-                      <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/5 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit">
-                        <span>Free Shipping</span>
-                      </span>
-                    ) : null}
+                  {/* Background organic SVG Leaf/Vine illustration for luxury feel */}
+                  <div className="absolute right-0 top-0 -translate-y-4 translate-x-4 opacity-[0.08] pointer-events-none text-brand-gold">
+                    <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
+                      <path d="M50,10 C60,25 90,35 90,55 C90,75 75,90 50,90 C25,90 10,75 10,55 C10,35 40,25 50,10 Z M50,22 C43,32 22,41 22,55 C22,69 35,80 50,80 C65,80 78,69 78,55 C78,41 57,32 50,22 Z" />
+                    </svg>
                   </div>
 
-                  {/* Right Column: Checkout Action Button */}
-                  <Link
-                    href={hasUnavailableItems ? "#" : "/checkout"}
-                    className={`flex-1 max-w-[210px] group relative flex items-center justify-center gap-2 py-3.5 px-5 bg-brand-green text-brand-cream rounded-2xl text-[9px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_8px_20px_rgba(45,58,38,0.25)] hover:shadow-[0_12px_28px_rgba(45,58,38,0.35)] active:scale-95 border border-brand-gold/25 ${
-                      hasUnavailableItems
-                        ? "opacity-40 cursor-not-allowed grayscale"
-                        : ""
-                    }`}
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      <ShieldCheck
-                        size={14}
-                        className="text-brand-gold animate-pulse"
-                      />
-                      <span>Checkout</span>
-                      <ArrowRight
-                        size={12}
-                        className="group-hover:translate-x-1.5 transition-transform duration-300"
-                      />
-                    </span>
-                    {/* Soft Shimmer Highlight */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-cream/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                    {/* Elegant background overlay */}
-                    <div className="absolute inset-0 bg-[#3a4b32] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  </Link>
+                  {/* Inner double border container for luxury box packaging feel */}
+                  <div className="border border-brand-gold/15 rounded-[2rem] p-4 flex items-center justify-between gap-4 relative z-10">
+                    {/* Left Column: Premium Price & Savings details */}
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[8px] uppercase tracking-[0.25em] font-black text-brand-brown/40">
+                        Total To Pay
+                      </span>
+                      <span className="text-2xl font-bold text-brand-brown font-serif tracking-tight">
+                        ₹{totalPayable.toFixed(0)}
+                      </span>
+                      {/* Dynamic Savings Tag - Premium UX touch */}
+                      {(cartDiscount.amount > 0 || productDiscount > 0) ? (
+                        <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-green bg-brand-green/8 px-2.5 py-0.5 rounded-full border border-brand-green/20 w-fit mt-0.5">
+                          <span className="w-1 h-1 rounded-full bg-brand-green animate-ping" />
+                          <span>Save ₹{(cartDiscount.amount + productDiscount).toFixed(0)}</span>
+                        </span>
+                      ) : shipping === 0 ? (
+                        <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
+                          <span>Free Shipping</span>
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {/* Right Column: Checkout Action Button */}
+                    <Link
+                      href={hasUnavailableItems ? "#" : "/checkout"}
+                      className={`flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 ${
+                        hasUnavailableItems
+                          ? "opacity-40 cursor-not-allowed grayscale"
+                          : ""
+                      }`}
+                    >
+                      <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
+                        <ShieldCheck
+                          size={14}
+                          className="text-brand-gold animate-pulse flex-shrink-0"
+                        />
+                        <span className="whitespace-nowrap">Checkout</span>
+                        <ArrowRight
+                          size={12}
+                          className="group-hover:translate-x-1.5 transition-transform duration-300 flex-shrink-0"
+                        />
+                      </span>
+                      {/* Soft Shimmer Highlight */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-cream/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
+                      {/* Elegant background overlay */}
+                      <div className="absolute inset-0 bg-[#3a4b32] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </Link>
+                  </div>
                 </div>
 
                 {/* Desktop Static Checkout Bar */}

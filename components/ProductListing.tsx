@@ -60,7 +60,7 @@ export default function ProductListing() {
     }
 
     return result;
-  }, [selectedCategory, sortOrder, products]);
+  }, [selectedCategory, sortOrder, visibleProducts]);
 
   return (
     <section

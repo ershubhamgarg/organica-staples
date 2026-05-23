@@ -13,13 +13,13 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { items, getTotalItems } = useCartStore();
+  const { getTotalItems } = useCartStore();
   const { user, signOut, fetchUser } = useUserStore();
-  const [mounted, setMounted] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -39,7 +39,9 @@ export default function Header() {
 
   useEffect(() => {
     if (mounted && totalItems > 0) {
-      setIsAnimating(true);
+      const animFrame = requestAnimationFrame(() => {
+        setIsAnimating(true);
+      });
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(() => {
@@ -47,7 +49,10 @@ export default function Header() {
         });
       }
       const timer = setTimeout(() => setIsAnimating(false), 500);
-      return () => clearTimeout(timer);
+      return () => {
+        cancelAnimationFrame(animFrame);
+        clearTimeout(timer);
+      };
     }
   }, [totalItems, mounted]);
 

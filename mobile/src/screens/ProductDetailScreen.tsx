@@ -268,7 +268,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                   {review.user_name || "Anonymous"}
                 </AppText>
                 {review.comment && review.comment.trim() && (
-                  <AppText variant="small">"{review.comment}"</AppText>
+                  <AppText variant="small">&quot;{review.comment}&quot;</AppText>
                 )}
               </View>
             ))}
