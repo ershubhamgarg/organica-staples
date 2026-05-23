@@ -360,9 +360,14 @@ export default function ProductPage({
                       />
                     ))}
                   </div>
-                  <span className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
+                  <button
+                    onClick={() => {
+                      document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/30 pb-0.5 text-left active:scale-95"
+                  >
                     {reviewCount} Customer Reviews
-                  </span>
+                  </button>
                 </div>
 
                 <h1 className="text-4xl lg:text-5xl font-serif text-brand-brown mb-2 tracking-tight leading-[0.95]">
@@ -513,9 +518,9 @@ export default function ProductPage({
       </section>
 
       {/* Customer Reviews */}
-      <section className="bg-brand-cream border-y border-brand-gold/10 py-16">
+      <section id="reviews" className="bg-brand-cream border-y border-brand-gold/10 py-10 md:py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 md:mb-12">
             <div>
               <div className="inline-flex items-center gap-3 mb-3">
                 <span className="h-[1px] w-8 bg-brand-terracotta" />
@@ -553,9 +558,9 @@ export default function ProductPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-20">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-10 lg:gap-20">
             {/* Review List */}
-            <div className="space-y-12">
+            <div className="space-y-6 md:space-y-10">
               {reviews.length === 0 ? (
                 <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl">
                   <p className="text-brand-brown/40 font-light italic">
@@ -567,11 +572,11 @@ export default function ProductPage({
                   {paginatedReviews.map((review) => (
                     <div
                       key={review.id}
-                      className="group pb-12 border-b border-brand-gold/10 last:border-0"
+                      className="group pb-6 md:pb-10 border-b border-brand-gold/10 last:border-0"
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-brand-sand flex items-center justify-center text-brand-brown font-serif text-lg">
+                      <div className="flex items-center justify-between mb-3 md:mb-4">
+                        <div className="flex items-center gap-3 md:gap-4">
+                          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-brand-sand flex items-center justify-center text-brand-brown font-serif text-base md:text-lg">
                             {review.user_name?.[0].toUpperCase() || "A"}
                           </div>
                           <div>
@@ -601,7 +606,7 @@ export default function ProductPage({
                         </div>
                       </div>
                       {review.comment && review.comment.trim() && (
-                        <p className="text-brand-brown/70 font-light leading-relaxed text-balance pl-14">
+                        <p className="text-brand-brown/70 font-light leading-relaxed text-balance pl-0 mt-2 md:pl-14 text-xs md:text-sm">
                           &quot;{review.comment}&quot;
                         </p>
                       )}
@@ -609,7 +614,7 @@ export default function ProductPage({
                   ))}
 
                   {totalPages > 1 && (
-                    <div className="flex items-center gap-4 pl-14 pt-8">
+                    <div className="flex items-center gap-4 pl-0 md:pl-14 pt-6 md:pt-8">
                       <button
                         onClick={() =>
                           setCurrentPage(Math.max(1, currentPage - 1))
@@ -642,18 +647,18 @@ export default function ProductPage({
             <div className="sticky top-32 h-max">
               <form
                 onSubmit={handleSubmitReview}
-                className="bg-white p-10 rounded-3xl shadow-2xl shadow-brand-brown/5 border border-brand-gold/5"
+                className="bg-white p-6 md:p-10 rounded-3xl shadow-2xl shadow-brand-brown/5 border border-brand-gold/5"
               >
                 <h3 className="text-2xl font-serif text-brand-brown mb-2">
                   Write a Review
                 </h3>
-                <p className="text-xs text-brand-brown/40 font-light mb-8">
+                <p className="text-xs text-brand-brown/40 font-light mb-6 md:mb-8">
                   Share your experience with this product.
                 </p>
 
                 {submitMessage && (
                   <div
-                    className={`mb-8 p-4 text-[10px] uppercase tracking-widest font-black rounded-xl ${
+                    className={`mb-6 md:mb-8 p-4 text-[10px] uppercase tracking-widest font-black rounded-xl ${
                       submitMessage.type === "success"
                         ? "bg-brand-green/10 text-brand-green"
                         : "bg-brand-terracotta/10 text-brand-terracotta"
@@ -663,7 +668,7 @@ export default function ProductPage({
                   </div>
                 )}
 
-                <div className="space-y-8">
+                <div className="space-y-5 md:space-y-8">
                   <div>
                     <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-4">
                       Rating
