@@ -6,8 +6,8 @@ import Link from "next/link";
 
 const DesiHero = () => {
   return (
-    <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream pt-16 lg:pt-0">
-      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
+    <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream pt-4 sm:pt-8 lg:pt-0">
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-2 sm:pt-6 pb-20 sm:pb-24 lg:pt-12 lg:pb-12">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
           <div className="max-w-xl text-left">
             <div className="inline-flex items-center justify-start gap-3 mb-6 text-brand-green/80">
@@ -22,7 +22,7 @@ const DesiHero = () => {
               <span className="text-brand-gold italic">every grain.</span>
             </h1>
 
-            <p className="text-sm sm:text-base text-brand-brown/70 mb-8 max-w-md font-light leading-relaxed">
+            <p className="text-sm sm:text-base text-brand-brown/70 mb-6 sm:mb-8 max-w-md font-light leading-relaxed">
               Experience the authentic taste of tradition with our ethically
               sourced, 100% organic pantry staples. Pure, potent, and close to
               nature.
@@ -114,7 +114,7 @@ const DesiHero = () => {
       </div>
 
       {/* Bottom Curve/Transition */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-30">
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-10">
         <svg
           className="relative block w-full h-[100px]"
           data-name="Layer 1"

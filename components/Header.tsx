@@ -103,8 +103,8 @@ export default function Header() {
       <header
         className={`sticky top-0 w-full z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-brand-cream/80 backdrop-blur-xl border-b border-brand-gold/10 py-2 shadow-[0_10px_30px_-15px_rgba(60,54,42,0.1)]"
-            : "bg-transparent py-6"
+            ? "bg-brand-cream/80 backdrop-blur-xl border-b border-brand-gold/10 py-2 shadow-[0_10px_30px_-15px_rgba(60,54,42,0.15)]"
+            : "bg-transparent py-3 lg:py-6"
         }`}
       >
         <div className="max-w-[95rem] mx-auto px-6 sm:px-10 flex items-center justify-between">
@@ -133,13 +133,13 @@ export default function Header() {
               className="relative z-50 transition-all duration-700 hover:scale-105"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <div className="p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
+              <div className="p-1 sm:p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
                 <Image
                   src="/logo-horizon.png"
                   alt="Amritya Organics"
-                  width={110}
-                  height={130}
-                  className="object-contain"
+                  width={90}
+                  height={110}
+                  className="object-contain w-20 lg:w-28 h-auto"
                   priority
                 />
               </div>
@@ -147,12 +147,20 @@ export default function Header() {
           </div>
 
           {/* Actions & Navigation - Right */}
-          <div className="flex items-center justify-end gap-6 lg:gap-10 flex-1">
+          <div className="flex items-center justify-end gap-3 sm:gap-6 lg:gap-10 flex-1">
             <Link
               href="/our-story"
               className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
             >
               Our Story
+              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+            </Link>
+
+            <Link
+              href="/#contact"
+              className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+            >
+              Contact Us
               <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
             </Link>
 
@@ -263,6 +271,13 @@ export default function Header() {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Our Story
+          </Link>
+          <Link
+            href="/#contact"
+            className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Contact Us
           </Link>
 
           <div className="mt-12 pt-12 border-t border-brand-gold/20">
