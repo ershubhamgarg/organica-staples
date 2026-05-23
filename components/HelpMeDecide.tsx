@@ -2,6 +2,7 @@
 
 import { ArrowRight, HeartPulse, Scale, Wheat } from "lucide-react";
 import { useMemo, useState } from "react";
+import ScrollReveal from "./ScrollReveal";
 
 type ActivityLevel = "low" | "moderate" | "high";
 
@@ -175,7 +176,7 @@ export default function HelpMeDecide() {
   return (
     <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-brand-sand/30 overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col items-center text-center mb-8">
+        <ScrollReveal className="flex flex-col items-center text-center mb-8">
           <div className="inline-flex items-center justify-center gap-3 text-brand-gold mb-3">
             <span className="h-px w-8 bg-brand-gold/30" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em]">
@@ -190,11 +191,11 @@ export default function HelpMeDecide() {
             Share your wellness markers for a personalized Amritya guide. Simple
             swaps designed for your unique health needs.
           </p>
-        </div>
+        </ScrollReveal>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left Column - Form */}
-          <div className="lg:col-span-5">
+          <ScrollReveal className="lg:col-span-5 h-full">
             <form
               onSubmit={handleSubmit}
               className="h-full bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5 relative overflow-hidden"
@@ -333,10 +334,14 @@ export default function HelpMeDecide() {
                 <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
               </button>
             </form>
-          </div>
+          </ScrollReveal>
 
           {/* Right Column - Results */}
-          <div className="lg:col-span-7">
+          <ScrollReveal
+            animation="reveal-fade"
+            delay={200}
+            className="lg:col-span-7 h-full"
+          >
             {!hasSubmitted ? (
               <div className="h-full bg-white/40 rounded-3xl border-2 border-dashed border-brand-gold/10 flex flex-col items-center justify-center p-16 text-center">
                 <div className="w-20 h-20 rounded-full bg-brand-sand flex items-center justify-center mb-8 text-brand-gold/30">
@@ -418,7 +423,7 @@ export default function HelpMeDecide() {
                 </div>
               </div>
             )}
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Star, ChevronDown } from "lucide-react";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
+import ScrollReveal from "@/components/ScrollReveal";
 
 import { supabase } from "@/utils/supabase";
 import { isProductAvailable, Product } from "@/lib/data";
@@ -34,16 +35,19 @@ export default function ProductListing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
 
-  const categories: string[] = [
-    "All",
-    ...Array.from(new Set(products.map((p: Product) => p.category))),
-  ];
+  const visibleProducts = useMemo(() => {
+    return products.filter((p) => p.isVisible !== false);
+  }, [products]);
+
+  const categories: string[] = useMemo(() => {
+    return [
+      "All",
+      ...Array.from(new Set(visibleProducts.map((p: Product) => p.category))),
+    ];
+  }, [visibleProducts]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // Exclude products that are not visible
-    result = result.filter((p) => p.isVisible !== false);
+    let result = [...visibleProducts];
 
     if (selectedCategory !== "All") {
       result = result.filter((p) => p.category === selectedCategory);
@@ -67,7 +71,7 @@ export default function ProductListing() {
       <div className="absolute top-0 right-0 w-72 h-72 bg-brand-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-green/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-      <div className="relative flex flex-col items-center text-center mb-16">
+      <ScrollReveal className="relative flex flex-col items-center text-center mb-16">
         <div className="inline-flex items-center gap-4 mb-4">
           <span className="h-[1px] w-8 bg-brand-gold" />
           <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
@@ -83,7 +87,7 @@ export default function ProductListing() {
           A selection of India&apos;s finest staples, harvested with respect for
           the earth and delivered with uncompromising purity.
         </p>
-      </div>
+      </ScrollReveal>
 
       {/* Filters & Sorting */}
       <div className="relative flex flex-col lg:flex-row justify-between items-center mb-20 gap-8">
@@ -126,7 +130,11 @@ export default function ProductListing() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+      <ScrollReveal
+        animation="reveal-fade"
+        threshold={0.05}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 min-h-[60vh] transition-all duration-500"
+      >
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
           const hasHighDiscount = hasHighProductDiscount(product);
@@ -136,7 +144,10 @@ export default function ProductListing() {
           const unitPrice = getUnitPriceInfo(product);
 
           return (
-            <div key={product.id} className="group flex flex-col">
+            <div
+              key={product.id}
+              className="group flex flex-col animate-fade-in"
+            >
               <Link
                 href={`/product/${product.id}`}
                 className="block relative mb-6 group/image"
@@ -151,7 +162,6 @@ export default function ProductListing() {
                     imageClassName="object-cover transition-transform duration-1000 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
-                  
 
                   {/* Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
@@ -209,8 +219,8 @@ export default function ProductListing() {
                             </div>
                           </div>
                           <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
-                             Save ₹{(product.price - discountedPrice).toFixed(0)}
-                           </p>
+                            Save ₹{(product.price - discountedPrice).toFixed(0)}
+                          </p>
                         </div>
                       ) : (
                         <div className="flex items-baseline gap-1.5">
@@ -260,7 +270,7 @@ export default function ProductListing() {
             </div>
           );
         })}
-      </div>
+      </ScrollReveal>
     </section>
   );
 }

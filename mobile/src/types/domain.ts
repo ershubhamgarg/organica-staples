@@ -13,6 +13,7 @@ export interface Product {
   rating?: number | null;
   review_count?: number | null;
   available?: boolean | null;
+  isVisible?: boolean | null;
 }
 
 export interface CartItem extends Product {
