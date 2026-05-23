@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/userStore";
 import { Address, useAddressStore } from "@/store/addressStore";
 import type { PaymentDetails } from "@/store/orderStore";
 import { useOrderStore } from "@/store/orderStore";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,6 +23,9 @@ import {
   Lock,
   Banknote,
   Share2,
+  X,
+  Camera,
+  Sparkles,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
@@ -186,19 +190,19 @@ export default function CheckoutPage() {
 
   const cartDiscount = orderSummary
     ? {
-        amount: launchOffer.isEligible ? 0 : orderSummary.couponDiscount.amount,
-        percent: launchOffer.isEligible
-          ? 100
-          : orderSummary.couponDiscount.percent,
-        code: launchOffer.isEligible
-          ? LAUNCH_OFFER_CODE
-          : orderSummary.couponDiscount.code,
-        isEligible: true, // If it's in orderSummary, it was eligible on cart page
-        shortfall: 0,
-        subtotalAfterDiscount: launchOffer.isEligible
-          ? 0
-          : orderSummary.subtotalAfterDiscount,
-      }
+      amount: launchOffer.isEligible ? 0 : orderSummary.couponDiscount.amount,
+      percent: launchOffer.isEligible
+        ? 100
+        : orderSummary.couponDiscount.percent,
+      code: launchOffer.isEligible
+        ? LAUNCH_OFFER_CODE
+        : orderSummary.couponDiscount.code,
+      isEligible: true, // If it's in orderSummary, it was eligible on cart page
+      shortfall: 0,
+      subtotalAfterDiscount: launchOffer.isEligible
+        ? 0
+        : orderSummary.subtotalAfterDiscount,
+    }
     : fallbackCartDiscount;
 
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
@@ -248,6 +252,8 @@ export default function CheckoutPage() {
     useState<PlacedOrderDetails | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
+  const [showInstagramInstructions, setShowInstagramInstructions] =
+    useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -266,6 +272,12 @@ export default function CheckoutPage() {
       }, 0);
     }
   }, [user, newAddress.email]);
+
+  useEffect(() => {
+    if (!orderPlaced) return;
+
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [orderPlaced]);
 
   useEffect(() => {
     if (launchOffer.isEligible || !appliedDiscountCode || appliedDiscountCoupon)
@@ -315,58 +327,145 @@ export default function CheckoutPage() {
   }
 
   if (orderPlaced && placedOrderDetails) {
+    const isLaunchOfferConfirmation =
+      placedOrderDetails.paymentMethod === "instagram_story_verification";
+    const shortOrderId = placedOrderDetails.id.slice(0, 8).toUpperCase();
+
     return (
-      <div className="min-h-screen bg-brand-cream py-12 px-4 sm:px-6 flex items-center justify-center">
-        <div className="max-w-xl w-full bg-white rounded-3xl p-8 md:p-12 text-center shadow-sm border border-brand-gold/10">
-          <div className="w-20 h-20 bg-brand-green/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-green-fresh">
-            <CheckCircle2 size={40} strokeWidth={1.5} />
-          </div>
-          <h1 className="text-3xl font-serif text-brand-brown mb-2 tracking-tight">
-            Order Received
-          </h1>
-          <p className="text-brand-brown/60 mb-8 font-light">
-            {placedOrderDetails.paymentMethod ===
-            "instagram_story_verification"
-              ? "Take a screenshot of this confirmation, upload it to your Instagram Story, and tag @amritya_organics. We will verify it before processing your order."
-              : "Thank you for your order! We are preparing your package."}
-          </p>
-
-          <div className="bg-brand-cream/50 p-6 rounded-2xl mb-8 border border-brand-gold/10 text-left">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
-                Order ID
-              </span>
-              <span className="text-xs font-medium text-brand-brown">
-                #{placedOrderDetails.id.slice(0, 8).toUpperCase()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
-                Total Amount
-              </span>
-              <span className="text-lg font-medium text-brand-brown">
-                ₹{placedOrderDetails.total.toFixed(0)}
-              </span>
-            </div>
-          </div>
-
-          {placedOrderDetails.paymentMethod ===
-            "instagram_story_verification" && (
-            <div className="mb-8 rounded-2xl border border-brand-green/15 bg-brand-green/5 p-5 text-left">
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
-                Instagram Verification Needed
-              </p>
-              <p className="mt-2 text-xs font-light leading-relaxed text-brand-brown/70">
-                Share this order confirmation on Instagram Story and tag
-                @amritya_organics. Offer is limited and orders are processed
-                after story verification.
-              </p>
+      <div className="min-h-screen overflow-hidden bg-brand-cream px-4 py-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-[430px] flex-col gap-4">
+          {isLaunchOfferConfirmation && showInstagramInstructions && (
+            <div className="animate-reveal-down rounded-2xl border border-[#ec4899]/20 bg-[#831843] p-1 text-white shadow-2xl shadow-[#831843]/20">
+              <div className="relative overflow-hidden rounded-[1rem] border border-white/10 px-4 py-3">
+                <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(236,72,153,0.9),rgba(124,58,237,0.82),rgba(250,204,21,0.55))]" />
+                <div className="relative z-10 flex items-start gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#831843] shadow-lg">
+                    <Camera size={17} strokeWidth={1.8} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[8px] font-black uppercase tracking-[0.24em] text-yellow-100">
+                      Instagram Verification
+                    </p>
+                    <p className="mt-1 text-xs font-semibold leading-relaxed">
+                      Close this banner, photograph the receipt, upload it to
+                      Instagram Story, and tag @amritya_organics.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowInstagramInstructions(false)}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-[#831843]"
+                    aria-label="Hide Instagram instructions"
+                  >
+                    <X size={16} strokeWidth={2} />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
+          <div className="order-confirmation-card relative overflow-hidden rounded-[1.65rem] border border-brand-gold/20 bg-white shadow-[0_30px_90px_-45px_rgba(60,54,42,0.45)]">
+            <div className="absolute inset-0 bg-organic-texture opacity-35" />
+            <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#A65D47,#D4AF37,#2D3A26)]" />
+            <div className="relative z-10 px-5 py-5 text-center">
+              <div className="mb-3 flex items-center justify-between gap-4">
+                <Image
+                  src="/logo-horizon.png"
+                  alt="Amritya Organics"
+                  width={122}
+                  height={56}
+                  className="h-auto w-28 object-contain"
+                  priority
+                />
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-brand-gold/25 bg-brand-cream shadow-xl confirmation-seal">
+                  <CheckCircle2
+                    size={30}
+                    strokeWidth={1.4}
+                    className="text-brand-green-fresh"
+                  />
+                </div>
+              </div>
+
+              <p className="mb-1 text-[8px] font-black uppercase tracking-[0.24em] text-brand-gold">
+                {isLaunchOfferConfirmation
+                  ? "Launch Offer Claimed"
+                  : "Order Confirmed"}
+              </p>
+              <h1 className="mx-auto text-2xl font-serif leading-[1] tracking-tight text-brand-brown">
+                Order Received
+              </h1>
+              <p className="mx-auto mt-2 max-w-xs text-[11px] font-light leading-relaxed text-brand-brown/60">
+                {isLaunchOfferConfirmation
+                  ? "Your launch offer products are reserved for Instagram verification."
+                  : "Thank you for your order. We are preparing your package with care."}
+              </p>
+
+              <div className="my-4 border-t border-dashed border-brand-gold/30" />
+
+              <div className="grid grid-cols-2 gap-3 text-left">
+                <div className="confirmation-detail rounded-2xl border border-brand-gold/10 bg-brand-cream/45 px-3 py-2.5">
+                  <p className="text-[7px] font-black uppercase tracking-[0.2em] text-brand-brown/35">
+                    Order ID
+                  </p>
+                  <p className="mt-1 font-serif text-lg tracking-tight text-brand-brown">
+                    #{shortOrderId}
+                  </p>
+                </div>
+                <div className="confirmation-detail rounded-2xl border border-brand-green/10 bg-brand-green/5 px-3 py-2.5 text-right">
+                  <p className="text-[7px] font-black uppercase tracking-[0.2em] text-brand-brown/35">
+                    Total Amount
+                  </p>
+                  <p className="mt-1 font-serif text-lg tracking-tight text-brand-green">
+                    ₹{placedOrderDetails.total.toFixed(0)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2 text-left">
+                {placedOrderDetails.items.slice(0, 3).map((item, index) => (
+                  <div
+                    key={item.id}
+                    className="confirmation-line flex items-center justify-between gap-3 rounded-2xl border border-brand-gold/10 bg-white/75 px-3 py-2.5"
+                    style={{ animationDelay: `${200 + index * 90}ms` }}
+                  >
+                    <div className="min-w-0">
+                      <p className="line-clamp-1 font-serif text-sm tracking-tight text-brand-brown">
+                        {item.name}
+                      </p>
+                      <p className="mt-0.5 text-[7px] font-black uppercase tracking-[0.16em] text-brand-brown/35">
+                        Qty {item.quantity} / {item.weight}
+                      </p>
+                    </div>
+                    <p className="shrink-0 text-[8px] font-black uppercase tracking-[0.14em] text-brand-green">
+                      Reserved
+                    </p>
+                  </div>
+                ))}
+                {placedOrderDetails.items.length > 3 && (
+                  <div className="rounded-2xl border border-brand-gold/10 bg-brand-cream/45 px-3 py-2 text-center">
+                    <p className="text-[8px] font-black uppercase tracking-[0.18em] text-brand-brown/45">
+                      +{placedOrderDetails.items.length - 3} more items in this
+                      order
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {isLaunchOfferConfirmation && (
+                <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
+                  <Sparkles size={13} strokeWidth={1.8} />
+                  <p className="text-[7px] font-black uppercase tracking-[0.2em]">
+                    @amritya_organics
+                  </p>
+                  <Sparkles size={13} strokeWidth={1.8} />
+                </div>
+              )}
+            </div>
+          </div>
+
           <Link
             href="/"
-            className="block w-full py-4 rounded-xl bg-brand-brown text-brand-cream text-[10px] font-black uppercase tracking-[0.2em] hover:bg-brand-brown-light transition-colors"
+            className="animate-reveal-up inline-flex min-h-[46px] w-full items-center justify-center rounded-full bg-brand-brown px-8 text-[9px] font-black uppercase tracking-[0.22em] text-brand-cream shadow-xl shadow-brand-brown/15 transition-all hover:translate-y-[-2px] hover:bg-brand-brown-light"
           >
             Continue Shopping
           </Link>
@@ -714,11 +813,10 @@ export default function CheckoutPage() {
                         <button
                           key={addr.id}
                           onClick={() => setSelectedAddressId(addr.id)}
-                          className={`p-6 text-left rounded-2xl border transition-all duration-500 relative group ${
-                            selectedAddressId === addr.id
-                              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
-                              : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                          }`}
+                          className={`p-6 text-left rounded-2xl border transition-all duration-500 relative group ${selectedAddressId === addr.id
+                            ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
+                            : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                            }`}
                         >
                           <div className="relative z-10">
                             <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-3 opacity-60">
@@ -1102,11 +1200,10 @@ export default function CheckoutPage() {
                         setSelectedPayment("razorpay");
                         setPaymentError(null);
                       }}
-                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
-                        selectedPayment === "razorpay"
-                          ? "bg-brand-brown text-brand-cream border-brand-brown"
-                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                      }`}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${selectedPayment === "razorpay"
+                        ? "bg-brand-brown text-brand-cream border-brand-brown"
+                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                        }`}
                     >
                       <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                         <CreditCard
@@ -1139,11 +1236,10 @@ export default function CheckoutPage() {
                         setSelectedPayment("cod");
                         setPaymentError(null);
                       }}
-                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
-                        selectedPayment === "cod"
-                          ? "bg-brand-brown text-brand-cream border-brand-brown"
-                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                      }`}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${selectedPayment === "cod"
+                        ? "bg-brand-brown text-brand-cream border-brand-brown"
+                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                        }`}
                     >
                       <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                         <Banknote
@@ -1181,7 +1277,7 @@ export default function CheckoutPage() {
                   {/* Subtle Jute/Paper texture background overlay */}
                   <div className="absolute inset-0 bg-organic-texture opacity-25 pointer-events-none" />
                   <div className="absolute inset-0 bg-jute opacity-[0.03] pointer-events-none" />
-                  
+
                   {/* Background organic SVG Leaf/Vine illustration for luxury feel */}
                   <div className="absolute right-0 top-0 -translate-y-4 translate-x-4 opacity-[0.08] pointer-events-none text-brand-gold">
                     <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
@@ -1217,8 +1313,8 @@ export default function CheckoutPage() {
                         launchOffer.isEligible
                           ? handleLaunchOfferOrder
                           : selectedPayment === "razorpay"
-                          ? handleRazorpayPayment
-                          : handleCODPayment
+                            ? handleRazorpayPayment
+                            : handleCODPayment
                       }
                       disabled={
                         isPlacingOrder ||
@@ -1251,8 +1347,8 @@ export default function CheckoutPage() {
                                 ? "Place Order"
                                 : "Sign In"
                               : selectedPayment === "razorpay"
-                              ? "Pay Securely"
-                              : "Place Order"}
+                                ? "Pay Securely"
+                                : "Place Order"}
                         </span>
                         <ArrowRight
                           size={12}
@@ -1274,8 +1370,8 @@ export default function CheckoutPage() {
                       launchOffer.isEligible
                         ? handleLaunchOfferOrder
                         : selectedPayment === "razorpay"
-                        ? handleRazorpayPayment
-                        : handleCODPayment
+                          ? handleRazorpayPayment
+                          : handleCODPayment
                     }
                     disabled={
                       isPlacingOrder ||
@@ -1305,8 +1401,8 @@ export default function CheckoutPage() {
                             ? "Place Launch Offer Order"
                             : "Sign In To Claim Offer"
                           : selectedPayment === "razorpay"
-                          ? `Pay ₹${finalTotal.toFixed(0)}`
-                          : `Confirm Order ₹${finalTotal.toFixed(0)}`}
+                            ? `Pay ₹${finalTotal.toFixed(0)}`
+                            : `Confirm Order ₹${finalTotal.toFixed(0)}`}
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-2 transition-transform"

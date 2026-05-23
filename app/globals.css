@@ -86,6 +86,43 @@ body {
   100% { transform: translateX(100%); }
 }
 
+@keyframes confirmationCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes confirmationSealIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) rotate(-8deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes confirmationLineIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
 }
@@ -153,6 +190,23 @@ body {
   animation: shimmer 2s infinite;
 }
 
+.order-confirmation-card {
+  animation: confirmationCardIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.confirmation-seal {
+  animation: confirmationSealIn 0.82s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+.confirmation-detail {
+  animation: fadeIn 0.7s ease-out 0.25s both;
+}
+
+.confirmation-line {
+  opacity: 0;
+  animation: confirmationLineIn 0.55s ease-out both;
+}
+
 .bg-organic-texture {
   background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
 }
@@ -188,4 +242,3 @@ body {
     display: none !important;
   }
 }
-
