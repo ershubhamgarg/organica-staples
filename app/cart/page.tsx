@@ -220,7 +220,7 @@ export default function CartPage() {
 
       if (!result.isEligible) {
         setDiscountError(
-          `Add ₹${result.shortfall.toFixed(0)} more to use ${result.coupon.code}.`,
+          `Add ₹${result.shortfall.toFixed(2)} more to use ${result.coupon.code}.`,
         );
         return;
       }
@@ -517,10 +517,10 @@ export default function CartPage() {
                           ) : launchOffer.isEligible ? (
                             <div className="flex flex-col">
                               <span className="text-[9px] text-brand-brown/30 line-through font-bold">
-                                ₹{actualLinePrice.toFixed(0)}
+                                ₹{actualLinePrice.toFixed(2)}
                               </span>
                               <span className="text-lg md:text-xl font-medium text-brand-green-fresh tracking-tight">
-                                ₹0
+                                ₹0.00
                               </span>
                               <span className="text-[7px] uppercase tracking-widest font-black text-brand-green-fresh">
                                 Launch Offer
@@ -530,11 +530,11 @@ export default function CartPage() {
                             <div className="flex flex-col">
                               {itemHasDiscount && (
                                 <span className="text-[9px] text-brand-brown/30 line-through font-bold">
-                                  ₹{actualLinePrice.toFixed(0)}
+                                  ₹{actualLinePrice.toFixed(2)}
                                 </span>
                               )}
                               <span className="text-lg md:text-xl font-medium text-brand-brown tracking-tight">
-                                ₹{discountedLinePrice.toFixed(0)}
+                                ₹{discountedLinePrice.toFixed(2)}
                               </span>
                             </div>
                           )}
@@ -558,7 +558,7 @@ export default function CartPage() {
                       Items subtotal
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{actualSubtotal.toFixed(0)}
+                      ₹{actualSubtotal.toFixed(2)}
                     </span>
                   </div>
                   {launchOffer.isEligible && (
@@ -567,7 +567,7 @@ export default function CartPage() {
                         Launch Story Offer ({LAUNCH_OFFER_CODE})
                       </span>
                       <span className="text-brand-green-fresh font-bold tracking-tight">
-                        -₹{launchOfferDiscount.toFixed(0)}
+                        -₹{launchOfferDiscount.toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -579,7 +579,7 @@ export default function CartPage() {
                         %)
                       </span>
                       <span className="text-brand-green-fresh font-bold tracking-tight">
-                        -₹{productDiscount.toFixed(0)}
+                        -₹{productDiscount.toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -591,7 +591,7 @@ export default function CartPage() {
                         {cartDiscount.percent}%)
                       </span>
                       <span className="text-brand-green-fresh font-bold tracking-tight">
-                        -₹{cartDiscount.amount.toFixed(0)}
+                        -₹{cartDiscount.amount.toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -601,7 +601,7 @@ export default function CartPage() {
                         Shipping
                       </span>
                       <span className="text-brand-brown font-bold tracking-tight">
-                        ₹{shipping}
+                        ₹{shipping.toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -611,7 +611,7 @@ export default function CartPage() {
                         Convenience Fee
                       </span>
                       <span className="text-brand-brown font-bold tracking-tight">
-                        ₹{convenienceFee}
+                        ₹{convenienceFee.toFixed(2)}
                       </span>
                     </div>
                   )}
@@ -620,7 +620,7 @@ export default function CartPage() {
                 {shipping > 0 && (
                   <div className="mb-8 rounded-2xl border border-brand-green/10 bg-brand-green/5 p-4 text-center">
                     <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
-                      Add ₹{shippingShortfall.toFixed(0)} more after discounts
+                      Add ₹{shippingShortfall.toFixed(2)} more after discounts
                       for <span className="italic">free</span> delivery
                     </p>
                   </div>
@@ -655,7 +655,7 @@ export default function CartPage() {
                         >
                           {cartDiscount.isEligible
                             ? `${appliedDiscountCoupon.percent}% OFF APPLIED`
-                            : `ADD ₹${cartDiscount.shortfall.toFixed(0)} MORE TO UNLOCK`}
+                            : `ADD ₹${cartDiscount.shortfall.toFixed(2)} MORE TO UNLOCK`}
                         </p>
                       </div>
                       <button
@@ -725,7 +725,7 @@ export default function CartPage() {
                     To Pay
                   </span>
                   <span className="text-3xl font-medium text-brand-brown tracking-tighter">
-                    ₹{totalPayable.toFixed(0)}
+                    ₹{totalPayable.toFixed(2)}
                   </span>
                 </div>
 
@@ -758,13 +758,13 @@ export default function CartPage() {
                         Total To Pay
                       </span>
                       <span className="text-2xl font-bold text-brand-brown font-serif tracking-tight">
-                        ₹{totalPayable.toFixed(0)}
+                        ₹{totalPayable.toFixed(2)}
                       </span>
                       {/* Dynamic Savings Tag - Premium UX touch */}
                       {(cartDiscount.amount > 0 || productDiscount > 0) ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-green bg-brand-green/8 px-2.5 py-0.5 rounded-full border border-brand-green/20 w-fit mt-0.5">
                           <span className="w-1 h-1 rounded-full bg-brand-green animate-ping" />
-                          <span>Save ₹{(cartDiscount.amount + productDiscount).toFixed(0)}</span>
+                          <span>Save ₹{(cartDiscount.amount + productDiscount).toFixed(2)}</span>
                         </span>
                       ) : shipping === 0 ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
@@ -897,7 +897,7 @@ export default function CartPage() {
                             </p>
                             {canApply && (
                               <span className="text-[8px] font-black uppercase tracking-widest bg-brand-green/10 text-brand-green-fresh px-2 py-0.5 rounded-full">
-                                Save ₹{savings.toFixed(0)}
+                                Save ₹{savings.toFixed(2)}
                               </span>
                             )}
                           </div>
@@ -912,12 +912,12 @@ export default function CartPage() {
                                 }`}
                             >
                               {coupon.minOrderValue
-                                ? `Minimum order ₹${coupon.minOrderValue.toFixed(0)}`
+                                ? `Minimum order ₹${coupon.minOrderValue.toFixed(2)}`
                                 : "No minimum order"}
                             </p>
                             {shortfall > 0 && (
                               <p className="text-[9px] font-bold uppercase tracking-widest text-brand-terracotta italic">
-                                Add ₹{shortfall.toFixed(0)} more to unlock this
+                                Add ₹{shortfall.toFixed(2)} more to unlock this
                                 offer
                               </p>
                             )}

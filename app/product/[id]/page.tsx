@@ -397,7 +397,7 @@ export default function ProductPage({
                       <div className="flex items-baseline gap-6">
                         <div className="flex items-baseline gap-3">
                           <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                            ₹{discountedPrice.toFixed(0)}
+                            ₹{discountedPrice.toFixed(2)}
                           </span>
                           {unitPrice && (
                             <span className="text-sm text-brand-brown/30 font-light">
@@ -406,18 +406,18 @@ export default function ProductPage({
                           )}
                         </div>
                         <span className="text-lg text-brand-brown/30 line-through font-light">
-                          ₹{product.price.toFixed(0)}
+                          ₹{product.price.toFixed(2)}
                         </span>
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-2">
-                        You Save ₹{(product.price - discountedPrice).toFixed(0)}{" "}
+                        You Save ₹{(product.price - discountedPrice).toFixed(2)}{" "}
                         ({discountPercent}% Off)
                       </p>
                     </div>
                   ) : available ? (
                     <div className="flex items-baseline gap-3">
                       <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                        ₹{product.price.toFixed(0)}
+                        ₹{product.price.toFixed(2)}
                       </span>
                       {unitPrice && (
                         <span className="text-sm text-brand-brown/30 font-light">
@@ -852,7 +852,7 @@ export default function ProductPage({
                         </p>
                         <div className="flex items-baseline gap-1.5">
                           <p className="text-2xl font-medium text-brand-brown tracking-tighter">
-                            ₹{p.price.toFixed(0)}
+                            ₹{p.price.toFixed(2)}
                           </p>
                           {unitPrice && (
                             <span className="text-[10px] text-brand-brown/30 font-light">

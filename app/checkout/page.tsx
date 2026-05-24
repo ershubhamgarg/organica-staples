@@ -516,7 +516,7 @@ export default function CheckoutPage() {
                     Total Amount
                   </p>
                   <p className="mt-1 font-serif text-lg tracking-tight text-brand-green">
-                    ₹{placedOrderDetails.total.toFixed(0)}
+                    ₹{placedOrderDetails.total.toFixed(2)}
                   </p>
                 </div>
               </div>
@@ -1486,7 +1486,7 @@ export default function CheckoutPage() {
                         Total To Pay
                       </span>
                       <span className="text-2xl font-bold text-brand-brown font-serif tracking-tight">
-                        ₹{finalTotal.toFixed(0)}
+                        ₹{finalTotal.toFixed(2)}
                       </span>
                       {/* Payment Mode Badge - Premium UX verification */}
                       {launchOffer.isEligible ? (
@@ -1598,8 +1598,8 @@ export default function CheckoutPage() {
                             ? "Place Launch Offer Order"
                             : "Sign In To Claim Offer"
                           : selectedPayment === "razorpay"
-                            ? `Pay ₹${finalTotal.toFixed(0)}`
-                            : `Confirm Order ₹${finalTotal.toFixed(0)}`}
+                            ? `Pay ₹${finalTotal.toFixed(2)}`
+                            : `Confirm Order ₹${finalTotal.toFixed(2)}`}
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-2 transition-transform"
@@ -1660,8 +1660,8 @@ export default function CheckoutPage() {
                         {!available
                           ? "Coming Soon"
                           : launchOffer.isEligible
-                            ? "₹0"
-                            : `₹${(getDiscountedPrice(item) * item.quantity).toFixed(0)}`}
+                            ? "₹0.00"
+                            : `₹${(getDiscountedPrice(item) * item.quantity).toFixed(2)}`}
                       </p>
                     </Link>
                   );
@@ -1674,7 +1674,7 @@ export default function CheckoutPage() {
                     Subtotal
                   </span>
                   <span className="text-brand-brown font-bold tracking-tight">
-                    ₹{actualSubtotal.toFixed(0)}
+                    ₹{actualSubtotal.toFixed(2)}
                   </span>
                 </div>
                 {launchOffer.isEligible && (
@@ -1683,7 +1683,7 @@ export default function CheckoutPage() {
                       Launch Story Offer ({LAUNCH_OFFER_CODE})
                     </span>
                     <span className="text-brand-green-fresh font-bold tracking-tight">
-                      -₹{launchOfferDiscount.toFixed(0)}
+                      -₹{launchOfferDiscount.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1695,7 +1695,7 @@ export default function CheckoutPage() {
                       %)
                     </span>
                     <span className="text-brand-green-fresh font-bold tracking-tight">
-                      -₹{productDiscount.toFixed(0)}
+                      -₹{productDiscount.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1706,7 +1706,7 @@ export default function CheckoutPage() {
                       {cartDiscount.percent}%)
                     </span>
                     <span className="text-brand-green-fresh font-bold tracking-tight">
-                      -₹{cartDiscount.amount.toFixed(0)}
+                      -₹{cartDiscount.amount.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1716,7 +1716,7 @@ export default function CheckoutPage() {
                       Shipping
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{shipping}
+                      ₹{shipping.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1726,7 +1726,7 @@ export default function CheckoutPage() {
                       Convenience Fee
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{convenienceFee.toFixed(0)}
+                      ₹{convenienceFee.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1736,7 +1736,7 @@ export default function CheckoutPage() {
                       COD Charge
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{currentCodFee}
+                      ₹{currentCodFee.toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -1747,7 +1747,7 @@ export default function CheckoutPage() {
                   Final Total
                 </span>
                 <span className="text-3xl font-medium text-brand-brown tracking-tighter">
-                  ₹{finalTotal.toFixed(0)}
+                  ₹{finalTotal.toFixed(2)}
                 </span>
               </div>
 

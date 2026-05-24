@@ -222,11 +222,11 @@ export default function ProductListing() {
                         <div className="flex flex-col items-center">
                           <div className="flex items-center gap-3">
                             <span className="text-xs sm:text-sm text-brand-brown/20 line-through font-light">
-                              ₹{product.price.toFixed(0)}
+                              ₹{product.price.toFixed(2)}
                             </span>
                             <div className="flex items-baseline gap-1 sm:gap-1.5">
                               <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
-                                ₹{discountedPrice.toFixed(0)}
+                                ₹{discountedPrice.toFixed(2)}
                               </span>
                               {unitPrice && (
                                 <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">
@@ -236,13 +236,13 @@ export default function ProductListing() {
                             </div>
                           </div>
                           <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
-                            Save ₹{(product.price - discountedPrice).toFixed(0)}
+                            Save ₹{(product.price - discountedPrice).toFixed(2)}
                           </p>
                         </div>
                       ) : (
                         <div className="flex items-baseline gap-1 sm:gap-1.5">
                           <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
-                            ₹{product.price.toFixed(0)}
+                            ₹{product.price.toFixed(2)}
                           </span>
                           {unitPrice && (
                             <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">

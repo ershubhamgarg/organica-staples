@@ -467,7 +467,7 @@ export default function ProfilePage() {
                               {order.status}
                             </span>
                             <p className="text-xl font-medium text-brand-brown tracking-tighter">
-                              ₹{order.total_amount.toFixed(0)}
+                              ₹{order.total_amount.toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
                                       </p>
                                       <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
                                       <p className="text-[10px] uppercase tracking-widest font-bold text-brand-gold">
-                                        ₹{(item.price * item.quantity).toFixed(0)}
+                                        ₹{(item.price * item.quantity).toFixed(2)}
                                       </p>
                                     </div>
                                   </div>
@@ -542,7 +542,7 @@ export default function ProfilePage() {
                                   Items Subtotal
                                 </span>
                                 <span className="text-brand-brown font-black">
-                                  ₹{breakdown.itemsSubtotal.toFixed(0)}
+                                  ₹{breakdown.itemsSubtotal.toFixed(2)}
                                 </span>
                               </div>
 
@@ -552,7 +552,7 @@ export default function ProfilePage() {
                                     Product Discount
                                   </span>
                                   <span className="text-brand-green-fresh font-black">
-                                    -₹{breakdown.productDiscount.toFixed(0)}
+                                    -₹{breakdown.productDiscount.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -566,7 +566,7 @@ export default function ProfilePage() {
                                       : ""}
                                   </span>
                                   <span className="text-brand-green-fresh font-black">
-                                    -₹{breakdown.couponDiscount.toFixed(0)}
+                                    -₹{breakdown.couponDiscount.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -577,7 +577,7 @@ export default function ProfilePage() {
                                     Shipping
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{breakdown.shipping.toFixed(0)}
+                                    ₹{breakdown.shipping.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -588,7 +588,7 @@ export default function ProfilePage() {
                                     Convenience Fee
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{breakdown.convenienceFee.toFixed(0)}
+                                    ₹{breakdown.convenienceFee.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                                     COD Charge
                                   </span>
                                   <span className="text-brand-brown font-black">
-                                    ₹{breakdown.codFee.toFixed(0)}
+                                    ₹{breakdown.codFee.toFixed(2)}
                                   </span>
                                 </div>
                               )}
@@ -609,7 +609,7 @@ export default function ProfilePage() {
                                   Order Total
                                 </span>
                                 <span className="text-brand-brown font-black text-lg tracking-tighter">
-                                  ₹{breakdown.total.toFixed(0)}
+                                  ₹{breakdown.total.toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -689,7 +689,7 @@ export default function ProfilePage() {
                                     Payment
                                   </span>
                                   <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                    ₹0
+                                    ₹0.00
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
