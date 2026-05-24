@@ -96,7 +96,7 @@ export default function ProfilePage() {
       const storyImage = await createInstagramStoryImage(order);
       const shareData: ShareData = {
         files: [storyImage],
-        text: "My Amritya Organics launch offer order is ready for story verification. Tagging @amritya_organics.",
+        text: "I just ordered some organic goodies from Amritya Organics! 🌿 Check out their website https://www.amrityaorganics.com and grab amazing launch offers. Don’t forget to tag them when you order! #AmrityaOrganics #OrganicFood #HealthyLiving #LaunchOffer",
         title: "Amritya Organics Launch Order",
       };
 
@@ -433,146 +433,145 @@ export default function ProfilePage() {
                         key={order.id}
                         className="bg-brand-cream/30 rounded-3xl border border-brand-gold/5 p-8 group hover:bg-brand-cream hover:border-brand-gold/20 transition-all duration-500"
                       >
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-brand-gold/10">
-                        <div>
-                          <p className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold mb-2">
-                            Order #{order.id.slice(0, 8).toUpperCase()}
-                          </p>
-                          <p className="text-xs font-light text-brand-brown/60">
-                            {new Date(order.created_at).toLocaleDateString(
-                              "en-IN",
-                              {
-                                day: "numeric",
-                                month: "long",
-                                year: "numeric",
-                              },
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 pb-6 border-b border-brand-gold/10">
+                          <div>
+                            <p className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold mb-2">
+                              Order #{order.id.slice(0, 8).toUpperCase()}
+                            </p>
+                            <p className="text-xs font-light text-brand-brown/60">
+                              {new Date(order.created_at).toLocaleDateString(
+                                "en-IN",
+                                {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                },
+                              )}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            {isLaunchOffer && (
+                              <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/10 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest text-brand-green">
+                                <Sparkles size={12} strokeWidth={1.8} />
+                                Launch Offer
+                              </span>
                             )}
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          {isLaunchOffer && (
-                            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/10 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest text-brand-green">
-                              <Sparkles size={12} strokeWidth={1.8} />
-                              Launch Offer
-                            </span>
-                          )}
-                          <span
-                            className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${
-                              order.status === "delivered"
+                            <span
+                              className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${order.status === "delivered"
                                 ? "bg-brand-green/10 text-brand-green border-brand-green/20"
                                 : order.status === "cancelled"
                                   ? "bg-brand-terracotta/10 text-brand-terracotta border-brand-terracotta/20"
                                   : "bg-brand-gold/10 text-brand-gold border-brand-gold/20"
-                            }`}
-                          >
-                            {order.status}
-                          </span>
-                          <p className="text-xl font-medium text-brand-brown tracking-tighter">
-                            ₹{order.total_amount.toFixed(0)}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
-                        <div className="flex flex-col gap-6 flex-1">
-                          <div className="space-y-4">
-                            {order.items.map((item, idx) => (
-                              <Link
-                                key={idx}
-                                href={`/product/${item.id}`}
-                                className="flex items-center gap-4 group/item hover:bg-brand-brown/[0.02] p-2 -m-2 rounded-2xl transition-all"
-                              >
-                                <div className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover/item:shadow-md transition-shadow">
-                                  <ImageWithFallback
-                                    src={getProductThumbnail(item)}
-                                    alt={item.name}
-                                    fill
-                                    className="object-cover group-hover/item:scale-110 transition-transform duration-500"
-                                    sizes="64px"
-                                  />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="text-sm font-serif text-brand-brown truncate group-hover/item:text-brand-terracotta transition-colors">
-                                    {item.name}
-                                  </h4>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
-                                      {item.weight}
-                                    </p>
-                                    <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
-                                    <p className="text-[10px] uppercase tracking-widest font-bold text-brand-brown/40">
-                                      Qty: {item.quantity}
-                                    </p>
-                                    <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
-                                    <p className="text-[10px] uppercase tracking-widest font-bold text-brand-gold">
-                                      ₹{(item.price * item.quantity).toFixed(0)}
-                                    </p>
-                                  </div>
-                                </div>
-                                <ChevronRight
-                                  size={14}
-                                  className="text-brand-gold/40 group-hover/item:text-brand-gold transition-colors group-hover/item:translate-x-1 transition-transform"
-                                />
-                              </Link>
-                            ))}
+                                }`}
+                            >
+                              {order.status}
+                            </span>
+                            <p className="text-xl font-medium text-brand-brown tracking-tighter">
+                              ₹{order.total_amount.toFixed(0)}
+                            </p>
                           </div>
+                        </div>
 
-                          {/* Order Summary Breakdown */}
-                          <div className="bg-brand-brown/[0.02] border border-brand-gold/5 rounded-2xl p-6 space-y-3">
-                            {isLaunchOffer && (
-                              <div className="mb-4 rounded-2xl border border-brand-green/15 bg-brand-green/5 p-4">
-                                <div className="flex items-start gap-3">
-                                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
-                                    <Share2 size={15} strokeWidth={1.7} />
+                        <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
+                          <div className="flex flex-col gap-6 flex-1">
+                            <div className="space-y-4">
+                              {order.items.map((item, idx) => (
+                                <Link
+                                  key={idx}
+                                  href={`/product/${item.id}`}
+                                  className="flex items-center gap-4 group/item hover:bg-brand-brown/[0.02] p-2 -m-2 rounded-2xl transition-all"
+                                >
+                                  <div className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover/item:shadow-md transition-shadow">
+                                    <ImageWithFallback
+                                      src={getProductThumbnail(item)}
+                                      alt={item.name}
+                                      fill
+                                      className="object-cover group-hover/item:scale-110 transition-transform duration-500"
+                                      sizes="64px"
+                                    />
                                   </div>
-                                  <div>
-                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-green-fresh">
-                                      Launch Story Offer
-                                    </p>
-                                    <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
-                                      Product cost was waived for Instagram
-                                      Story verification.
-                                    </p>
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-sm font-serif text-brand-brown truncate group-hover/item:text-brand-terracotta transition-colors">
+                                      {item.name}
+                                    </h4>
+                                    <div className="flex items-center gap-3 mt-1">
+                                      <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                                        {item.weight}
+                                      </p>
+                                      <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
+                                      <p className="text-[10px] uppercase tracking-widest font-bold text-brand-brown/40">
+                                        Qty: {item.quantity}
+                                      </p>
+                                      <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
+                                      <p className="text-[10px] uppercase tracking-widest font-bold text-brand-gold">
+                                        ₹{(item.price * item.quantity).toFixed(0)}
+                                      </p>
+                                    </div>
                                   </div>
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                              <span className="text-brand-brown/40 font-bold">
-                                Items Subtotal
-                              </span>
-                              <span className="text-brand-brown font-black">
-                                ₹{breakdown.itemsSubtotal.toFixed(0)}
-                              </span>
+                                  <ChevronRight
+                                    size={14}
+                                    className="text-brand-gold/40 group-hover/item:text-brand-gold transition-colors group-hover/item:translate-x-1 transition-transform"
+                                  />
+                                </Link>
+                              ))}
                             </div>
 
-                            {breakdown.productDiscount > 0 && (
+                            {/* Order Summary Breakdown */}
+                            <div className="bg-brand-brown/[0.02] border border-brand-gold/5 rounded-2xl p-6 space-y-3">
+                              {isLaunchOffer && (
+                                <div className="mb-4 rounded-2xl border border-brand-green/15 bg-brand-green/5 p-4">
+                                  <div className="flex items-start gap-3">
+                                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                                      <Share2 size={15} strokeWidth={1.7} />
+                                    </div>
+                                    <div>
+                                      <p className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-green-fresh">
+                                        Launch Story Offer
+                                      </p>
+                                      <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
+                                        Product cost was waived for Instagram
+                                        Story verification.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
                               <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                                <span className="text-brand-green-fresh font-bold italic">
-                                  Product Discount
+                                <span className="text-brand-brown/40 font-bold">
+                                  Items Subtotal
                                 </span>
-                                <span className="text-brand-green-fresh font-black">
-                                  -₹{breakdown.productDiscount.toFixed(0)}
+                                <span className="text-brand-brown font-black">
+                                  ₹{breakdown.itemsSubtotal.toFixed(0)}
                                 </span>
                               </div>
-                            )}
 
-                            {breakdown.couponDiscount > 0 && (
-                              <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                                <span className="text-brand-green-fresh font-bold italic">
-                                  Coupon Discount
-                                  {order.discount_code
-                                    ? ` (${order.discount_code})`
-                                    : ""}
-                                </span>
-                                <span className="text-brand-green-fresh font-black">
-                                  -₹{breakdown.couponDiscount.toFixed(0)}
-                                </span>
-                              </div>
-                            )}
+                              {breakdown.productDiscount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-green-fresh font-bold italic">
+                                    Product Discount
+                                  </span>
+                                  <span className="text-brand-green-fresh font-black">
+                                    -₹{breakdown.productDiscount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
 
-                            {breakdown.shipping > 0 && (
+                              {breakdown.couponDiscount > 0 && (
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                  <span className="text-brand-green-fresh font-bold italic">
+                                    Coupon Discount
+                                    {order.discount_code
+                                      ? ` (${order.discount_code})`
+                                      : ""}
+                                  </span>
+                                  <span className="text-brand-green-fresh font-black">
+                                    -₹{breakdown.couponDiscount.toFixed(0)}
+                                  </span>
+                                </div>
+                              )}
+
+                              {breakdown.shipping > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     Shipping
@@ -583,7 +582,7 @@ export default function ProfilePage() {
                                 </div>
                               )}
 
-                            {breakdown.convenienceFee > 0 && (
+                              {breakdown.convenienceFee > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     Convenience Fee
@@ -594,7 +593,7 @@ export default function ProfilePage() {
                                 </div>
                               )}
 
-                            {breakdown.codFee > 0 && (
+                              {breakdown.codFee > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                                   <span className="text-brand-brown/40 font-bold">
                                     COD Charge
@@ -605,134 +604,134 @@ export default function ProfilePage() {
                                 </div>
                               )}
 
-                            <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-3 border-t border-brand-gold/10">
-                              <span className="text-brand-brown font-black">
-                                Order Total
-                              </span>
-                              <span className="text-brand-brown font-black text-lg tracking-tighter">
-                                ₹{breakdown.total.toFixed(0)}
-                              </span>
+                              <div className="flex justify-between items-center text-[11px] uppercase tracking-[0.2em] pt-3 border-t border-brand-gold/10">
+                                <span className="text-brand-brown font-black">
+                                  Order Total
+                                </span>
+                                <span className="text-brand-brown font-black text-lg tracking-tighter">
+                                  ₹{breakdown.total.toFixed(0)}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {order.payment_method === "razorpay" &&
-                          order.payment_details && (
-                            <div className="md:w-72 bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shrink-0 shadow-sm">
-                              <div className="flex items-center gap-3 mb-6">
-                                <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
-                                  <ShieldCheck size={16} />
+                          {order.payment_method === "razorpay" &&
+                            order.payment_details && (
+                              <div className="md:w-72 bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shrink-0 shadow-sm">
+                                <div className="flex items-center gap-3 mb-6">
+                                  <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
+                                    <ShieldCheck size={16} />
+                                  </div>
+                                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
+                                    Verified Payment
+                                  </p>
                                 </div>
-                                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
-                                  Verified Payment
+                                <div className="space-y-4">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Provider
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                      Razorpay
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Payment ID
+                                    </span>
+                                    <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/5 px-2 py-1 rounded">
+                                      {order.payment_details.provider_payment_id.toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Method
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                      {order.payment_details.method ||
+                                        "UPI / Card"}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Status
+                                    </span>
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-green font-black flex items-center gap-1.5">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />
+                                      {order.payment_details.status}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                          {isLaunchOffer && (
+                            <div className="md:w-72 bg-brand-green/5 border border-brand-green/15 rounded-3xl p-6 shrink-0 shadow-sm">
+                              <div className="flex items-center gap-3 mb-6">
+                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-green-fresh shadow-sm">
+                                  <Share2 size={16} strokeWidth={1.7} />
+                                </div>
+                                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
+                                  Story Verification
                                 </p>
                               </div>
                               <div className="space-y-4">
                                 <div className="flex justify-between items-center">
                                   <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Provider
+                                    Offer Code
                                   </span>
-                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                    Razorpay
+                                  <span className="text-[10px] uppercase tracking-widest text-brand-green font-black">
+                                    {order.discount_code ?? LAUNCH_OFFER_CODE}
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Payment ID
+                                    Payment
                                   </span>
-                                  <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/5 px-2 py-1 rounded">
-                                    {order.payment_details.provider_payment_id.toUpperCase()}
+                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                    ₹0
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
                                     Method
                                   </span>
-                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                    {order.payment_details.method ||
-                                      "UPI / Card"}
+                                  <span className="text-right text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                    Instagram Story
                                   </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                   <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Status
+                                    Tag
                                   </span>
-                                  <span className="text-[9px] uppercase tracking-widest text-brand-green font-black flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />
-                                    {order.payment_details.status}
+                                  <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
+                                    @amritya_organics
                                   </span>
                                 </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleInstagramStoryShare(order)}
+                                  disabled={sharingOrderId === order.id}
+                                  className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {sharingOrderId === order.id ? (
+                                    <span className="h-3.5 w-3.5 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                                  ) : (
+                                    <Share2 size={13} strokeWidth={2} />
+                                  )}
+                                  {sharingOrderId === order.id
+                                    ? "Preparing Story"
+                                    : "Share Story Receipt"}
+                                </button>
+                                {shareError && sharingOrderId !== order.id && (
+                                  <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
+                                    {shareError}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           )}
-
-                        {isLaunchOffer && (
-                          <div className="md:w-72 bg-brand-green/5 border border-brand-green/15 rounded-3xl p-6 shrink-0 shadow-sm">
-                            <div className="flex items-center gap-3 mb-6">
-                              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-green-fresh shadow-sm">
-                                <Share2 size={16} strokeWidth={1.7} />
-                              </div>
-                              <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
-                                Story Verification
-                              </p>
-                            </div>
-                            <div className="space-y-4">
-                              <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                  Offer Code
-                                </span>
-                                <span className="text-[10px] uppercase tracking-widest text-brand-green font-black">
-                                  {order.discount_code ?? LAUNCH_OFFER_CODE}
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                  Payment
-                                </span>
-                                <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                  ₹0
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                  Method
-                                </span>
-                                <span className="text-right text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                  Instagram Story
-                                </span>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                  Tag
-                                </span>
-                                <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
-                                  @amritya_organics
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => handleInstagramStoryShare(order)}
-                                disabled={sharingOrderId === order.id}
-                                className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
-                              >
-                                {sharingOrderId === order.id ? (
-                                  <span className="h-3.5 w-3.5 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
-                                ) : (
-                                  <Share2 size={13} strokeWidth={2} />
-                                )}
-                                {sharingOrderId === order.id
-                                  ? "Preparing Story"
-                                  : "Share Story Receipt"}
-                              </button>
-                              {shareError && sharingOrderId !== order.id && (
-                                <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
-                                  {shareError}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                        </div>
                       </div>
                     );
                   })}

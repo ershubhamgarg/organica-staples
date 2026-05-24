@@ -201,14 +201,10 @@ export const createInstagramStoryReceiptImage = async (
     );
   }
 
-  context.fillStyle = "#D63176";
-  context.font = "700 34px Arial";
-  context.textAlign = "center";
-  context.fillText("@amritya_organics", width / 2, 1580);
-
   context.fillStyle = "rgba(255,255,255,0.94)";
   context.font = "700 30px Arial";
-  context.fillText("Pure by nature, essesntial by choice", width / 2, 1660);
+  context.textAlign = "center";
+  context.fillText("Pure by nature, essesntial by choice", width / 2, 1605);
 
   return new Promise<File>((resolve, reject) => {
     canvas.toBlob((blob) => {

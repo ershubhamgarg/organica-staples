@@ -342,8 +342,6 @@ export default function CheckoutPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
   const [isSharingToInstagram, setIsSharingToInstagram] = useState(false);
-  const [showInstagramInstructions, setShowInstagramInstructions] =
-    useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -466,36 +464,6 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen overflow-hidden bg-brand-cream px-4 py-4 sm:px-6">
         <div className="mx-auto flex w-full max-w-[430px] flex-col gap-4">
-          {isLaunchOfferConfirmation && showInstagramInstructions && (
-            <div className="animate-reveal-down rounded-2xl border border-[#ec4899]/20 bg-[#831843] p-1 text-white shadow-2xl shadow-[#831843]/20">
-              <div className="relative overflow-hidden rounded-[1rem] border border-white/10 px-4 py-3">
-                <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(236,72,153,0.9),rgba(124,58,237,0.82),rgba(250,204,21,0.55))]" />
-                <div className="relative z-10 flex items-start gap-3">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#831843] shadow-lg">
-                    <Camera size={17} strokeWidth={1.8} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[8px] font-black uppercase tracking-[0.24em] text-yellow-100">
-                      Instagram Verification
-                    </p>
-                    <p className="mt-1 text-xs font-semibold leading-relaxed">
-                      Close this banner, photograph the receipt, upload it to
-                      Instagram Story, and tag @amritya_organics.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowInstagramInstructions(false)}
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-[#831843]"
-                    aria-label="Hide Instagram instructions"
-                  >
-                    <X size={16} strokeWidth={2} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="order-confirmation-card relative overflow-hidden rounded-[1.65rem] border border-brand-gold/20 bg-white shadow-[0_30px_90px_-45px_rgba(60,54,42,0.45)]">
             <div className="absolute inset-0 bg-organic-texture opacity-35" />
             <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#A65D47,#D4AF37,#2D3A26)]" />
@@ -596,25 +564,31 @@ export default function CheckoutPage() {
           </div>
 
           {isLaunchOfferConfirmation ? (
-            <button
-              type="button"
-              onClick={handleInstagramStoryShare}
-              disabled={isSharingToInstagram}
-              className="animate-reveal-up relative inline-flex min-h-[52px] w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-[#DD2A7B] px-8 text-[9px] font-black uppercase tracking-[0.22em] text-white shadow-xl shadow-[#DD2A7B]/25 transition-all hover:translate-y-[-2px] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,#F58529,#DD2A7B,#8134AF,#515BD4)]" />
-              <span className="absolute inset-0 bg-white/0 transition-colors hover:bg-white/10" />
-              <span className="relative z-10 flex items-center gap-3">
-                {isSharingToInstagram ? (
-                  <span className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
-                ) : (
-                  <Camera size={16} strokeWidth={2} />
-                )}
-                {isSharingToInstagram
-                  ? "Preparing Story"
-                  : "Take Me To Instagram"}
-              </span>
-            </button>
+            <div className="animate-reveal-up space-y-3">
+              <p className="rounded-2xl border border-brand-gold/20 bg-white px-4 py-3 text-center text-[10px] font-semibold leading-relaxed text-brand-brown/65 shadow-lg shadow-brand-brown/5">
+                Before posting, add an Instagram mention tag for
+                @amritya_organics on your Story.
+              </p>
+              <button
+                type="button"
+                onClick={handleInstagramStoryShare}
+                disabled={isSharingToInstagram}
+                className="relative inline-flex min-h-[52px] w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-[#DD2A7B] px-8 text-[9px] font-black uppercase tracking-[0.22em] text-white shadow-xl shadow-[#DD2A7B]/25 transition-all hover:translate-y-[-2px] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,#F58529,#DD2A7B,#8134AF,#515BD4)]" />
+                <span className="absolute inset-0 bg-white/0 transition-colors hover:bg-white/10" />
+                <span className="relative z-10 flex items-center gap-3">
+                  {isSharingToInstagram ? (
+                    <span className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                  ) : (
+                    <Camera size={16} strokeWidth={2} />
+                  )}
+                  {isSharingToInstagram
+                    ? "Preparing Story"
+                    : "Take Me To Instagram"}
+                </span>
+              </button>
+            </div>
           ) : (
             <Link
               href="/"
