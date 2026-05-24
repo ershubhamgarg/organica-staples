@@ -37,6 +37,7 @@ import {
 } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
+import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 
 interface PlacedOrderDetails {
   id: string;
@@ -206,6 +207,7 @@ export default function CheckoutPage() {
   const removeDiscountCode = useCartStore((state) => state.removeDiscountCode);
   const orderSummary = useCartStore((state) => state.orderSummary);
   const { user } = useUserStore();
+  const launchOfferClaim = useLaunchOfferClaimStatus(user);
   const { addresses, addAddress } = useAddressStore();
   const { placeOrder, isLoading: isPlacingOrder } = useOrderStore();
   const [mounted, setMounted] = useState(false);
@@ -217,16 +219,32 @@ export default function CheckoutPage() {
     0,
   );
   const fallbackEffectiveSubtotal = getTotalPrice();
-  const launchOffer = getLaunchOfferState(items);
+  const rawLaunchOffer = getLaunchOfferState(items);
+  const launchOffer =
+    launchOfferClaim.hasClaimed || (user && launchOfferClaim.isLoading)
+      ? {
+        ...rawLaunchOffer,
+        isEligible: false,
+        message: launchOfferClaim.hasClaimed
+          ? "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment."
+          : "Checking your launch offer claim status.",
+      }
+      : rawLaunchOffer;
+  const usableOrderSummary =
+    orderSummary?.couponDiscount.code === LAUNCH_OFFER_CODE &&
+    !launchOffer.isEligible
+      ? null
+      : orderSummary;
   const launchOfferDiscount = launchOffer.isEligible
     ? fallbackActualSubtotal
     : 0;
-  const totalPrice = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
-  const actualSubtotal = orderSummary?.actualSubtotal ?? fallbackActualSubtotal;
+  const totalPrice = usableOrderSummary?.actualSubtotal ?? fallbackActualSubtotal;
+  const actualSubtotal =
+    usableOrderSummary?.actualSubtotal ?? fallbackActualSubtotal;
   const productDiscount =
     launchOffer.isEligible
       ? launchOfferDiscount
-      : (orderSummary?.productDiscount ??
+      : (usableOrderSummary?.productDiscount ??
         Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0));
 
   // Fallback calculation if orderSummary is missing
@@ -238,12 +256,12 @@ export default function CheckoutPage() {
   const subtotalAfterDiscount =
     launchOffer.isEligible
       ? 0
-      : (orderSummary?.subtotalAfterDiscount ??
+      : (usableOrderSummary?.subtotalAfterDiscount ??
         fallbackCartDiscount.subtotalAfterDiscount);
   const shipping =
     launchOffer.isEligible
       ? 0
-      : (orderSummary?.shipping ??
+      : (usableOrderSummary?.shipping ??
         (subtotalAfterDiscount >= 1500
           ? 0
           : subtotalAfterDiscount >= 1000
@@ -254,22 +272,24 @@ export default function CheckoutPage() {
                 ? 149
                 : 0));
   const convenienceFee =
-    launchOffer.isEligible ? 0 : (orderSummary?.convenienceFee ?? 10);
+    launchOffer.isEligible ? 0 : (usableOrderSummary?.convenienceFee ?? 10);
 
-  const cartDiscount = orderSummary
+  const cartDiscount = usableOrderSummary
     ? {
-      amount: launchOffer.isEligible ? 0 : orderSummary.couponDiscount.amount,
+      amount: launchOffer.isEligible
+        ? 0
+        : usableOrderSummary.couponDiscount.amount,
       percent: launchOffer.isEligible
         ? 100
-        : orderSummary.couponDiscount.percent,
+        : usableOrderSummary.couponDiscount.percent,
       code: launchOffer.isEligible
         ? LAUNCH_OFFER_CODE
-        : orderSummary.couponDiscount.code,
+        : usableOrderSummary.couponDiscount.code,
       isEligible: true, // If it's in orderSummary, it was eligible on cart page
       shortfall: 0,
       subtotalAfterDiscount: launchOffer.isEligible
         ? 0
-        : orderSummary.subtotalAfterDiscount,
+        : usableOrderSummary.subtotalAfterDiscount,
     }
     : fallbackCartDiscount;
 
@@ -313,7 +333,7 @@ export default function CheckoutPage() {
   const finalTotal =
     launchOffer.isEligible
       ? 0
-      : (orderSummary?.totalPayable ??
+      : (usableOrderSummary?.totalPayable ??
         subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
@@ -614,6 +634,13 @@ export default function CheckoutPage() {
   const handleLaunchOfferOrder = async () => {
     if (!selectedAddressId || !launchOffer.isEligible) return;
 
+    if (launchOfferClaim.hasClaimed) {
+      setPaymentError(
+        "You have already claimed the launch offer. Please place this as a regular paid order.",
+      );
+      return;
+    }
+
     if (!user?.email) {
       setPaymentError("Please sign in to claim the launch offer.");
       router.push("/login");
@@ -843,6 +870,28 @@ export default function CheckoutPage() {
             <ArrowLeft size={12} /> Back to Cart
           </Link>
         </div>
+
+        {launchOfferClaim.hasClaimed && (
+          <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
+            <div className="flex items-start gap-4">
+              <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                <CheckCircle2 size={20} strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
+                  Launch Story Offer Claimed
+                </p>
+                <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
+                  Congratulations on claiming the launch offer.
+                </h2>
+                <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
+                  Our team is working toward fulfilment. This checkout will
+                  continue as a regular paid order.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {launchOffer.isEligible && (
           <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">

@@ -26,13 +26,14 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 - `/profile`: user profile/orders/addresses
 - `/our-story`: brand content
 - `/api/verify-vpa`: mocked VPA/UPI validation endpoint
+- `/api/launch-offer-claim`: authenticated claim-status check for the launch offer
 
 ## Data Flow & Logic
 
 - **Product Data**: Fetched through `/api/products`, which joins Supabase `products` with `product_inventory`. Types in `lib/data.ts`.
 - **Pricing**: Helpers in `lib/pricing.ts` handle discounts and unit price calculations (e.g., `getUnitPriceInfo` for ₹/100g or ₹/100ml display).
 - **Cart Sync**: `store/cartStore.ts` syncs to Supabase `carts` for logged-in users; otherwise persists to localStorage.
-- **Availability**: Product availability is backend-driven from `product_inventory.available_quantity`. `isProductAvailable` treats stock `<= 0` as unavailable, which uses `blur-[2px]`, "Available Soon" badge, and hidden prices. Low stock uses `product_inventory.low_stock_threshold` and should show "Few Left" / "Only X left" style cues.
+- **Availability**: Product availability is backend-driven from `product_inventory.available_quantity`. `isProductAvailable` treats stock `<= 0` as unavailable, which uses `blur-[2px]`, "Available Soon" badge, and hidden prices. Low stock uses `product_inventory.low_stock_threshold`, but do **not** show exact quantities to customers. Use soft cues like "Few Left" badges and "Selling Out Soon"; normal stock copy should be generic like "In Stock".
 - **Reviews**: Only render review text if it contains non-whitespace content.
 
 ## Launch Offer
@@ -41,8 +42,13 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 - **Customer Rule**: Signed-in customers can claim the offer once per email address.
 - **Cart Rule**: Exactly 2 different products, quantity 1 each. Product cost is waived, final total becomes ₹0, and the order uses `instagram_story_verification` as the payment method.
 - **Claim Enforcement**: `/api/orders` validates the authenticated Supabase bearer token for launch-offer orders and passes the normalized user email to the `place_order_with_inventory` RPC. The database table `launch_offer_claims` has a unique constraint on normalized email to prevent duplicate claims.
+- **Claim Status UI Gate**: `lib/useLaunchOfferClaimStatus.ts` calls `/api/launch-offer-claim` to check whether the signed-in user's normalized email has already claimed the offer. Cart and checkout must use this status to disable ₹0 launch-offer pricing for already-claimed customers, even if their cart shape is otherwise eligible.
 - **Inventory Enforcement**: Orders go through `/api/orders` and the `place_order_with_inventory` RPC, which checks `product_inventory.available_quantity`, inserts the order, creates `order_items`, decrements stock, and creates the launch-offer claim atomically.
-- **Promotion UI**: `components/LaunchOfferBanner.tsx` renders directly below `Header`. Cart and checkout also have launch-offer-specific messaging. The order confirmation has a photo-friendly receipt and a closable Instagram instruction banner.
+- **Promotion UI**: `components/LaunchOfferBanner.tsx` renders directly below `Header`. It is dismissible on all screens. For unclaimed users it uses the red/dark premium banner with a "Learn More" CTA that opens a centered modal. For already-claimed users it changes to a green fulfilment-style banner, congratulates them, and says the team is working on fulfilment.
+- **Launch Offer Modal**: Unclaimed users see the offer summary, steps, rules, and CTA (`Login To Claim` for logged-out users, `Claim Offer` to `/#shop` for logged-in users). Already-claimed users should not see claim rules or offer instructions in the popup; show only the confirmation/fulfilment status and a `View Order Status` CTA.
+- **Cart/Checkout Claimed State**: Already-claimed users must not see waived product pricing, `LAUNCHSTORY` discounts, `instagram_story_verification`, or ₹0 launch-offer totals. Cart and checkout should continue as regular paid orders and show fulfilment/congratulations messaging.
+- **Order History**: Launch-offer orders are identified by `payment_method === "instagram_story_verification"` or `discount_code === LAUNCHSTORY`; show a launch-offer badge and story-verification detail panel in `/profile`.
+- **Error UX**: Checkout uses a premium closable alert/toast for order-placement errors. Preserve backend messages, especially duplicate launch-offer claim errors, and avoid replacing them with generic failure copy.
 - **Instagram Verification**: Launch-offer confirmation asks the customer to photograph the receipt, upload it to Instagram Story, and tag `@amritya_organics`. Keep these instructions outside the receipt or closable so the customer can hide them before taking the photo.
 
 ### To Stop Or Remove The Launch Offer
@@ -51,6 +57,7 @@ When the promotion ends, remove or disable all of these paths together so the UI
 
 - Hide/remove `LaunchOfferBanner` from `components/Header.tsx`.
 - Disable launch-offer eligibility in `lib/launchOffer.ts` (for example make `getLaunchOfferState` always return `isEligible: false`) or remove the helper after updating all callers.
+- Remove or disable `lib/useLaunchOfferClaimStatus.ts` and `/api/launch-offer-claim` callers if claim-status UI is no longer needed.
 - Remove launch-offer discount handling from `/cart` and `/checkout`, especially uses of `LAUNCH_OFFER_CODE`, `launchOffer.isEligible`, `launchOfferDiscount`, zero-product-cost totals, and `instagram_story_verification`.
 - Remove or block the launch-offer branch in `/api/orders`; backend must no longer accept `paymentMethod === "instagram_story_verification"` or `discountCode === LAUNCH_OFFER_CODE` unless the offer is intentionally still active.
 - Keep inventory validation/decrement logic. It is not launch-offer-specific and must remain for normal paid orders.
@@ -70,6 +77,8 @@ When the promotion ends, remove or disable all of these paths together so the UI
   - Discounts: All discount amounts and savings text MUST be displayed in `brand-green`.
   - Order Summary: Hide any summary item (shipping, convenience fee, discount) if its value is zero.
   - Navigation: Use Next.js `<Link>` for all internal routing, including hash IDs (e.g., `#shop`).
+  - Launch offer banner typography should use the theme serif (`font-serif`) for a fancy premium feel.
+  - Login page branding uses the white logo asset (`/logo-white.png`) on the green brand panel.
 
 ## Gotchas & Constraints
 

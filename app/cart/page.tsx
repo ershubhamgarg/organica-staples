@@ -42,6 +42,7 @@ import {
   isProductAvailable,
   isProductLowStock,
 } from "@/lib/data";
+import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -61,6 +62,7 @@ export default function CartPage() {
   );
   const setOrderSummary = useCartStore((state) => state.setOrderSummary);
   const { user } = useUserStore();
+  const launchOfferClaim = useLaunchOfferClaimStatus(user);
   const [discountInput, setDiscountInput] = useState("");
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [discountMessage, setDiscountMessage] = useState<string | null>(null);
@@ -79,7 +81,32 @@ export default function CartPage() {
     () => items.reduce((total, item) => total + item.price * item.quantity, 0),
     [items],
   );
-  const launchOffer = useMemo(() => getLaunchOfferState(items), [items]);
+  const rawLaunchOffer = useMemo(() => getLaunchOfferState(items), [items]);
+  const launchOffer = useMemo(() => {
+    if (launchOfferClaim.hasClaimed) {
+      return {
+        ...rawLaunchOffer,
+        isEligible: false,
+        message:
+          "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment.",
+      };
+    }
+
+    if (user && launchOfferClaim.isLoading) {
+      return {
+        ...rawLaunchOffer,
+        isEligible: false,
+        message: "Checking your launch offer claim status.",
+      };
+    }
+
+    return rawLaunchOffer;
+  }, [
+    rawLaunchOffer,
+    launchOfferClaim.hasClaimed,
+    launchOfferClaim.isLoading,
+    user,
+  ]);
   const launchOfferDiscount = launchOffer.isEligible ? actualSubtotal : 0;
   const productDiscount = launchOffer.isEligible
     ? launchOfferDiscount
@@ -303,36 +330,50 @@ export default function CartPage() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
-                Limited Launch Story Offer
+                {launchOfferClaim.hasClaimed
+                  ? "Launch Story Offer Claimed"
+                  : "Limited Launch Story Offer"}
               </p>
               <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
-                Get any 2 products at{" "}
-                <span className="italic text-brand-green-fresh">
-                  ₹0 product cost
-                </span>
+                {launchOfferClaim.hasClaimed ? (
+                  "Congratulations on claiming the launch offer."
+                ) : (
+                  <>
+                    Get any 2 products at{" "}
+                    <span className="italic text-brand-green-fresh">
+                      ₹0 product cost
+                    </span>
+                  </>
+                )}
               </h2>
               <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
-                Pick exactly 2 different products, 1 quantity each. Place your
-                order, upload the final order confirmation to your Instagram
-                Story, and tag @amritya_organics for verification.
+                {launchOfferClaim.hasClaimed
+                  ? "Your one-time launch offer claim is confirmed. Our team is working toward fulfilment, so this cart will continue as a regular paid order."
+                  : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @amritya_organics for verification."}
               </p>
             </div>
             <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">
               <p className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
-                {launchOffer.isEligible ? "Unlocked" : "How to unlock"}
+                {launchOfferClaim.hasClaimed
+                  ? "Claim Confirmed"
+                  : launchOffer.isEligible
+                    ? "Unlocked"
+                    : "How to unlock"}
               </p>
               <p
                 className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${
-                  launchOffer.isEligible
+                  launchOffer.isEligible || launchOfferClaim.hasClaimed
                     ? "text-brand-green-fresh"
                     : "text-brand-brown/50"
                 }`}
               >
                 {launchOffer.message}
               </p>
-              <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
-                Only {LAUNCH_OFFER_PACK_LIMIT} packs per item available.
-              </p>
+              {!launchOfferClaim.hasClaimed && (
+                <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
+                  Only {LAUNCH_OFFER_PACK_LIMIT} packs per item available.
+                </p>
+              )}
             </div>
           </div>
         </div>
