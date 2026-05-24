@@ -64,6 +64,8 @@ export default function ProfilePage() {
 
   const [visibleAddressesCount, setVisibleAddressesCount] = useState(3);
   const [visibleOrdersCount, setVisibleOrdersCount] = useState(3);
+  const [sharingOrderId, setSharingOrderId] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -81,6 +83,190 @@ export default function ProfilePage() {
   if (!user) {
     return null;
   }
+
+  const createInstagramStoryImage = async (order: Order) => {
+    const logo = new window.Image();
+    logo.src = "/logo-horizon.png";
+    await new Promise<void>((resolve) => {
+      logo.onload = () => resolve();
+      logo.onerror = () => resolve();
+    });
+
+    const canvas = document.createElement("canvas");
+    const width = 1080;
+    const height = 1920;
+    const scale = window.devicePixelRatio || 1;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Unable to create the Instagram story image.");
+    }
+
+    context.scale(scale, scale);
+
+    const gradient = context.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#F58529");
+    gradient.addColorStop(0.32, "#DD2A7B");
+    gradient.addColorStop(0.68, "#8134AF");
+    gradient.addColorStop(1, "#515BD4");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
+
+    const glow = context.createRadialGradient(220, 240, 20, 220, 240, 520);
+    glow.addColorStop(0, "rgba(255,255,255,0.52)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+
+    context.fillStyle = "rgba(255,255,255,0.96)";
+    context.beginPath();
+    context.roundRect(90, 250, 900, 1080, 48);
+    context.fill();
+
+    if (logo.complete && logo.naturalWidth > 0) {
+      context.drawImage(logo, 360, 300, 360, 160);
+    } else {
+      context.fillStyle = "#2F2A20";
+      context.textAlign = "center";
+      context.font = "700 42px Arial";
+      context.fillText("Amritya Organics", width / 2, 380);
+    }
+
+    context.textAlign = "center";
+    context.font = "700 28px Arial";
+    context.fillStyle = "#D4AF37";
+    context.fillText("ORGANIC PANTRY ORDER", width / 2, 520);
+
+    context.font = "700 72px Georgia";
+    context.fillStyle = "#3C362A";
+    context.fillText("Healthy Order", width / 2, 635);
+    context.fillText("Placed", width / 2, 720);
+
+    context.font = "400 30px Arial";
+    context.fillStyle = "#7A7165";
+    context.fillText(
+      "I just placed my order from Amritya Organics.",
+      width / 2,
+      795,
+    );
+    context.fillText(
+      "Smooth checkout. Pure organic goodness.",
+      width / 2,
+      845,
+    );
+
+    context.strokeStyle = "rgba(212,175,55,0.45)";
+    context.setLineDash([18, 18]);
+    context.beginPath();
+    context.moveTo(165, 925);
+    context.lineTo(915, 925);
+    context.stroke();
+    context.setLineDash([]);
+
+    const shortOrderId = order.id.slice(0, 8).toUpperCase();
+
+    context.textAlign = "left";
+    context.fillStyle = "#8A7E70";
+    context.font = "700 24px Arial";
+    context.fillText("ORDER ID", 165, 1010);
+    context.fillText("FROM", 650, 1010);
+
+    context.fillStyle = "#3C362A";
+    context.font = "700 52px Georgia";
+    context.fillText(`#${shortOrderId}`, 165, 1075);
+
+    context.fillStyle = "#2D7A44";
+    context.font = "700 40px Georgia";
+    context.fillText("Amritya", 650, 1064);
+    context.fillText("Organics", 650, 1112);
+
+    let itemY = 1215;
+    context.fillStyle = "#3C362A";
+    context.font = "700 34px Georgia";
+    order.items.slice(0, 2).forEach((item) => {
+      context.fillText(item.name.slice(0, 28), 165, itemY);
+      context.font = "700 22px Arial";
+      context.fillStyle = "#8A7E70";
+      context.fillText(`Qty ${item.quantity} / ${item.weight}`, 165, itemY + 42);
+      context.fillStyle = "#2D7A44";
+      context.textAlign = "right";
+      context.fillText("RESERVED", 915, itemY + 20);
+      context.textAlign = "left";
+      context.fillStyle = "#3C362A";
+      context.font = "700 34px Georgia";
+      itemY += 120;
+    });
+
+    if (order.items.length > 2) {
+      context.fillStyle = "#8A7E70";
+      context.font = "700 24px Arial";
+      context.textAlign = "center";
+      context.fillText(
+        `+${order.items.length - 2} more organic staples`,
+        width / 2,
+        itemY + 10,
+      );
+    }
+
+    context.fillStyle = "#DD2A7B";
+    context.font = "700 34px Arial";
+    context.textAlign = "center";
+    context.fillText("@amritya_organics", width / 2, 1505);
+
+    context.fillStyle = "rgba(255,255,255,0.9)";
+    context.font = "700 28px Arial";
+    context.fillText("organic staples, thoughtfully sourced", width / 2, 1585);
+
+    return new Promise<File>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("Unable to export the Instagram story image."));
+          return;
+        }
+
+        resolve(
+          new File([blob], `amritya-launch-order-${shortOrderId}.png`, {
+            type: "image/png",
+          }),
+        );
+      }, "image/png");
+    });
+  };
+
+  const handleInstagramStoryShare = async (order: Order) => {
+    setSharingOrderId(order.id);
+    setShareError(null);
+    try {
+      const storyImage = await createInstagramStoryImage(order);
+      const shareData: ShareData = {
+        files: [storyImage],
+        text: "My Amritya Organics launch offer order is ready for story verification. Tagging @amritya_organics.",
+        title: "Amritya Organics Launch Order",
+      };
+
+      if (navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      setShareError(
+        "This browser cannot open the share sheet with the receipt attached. Please try from Chrome on Android or Safari on iPhone.",
+      );
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
+      console.error("Instagram story share error:", error);
+      setShareError(
+        "Could not open the share sheet for this receipt. Please try again from your phone browser.",
+      );
+    } finally {
+      setSharingOrderId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-brand-cream py-12 lg:py-24 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
@@ -669,6 +855,26 @@ export default function ProfilePage() {
                                   @amritya_organics
                                 </span>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => handleInstagramStoryShare(order)}
+                                disabled={sharingOrderId === order.id}
+                                className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
+                              >
+                                {sharingOrderId === order.id ? (
+                                  <span className="h-3.5 w-3.5 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                                ) : (
+                                  <Share2 size={13} strokeWidth={2} />
+                                )}
+                                {sharingOrderId === order.id
+                                  ? "Preparing Story"
+                                  : "Share Story Receipt"}
+                              </button>
+                              {shareError && sharingOrderId !== order.id && (
+                                <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
+                                  {shareError}
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
