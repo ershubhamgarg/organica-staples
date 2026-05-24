@@ -233,7 +233,7 @@ export default function CheckoutPage() {
       : rawLaunchOffer;
   const usableOrderSummary =
     orderSummary?.couponDiscount.code === LAUNCH_OFFER_CODE &&
-    !launchOffer.isEligible
+      !launchOffer.isEligible
       ? null
       : orderSummary;
   const launchOfferDiscount = launchOffer.isEligible
@@ -420,7 +420,7 @@ export default function CheckoutPage() {
       const storyImage = await createInstagramStoryImage(placedOrderDetails);
       const shareData: ShareData = {
         files: [storyImage],
-        text: "My Amritya Organics launch offer order is ready for story verification. Tagging @amritya_organics.",
+        text: "I just ordered some organic goodies from Amritya Organics! 🌿 Check out their website https://www.amrityaorganics.com and grab amazing launch offers. Don’t forget to tag them when you order! #AmrityaOrganics #OrganicFood #HealthyLiving #LaunchOffer",
         title: "Amritya Organics Launch Order",
       };
 
