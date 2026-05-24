@@ -410,6 +410,13 @@ export default function CheckoutPage() {
   const createInstagramStoryImage = async (
     orderDetails: PlacedOrderDetails,
   ) => {
+    const logo = new window.Image();
+    logo.src = "/logo-horizon.png";
+    await new Promise<void>((resolve) => {
+      logo.onload = () => resolve();
+      logo.onerror = () => resolve();
+    });
+
     const canvas = document.createElement("canvas");
     const width = 1080;
     const height = 1920;
@@ -440,35 +447,46 @@ export default function CheckoutPage() {
 
     context.fillStyle = "rgba(255,255,255,0.96)";
     context.beginPath();
-    context.roundRect(90, 245, 900, 1185, 48);
+    context.roundRect(90, 250, 900, 1080, 48);
     context.fill();
 
-    context.fillStyle = "#2F2A20";
-    context.textAlign = "center";
-    context.font = "700 42px Arial";
-    context.fillText("Amritya Organics", width / 2, 350);
+    if (logo.complete && logo.naturalWidth > 0) {
+      context.drawImage(logo, 360, 300, 360, 160);
+    } else {
+      context.fillStyle = "#2F2A20";
+      context.textAlign = "center";
+      context.font = "700 42px Arial";
+      context.fillText("Amritya Organics", width / 2, 380);
+    }
 
+    context.textAlign = "center";
     context.font = "700 28px Arial";
     context.fillStyle = "#D4AF37";
-    context.fillText("LAUNCH OFFER CLAIMED", width / 2, 438);
+    context.fillText("ORGANIC PANTRY ORDER", width / 2, 520);
 
     context.font = "700 72px Georgia";
     context.fillStyle = "#3C362A";
-    context.fillText("Order Received", width / 2, 540);
+    context.fillText("Healthy Order", width / 2, 635);
+    context.fillText("Placed", width / 2, 720);
 
     context.font = "400 30px Arial";
     context.fillStyle = "#7A7165";
     context.fillText(
-      "Reserved for Instagram Story verification",
+      "I just placed my order from Amritya Organics.",
       width / 2,
-      606,
+      795,
+    );
+    context.fillText(
+      "Smooth checkout. Pure organic goodness.",
+      width / 2,
+      845,
     );
 
     context.strokeStyle = "rgba(212,175,55,0.45)";
     context.setLineDash([18, 18]);
     context.beginPath();
-    context.moveTo(165, 690);
-    context.lineTo(915, 690);
+    context.moveTo(165, 925);
+    context.lineTo(915, 925);
     context.stroke();
     context.setLineDash([]);
 
@@ -477,20 +495,22 @@ export default function CheckoutPage() {
     context.textAlign = "left";
     context.fillStyle = "#8A7E70";
     context.font = "700 24px Arial";
-    context.fillText("ORDER ID", 165, 780);
-    context.fillText("TOTAL", 650, 780);
+    context.fillText("ORDER ID", 165, 1010);
+    context.fillText("FROM", 650, 1010);
 
     context.fillStyle = "#3C362A";
     context.font = "700 52px Georgia";
-    context.fillText(`#${shortOrderId}`, 165, 845);
+    context.fillText(`#${shortOrderId}`, 165, 1075);
 
     context.fillStyle = "#2D7A44";
-    context.fillText(`₹${orderDetails.total.toFixed(0)}`, 650, 845);
+    context.font = "700 40px Georgia";
+    context.fillText("Amritya", 650, 1064);
+    context.fillText("Organics", 650, 1112);
 
-    let itemY = 970;
+    let itemY = 1215;
     context.fillStyle = "#3C362A";
     context.font = "700 34px Georgia";
-    orderDetails.items.slice(0, 3).forEach((item) => {
+    orderDetails.items.slice(0, 2).forEach((item) => {
       context.fillText(item.name.slice(0, 28), 165, itemY);
       context.font = "700 22px Arial";
       context.fillStyle = "#8A7E70";
@@ -504,19 +524,25 @@ export default function CheckoutPage() {
       itemY += 120;
     });
 
+    if (orderDetails.items.length > 2) {
+      context.fillStyle = "#8A7E70";
+      context.font = "700 24px Arial";
+      context.textAlign = "center";
+      context.fillText(
+        `+${orderDetails.items.length - 2} more organic staples`,
+        width / 2,
+        itemY + 10,
+      );
+    }
+
     context.fillStyle = "#DD2A7B";
-    context.font = "700 32px Arial";
+    context.font = "700 34px Arial";
     context.textAlign = "center";
-    context.fillText("@amritya_organics", width / 2, 1325);
+    context.fillText("@amritya_organics", width / 2, 1505);
 
-    context.fillStyle = "rgba(255,255,255,0.92)";
-    context.beginPath();
-    context.roundRect(130, 1510, 820, 112, 56);
-    context.fill();
-
-    context.fillStyle = "#DD2A7B";
+    context.fillStyle = "rgba(255,255,255,0.9)";
     context.font = "700 28px Arial";
-    context.fillText("Share this to your Story and tag us", width / 2, 1580);
+    context.fillText("organic staples, thoughtfully sourced", width / 2, 1585);
 
     return new Promise<File>((resolve, reject) => {
       canvas.toBlob((blob) => {

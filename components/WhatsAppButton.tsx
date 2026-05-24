@@ -1,8 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
 
 const WHATSAPP_NUMBER = "918295433041"; // Replace with actual Amritya number
 const DEFAULT_MESSAGE = "Hey Amritya team, I would like to know more.";
@@ -10,15 +11,27 @@ const DEFAULT_MESSAGE = "Hey Amritya team, I would like to know more.";
 export default function WhatsAppButton() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const totalItems = useCartStore((state) => state.getTotalItems());
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   // On cart and checkout pages, lift the button slightly higher to avoid overlapping the new floating checkout bars
   const isCartOrCheckout = pathname === "/cart" || pathname === "/checkout";
+  const hasMobileFloatingCart = mounted && totalItems > 0 && !isCartOrCheckout;
+  const bottomOffset = isCartOrCheckout
+    ? "bottom-[108px]"
+    : hasMobileFloatingCart
+      ? "bottom-[104px]"
+      : "bottom-6";
 
   return (
     <div
-      className={`fixed right-0 z-[9999] whatsapp-mobile-only items-center transition-all duration-300 ease-out ${isCartOrCheckout ? "bottom-[108px]" : "bottom-6"
-        } ${isOpen
+      className={`fixed right-0 z-[9999] whatsapp-mobile-only items-center transition-all duration-300 ease-out ${bottomOffset} ${isOpen
           ? "translate-x-[-16px]" // float nicely off the right edge when open
           : "translate-x-[34px]" // tuck away, leaving only a peeking tab visible
         }`}
