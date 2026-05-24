@@ -420,7 +420,7 @@ export default function CartPage() {
                             )}
                             {available && lowStock && (
                               <span className="px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-brand-terracotta/20 bg-brand-terracotta/10 text-brand-terracotta">
-                                Only {item.stock_quantity} left
+                                Selling Out Soon
                               </span>
                             )}
                           </div>

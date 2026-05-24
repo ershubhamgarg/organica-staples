@@ -26,6 +26,7 @@ import {
   X,
   Camera,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
@@ -98,6 +99,73 @@ type RazorpayCheckoutOptions = {
     ondismiss?: () => void;
   };
 };
+
+const getOrderErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
+
+const getCheckoutAlertTitle = (message: string) => {
+  const normalizedMessage = message.toLowerCase();
+
+  if (
+    normalizedMessage.includes("already claimed") ||
+    normalizedMessage.includes("duplicate")
+  ) {
+    return "Launch offer already claimed";
+  }
+
+  if (normalizedMessage.includes("sign in")) {
+    return "Sign in required";
+  }
+
+  if (
+    normalizedMessage.includes("stock") ||
+    normalizedMessage.includes("available")
+  ) {
+    return "Stock changed";
+  }
+
+  return "We could not place this order";
+};
+
+type CheckoutIssueAlertProps = {
+  message: string;
+  onClose: () => void;
+};
+
+function CheckoutIssueAlert({ message, onClose }: CheckoutIssueAlertProps) {
+  return (
+    <div
+      role="alert"
+      className="animate-reveal-down overflow-hidden rounded-3xl border border-brand-terracotta/25 bg-white shadow-[0_24px_70px_-30px_rgba(60,54,42,0.45)]"
+    >
+      <div className="relative p-1">
+        <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#A65D47,#D4AF37,#7FB069)]" />
+        <div className="absolute inset-0 bg-organic-texture opacity-30" />
+        <div className="relative flex items-start gap-4 rounded-[1.35rem] bg-brand-cream/75 px-4 py-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-brand-terracotta/20 bg-white text-brand-terracotta shadow-lg shadow-brand-terracotta/10">
+            <AlertTriangle size={20} strokeWidth={1.7} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[8px] font-black uppercase tracking-[0.24em] text-brand-terracotta">
+              {getCheckoutAlertTitle(message)}
+            </p>
+            <p className="mt-2 text-sm font-light leading-relaxed text-brand-brown/75">
+              {message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-brand-gold/15 bg-white text-brand-brown/45 transition-colors hover:border-brand-terracotta/30 hover:text-brand-terracotta"
+            aria-label="Dismiss checkout alert"
+          >
+            <X size={15} strokeWidth={2} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 declare global {
   interface Window {
@@ -566,7 +634,12 @@ export default function CheckoutPage() {
       );
     } catch (error) {
       console.error("Launch offer placement error:", error);
-      setPaymentError("Failed to place launch offer order. Please try again.");
+      setPaymentError(
+        getOrderErrorMessage(
+          error,
+          "We could not place your launch offer order. Please try again.",
+        ),
+      );
     }
   };
 
@@ -582,7 +655,12 @@ export default function CheckoutPage() {
       await completeOrder(deliveryAddress, "cod", undefined);
     } catch (error) {
       console.error("COD placement error:", error);
-      setPaymentError("Failed to place COD order. Please try again.");
+      setPaymentError(
+        getOrderErrorMessage(
+          error,
+          "We could not place your COD order. Please try again.",
+        ),
+      );
     }
   };
 
@@ -736,6 +814,15 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-brand-cream py-6 px-4 sm:px-6 lg:px-12">
+      {paymentError && (
+        <div className="fixed left-4 right-4 top-4 z-50 mx-auto max-w-xl lg:left-auto lg:right-8 lg:top-8 lg:w-[420px]">
+          <CheckoutIssueAlert
+            message={paymentError}
+            onClose={() => setPaymentError(null)}
+          />
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto pb-32 lg:pb-0">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
@@ -1300,11 +1387,7 @@ export default function CheckoutPage() {
                   </>
                 )}
 
-                {paymentError && (
-                  <div className="rounded-2xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-4 text-[10px] font-bold uppercase tracking-widest text-brand-terracotta">
-                    {paymentError}
-                  </div>
-                )}                {/* Mobile Floating Checkout Bar - Redesigned to be "Wow" and Premium */}
+                {/* Mobile Floating Checkout Bar - Redesigned to be "Wow" and Premium */}
                 <div className="lg:hidden fixed bottom-6 left-4 right-4 bg-brand-cream/95 backdrop-blur-xl border border-brand-gold/25 shadow-[0_20px_50px_rgba(60,54,42,0.22)] z-40 rounded-[2.2rem] p-1 safe-bottom animate-fade-in overflow-hidden">
                   {/* Subtle Jute/Paper texture background overlay */}
                   <div className="absolute inset-0 bg-organic-texture opacity-25 pointer-events-none" />

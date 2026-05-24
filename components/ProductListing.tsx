@@ -260,9 +260,7 @@ export default function ProductListing() {
                                 : "text-brand-green/40"
                             }`}
                           >
-                            {lowStock
-                              ? `Only ${product.stock_quantity} left`
-                              : `${product.stock_quantity} units left`}
+                            {lowStock ? "Selling Out Soon" : "In Stock"}
                           </span>
                         )}
                     </div>

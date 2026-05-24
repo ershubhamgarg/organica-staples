@@ -18,10 +18,13 @@ import {
   ChevronRight,
   ArrowRight,
   ShoppingBag,
+  Share2,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getProductThumbnail } from "@/lib/data";
+import { LAUNCH_OFFER_CODE } from "@/lib/launchOffer";
 
 const getOrderAmount = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -37,6 +40,10 @@ const getOrderBreakdown = (order: Order) => {
     total: getOrderAmount(order.total_amount),
   };
 };
+
+const isLaunchOfferOrder = (order: Order) =>
+  order.payment_method === "instagram_story_verification" ||
+  order.discount_code === LAUNCH_OFFER_CODE;
 
 export default function ProfilePage() {
   const { user, signOut } = useUserStore();
@@ -379,6 +386,7 @@ export default function ProfilePage() {
                 <div className="space-y-8">
                   {orders.slice(0, visibleOrdersCount).map((order) => {
                     const breakdown = getOrderBreakdown(order);
+                    const isLaunchOffer = isLaunchOfferOrder(order);
 
                     return (
                       <div
@@ -401,7 +409,13 @@ export default function ProfilePage() {
                             )}
                           </p>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-wrap items-center gap-3">
+                          {isLaunchOffer && (
+                            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/10 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest text-brand-green">
+                              <Sparkles size={12} strokeWidth={1.8} />
+                              Launch Offer
+                            </span>
+                          )}
                           <span
                             className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${
                               order.status === "delivered"
@@ -465,6 +479,25 @@ export default function ProfilePage() {
 
                           {/* Order Summary Breakdown */}
                           <div className="bg-brand-brown/[0.02] border border-brand-gold/5 rounded-2xl p-6 space-y-3">
+                            {isLaunchOffer && (
+                              <div className="mb-4 rounded-2xl border border-brand-green/15 bg-brand-green/5 p-4">
+                                <div className="flex items-start gap-3">
+                                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
+                                    <Share2 size={15} strokeWidth={1.7} />
+                                  </div>
+                                  <div>
+                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-brand-green-fresh">
+                                      Launch Story Offer
+                                    </p>
+                                    <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
+                                      Product cost was waived for Instagram
+                                      Story verification.
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
                             <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
                               <span className="text-brand-brown/40 font-bold">
                                 Items Subtotal
@@ -592,6 +625,53 @@ export default function ProfilePage() {
                               </div>
                             </div>
                           )}
+
+                        {isLaunchOffer && (
+                          <div className="md:w-72 bg-brand-green/5 border border-brand-green/15 rounded-3xl p-6 shrink-0 shadow-sm">
+                            <div className="flex items-center gap-3 mb-6">
+                              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-green-fresh shadow-sm">
+                                <Share2 size={16} strokeWidth={1.7} />
+                              </div>
+                              <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
+                                Story Verification
+                              </p>
+                            </div>
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                  Offer Code
+                                </span>
+                                <span className="text-[10px] uppercase tracking-widest text-brand-green font-black">
+                                  {order.discount_code ?? LAUNCH_OFFER_CODE}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                  Payment
+                                </span>
+                                <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                  ₹0
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                  Method
+                                </span>
+                                <span className="text-right text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                  Instagram Story
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                  Tag
+                                </span>
+                                <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
+                                  @amritya_organics
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       </div>
                     );

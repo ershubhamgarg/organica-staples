@@ -443,9 +443,7 @@ export default function ProductPage({
                             lowStock ? "text-brand-terracotta" : "text-brand-green"
                           }`}
                         >
-                          {lowStock
-                            ? `Only ${product.stock_quantity} left`
-                            : `${product.stock_quantity} in stock`}
+                          {lowStock ? "Selling Out Soon" : "In Stock"}
                         </span>
                       </div>
                     )}
@@ -871,9 +869,7 @@ export default function ProductPage({
                                   : "text-brand-green/40"
                               }`}
                             >
-                              {lowStock
-                                ? `Only ${p.stock_quantity} left`
-                                : `${p.stock_quantity} in stock`}
+                              {lowStock ? "Selling Out Soon" : "In Stock"}
                             </span>
                           )}
                       </div>

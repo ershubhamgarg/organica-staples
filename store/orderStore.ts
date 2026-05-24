@@ -55,6 +55,14 @@ export type OrderPricingDetails = {
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Something went wrong";
 
+const getOrderApiErrorMessage = (error?: string, code?: string) => {
+  if (code === "23505") {
+    return "This email has already claimed the one-time launch offer. You can still place a regular order from your cart.";
+  }
+
+  return error || "Failed to place order.";
+};
+
 interface OrderState {
   orders: Order[];
   isLoading: boolean;
@@ -144,7 +152,7 @@ export const useOrderStore = create<OrderState>()(
           };
 
           if (!response.ok || !result.order) {
-            throw new Error(result.error || "Failed to place order.");
+            throw new Error(getOrderApiErrorMessage(result.error, result.code));
           }
 
           set({
