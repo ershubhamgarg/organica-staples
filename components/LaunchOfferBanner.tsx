@@ -17,6 +17,7 @@ import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 
 export default function LaunchOfferBanner() {
   const { user } = useUserStore();
+  const [hasRevealDelayElapsed, setHasRevealDelayElapsed] = useState(false);
   const [showOfferDetails, setShowOfferDetails] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const { hasClaimed } = useLaunchOfferClaimStatus(user);
@@ -33,6 +34,16 @@ export default function LaunchOfferBanner() {
       : "Login To Claim";
 
   useEffect(() => {
+    const revealTimer = window.setTimeout(() => {
+      setHasRevealDelayElapsed(true);
+    }, 1400);
+
+    return () => {
+      window.clearTimeout(revealTimer);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!showOfferDetails) {
       return;
     }
@@ -45,14 +56,14 @@ export default function LaunchOfferBanner() {
     };
   }, [showOfferDetails]);
 
-  if (isDismissed) {
+  if (isDismissed || !hasRevealDelayElapsed) {
     return null;
   }
 
   return (
     <>
       <div
-        className={`relative z-40 border-y text-white shadow-[0_12px_30px_rgba(17,24,39,0.22)] ${
+        className={`animate-reveal-down relative z-40 border-y text-white shadow-[0_12px_30px_rgba(17,24,39,0.22)] ${
           hasClaimed
             ? "border-brand-green/20 bg-brand-green"
             : "border-white/15 bg-[#111827]"
@@ -101,14 +112,16 @@ export default function LaunchOfferBanner() {
               {hasClaimed ? "View Status" : "Learn More"}{" "}
               <ArrowRight size={13} strokeWidth={2} />
             </button>
-            <button
-              type="button"
-              onClick={() => setIsDismissed(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-brand-brown"
-              aria-label="Hide launch offer banner"
-            >
-              <X size={16} strokeWidth={2} />
-            </button>
+            {hasClaimed && (
+              <button
+                type="button"
+                onClick={() => setIsDismissed(true)}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white hover:text-brand-brown"
+                aria-label="Hide launch offer banner"
+              >
+                <X size={16} strokeWidth={2} />
+              </button>
+            )}
           </div>
         </div>
       </div>
