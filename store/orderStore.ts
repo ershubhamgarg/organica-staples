@@ -24,6 +24,26 @@ export interface Order {
   cod_amount?: number | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  shiprocket_order_id?: string | null;
+  shiprocket_shipment_id?: string | null;
+  shiprocket_awb_code?: string | null;
+  shiprocket_courier_name?: string | null;
+  shiprocket_tracking_url?: string | null;
+  shipping_status?:
+    | "pending"
+    | "not_configured"
+    | "sync_failed"
+    | "created"
+    | "awb_assigned"
+    | "in_transit"
+    | "out_for_delivery"
+    | "delivered"
+    | "cancelled"
+    | string
+    | null;
+  shipping_error?: string | null;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
   created_at: string;
 }
 

@@ -56,6 +56,21 @@ type RazorpayOrderResponse = {
   };
 };
 
+type ShippingRateEstimate = {
+  available: boolean;
+  shippingAmount: number;
+  courierName: string | null;
+  courierCompanyId: number | null;
+  expectedDeliveryDate: string | null;
+  chargeableWeightKg: number;
+  error: string | null;
+};
+
+type ShippingRateResponse = {
+  estimate?: ShippingRateEstimate;
+  error?: string;
+};
+
 type RazorpayCheckoutResponse = {
   razorpay_payment_id: string;
   razorpay_order_id: string;
@@ -259,19 +274,16 @@ export default function CheckoutPage() {
       ? 0
       : (usableOrderSummary?.subtotalAfterDiscount ??
         fallbackCartDiscount.subtotalAfterDiscount);
-  const shipping =
+  const baseShipping =
     launchOffer.isEligible
       ? 0
-      : (usableOrderSummary?.shipping ??
-        (subtotalAfterDiscount >= 1500
-          ? 0
-          : subtotalAfterDiscount >= 1000
-            ? 49
-            : subtotalAfterDiscount >= 500
-              ? 99
-              : subtotalAfterDiscount > 0
-                ? 149
-                : 0));
+      : subtotalAfterDiscount >= 1000
+        ? 0
+        : subtotalAfterDiscount >= 500
+          ? 99
+          : subtotalAfterDiscount > 0
+            ? 149
+            : 0;
   const convenienceFee =
     launchOffer.isEligible ? 0 : (usableOrderSummary?.convenienceFee ?? 10);
 
@@ -311,6 +323,9 @@ export default function CheckoutPage() {
     : guestAddress
       ? [guestAddress]
       : [];
+  const selectedAddress =
+    checkoutAddresses.find((address) => address.id === selectedAddressId) ??
+    null;
 
   const [newAddress, setNewAddress] = useState({
     name: "",
@@ -330,12 +345,22 @@ export default function CheckoutPage() {
   const codCharge = 15;
   const currentCodFee =
     selectedPayment === "cod" && !launchOffer.isEligible ? codCharge : 0;
+  const [dynamicShipping, setDynamicShipping] =
+    useState<ShippingRateEstimate | null>(null);
+  const [shippingRateError, setShippingRateError] = useState<string | null>(
+    null,
+  );
+  const [isShippingRateLoading, setIsShippingRateLoading] = useState(false);
+  const shipping = launchOffer.isEligible
+    ? 0
+    : subtotalAfterDiscount >= 1000
+      ? 0
+      : (dynamicShipping?.shippingAmount ?? baseShipping);
 
   const finalTotal =
     launchOffer.isEligible
       ? 0
-      : (usableOrderSummary?.totalPayable ??
-        subtotalAfterDiscount + shipping + convenienceFee) + currentCodFee;
+      : subtotalAfterDiscount + shipping + convenienceFee + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -360,6 +385,88 @@ export default function CheckoutPage() {
       }, 0);
     }
   }, [user, newAddress.email]);
+
+  useEffect(() => {
+    if (launchOffer.isEligible || subtotalAfterDiscount >= 1000) {
+      setDynamicShipping(null);
+      setShippingRateError(null);
+      setIsShippingRateLoading(false);
+      return;
+    }
+
+    const deliveryPostcode = selectedAddress?.zipCode.replace(/\D/g, "") ?? "";
+
+    if (deliveryPostcode.length !== 6) {
+      setDynamicShipping(null);
+      setShippingRateError(
+        selectedAddress ? "Select a valid 6-digit delivery pincode." : null,
+      );
+      setIsShippingRateLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchShippingRate = async () => {
+      setIsShippingRateLoading(true);
+      setShippingRateError(null);
+
+      try {
+        const response = await fetch("/api/shiprocket/rates", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            deliveryPostcode,
+            items,
+            paymentMethod: selectedPayment,
+            declaredValue: subtotalAfterDiscount,
+          }),
+        });
+        const result = (await response.json()) as ShippingRateResponse;
+
+        if (!response.ok || !result.estimate) {
+          throw new Error(
+            result.error ?? "Unable to calculate live shipping right now.",
+          );
+        }
+
+        if (!result.estimate.available) {
+          setDynamicShipping(null);
+          setShippingRateError(
+            result.estimate.error ??
+            "Shiprocket does not show a serviceable courier for this pincode.",
+          );
+          return;
+        }
+
+        setDynamicShipping(result.estimate);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+
+        setDynamicShipping(null);
+        setShippingRateError(
+          error instanceof Error
+            ? error.message
+            : "Unable to calculate live shipping right now.",
+        );
+      } finally {
+        setIsShippingRateLoading(false);
+      }
+    };
+
+    void fetchShippingRate();
+
+    return () => controller.abort();
+  }, [
+    items,
+    launchOffer.isEligible,
+    selectedAddress,
+    selectedPayment,
+    subtotalAfterDiscount,
+  ]);
 
   useEffect(() => {
     if (!orderPlaced) return;
@@ -1516,12 +1623,13 @@ export default function CheckoutPage() {
                       disabled={
                         isPlacingOrder ||
                         isStartingPayment ||
+                        isShippingRateLoading ||
                         (!launchOffer.isEligible && !selectedPayment)
                       }
                       className="flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
-                        {isPlacingOrder || isStartingPayment ? (
+                        {isPlacingOrder || isStartingPayment || isShippingRateLoading ? (
                           <div className="w-3.5 h-3.5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin flex-shrink-0" />
                         ) : launchOffer.isEligible ? (
                           <Share2
@@ -1537,7 +1645,7 @@ export default function CheckoutPage() {
                           />
                         )}
                         <span className="whitespace-nowrap">
-                          {isPlacingOrder || isStartingPayment
+                          {isPlacingOrder || isStartingPayment || isShippingRateLoading
                             ? "Verifying..."
                             : launchOffer.isEligible
                               ? user
@@ -1573,6 +1681,7 @@ export default function CheckoutPage() {
                     disabled={
                       isPlacingOrder ||
                       isStartingPayment ||
+                      isShippingRateLoading ||
                       (!launchOffer.isEligible && !selectedPayment)
                     }
                     className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-4 lg:py-6 rounded-xl lg:rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
@@ -1591,7 +1700,7 @@ export default function CheckoutPage() {
                           className="text-brand-green-fresh"
                         />
                       )}
-                      {isPlacingOrder || isStartingPayment
+                      {isPlacingOrder || isStartingPayment || isShippingRateLoading
                         ? "Verifying Securely..."
                         : launchOffer.isEligible
                           ? user
@@ -1711,14 +1820,38 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 {shipping > 0 && (
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-brand-brown/60 font-light">
+                        {dynamicShipping ? "Shipping" : "Shipping"}
+                      </span>
+                      <span className="text-brand-brown font-bold tracking-tight">
+                        ₹{shipping.toFixed(2)}
+                      </span>
+                    </div>
+                    {dynamicShipping?.courierName && (
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
+                        {dynamicShipping.courierName}
+                        {dynamicShipping.expectedDeliveryDate
+                          ? ` • ETA ${dynamicShipping.expectedDeliveryDate}`
+                          : ""}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {isShippingRateLoading && !launchOffer.isEligible && (
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-brown/60 font-light">
-                      Shipping
+                      Checking live shipping
                     </span>
-                    <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{shipping.toFixed(2)}
-                    </span>
+                    <span className="h-3.5 w-3.5 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
                   </div>
+                )}
+                {shippingRateError && !launchOffer.isEligible && (
+                  <p className="rounded-2xl border border-brand-gold/10 bg-brand-cream/60 px-3 py-2 text-[9px] font-semibold leading-relaxed text-brand-brown/50">
+                    {shippingRateError} Using standard shipping estimate for
+                    now.
+                  </p>
                 )}
                 {convenienceFee > 0 && (
                   <div className="flex justify-between text-xs">

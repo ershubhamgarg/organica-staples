@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import OrderTrackingCard from "@/components/OrderTrackingCard";
 import { getProductThumbnail } from "@/lib/data";
 import { LAUNCH_OFFER_CODE } from "@/lib/launchOffer";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
@@ -615,9 +616,10 @@ export default function ProfilePage() {
                             </div>
                           </div>
 
-                          {order.payment_method === "razorpay" &&
-                            order.payment_details && (
-                              <div className="md:w-72 bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shrink-0 shadow-sm">
+                          <div className="md:w-80 shrink-0 space-y-5">
+                            {order.payment_method === "razorpay" &&
+                              order.payment_details && (
+                                <div className="bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shadow-sm">
                                 <div className="flex items-center gap-3 mb-6">
                                   <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
                                     <ShieldCheck size={16} />
@@ -662,75 +664,78 @@ export default function ProfilePage() {
                                     </span>
                                   </div>
                                 </div>
+                                </div>
+                              )}
+
+                            {isLaunchOffer && (
+                              <div className="bg-brand-green/5 border border-brand-green/15 rounded-3xl p-6 shadow-sm">
+                                <div className="flex items-center gap-3 mb-6">
+                                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-green-fresh shadow-sm">
+                                    <Share2 size={16} strokeWidth={1.7} />
+                                  </div>
+                                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
+                                    Story Verification
+                                  </p>
+                                </div>
+                                <div className="space-y-4">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Offer Code
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-widest text-brand-green font-black">
+                                      {order.discount_code ?? LAUNCH_OFFER_CODE}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Payment
+                                    </span>
+                                    <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                      ₹0.00
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Method
+                                    </span>
+                                    <span className="text-right text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                      Instagram Story
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                      Tag
+                                    </span>
+                                    <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
+                                      @amritya_organics
+                                    </span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleInstagramStoryShare(order)}
+                                    disabled={sharingOrderId === order.id}
+                                    className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
+                                  >
+                                    {sharingOrderId === order.id ? (
+                                      <span className="h-3.5 w-3.5 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                                    ) : (
+                                      <Share2 size={13} strokeWidth={2} />
+                                    )}
+                                    {sharingOrderId === order.id
+                                      ? "Preparing Story"
+                                      : "Share Story Receipt"}
+                                  </button>
+                                  {shareError && sharingOrderId !== order.id && (
+                                    <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
+                                      {shareError}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
                             )}
 
-                          {isLaunchOffer && (
-                            <div className="md:w-72 bg-brand-green/5 border border-brand-green/15 rounded-3xl p-6 shrink-0 shadow-sm">
-                              <div className="flex items-center gap-3 mb-6">
-                                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-brand-green-fresh shadow-sm">
-                                  <Share2 size={16} strokeWidth={1.7} />
-                                </div>
-                                <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
-                                  Story Verification
-                                </p>
-                              </div>
-                              <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Offer Code
-                                  </span>
-                                  <span className="text-[10px] uppercase tracking-widest text-brand-green font-black">
-                                    {order.discount_code ?? LAUNCH_OFFER_CODE}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Payment
-                                  </span>
-                                  <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                    ₹0.00
-                                  </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Method
-                                  </span>
-                                  <span className="text-right text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                    Instagram Story
-                                  </span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                    Tag
-                                  </span>
-                                  <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
-                                    @amritya_organics
-                                  </span>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleInstagramStoryShare(order)}
-                                  disabled={sharingOrderId === order.id}
-                                  className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
-                                >
-                                  {sharingOrderId === order.id ? (
-                                    <span className="h-3.5 w-3.5 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
-                                  ) : (
-                                    <Share2 size={13} strokeWidth={2} />
-                                  )}
-                                  {sharingOrderId === order.id
-                                    ? "Preparing Story"
-                                    : "Share Story Receipt"}
-                                </button>
-                                {shareError && sharingOrderId !== order.id && (
-                                  <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
-                                    {shareError}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          )}
+                            <OrderTrackingCard order={order} />
+                          </div>
                         </div>
                       </div>
                     );

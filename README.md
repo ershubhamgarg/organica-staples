@@ -34,6 +34,26 @@ RAZORPAY_KEY_SECRET=...
 RAZORPAY_CHECKOUT_CONFIG_ID=config_...
 ```
 
+Shiprocket shipment creation runs server-side after the Supabase order and
+inventory transaction succeeds:
+
+```bash
+SHIPROCKET_EMAIL=api-user@example.com
+SHIPROCKET_PASSWORD=...
+SHIPROCKET_PICKUP_LOCATION=Primary
+# Required for live checkout shipping rates. Use the home/pickup address pincode.
+SHIPROCKET_PICKUP_POSTCODE=125055
+# Optional: set if you want a specific Shiprocket channel.
+SHIPROCKET_CHANNEL_ID=123456
+# Optional: automatically assign an AWB after order creation.
+SHIPROCKET_AUTO_ASSIGN_AWB=true
+# Optional package defaults used when product weights do not fully describe the parcel.
+SHIPROCKET_DEFAULT_LENGTH_CM=20
+SHIPROCKET_DEFAULT_BREADTH_CM=15
+SHIPROCKET_DEFAULT_HEIGHT_CM=8
+SHIPROCKET_DEFAULT_WEIGHT_KG=0.5
+```
+
 ## Stack
 
 - TypeScript strict, path alias `@/*`

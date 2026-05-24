@@ -3,7 +3,9 @@ import type { Address } from "@/store/addressStore";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
+import type { Order } from "@/store/orderStore";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
+import { createShiprocketShipment } from "@/lib/shiprocket";
 
 type OrderPayload = {
   userId: string | null;
@@ -32,6 +34,12 @@ const getSupabaseAdmin = () => {
 };
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const getShippingStatusForOrder = (status: string) => {
+  if (status === "awb_assigned") return "processing";
+  if (status === "created") return "processing";
+  return "pending";
+};
 
 export async function POST(request: Request) {
   const supabaseAdmin = getSupabaseAdmin();
@@ -114,6 +122,10 @@ export async function POST(request: Request) {
     );
   }
 
+  const deliveryAddressForOrder = {
+    ...deliveryAddress,
+    email: deliveryAddress.email ?? user?.email ?? "",
+  };
   const orderUserId = user?.id ?? userId ?? null;
   const launchOfferEmail = isLaunchOfferOrder
     ? normalizeEmail(user?.email ?? "")
@@ -122,7 +134,7 @@ export async function POST(request: Request) {
   const orderData = {
     user_id: orderUserId,
     items,
-    delivery_address: deliveryAddress,
+    delivery_address: deliveryAddressForOrder,
     payment_method: paymentMethod,
     payment_details: paymentDetails ?? null,
     subtotal_amount: pricingDetails?.subtotalAmount ?? 0,
@@ -169,5 +181,35 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ order: data });
+  const order = data as Order;
+  const shipment = await createShiprocketShipment(order);
+  const shippingUpdate = {
+    shiprocket_order_id: shipment.orderId,
+    shiprocket_shipment_id: shipment.shipmentId,
+    shiprocket_awb_code: shipment.awbCode,
+    shiprocket_courier_name: shipment.courierName,
+    shiprocket_tracking_url: shipment.trackingUrl,
+    shipping_status:
+      shipment.status === "failed" ? "sync_failed" : shipment.status,
+    shipping_error: shipment.error,
+    status: getShippingStatusForOrder(shipment.status),
+  };
+  const { data: updatedOrder, error: shippingUpdateError } = await supabaseAdmin
+    .from("orders")
+    .update(shippingUpdate)
+    .eq("id", order.id)
+    .select("*")
+    .single();
+
+  if (shippingUpdateError) {
+    console.error("Shiprocket order metadata update failed:", shippingUpdateError);
+    return NextResponse.json({
+      order: {
+        ...order,
+        ...shippingUpdate,
+      },
+    });
+  }
+
+  return NextResponse.json({ order: updatedOrder });
 }

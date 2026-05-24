@@ -118,22 +118,11 @@ export default function CartPage() {
   const subtotalAfterDiscount = launchOffer.isEligible
     ? 0
     : cartDiscount.subtotalAfterDiscount;
-  const shipping =
-    launchOffer.isEligible
-      ? 0
-      : subtotalAfterDiscount >= 1500
-        ? 0
-        : subtotalAfterDiscount >= 1000
-          ? 49
-          : subtotalAfterDiscount >= 500
-            ? 99
-            : subtotalAfterDiscount > 0
-              ? 149
-              : 0;
+  const shipping = 0;
   const convenienceFee = launchOffer.isEligible ? 0 : 10;
-  const totalPayable = subtotalAfterDiscount + convenienceFee + shipping;
-  const freeShippingThreshold = 1500;
-  const shippingShortfall = Math.max(
+  const totalPayable = subtotalAfterDiscount + convenienceFee;
+  const freeShippingThreshold = 1000;
+  const freeShippingShortfall = Math.max(
     freeShippingThreshold - subtotalAfterDiscount,
     0,
   );
@@ -595,17 +584,7 @@ export default function CartPage() {
                       </span>
                     </div>
                   )}
-                  {shipping > 0 && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-brand-brown/60 font-light">
-                        Shipping
-                      </span>
-                      <span className="text-brand-brown font-bold tracking-tight">
-                        ₹{shipping.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
-                  {convenienceFee > 0 && (
+                  {/* {convenienceFee > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-brand-brown/60 font-light">
                         Convenience Fee
@@ -614,14 +593,15 @@ export default function CartPage() {
                         ₹{convenienceFee.toFixed(2)}
                       </span>
                     </div>
-                  )}
+                  )} */}
                 </div>
 
-                {shipping > 0 && (
+                {!launchOffer.isEligible && (
                   <div className="mb-8 rounded-2xl border border-brand-green/10 bg-brand-green/5 p-4 text-center">
                     <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
-                      Add ₹{shippingShortfall.toFixed(2)} more after discounts
-                      for <span className="italic">free</span> delivery
+                      {subtotalAfterDiscount >= freeShippingThreshold
+                        ? "Shipping unlocks free at checkout for this order"
+                        : `Shipping will be calculated at checkout after delivery address. Add ₹${freeShippingShortfall.toFixed(2)} more for free shipping.`}
                     </p>
                   </div>
                 )}
@@ -722,7 +702,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-baseline mb-8">
                   <span className="text-base font-serif text-brand-brown">
-                    To Pay
+                    Total
                   </span>
                   <span className="text-3xl font-medium text-brand-brown tracking-tighter">
                     ₹{totalPayable.toFixed(2)}
@@ -766,11 +746,15 @@ export default function CartPage() {
                           <span className="w-1 h-1 rounded-full bg-brand-green animate-ping" />
                           <span>Save ₹{(cartDiscount.amount + productDiscount).toFixed(2)}</span>
                         </span>
-                      ) : shipping === 0 ? (
+                      ) : subtotalAfterDiscount >= freeShippingThreshold ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
                           <span>Free Shipping</span>
                         </span>
-                      ) : null}
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
+                          <span>Shipping at checkout</span>
+                        </span>
+                      )}
                     </div>
 
                     {/* Right Column: Checkout Action Button */}
@@ -821,7 +805,7 @@ export default function CartPage() {
                       />
                     </span>
                     <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
-                      100% Encrypted & Safe
+                      Shipping calculated after address
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
                     <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
