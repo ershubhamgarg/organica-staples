@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { supabase } from "@/utils/supabase";
-import { User, AuthError } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { useCartStore } from "./cartStore";
 
 const getSiteUrl = () => {
@@ -19,13 +19,49 @@ const getSiteUrl = () => {
   return url.endsWith("/") ? url : `${url}/`;
 };
 
+const getAuthErrorMessage = (error: unknown) => {
+  if (
+    typeof navigator !== "undefined" &&
+    navigator.onLine === false
+  ) {
+    return "You appear to be offline. Please check your connection and try again.";
+  }
+
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+
+    if (message.includes("invalid login credentials")) {
+      return "The email or password you entered is incorrect.";
+    }
+
+    if (message.includes("email not confirmed")) {
+      return "Please confirm your email address before signing in.";
+    }
+
+    if (
+      message.includes("failed to fetch") ||
+      message.includes("network") ||
+      message.includes("fetch")
+    ) {
+      return "We could not reach the authentication server. Please try again.";
+    }
+
+    if (error.message.trim()) {
+      return error.message;
+    }
+  }
+
+  return "Something went wrong while signing you in. Please try again.";
+};
+
 interface UserState {
   user: User | null;
   isLoading: boolean;
   error: string | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  clearError: () => void;
+  signIn: (email: string, password: string) => Promise<boolean>;
+  signInWithGoogle: () => Promise<boolean>;
+  signUp: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   fetchUser: () => Promise<void>;
 }
@@ -36,6 +72,7 @@ export const useUserStore = create<UserState>()(
       user: null,
       isLoading: false,
       error: null,
+      clearError: () => set({ error: null }),
 
       signIn: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
@@ -54,8 +91,10 @@ export const useUserStore = create<UserState>()(
             const { useOrderStore } = await import("./orderStore");
             await useOrderStore.getState().fetchOrders(data.user.id);
           }
+          return true;
         } catch (error) {
-          set({ error: (error as AuthError).message, isLoading: false });
+          set({ error: getAuthErrorMessage(error), isLoading: false });
+          return false;
         }
       },
 
@@ -65,12 +104,18 @@ export const useUserStore = create<UserState>()(
           const { error } = await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-              redirectTo: getSiteUrl(),
+              redirectTo: `${getSiteUrl()}auth/callback?next=/`,
+              queryParams: {
+                access_type: "offline",
+                prompt: "select_account",
+              },
             },
           });
           if (error) throw error;
+          return true;
         } catch (error) {
-          set({ error: (error as AuthError).message, isLoading: false });
+          set({ error: getAuthErrorMessage(error), isLoading: false });
+          return false;
         }
       },
 
@@ -83,8 +128,10 @@ export const useUserStore = create<UserState>()(
           });
           if (error) throw error;
           set({ user: data.user, isLoading: false });
+          return Boolean(data.user);
         } catch (error) {
-          set({ error: (error as AuthError).message, isLoading: false });
+          set({ error: getAuthErrorMessage(error), isLoading: false });
+          return false;
         }
       },
 
@@ -99,7 +146,7 @@ export const useUserStore = create<UserState>()(
           const { useOrderStore } = await import("./orderStore");
           useOrderStore.getState().clearOrders();
         } catch (error) {
-          set({ error: (error as AuthError).message, isLoading: false });
+          set({ error: getAuthErrorMessage(error), isLoading: false });
         }
       },
 
@@ -120,7 +167,7 @@ export const useUserStore = create<UserState>()(
             await useOrderStore.getState().fetchOrders(user.id);
           }
         } catch (error) {
-          set({ error: (error as AuthError).message, isLoading: false });
+          set({ error: getAuthErrorMessage(error), isLoading: false });
         }
       },
     }),

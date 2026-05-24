@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,23 +11,107 @@ export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signIn, signInWithGoogle, signUp, isLoading, error } = useUserStore();
+  const [touchedFields, setTouchedFields] = useState({
+    email: false,
+    password: false,
+  });
+  const [formError, setFormError] = useState<string | null>(null);
+  const { signIn, signInWithGoogle, signUp, isLoading, error, clearError } =
+    useUserStore();
   const router = useRouter();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authError = params.get("authError");
+
+    if (authError) {
+      window.requestAnimationFrame(() => {
+        setFormError(authError);
+        window.history.replaceState(null, "", window.location.pathname);
+      });
+    }
+  }, []);
+
+  const validateForm = () => {
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail && !password) {
+      return "Please enter your email address and password.";
+    }
+
+    if (!trimmedEmail) {
+      return "Please enter your email address.";
+    }
+
+    if (!password) {
+      return "Please enter your password.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return "Please enter a valid email address.";
+    }
+
+    if (isSignUp && password.length < 6) {
+      return "Please use a password with at least 6 characters.";
+    }
+
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      return "You appear to be offline. Please check your connection and try again.";
+    }
+
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSignUp) {
-      await signUp(email, password);
-    } else {
-      await signIn(email, password);
+
+    clearError();
+    setFormError(null);
+    setTouchedFields({ email: true, password: true });
+
+    const validationError = validateForm();
+
+    if (validationError) {
+      setFormError(validationError);
+      return;
     }
-    router.push("/");
+
+    const didAuthenticate = isSignUp
+      ? await signUp(email.trim(), password)
+      : await signIn(email.trim(), password);
+
+    if (didAuthenticate) {
+      router.push("/");
+    }
   };
 
   const handleGoogleSignIn = async () => {
+    clearError();
+    setFormError(null);
+
+    if (typeof navigator !== "undefined" && navigator.onLine === false) {
+      setFormError(
+        "You appear to be offline. Please check your connection and try again.",
+      );
+      return;
+    }
+
     await signInWithGoogle();
-    router.push("/");
   };
+
+  const displayError = formError ?? error;
+  const trimmedEmail = email.trim();
+  const emailError = !trimmedEmail
+    ? "Email address is required."
+    : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)
+      ? "Enter a valid email address."
+      : null;
+  const passwordError = !password
+    ? "Password is required."
+    : isSignUp && password.length < 6
+      ? "Use at least 6 characters."
+      : null;
+  const canSubmit = !emailError && !passwordError && !isLoading;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-brand-cream px-4 py-12">
@@ -88,12 +172,31 @@ export default function LoginPage() {
               <input
                 id="email"
                 type="email"
-                required
+                autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setFormError(null);
+                  clearError();
+                }}
+                onBlur={() =>
+                  setTouchedFields((fields) => ({ ...fields, email: true }))
+                }
+                aria-invalid={Boolean(touchedFields.email && emailError)}
+                aria-describedby={
+                  touchedFields.email && emailError ? "email-error" : undefined
+                }
                 className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
                 placeholder="you@example.com"
               />
+              {touchedFields.email && emailError && (
+                <p
+                  id="email-error"
+                  className="mt-1 text-xs font-medium text-brand-terracotta"
+                >
+                  {emailError}
+                </p>
+              )}
             </div>
 
             <div>
@@ -103,23 +206,47 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                required
+                autoComplete={isSignUp ? "new-password" : "current-password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setFormError(null);
+                  clearError();
+                }}
+                onBlur={() =>
+                  setTouchedFields((fields) => ({ ...fields, password: true }))
+                }
+                aria-invalid={Boolean(touchedFields.password && passwordError)}
+                aria-describedby={
+                  touchedFields.password && passwordError
+                    ? "password-error"
+                    : undefined
+                }
                 className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
                 placeholder="Minimum 6 characters"
               />
+              {touchedFields.password && passwordError && (
+                <p
+                  id="password-error"
+                  className="mt-1 text-xs font-medium text-brand-terracotta"
+                >
+                  {passwordError}
+                </p>
+              )}
             </div>
 
-            {error && (
-              <div className="rounded-md border border-brand-terracotta/15 bg-brand-terracotta/5 p-3 text-center text-xs font-medium text-brand-terracotta">
-                {error}
+            {displayError && (
+              <div
+                role="alert"
+                className="rounded-md border border-brand-terracotta/15 bg-brand-terracotta/5 p-3 text-center text-xs font-medium text-brand-terracotta"
+              >
+                {displayError}
               </div>
             )}
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={!canSubmit}
               className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-sm font-bold uppercase text-brand-cream transition-all hover:bg-brand-brown-light disabled:opacity-50 hover:shadow-md"
             >
               {isLoading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
@@ -131,7 +258,12 @@ export default function LoginPage() {
             {isSignUp ? "Already have an account?" : "New to Amritya?"}
             <button
               type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setFormError(null);
+                clearError();
+                setTouchedFields({ email: false, password: false });
+              }}
               className="ml-2 font-medium text-brand-gold hover:text-brand-brown"
             >
               {isSignUp ? "Sign In" : "Create Account"}

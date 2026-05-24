@@ -26,7 +26,10 @@ interface AddressState {
   isLoading: boolean;
   error: string | null;
   fetchAddresses: (userId: string) => Promise<void>;
-  addAddress: (userId: string, addressData: SavedAddressPayload) => Promise<void>;
+  addAddress: (
+    userId: string,
+    addressData: SavedAddressPayload,
+  ) => Promise<Address | null>;
   removeAddress: (addressId: string) => Promise<void>;
   clearAddresses: () => void;
 }
@@ -94,7 +97,7 @@ export const useAddressStore = create<AddressState>()(
               console.warn("Addresses table missing. Saving to local state only.");
               const localAddr = { id: tempId, ...newAddress };
               set({ addresses: [localAddr, ...get().addresses], isLoading: false });
-              return;
+              return localAddr;
             }
             throw error;
           }
@@ -103,8 +106,10 @@ export const useAddressStore = create<AddressState>()(
             addresses: [data, ...get().addresses],
             isLoading: false,
           });
+          return data;
         } catch (error) {
           set({ error: getErrorMessage(error), isLoading: false });
+          return null;
         }
       },
 

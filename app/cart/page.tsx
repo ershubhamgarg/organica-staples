@@ -361,11 +361,10 @@ export default function CartPage() {
                     : "How to unlock"}
               </p>
               <p
-                className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${
-                  launchOffer.isEligible || launchOfferClaim.hasClaimed
-                    ? "text-brand-green-fresh"
-                    : "text-brand-brown/50"
-                }`}
+                className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${launchOffer.isEligible || launchOfferClaim.hasClaimed
+                  ? "text-brand-green-fresh"
+                  : "text-brand-brown/50"
+                  }`}
               >
                 {launchOffer.message}
               </p>
@@ -450,8 +449,8 @@ export default function CartPage() {
                             {available && itemHasDiscount && (
                               <span
                                 className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 text-white ${itemHasHighDiscount
-                                    ? "bg-brand-terracotta shadow-lg"
-                                    : "bg-brand-green"
+                                  ? "bg-brand-terracotta shadow-lg"
+                                  : "bg-brand-green"
                                   }`}
                               >
                                 {itemHasHighDiscount
@@ -712,8 +711,8 @@ export default function CartPage() {
                   {(discountError || discountMessage) && (
                     <p
                       className={`mt-3 text-[9px] font-bold uppercase tracking-widest ${discountError
-                          ? "text-brand-terracotta"
-                          : "text-brand-green-fresh"
+                        ? "text-brand-terracotta"
+                        : "text-brand-green-fresh"
                         }`}
                     >
                       {discountError || discountMessage}
@@ -778,8 +777,8 @@ export default function CartPage() {
                     <Link
                       href={hasUnavailableItems ? "#" : "/checkout"}
                       className={`flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 ${hasUnavailableItems
-                          ? "opacity-40 cursor-not-allowed grayscale"
-                          : ""
+                        ? "opacity-40 cursor-not-allowed grayscale"
+                        : ""
                         }`}
                     >
                       <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
@@ -806,8 +805,8 @@ export default function CartPage() {
                   <Link
                     href={hasUnavailableItems ? "#" : "/checkout"}
                     className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] ${hasUnavailableItems
-                        ? "opacity-40 cursor-not-allowed grayscale"
-                        : ""
+                      ? "opacity-40 cursor-not-allowed grayscale"
+                      : ""
                       }`}
                   >
                     <span className="relative z-10 flex items-center gap-3">
@@ -886,8 +885,8 @@ export default function CartPage() {
                     <div
                       key={coupon.code}
                       className={`rounded-2xl border transition-all p-5 ${canApply
-                          ? "border-brand-gold/10 bg-brand-cream/40"
-                          : "border-brand-brown/5 bg-brand-brown/[0.02] grayscale opacity-75"
+                        ? "border-brand-gold/10 bg-brand-cream/40"
+                        : "border-brand-brown/5 bg-brand-brown/[0.02] grayscale opacity-75"
                         }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -908,8 +907,8 @@ export default function CartPage() {
                           <div className="mt-2 space-y-1">
                             <p
                               className={`text-[9px] font-bold uppercase tracking-widest ${shortfall > 0
-                                  ? "text-brand-terracotta"
-                                  : "text-brand-brown/40"
+                                ? "text-brand-terracotta"
+                                : "text-brand-brown/40"
                                 }`}
                             >
                               {coupon.minOrderValue
@@ -929,8 +928,8 @@ export default function CartPage() {
                           onClick={() => handleApplyDiscount(coupon.code)}
                           disabled={!canApply}
                           className={`rounded-full px-5 py-3 text-[9px] font-black uppercase tracking-widest transition-all ${canApply
-                              ? "bg-brand-brown text-brand-cream hover:bg-brand-brown-light"
-                              : "bg-brand-brown/10 text-brand-brown/20 cursor-not-allowed"
+                            ? "bg-brand-brown text-brand-cream hover:bg-brand-brown-light"
+                            : "bg-brand-brown/10 text-brand-brown/20 cursor-not-allowed"
                             }`}
                         >
                           {canApply ? "Apply" : "Locked"}

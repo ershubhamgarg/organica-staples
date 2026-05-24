@@ -340,6 +340,7 @@ export default function CheckoutPage() {
     useState<PlacedOrderDetails | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isStartingPayment, setIsStartingPayment] = useState(false);
+  const [isSharingToInstagram, setIsSharingToInstagram] = useState(false);
   const [showInstagramInstructions, setShowInstagramInstructions] =
     useState(true);
 
@@ -405,6 +406,169 @@ export default function CheckoutPage() {
     launchOffer.isEligible,
     user?.id,
   ]);
+
+  const createInstagramStoryImage = async (
+    orderDetails: PlacedOrderDetails,
+  ) => {
+    const canvas = document.createElement("canvas");
+    const width = 1080;
+    const height = 1920;
+    const scale = window.devicePixelRatio || 1;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Unable to create the Instagram story image.");
+    }
+
+    context.scale(scale, scale);
+
+    const gradient = context.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#F58529");
+    gradient.addColorStop(0.32, "#DD2A7B");
+    gradient.addColorStop(0.68, "#8134AF");
+    gradient.addColorStop(1, "#515BD4");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, width, height);
+
+    const glow = context.createRadialGradient(220, 240, 20, 220, 240, 520);
+    glow.addColorStop(0, "rgba(255,255,255,0.52)");
+    glow.addColorStop(1, "rgba(255,255,255,0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+
+    context.fillStyle = "rgba(255,255,255,0.96)";
+    context.beginPath();
+    context.roundRect(90, 245, 900, 1185, 48);
+    context.fill();
+
+    context.fillStyle = "#2F2A20";
+    context.textAlign = "center";
+    context.font = "700 42px Arial";
+    context.fillText("Amritya Organics", width / 2, 350);
+
+    context.font = "700 28px Arial";
+    context.fillStyle = "#D4AF37";
+    context.fillText("LAUNCH OFFER CLAIMED", width / 2, 438);
+
+    context.font = "700 72px Georgia";
+    context.fillStyle = "#3C362A";
+    context.fillText("Order Received", width / 2, 540);
+
+    context.font = "400 30px Arial";
+    context.fillStyle = "#7A7165";
+    context.fillText(
+      "Reserved for Instagram Story verification",
+      width / 2,
+      606,
+    );
+
+    context.strokeStyle = "rgba(212,175,55,0.45)";
+    context.setLineDash([18, 18]);
+    context.beginPath();
+    context.moveTo(165, 690);
+    context.lineTo(915, 690);
+    context.stroke();
+    context.setLineDash([]);
+
+    const shortOrderId = orderDetails.id.slice(0, 8).toUpperCase();
+
+    context.textAlign = "left";
+    context.fillStyle = "#8A7E70";
+    context.font = "700 24px Arial";
+    context.fillText("ORDER ID", 165, 780);
+    context.fillText("TOTAL", 650, 780);
+
+    context.fillStyle = "#3C362A";
+    context.font = "700 52px Georgia";
+    context.fillText(`#${shortOrderId}`, 165, 845);
+
+    context.fillStyle = "#2D7A44";
+    context.fillText(`₹${orderDetails.total.toFixed(0)}`, 650, 845);
+
+    let itemY = 970;
+    context.fillStyle = "#3C362A";
+    context.font = "700 34px Georgia";
+    orderDetails.items.slice(0, 3).forEach((item) => {
+      context.fillText(item.name.slice(0, 28), 165, itemY);
+      context.font = "700 22px Arial";
+      context.fillStyle = "#8A7E70";
+      context.fillText(`Qty ${item.quantity} / ${item.weight}`, 165, itemY + 42);
+      context.fillStyle = "#2D7A44";
+      context.textAlign = "right";
+      context.fillText("RESERVED", 915, itemY + 20);
+      context.textAlign = "left";
+      context.fillStyle = "#3C362A";
+      context.font = "700 34px Georgia";
+      itemY += 120;
+    });
+
+    context.fillStyle = "#DD2A7B";
+    context.font = "700 32px Arial";
+    context.textAlign = "center";
+    context.fillText("@amritya_organics", width / 2, 1325);
+
+    context.fillStyle = "rgba(255,255,255,0.92)";
+    context.beginPath();
+    context.roundRect(130, 1510, 820, 112, 56);
+    context.fill();
+
+    context.fillStyle = "#DD2A7B";
+    context.font = "700 28px Arial";
+    context.fillText("Share this to your Story and tag us", width / 2, 1580);
+
+    return new Promise<File>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("Unable to export the Instagram story image."));
+          return;
+        }
+
+        resolve(
+          new File([blob], `amritya-launch-order-${shortOrderId}.png`, {
+            type: "image/png",
+          }),
+        );
+      }, "image/png");
+    });
+  };
+
+  const handleInstagramStoryShare = async () => {
+    if (!placedOrderDetails) return;
+
+    setIsSharingToInstagram(true);
+    try {
+      const storyImage = await createInstagramStoryImage(placedOrderDetails);
+      const shareData: ShareData = {
+        files: [storyImage],
+        text: "My Amritya Organics launch offer order is ready for story verification. Tagging @amritya_organics.",
+        title: "Amritya Organics Launch Order",
+      };
+
+      if (navigator.canShare?.(shareData)) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      const downloadUrl = URL.createObjectURL(storyImage);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = downloadUrl;
+      downloadLink.download = storyImage.name;
+      downloadLink.click();
+      URL.revokeObjectURL(downloadUrl);
+
+      window.location.href = "instagram://story-camera";
+      window.setTimeout(() => {
+        window.open("https://www.instagram.com/amritya_organics/", "_blank");
+      }, 800);
+    } catch (error) {
+      console.error("Instagram story share error:", error);
+      window.open("https://www.instagram.com/amritya_organics/", "_blank");
+    } finally {
+      setIsSharingToInstagram(false);
+    }
+  };
 
   if (!mounted) {
     return (
@@ -551,12 +715,34 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <Link
-            href="/"
-            className="animate-reveal-up inline-flex min-h-[46px] w-full items-center justify-center rounded-full bg-brand-brown px-8 text-[9px] font-black uppercase tracking-[0.22em] text-brand-cream shadow-xl shadow-brand-brown/15 transition-all hover:translate-y-[-2px] hover:bg-brand-brown-light"
-          >
-            Continue Shopping
-          </Link>
+          {isLaunchOfferConfirmation ? (
+            <button
+              type="button"
+              onClick={handleInstagramStoryShare}
+              disabled={isSharingToInstagram}
+              className="animate-reveal-up relative inline-flex min-h-[52px] w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-[#DD2A7B] px-8 text-[9px] font-black uppercase tracking-[0.22em] text-white shadow-xl shadow-[#DD2A7B]/25 transition-all hover:translate-y-[-2px] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,#F58529,#DD2A7B,#8134AF,#515BD4)]" />
+              <span className="absolute inset-0 bg-white/0 transition-colors hover:bg-white/10" />
+              <span className="relative z-10 flex items-center gap-3">
+                {isSharingToInstagram ? (
+                  <span className="h-4 w-4 rounded-full border-2 border-white/70 border-t-transparent animate-spin" />
+                ) : (
+                  <Camera size={16} strokeWidth={2} />
+                )}
+                {isSharingToInstagram
+                  ? "Preparing Story"
+                  : "Take Me To Instagram"}
+              </span>
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="animate-reveal-up inline-flex min-h-[46px] w-full items-center justify-center rounded-full bg-brand-brown px-8 text-[9px] font-black uppercase tracking-[0.22em] text-brand-cream shadow-xl shadow-brand-brown/15 transition-all hover:translate-y-[-2px] hover:bg-brand-brown-light"
+            >
+              Continue Shopping
+            </Link>
+          )}
         </div>
       </div>
     );
@@ -1192,7 +1378,13 @@ export default function CheckoutPage() {
                               return;
                             }
                             if (user) {
-                              await addAddress(user.id, newAddress);
+                              const addedAddress = await addAddress(
+                                user.id,
+                                newAddress,
+                              );
+                              if (addedAddress?.id) {
+                                setSelectedAddressId(addedAddress.id);
+                              }
                               setShowNewAddressForm(false);
                             } else {
                               const tempAddr: Address = {
@@ -1342,23 +1534,6 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleLaunchOfferOrder}
-                      disabled={isPlacingOrder || isStartingPayment}
-                      className="mt-5 flex min-h-[52px] w-full items-center justify-center gap-3 rounded-full bg-brand-brown px-6 text-[10px] font-black uppercase tracking-[0.22em] text-brand-cream shadow-xl shadow-brand-brown/15 transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {isPlacingOrder || isStartingPayment ? (
-                        <div className="h-4 w-4 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
-                      ) : (
-                        <Share2 size={15} className="text-brand-gold" />
-                      )}
-                      {isPlacingOrder || isStartingPayment
-                        ? "Placing Order..."
-                        : user
-                          ? "Place ₹0 Launch Order"
-                          : "Sign In To Claim"}
-                    </button>
                   </div>
                 ) : (
                   <>
