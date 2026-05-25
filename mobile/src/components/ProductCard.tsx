@@ -74,6 +74,11 @@ export function ProductCard({
         <AppText variant="heading" style={styles.name}>
           {product.name}
         </AppText>
+        {product.name2 && (
+          <AppText variant="small" style={styles.name2}>
+            {product.name2}
+          </AppText>
+        )}
         <AppText variant="small" style={styles.description} numberOfLines={2}>
           {product.description}
         </AppText>
@@ -127,6 +132,7 @@ const styles = StyleSheet.create({
   },
   rating: { flexDirection: "row", alignItems: "center", gap: 3 },
   name: { fontSize: 20, lineHeight: 24 },
+  name2: { opacity: 0.5, marginTop: -8 },
   description: { minHeight: 36 },
   priceRow: { flexDirection: "row", gap: 5, alignItems: "baseline" },
   tapeWrapper: { flexDirection: "row", alignItems: "baseline", gap: 2 },

@@ -203,10 +203,17 @@ export default function ProductListing() {
               </Link>
 
               <div className="flex flex-col flex-grow text-center px-1 sm:px-4">
-                <Link href={`/product/${product.id}`} className="mb-1 sm:mb-2">
-                  <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center">
-                    {product.name}
-                  </h3>
+                <Link href={`/product/${product.id}`} className="mb-1 sm:mb-2 block">
+                  <div className="flex flex-col items-center justify-center min-h-[2.5em] sm:min-h-[3.5em]">
+                    <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2">
+                      {product.name}
+                    </h3>
+                    {product.name2 && (
+                      <span className="text-[10px] sm:text-[13px] text-brand-brown/40 font-medium mt-0.5 sm:mt-1">
+                        {product.name2}
+                      </span>
+                    )}
+                  </div>
                 </Link>
 
                 <div className="flex flex-col items-center gap-1 mb-4 sm:mb-6">

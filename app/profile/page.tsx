@@ -495,6 +495,11 @@ export default function ProfilePage() {
                                     <h4 className="text-sm font-serif text-brand-brown truncate group-hover/item:text-brand-terracotta transition-colors">
                                       {item.name}
                                     </h4>
+                                    {item.name2 && (
+                                      <p className="text-[10px] text-brand-brown/40 font-medium truncate">
+                                        {item.name2}
+                                      </p>
+                                    )}
                                     <div className="flex items-center gap-3 mt-1">
                                       <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
                                         {item.weight}

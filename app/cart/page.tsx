@@ -431,6 +431,11 @@ export default function CartPage() {
                           <h3 className="text-base md:text-xl font-serif text-brand-brown tracking-tight mb-1 truncate md:whitespace-normal group-hover/link:text-brand-terracotta transition-colors">
                             {item.name}
                           </h3>
+                          {item.name2 && (
+                            <p className="text-[10px] md:text-xs text-brand-brown/40 font-medium mb-1 truncate">
+                              {item.name2}
+                            </p>
+                          )}
                           <div className="flex flex-wrap items-center gap-2 mt-0.5">
                             <p className="text-[9px] text-brand-brown/40 font-bold uppercase tracking-widest">
                               {item.weight}

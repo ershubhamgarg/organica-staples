@@ -23,6 +23,7 @@ import {
 import { useEffect, useState, use, useMemo } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import QuickAddButton from "@/components/QuickAddButton";
+import ScrollReveal from "@/components/ScrollReveal";
 import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import { supabase } from "@/utils/supabase";
 import {
@@ -263,10 +264,7 @@ export default function ProductPage({
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb - Mobile (above image) */}
           <nav className="flex lg:hidden items-center gap-2 mb-4 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-brown/40 flex-wrap">
-            <Link
-              href="/"
-              className="hover:text-brand-brown transition-colors"
-            >
+            <Link href="/" className="hover:text-brand-brown transition-colors">
               Home
             </Link>
             <span className="text-brand-brown/20">/</span>
@@ -279,7 +277,9 @@ export default function ProductPage({
             <span className="text-brand-brown/20">/</span>
             <span className="text-brand-brown/50">{product.category}</span>
             <span className="text-brand-brown/20">/</span>
-            <span className="text-brand-gold/80 truncate max-w-[120px]">{product.name}</span>
+            <span className="text-brand-gold/80 truncate max-w-[120px]">
+              {product.name}
+            </span>
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
@@ -375,7 +375,9 @@ export default function ProductPage({
                   </div>
                   <button
                     onClick={() => {
-                      document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" });
+                      document
+                        .getElementById("reviews")
+                        ?.scrollIntoView({ behavior: "smooth" });
                     }}
                     className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/30 pb-0.5 text-left active:scale-95"
                   >
@@ -383,15 +385,21 @@ export default function ProductPage({
                   </button>
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-serif text-brand-brown mb-2 tracking-tight leading-[0.95]">
+                <h1 className="text-4xl lg:text-5xl font-serif text-brand-brown mb-1 tracking-tight leading-[0.95]">
                   {product.name}
                 </h1>
 
-                <p className="text-[12px] text-brand-gold uppercase tracking-[0.3em] font-black mb-6">
+                {product.name2 && (
+                  <p className="text-lg lg:text-xl font-medium text-brand-brown/40 mb-2 tracking-wide">
+                    {product.name2}
+                  </p>
+                )}
+
+                <p className="text-[12px] text-brand-gold uppercase tracking-[0.3em] font-black mb-3">
                   {product.weight}
                 </p>
 
-                <div className="flex items-center gap-6 mb-6">
+                <div className="flex items-center gap-6 mb-4">
                   {available && hasDiscount ? (
                     <div className="flex flex-col">
                       <div className="flex items-baseline gap-6">
@@ -409,7 +417,7 @@ export default function ProductPage({
                           ₹{product.price.toFixed(2)}
                         </span>
                       </div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-2">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-1">
                         You Save ₹{(product.price - discountedPrice).toFixed(2)}{" "}
                         ({discountPercent}% Off)
                       </p>
@@ -425,9 +433,7 @@ export default function ProductPage({
                         </span>
                       )}
                     </div>
-                  ) : (
-                    <div className="h-8" /> // Placeholder if out of stock
-                  )}
+                  ) : null}
 
                   {available &&
                     product.stock_quantity !== undefined &&
@@ -440,7 +446,9 @@ export default function ProductPage({
                         />
                         <span
                           className={`text-[10px] uppercase tracking-widest font-black ${
-                            lowStock ? "text-brand-terracotta" : "text-brand-green"
+                            lowStock
+                              ? "text-brand-terracotta"
+                              : "text-brand-green"
                           }`}
                         >
                           {lowStock ? "Selling Out Soon" : "In Stock"}
@@ -452,6 +460,25 @@ export default function ProductPage({
                 <p className="text-base text-brand-brown/60 font-light leading-relaxed max-w-xl text-balance">
                   {product.description}
                 </p>
+
+                {/* Compact Benefits List */}
+                {product.benefits && product.benefits.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
+                    {product.benefits.map((benefit, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-2 group"
+                      >
+                        <div className="w-5 h-5 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green group-hover:bg-brand-green group-hover:text-white transition-colors duration-300">
+                          <Check size={10} strokeWidth={4} />
+                        </div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-brand-brown/70 group-hover:text-brand-brown transition-colors">
+                          {benefit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Cart Actions */}
@@ -549,31 +576,34 @@ export default function ProductPage({
       </section>
 
       {/* Customer Reviews */}
-      <section id="reviews" className="bg-brand-cream border-y border-brand-gold/10 py-10 md:py-16 scroll-mt-24">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8 md:mb-12">
+      <section
+        id="reviews"
+        className="bg-brand-cream border-y border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
+      >
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-8">
             <div>
-              <div className="inline-flex items-center gap-3 mb-3">
-                <span className="h-[1px] w-8 bg-brand-terracotta" />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-terracotta">
+              <div className="inline-flex items-center gap-2 mb-2">
+                <span className="h-[1px] w-6 bg-brand-terracotta" />
+                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-terracotta">
                   Reviews
                 </span>
               </div>
-              <h2 className="text-3xl lg:text-4xl font-serif text-brand-brown tracking-tight">
+              <h2 className="text-2xl lg:text-3xl font-serif text-brand-brown tracking-tight">
                 Customer <span className="italic">Feedback</span>
               </h2>
             </div>
 
-            <div className="flex items-center gap-4 text-brand-brown">
-              <span className="text-4xl font-serif">
+            <div className="flex items-center gap-3 text-brand-brown bg-white/50 px-4 py-2 rounded-2xl border border-brand-gold/10">
+              <span className="text-3xl font-serif">
                 {averageRating.toFixed(1)}
               </span>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col">
                 <div className="flex text-brand-gold">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      size={12}
+                      size={10}
                       className={
                         i < Math.round(averageRating)
                           ? "fill-brand-gold text-brand-gold"
@@ -582,19 +612,19 @@ export default function ProductPage({
                     />
                   ))}
                 </div>
-                <span className="text-[9px] uppercase tracking-widest font-bold opacity-40">
+                <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
                   {reviewCount} Reviews
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-10 lg:gap-20">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12">
             {/* Review List */}
-            <div className="space-y-6 md:space-y-10">
+            <div className="space-y-4 md:space-y-6">
               {reviews.length === 0 ? (
-                <div className="p-12 text-center border-2 border-dashed border-brand-gold/10 rounded-3xl">
-                  <p className="text-brand-brown/40 font-light italic">
+                <div className="p-10 text-center border border-dashed border-brand-gold/15 rounded-3xl bg-white/30">
+                  <p className="text-brand-brown/40 text-sm font-light italic">
                     Be the first to share your experience.
                   </p>
                 </div>
@@ -603,80 +633,80 @@ export default function ProductPage({
                   {paginatedReviews.map((review) => {
                     const isOwnReview = user && review.user_id === user.id;
                     return (
-                    <div
-                      key={review.id}
-                      className={`group pb-6 md:pb-10 border-b border-brand-gold/10 last:border-0 ${
-                        isOwnReview
-                          ? "bg-brand-green/[0.03] -mx-4 px-4 rounded-2xl border-brand-green/10"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-3 md:mb-4">
-                        <div className="flex items-center gap-3 md:gap-4">
-                          <div
-                            className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center font-serif text-base md:text-lg ${
-                              isOwnReview
-                                ? "bg-brand-green/10 text-brand-green ring-2 ring-brand-green/30"
-                                : "bg-brand-sand text-brand-brown"
-                            }`}
-                          >
-                            {review.user_name?.[0].toUpperCase() || "A"}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
-                                {review.user_name || "Anonymous"}
-                              </h5>
-                              {isOwnReview && (
-                                <span className="text-[7px] uppercase tracking-widest font-black text-brand-green bg-brand-green/10 px-2 py-0.5 rounded-full border border-brand-green/20">
-                                  You
-                                </span>
-                              )}
+                      <div
+                        key={review.id}
+                        className={`group pb-4 md:pb-6 border-b border-brand-gold/10 last:border-0 ${
+                          isOwnReview
+                            ? "bg-brand-green/[0.03] -mx-4 px-4 py-4 rounded-2xl border-brand-green/10"
+                            : ""
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2 md:mb-3">
+                          <div className="flex items-center gap-3 md:gap-4">
+                            <div
+                              className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-serif text-sm md:text-base ${
+                                isOwnReview
+                                  ? "bg-brand-green/10 text-brand-green ring-1 ring-brand-green/30"
+                                  : "bg-brand-sand text-brand-brown"
+                              }`}
+                            >
+                              {review.user_name?.[0].toUpperCase() || "A"}
                             </div>
-                            <p className="text-[9px] text-brand-brown/30 font-bold mt-1 uppercase tracking-tighter">
-                              {new Date(review.created_at).toLocaleDateString(
-                                "en-IN",
-                                { month: "short", year: "numeric" },
-                              )}
-                            </p>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
+                                  {review.user_name || "Anonymous"}
+                                </h5>
+                                {isOwnReview && (
+                                  <span className="text-[6px] uppercase tracking-widest font-black text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded-full border border-brand-green/20">
+                                    You
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[8px] text-brand-brown/30 font-bold mt-0.5 uppercase tracking-tighter">
+                                {new Date(review.created_at).toLocaleDateString(
+                                  "en-IN",
+                                  { month: "short", year: "numeric" },
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex text-brand-gold">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={9}
+                                className={
+                                  i < (review.rating || 0)
+                                    ? "fill-brand-gold text-brand-gold"
+                                    : "text-brand-gold/10"
+                                }
+                              />
+                            ))}
                           </div>
                         </div>
-                        <div className="flex text-brand-gold">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={10}
-                              className={
-                                i < (review.rating || 0)
-                                  ? "fill-brand-gold text-brand-gold"
-                                  : "text-brand-gold/10"
-                              }
-                            />
-                          ))}
-                        </div>
+                        {review.comment && review.comment.trim() && (
+                          <p className="text-brand-brown/70 font-light leading-relaxed pl-0 mt-1 md:pl-12 text-xs md:text-[13px]">
+                            &quot;{review.comment}&quot;
+                          </p>
+                        )}
                       </div>
-                      {review.comment && review.comment.trim() && (
-                        <p className="text-brand-brown/70 font-light leading-relaxed text-balance pl-0 mt-2 md:pl-14 text-xs md:text-sm">
-                          &quot;{review.comment}&quot;
-                        </p>
-                      )}
-                    </div>
                     );
                   })}
 
                   {totalPages > 1 && (
-                    <div className="flex items-center gap-4 pl-0 md:pl-14 pt-6 md:pt-8">
+                    <div className="flex items-center gap-3 pl-0 md:pl-12 pt-4 md:pt-6">
                       <button
                         onClick={() =>
                           setCurrentPage(Math.max(1, currentPage - 1))
                         }
                         disabled={currentPage === 1}
-                        className="w-10 h-10 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
                       >
-                        <ChevronLeft size={16} />
+                        <ChevronLeft size={14} />
                       </button>
-                      <span className="text-[10px] uppercase tracking-widest font-black text-brand-brown/40">
-                        {currentPage} <span className="mx-2">of</span>{" "}
+                      <span className="text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
+                        {currentPage} <span className="mx-2">/</span>{" "}
                         {totalPages}
                       </span>
                       <button
@@ -684,9 +714,9 @@ export default function ProductPage({
                           setCurrentPage(Math.min(totalPages, currentPage + 1))
                         }
                         disabled={currentPage === totalPages}
-                        className="w-10 h-10 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
                       >
-                        <ChevronRight size={16} />
+                        <ChevronRight size={14} />
                       </button>
                     </div>
                   )}
@@ -695,21 +725,21 @@ export default function ProductPage({
             </div>
 
             {/* Review Form */}
-            <div className="sticky top-32 h-max">
+            <div className="lg:sticky lg:top-32 h-max">
               <form
                 onSubmit={handleSubmitReview}
-                className="bg-white p-6 md:p-10 rounded-3xl shadow-2xl shadow-brand-brown/5 border border-brand-gold/5"
+                className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5"
               >
-                <h3 className="text-2xl font-serif text-brand-brown mb-2">
+                <h3 className="text-xl font-serif text-brand-brown mb-1">
                   Write a Review
                 </h3>
-                <p className="text-xs text-brand-brown/40 font-light mb-6 md:mb-8">
+                <p className="text-[10px] text-brand-brown/40 font-light mb-6">
                   Share your experience with this product.
                 </p>
 
                 {submitMessage && (
                   <div
-                    className={`mb-6 md:mb-8 p-4 text-[10px] uppercase tracking-widest font-black rounded-xl ${
+                    className={`mb-6 p-3 text-[9px] uppercase tracking-widest font-black rounded-xl ${
                       submitMessage.type === "success"
                         ? "bg-brand-green/10 text-brand-green"
                         : "bg-brand-terracotta/10 text-brand-terracotta"
@@ -719,21 +749,21 @@ export default function ProductPage({
                   </div>
                 )}
 
-                <div className="space-y-5 md:space-y-8">
+                <div className="space-y-4 md:space-y-6">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-4">
+                    <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-3">
                       Rating
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
                           type="button"
                           onClick={() => setNewRating(star)}
-                          className="transition-transform hover:scale-125"
+                          className="transition-transform hover:scale-110"
                         >
                           <Star
-                            size={24}
+                            size={20}
                             className={
                               star <= (newRating || 0)
                                 ? "fill-brand-gold text-brand-gold"
@@ -747,7 +777,7 @@ export default function ProductPage({
 
                   {!user && (
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
+                      <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
                         Name
                       </label>
                       <input
@@ -755,28 +785,28 @@ export default function ProductPage({
                         value={newUserName}
                         onChange={(e) => setNewUserName(e.target.value)}
                         placeholder="Your name"
-                        className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/20 font-light"
+                        className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/20 font-light"
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest font-black text-brand-brown/60 mb-2">
+                    <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
                       Message
                     </label>
                     <textarea
-                      rows={4}
+                      rows={3}
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
                       placeholder="Share your thoughts..."
-                      className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/20 font-light"
+                      className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/20 font-light"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-brand-brown text-brand-cream py-5 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light disabled:opacity-50"
+                    className="w-full bg-brand-brown text-brand-cream py-4 rounded-full text-[9px] uppercase tracking-[0.25em] font-black transition-all hover:bg-brand-brown-light disabled:opacity-50"
                   >
                     {isSubmitting ? "Submitting..." : "Send Review"}
                   </button>

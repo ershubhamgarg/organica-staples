@@ -1761,6 +1761,11 @@ export default function CheckoutPage() {
                         <h4 className="text-[11px] font-serif text-brand-brown line-clamp-1 group-hover:text-brand-terracotta transition-colors">
                           {item.name}
                         </h4>
+                        {item.name2 && (
+                          <p className="text-[9px] text-brand-brown/40 font-medium truncate">
+                            {item.name2}
+                          </p>
+                        )}
                         <p className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-bold mt-1">
                           Qty: {item.quantity}
                         </p>

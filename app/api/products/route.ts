@@ -41,18 +41,53 @@ const mapProduct = (row: ProductRow): Product => {
   const inventory = getInventory(row);
   const stockQuantity = inventory?.available_quantity;
   const lowStockThreshold = inventory?.low_stock_threshold;
-  const product = { ...row };
+  const product = { ...row } as any;
   delete product.product_inventory;
+
+  if (product.name === "Cold Pressed Mustard Oil") {
+    product.name2 = "सरसों का तेल (Sarson ka Tel)";
+    product.benefits = [
+      "Rich in monounsaturated fatty acids",
+      "Traditional cold-press extraction",
+      "High smoke point for healthy cooking",
+      "Natural source of Vitamin E",
+      "Promotes heart health and digestion",
+      "Chemical-free and unrefined"
+    ];
+  } else if (product.name === "Raw Himalayan Honey") {
+    product.name2 = "हिमालयन शहद (Himalayan Shahad)";
+    product.benefits = [
+      "Ethically sourced from Himalayan hives",
+      "Natural immunity booster",
+      "Rich in antioxidants and minerals",
+      "Anti-bacterial and anti-inflammatory",
+      "Unfiltered and unprocessed purity",
+      "Perfect natural sweetener"
+    ];
+  } else if (product.name === "A2 Desi Cow Ghee") {
+    product.name2 = "शुद्ध देसी घी (Shuddh Desi Ghee)";
+    product.benefits = [
+      "Made from A2 milk of Desi cows",
+      "Hand-churned Bilona method",
+      "Improves digestion and metabolism",
+      "Rich in fat-soluble vitamins",
+      "Promotes healthy skin and hair",
+      "Lactose-free and highly nutritious"
+    ];
+  }
 
   return {
     ...product,
     stock_quantity:
-      typeof stockQuantity === "number" ? stockQuantity : product.stock_quantity,
+      typeof stockQuantity === "number"
+        ? stockQuantity
+        : product.stock_quantity,
     low_stock_threshold:
       typeof lowStockThreshold === "number"
         ? lowStockThreshold
         : product.low_stock_threshold,
-    available: typeof stockQuantity === "number" ? stockQuantity > 0 : product.available,
+    available:
+      typeof stockQuantity === "number" ? stockQuantity > 0 : product.available,
   };
 };
 

@@ -101,6 +101,11 @@ export function ProductDetailScreen({ navigation, route }: Props) {
         <Card style={styles.header}>
           <AppText variant="eyebrow">{product.category}</AppText>
           <AppText variant="title">{product.name}</AppText>
+          {product.name2 && (
+            <AppText variant="body" style={styles.name2}>
+              {product.name2}
+            </AppText>
+          )}
           <View style={styles.ratingRow}>
             {[0, 1, 2, 3, 4].map((star) => (
               <Star
@@ -268,7 +273,9 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                   {review.user_name || "Anonymous"}
                 </AppText>
                 {review.comment && review.comment.trim() && (
-                  <AppText variant="small">&quot;{review.comment}&quot;</AppText>
+                  <AppText variant="small">
+                    &quot;{review.comment}&quot;
+                  </AppText>
                 )}
               </View>
             ))}
@@ -288,6 +295,7 @@ const styles = StyleSheet.create({
   content: { padding: 18, gap: 18 },
   center: { alignItems: "center", justifyContent: "center" },
   header: { gap: 10 },
+  name2: { opacity: 0.4, marginTop: -6 },
   ratingRow: { flexDirection: "row", alignItems: "center", gap: 5 },
   panel: { gap: 14 },
   priceRow: { flexDirection: "row", alignItems: "baseline", gap: 12 },

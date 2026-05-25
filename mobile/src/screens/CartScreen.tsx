@@ -39,6 +39,11 @@ export function CartScreen({ navigation }: Props) {
                 <ProductImage product={item} size="small" />
                 <View style={styles.itemBody}>
                   <AppText style={{ fontWeight: "800" }}>{item.name}</AppText>
+                  {item.name2 && (
+                    <AppText variant="small" style={{ opacity: 0.5, marginTop: -4 }}>
+                      {item.name2}
+                    </AppText>
+                  )}
                   <AppText variant="small">{item.weight}</AppText>
                   <QuantityStepper
                     value={item.quantity}
