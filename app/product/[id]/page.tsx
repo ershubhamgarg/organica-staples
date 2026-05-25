@@ -292,30 +292,23 @@ export default function ProductPage({
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
 
-                {/* Product Badges */}
-                <div className="absolute top-6 left-6 flex flex-col gap-3">
-                  <div className="bg-brand-cream border border-brand-gold/20 px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown shadow-md">
-                    {product.category}
-                  </div>
-                  {available && hasDiscount && (
+                {/* Premium Corner Badge for Discount */}
+                {available && hasDiscount && (
+                  <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
                     <div
-                      className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-white shadow-xl ${
+                      className={`absolute top-[20px] right-[-32px] rotate-45 w-32 py-1.5 text-center text-[9px] font-black uppercase tracking-[0.25em] shadow-xl border-y border-white/20 text-white ${
                         hasHighDiscount
                           ? "bg-brand-terracotta"
                           : "bg-brand-green-fresh"
                       }`}
                     >
                       {hasHighDiscount
-                        ? "Special Edition"
+                        ? "Exclusive"
                         : `${discountPercent}% Off`}
                     </div>
-                  )}
-                  {available && lowStock && (
-                    <div className="px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-black text-white shadow-xl bg-brand-terracotta">
-                      Few Left
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
+
                 {!available && (
                   <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
                     <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">

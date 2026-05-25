@@ -168,30 +168,17 @@ export default function ProductListing() {
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
 
-                  {/* Badges */}
-                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 flex flex-col gap-1 sm:gap-2">
-                    <div className="bg-brand-cream/90 backdrop-blur-md text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 text-brand-brown rounded-full shadow-lg border border-brand-gold/10">
-                      {product.category}
+                  {/* Premium Corner Badge for Discount */}
+                  {available && hasDiscount && (
+                    <div className="absolute top-0 right-0 overflow-hidden w-16 h-16 pointer-events-none">
+                      <div className={`absolute top-[12px] right-[-24px] rotate-45 w-24 py-1 text-center text-[7px] font-black uppercase tracking-[0.2em] shadow-lg border-y border-white/20 text-white ${
+                        hasHighDiscount ? "bg-brand-terracotta" : "bg-brand-green-fresh"
+                      }`}>
+                        {hasHighDiscount ? "Special" : `${discountPercent}% Off`}
+                      </div>
                     </div>
-                    {available && hasDiscount && (
-                      <div
-                        className={`text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20 text-white ${
-                          hasHighDiscount
-                            ? "bg-brand-terracotta"
-                            : "bg-brand-green-fresh"
-                        }`}
-                      >
-                        {hasHighDiscount
-                          ? "Exclusive"
-                          : `${discountPercent}% Off`}
-                      </div>
-                    )}
-                    {available && lowStock && (
-                      <div className="bg-brand-terracotta text-white text-[8px] uppercase tracking-[0.2em] font-black px-3 py-1.5 rounded-full shadow-lg border border-white/20">
-                        Few Left
-                      </div>
-                    )}
-                  </div>
+                  )}
+
                   {!available && (
                     <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
                       <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
@@ -203,6 +190,11 @@ export default function ProductListing() {
               </Link>
 
               <div className="flex flex-col flex-grow text-center px-1 sm:px-4">
+                <div className="flex flex-col items-center mb-1">
+                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold/50">
+                    {product.category}
+                  </span>
+                </div>
                 <Link href={`/product/${product.id}`} className="mb-1 sm:mb-2 block">
                   <div className="flex flex-col items-center justify-center min-h-[2.5em] sm:min-h-[3.5em]">
                     <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2">
