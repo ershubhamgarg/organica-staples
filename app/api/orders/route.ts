@@ -101,10 +101,7 @@ export async function POST(request: Request) {
     }
 
     if (!launchOffer.isEligible) {
-      return NextResponse.json(
-        { error: launchOffer.message },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: launchOffer.message }, { status: 400 });
     }
   }
 
@@ -183,6 +180,19 @@ export async function POST(request: Request) {
   }
 
   const order = data as Order;
+
+  // Toggle for Shiprocket Shipment Creation
+  // Set NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT=true in env to enable live shipment creation
+  const enableShiprocket =
+    process.env.NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT === "true";
+
+  if (!enableShiprocket) {
+    console.log(
+      "Shiprocket shipment creation is disabled in development. Order saved to DB only.",
+    );
+    return NextResponse.json({ order });
+  }
+
   const shipment = await createShiprocketShipment(order);
   const shippingUpdate = {
     shiprocket_order_id: shipment.orderId,
@@ -203,7 +213,10 @@ export async function POST(request: Request) {
     .single();
 
   if (shippingUpdateError) {
-    console.error("Shiprocket order metadata update failed:", shippingUpdateError);
+    console.error(
+      "Shiprocket order metadata update failed:",
+      shippingUpdateError,
+    );
     return NextResponse.json({
       order: {
         ...order,

@@ -87,3 +87,26 @@ When the promotion ends, remove or disable all of these paths together so the UI
 - **Linter**: Ensure all component props are typed; avoid `any`.
 - **Images**: Use `ImageWithFallback` for product images to handle remote loading errors gracefully.
 - **Unit Prices**: Always display unit price info (from `getUnitPriceInfo`) next to the main price in listing and detail pages.
+
+## Go-Live Checklist
+
+Follow these steps before transitioning from development to production:
+
+### 1. Database Cleanup
+
+Clear transactional data while preserving catalog and user records:
+
+- **TRUNCATE** `orders`, `order_items`, `launch_offer_claims` tables.
+- **DO NOT** delete from `products`, `product_inventory`, `categories`, or `auth.users`.
+- Reset `product_inventory.available_quantity` to initial stock levels.
+
+### 2. Shipping Configuration
+
+- Set `NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT=true` in the production environment variables to enable real-time Shiprocket order syncing.
+- Verify Shiprocket API credentials (`SHIPROCKET_EMAIL`, `SHIPROCKET_PASSWORD`) are correctly set in the backend environment.
+
+### 3. Verification
+
+- Place a test order to confirm real-time shipping calculation and capping (max ₹149) works as expected.
+- Confirm `extra_shipping_amount` is correctly populated in the `orders` table for capped orders.
+- Verify that the Launch Offer (`LAUNCHSTORY`) correctly waives product costs and creates a claim record.

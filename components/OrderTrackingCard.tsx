@@ -99,7 +99,15 @@ const getInitialTracking = (order: Order): TrackingDetails => ({
   activities: [],
 });
 
-const getStatusCopy = (tracking: TrackingDetails, order: Order) => {
+const getStatusCopy = (
+  tracking: TrackingDetails,
+  order: Order,
+  enableShiprocket: boolean,
+) => {
+  if (!enableShiprocket) {
+    return "Shipping services are currently disabled in development mode.";
+  }
+
   if (tracking.shippingStatus === "not_configured") {
     return "Tracking will appear after the team books this parcel.";
   }
@@ -126,12 +134,15 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [trackingError, setTrackingError] = useState<string | null>(null);
 
+  const enableShiprocket =
+    process.env.NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT === "true";
+
   const activeStep = useMemo(
     () => getStepIndex(tracking.shippingStatus ?? tracking.currentStatus),
     [tracking.currentStatus, tracking.shippingStatus],
   );
   const latestActivities = tracking.activities.slice(0, 3);
-  const canRefresh = true; // Always allow refresh to check for new AWB assignments
+  const canRefresh = enableShiprocket; // Only allow refresh in production mode
 
   const refreshTracking = async () => {
     if (!canRefresh) return;
@@ -175,6 +186,14 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
 
   return (
     <div className="md:w-80 shrink-0 rounded-3xl border border-brand-gold/15 bg-white/60 p-6 shadow-sm">
+      {!enableShiprocket && (
+        <div className="mb-4 flex items-center gap-2 rounded-xl bg-brand-gold/10 px-3 py-2 text-brand-gold">
+          <AlertCircle size={14} />
+          <p className="text-[9px] font-black uppercase tracking-widest">
+            Shipping Disabled (Dev Mode)
+          </p>
+        </div>
+      )}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
@@ -221,7 +240,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
             )}
           </div>
           <p className="text-xs font-semibold leading-relaxed text-brand-brown/70">
-            {getStatusCopy(tracking, order)}
+            {getStatusCopy(tracking, order, enableShiprocket)}
           </p>
         </div>
         {trackingError && (
@@ -231,58 +250,62 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         )}
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-3">
-        <div>
-          <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
-            AWB
-          </p>
-          <p className="mt-1 break-all text-[10px] font-black uppercase tracking-wide text-brand-brown">
-            {tracking.awbCode ?? "Pending"}
-          </p>
-        </div>
-        <div>
-          <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
-            Courier
-          </p>
-          <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-brand-brown">
-            {tracking.courierName ?? "Assigning"}
-          </p>
-        </div>
-        {tracking.expectedDeliveryDate && (
-          <div className="col-span-2">
+      {enableShiprocket && (
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <div>
             <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
-              Expected Delivery
+              AWB
             </p>
-            <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-brand-green-fresh">
-              {formatDate(tracking.expectedDeliveryDate)}
+            <p className="mt-1 break-all text-[10px] font-black uppercase tracking-wide text-brand-brown">
+              {tracking.awbCode ?? "Pending"}
             </p>
           </div>
-        )}
-      </div>
-
-      <div className="mb-6 grid grid-cols-4 gap-2">
-        {steps.map((step, index) => {
-          const isDone = index <= activeStep;
-
-          return (
-            <div key={step.key} className="min-w-0">
-              <div
-                className={`mb-2 h-1.5 rounded-full ${isDone ? "bg-brand-green-fresh" : "bg-brand-gold/15"}`}
-              />
-              <p
-                className={`truncate text-[7px] font-black uppercase tracking-wide ${isDone ? "text-brand-brown" : "text-brand-brown/30"}`}
-              >
-                {step.label}
+          <div>
+            <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
+              Courier
+            </p>
+            <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-brand-brown">
+              {tracking.courierName ?? "Assigning"}
+            </p>
+          </div>
+          {tracking.expectedDeliveryDate && (
+            <div className="col-span-2">
+              <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
+                Expected Delivery
               </p>
-              <p className="mt-0.5 truncate text-[7px] font-bold uppercase tracking-wide text-brand-brown/30">
-                {step.helper}
+              <p className="mt-1 text-[10px] font-black uppercase tracking-wide text-brand-green-fresh">
+                {formatDate(tracking.expectedDeliveryDate)}
               </p>
             </div>
-          );
-        })}
-      </div>
+          )}
+        </div>
+      )}
 
-      {latestActivities.length > 0 && (
+      {enableShiprocket && (
+        <div className="mb-6 grid grid-cols-4 gap-2">
+          {steps.map((step, index) => {
+            const isDone = index <= activeStep;
+
+            return (
+              <div key={step.key} className="min-w-0">
+                <div
+                  className={`mb-2 h-1.5 rounded-full ${isDone ? "bg-brand-green-fresh" : "bg-brand-gold/15"}`}
+                />
+                <p
+                  className={`truncate text-[7px] font-black uppercase tracking-wide ${isDone ? "text-brand-brown" : "text-brand-brown/30"}`}
+                >
+                  {step.label}
+                </p>
+                <p className="mt-0.5 truncate text-[7px] font-bold uppercase tracking-wide text-brand-brown/30">
+                  {step.helper}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {enableShiprocket && latestActivities.length > 0 && (
         <div className="mb-6 space-y-3 border-t border-brand-gold/10 pt-5">
           {latestActivities.map((activity, index) => (
             <div key={`${activity.status}-${index}`} className="flex gap-3">
