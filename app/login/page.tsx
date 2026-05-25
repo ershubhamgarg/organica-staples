@@ -16,9 +16,15 @@ export default function LoginPage() {
     password: false,
   });
   const [formError, setFormError] = useState<string | null>(null);
-  const { signIn, signInWithGoogle, signUp, isLoading, error, clearError } =
+  const { signIn, signInWithGoogle, signUp, isLoading, error, clearError, user, isInitialized } =
     useUserStore();
   const router = useRouter();
+
+  useEffect(() => {
+    if (isInitialized && user) {
+      router.push("/profile");
+    }
+  }, [isInitialized, user, router]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

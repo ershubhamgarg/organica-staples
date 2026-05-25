@@ -10,7 +10,9 @@ const getSiteUrl = () => {
   let url =
     process.env.NEXT_PUBLIC_SITE_URL ??
     process.env.NEXT_PUBLIC_VERCEL_URL ??
-    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+    (typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000");
 
   if (!url.startsWith("http")) {
     url = `https://${url}`;
@@ -20,10 +22,7 @@ const getSiteUrl = () => {
 };
 
 const getAuthErrorMessage = (error: unknown) => {
-  if (
-    typeof navigator !== "undefined" &&
-    navigator.onLine === false
-  ) {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
     return "You appear to be offline. Please check your connection and try again.";
   }
 
@@ -57,6 +56,7 @@ const getAuthErrorMessage = (error: unknown) => {
 interface UserState {
   user: User | null;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
   clearError: () => void;
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -71,6 +71,7 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       isLoading: false,
+      isInitialized: false,
       error: null,
       clearError: () => set({ error: null }),
 
@@ -156,7 +157,7 @@ export const useUserStore = create<UserState>()(
           const {
             data: { user },
           } = await supabase.auth.getUser();
-          set({ user, isLoading: false });
+          set({ user, isLoading: false, isInitialized: true });
 
           if (user) {
             await useCartStore.getState().syncCartWithSupabase(user.id);
@@ -167,7 +168,11 @@ export const useUserStore = create<UserState>()(
             await useOrderStore.getState().fetchOrders(user.id);
           }
         } catch (error) {
-          set({ error: getAuthErrorMessage(error), isLoading: false });
+          set({
+            error: getAuthErrorMessage(error),
+            isLoading: false,
+            isInitialized: true,
+          });
         }
       },
     }),

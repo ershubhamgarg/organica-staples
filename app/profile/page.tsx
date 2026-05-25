@@ -48,7 +48,7 @@ const isLaunchOfferOrder = (order: Order) =>
   order.discount_code === LAUNCH_OFFER_CODE;
 
 export default function ProfilePage() {
-  const { user, signOut } = useUserStore();
+  const { user, signOut, isInitialized } = useUserStore();
   const { addresses, fetchAddresses, addAddress, removeAddress } =
     useAddressStore();
   const { orders, fetchOrders } = useOrderStore();
@@ -77,10 +77,18 @@ export default function ProfilePage() {
   }, [user, fetchAddresses, fetchOrders]);
 
   useEffect(() => {
-    if (!user) {
+    if (isInitialized && !user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [isInitialized, user, router]);
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+        <div className="animate-pulse w-12 h-12 rounded-full bg-brand-gold/20" />
+      </div>
+    );
+  }
 
   if (!user) {
     return null;
@@ -458,12 +466,13 @@ export default function ProfilePage() {
                               </span>
                             )}
                             <span
-                              className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${order.status === "delivered"
-                                ? "bg-brand-green/10 text-brand-green border-brand-green/20"
-                                : order.status === "cancelled"
-                                  ? "bg-brand-terracotta/10 text-brand-terracotta border-brand-terracotta/20"
-                                  : "bg-brand-gold/10 text-brand-gold border-brand-gold/20"
-                                }`}
+                              className={`px-4 py-1.5 rounded-full text-[8px] uppercase tracking-widest font-black border ${
+                                order.status === "delivered"
+                                  ? "bg-brand-green/10 text-brand-green border-brand-green/20"
+                                  : order.status === "cancelled"
+                                    ? "bg-brand-terracotta/10 text-brand-terracotta border-brand-terracotta/20"
+                                    : "bg-brand-gold/10 text-brand-gold border-brand-gold/20"
+                              }`}
                             >
                               {order.status}
                             </span>
@@ -510,7 +519,10 @@ export default function ProfilePage() {
                                       </p>
                                       <span className="w-1 h-1 rounded-full bg-brand-gold/30" />
                                       <p className="text-[10px] uppercase tracking-widest font-bold text-brand-gold">
-                                        ₹{(item.price * item.quantity).toFixed(2)}
+                                        ₹
+                                        {(item.price * item.quantity).toFixed(
+                                          2,
+                                        )}
                                       </p>
                                     </div>
                                   </div>
@@ -625,50 +637,50 @@ export default function ProfilePage() {
                             {order.payment_method === "razorpay" &&
                               order.payment_details && (
                                 <div className="bg-white/50 border border-brand-gold/15 rounded-3xl p-6 shadow-sm">
-                                <div className="flex items-center gap-3 mb-6">
-                                  <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
-                                    <ShieldCheck size={16} />
+                                  <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
+                                      <ShieldCheck size={16} />
+                                    </div>
+                                    <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
+                                      Verified Payment
+                                    </p>
                                   </div>
-                                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-brown/60">
-                                    Verified Payment
-                                  </p>
-                                </div>
-                                <div className="space-y-4">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                      Provider
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                      Razorpay
-                                    </span>
+                                  <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                        Provider
+                                      </span>
+                                      <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                        Razorpay
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                        Payment ID
+                                      </span>
+                                      <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/5 px-2 py-1 rounded">
+                                        {order.payment_details.provider_payment_id.toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                        Method
+                                      </span>
+                                      <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
+                                        {order.payment_details.method ||
+                                          "UPI / Card"}
+                                      </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
+                                        Status
+                                      </span>
+                                      <span className="text-[9px] uppercase tracking-widest text-brand-green font-black flex items-center gap-1.5">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />
+                                        {order.payment_details.status}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                      Payment ID
-                                    </span>
-                                    <span className="text-[10px] font-mono text-brand-gold bg-brand-gold/5 px-2 py-1 rounded">
-                                      {order.payment_details.provider_payment_id.toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                      Method
-                                    </span>
-                                    <span className="text-[10px] uppercase tracking-widest text-brand-brown font-black">
-                                      {order.payment_details.method ||
-                                        "UPI / Card"}
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
-                                      Status
-                                    </span>
-                                    <span className="text-[9px] uppercase tracking-widest text-brand-green font-black flex items-center gap-1.5">
-                                      <div className="w-1.5 h-1.5 rounded-full bg-brand-green" />
-                                      {order.payment_details.status}
-                                    </span>
-                                  </div>
-                                </div>
                                 </div>
                               )}
 
@@ -717,7 +729,9 @@ export default function ProfilePage() {
                                   </div>
                                   <button
                                     type="button"
-                                    onClick={() => handleInstagramStoryShare(order)}
+                                    onClick={() =>
+                                      handleInstagramStoryShare(order)
+                                    }
                                     disabled={sharingOrderId === order.id}
                                     className="mt-2 inline-flex min-h-[42px] w-full items-center justify-center gap-2 rounded-full bg-[#DD2A7B] px-4 text-[8px] font-black uppercase tracking-[0.18em] text-white shadow-lg shadow-[#DD2A7B]/20 transition-all hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
                                   >
@@ -730,11 +744,12 @@ export default function ProfilePage() {
                                       ? "Preparing Story"
                                       : "Share Story Receipt"}
                                   </button>
-                                  {shareError && sharingOrderId !== order.id && (
-                                    <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
-                                      {shareError}
-                                    </p>
-                                  )}
+                                  {shareError &&
+                                    sharingOrderId !== order.id && (
+                                      <p className="rounded-2xl border border-brand-terracotta/15 bg-white px-3 py-2 text-center text-[9px] font-semibold leading-relaxed text-brand-terracotta">
+                                        {shareError}
+                                      </p>
+                                    )}
                                 </div>
                               </div>
                             )}
