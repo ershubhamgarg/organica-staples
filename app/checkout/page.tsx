@@ -350,7 +350,7 @@ export default function CheckoutPage() {
 
   // Real-time shipping logic with capping
   const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
-  const shippingCap = 149;
+  const shippingCap = 99;
   const isCapped =
     !launchOffer.isEligible &&
     subtotalAfterDiscount < 1000 &&
