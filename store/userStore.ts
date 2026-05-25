@@ -31,8 +31,21 @@ const getAuthErrorMessage = (error: unknown) => {
     return "You appear to be offline. Please check your connection and try again.";
   }
 
+  console.error("Auth error details:", error);
+
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
+
+    // Handle Supabase specific fetch errors
+    if (
+      message.includes("failed to fetch") ||
+      message.includes("network") ||
+      message.includes("fetch") ||
+      message.includes("retryable") ||
+      error.name === "AuthRetryableFetchError"
+    ) {
+      return "Connection error: Could not reach the authentication server. Please check your internet or if the local database is running.";
+    }
 
     if (message.includes("invalid login credentials")) {
       return "The email or password you entered is incorrect.";
@@ -42,20 +55,12 @@ const getAuthErrorMessage = (error: unknown) => {
       return "Please confirm your email address before signing in.";
     }
 
-    if (
-      message.includes("failed to fetch") ||
-      message.includes("network") ||
-      message.includes("fetch")
-    ) {
-      return "We could not reach the authentication server. Please try again.";
-    }
-
     if (error.message.trim()) {
       return error.message;
     }
   }
 
-  return "Something went wrong while signing you in. Please try again.";
+  return "An unexpected authentication error occurred. Please try again.";
 };
 
 interface UserState {
@@ -127,15 +132,60 @@ export const useUserStore = create<UserState>()(
 
       signUp: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
+        console.log("Starting signup for:", email);
+
         try {
-          const { data, error } = await supabase.auth.signUp({
+          // Add a timeout to the signup request
+          const signupPromise = supabase.auth.signUp({
             email,
             password,
+            options: {
+              emailRedirectTo: `${getSiteUrl()}auth/callback?next=/`,
+            },
           });
-          if (error) throw error;
+
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Signup request timed out")),
+              15000,
+            ),
+          );
+
+          const { data, error } = (await Promise.race([
+            signupPromise,
+            timeoutPromise,
+          ])) as any;
+
+          if (error) {
+            console.error("Supabase signup error:", error);
+            throw error;
+          }
+
+          console.log("Signup response data:", data);
+
+          // If session is null, it means email confirmation is required
+          if (data.user && !data.session) {
+            console.log("Signup successful, confirmation required");
+            set({
+              isLoading: false,
+              error: "CONFIRM_EMAIL",
+            });
+            return false;
+          }
+
           set({ user: data.user, isLoading: false });
+
+          if (data.user?.email) {
+            fetch(`${getSiteUrl()}api/welcome-email`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: data.user.email }),
+            }).catch((e) => console.error("Welcome email failed:", e));
+          }
+
           return Boolean(data.user);
         } catch (error) {
+          console.error("Caught signup error:", error);
           set({ error: getAuthErrorMessage(error), isLoading: false });
           return false;
         }
@@ -158,7 +208,22 @@ export const useUserStore = create<UserState>()(
 
       fetchUser: async () => {
         set({ isLoading: true, error: null });
+        console.log("Checking Supabase connection...");
+        console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+
         try {
+          // Quick connection test
+          const { error: connError } = await supabase
+            .from("products")
+            .select("id")
+            .limit(1);
+          if (connError) {
+            console.warn("Supabase connection test failed:", connError.message);
+            // We don't throw here as it might just be an empty table or RLS
+          } else {
+            console.log("Supabase connection successful");
+          }
+
           const {
             data: { user },
           } = await supabase.auth.getUser();

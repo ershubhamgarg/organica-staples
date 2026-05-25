@@ -6,6 +6,7 @@ import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
 import type { Order } from "@/store/orderStore";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { createShiprocketShipment } from "@/lib/shiprocket";
+import { sendOrderConfirmationEmail } from "@/lib/resend";
 
 type OrderPayload = {
   userId: string | null;
@@ -190,6 +191,8 @@ export async function POST(request: Request) {
     console.log(
       "Shiprocket shipment creation is disabled in development. Order saved to DB only.",
     );
+    // Send email even in dev mode if Resend is configured
+    await sendOrderConfirmationEmail(order);
     return NextResponse.json({ order });
   }
 
@@ -224,6 +227,9 @@ export async function POST(request: Request) {
       },
     });
   }
+
+  // Send order confirmation email
+  await sendOrderConfirmationEmail(updatedOrder);
 
   return NextResponse.json({ order: updatedOrder });
 }

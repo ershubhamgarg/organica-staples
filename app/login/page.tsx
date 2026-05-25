@@ -16,8 +16,16 @@ export default function LoginPage() {
     password: false,
   });
   const [formError, setFormError] = useState<string | null>(null);
-  const { signIn, signInWithGoogle, signUp, isLoading, error, clearError, user, isInitialized } =
-    useUserStore();
+  const {
+    signIn,
+    signInWithGoogle,
+    signUp,
+    isLoading,
+    error,
+    clearError,
+    user,
+    isInitialized,
+  } = useUserStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -71,6 +79,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isLoading) return;
+
     clearError();
     setFormError(null);
     setTouchedFields({ email: true, password: true });
@@ -82,12 +92,17 @@ export default function LoginPage() {
       return;
     }
 
-    const didAuthenticate = isSignUp
-      ? await signUp(email.trim(), password)
-      : await signIn(email.trim(), password);
+    try {
+      const result = isSignUp
+        ? await signUp(email.trim(), password)
+        : await signIn(email.trim(), password);
 
-    if (didAuthenticate) {
-      router.push("/");
+      if (result) {
+        router.push("/");
+      }
+    } catch (err) {
+      console.error("Form submission error:", err);
+      setFormError("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -106,6 +121,7 @@ export default function LoginPage() {
   };
 
   const displayError = formError ?? error;
+  const isConfirmEmailState = error === "CONFIRM_EMAIL";
   const trimmedEmail = email.trim();
   const emailError = !trimmedEmail
     ? "Email address is required."
@@ -130,7 +146,7 @@ export default function LoginPage() {
             width={580}
             height={280}
             priority
-          // className="mb-5 h-auto w-36 sm:w-44"
+            // className="mb-5 h-auto w-36 sm:w-44"
           />
           {/* <p className="text-sm text-brand-cream/80 text-center max-w-xs">
             Premium organic pantry for a healthier lifestyle.
@@ -139,7 +155,10 @@ export default function LoginPage() {
 
         {/* Right column - authentication form */}
         <div className="p-8 lg:p-12 space-y-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-brown transition-colors mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-brown transition-colors mb-4"
+          >
             <ArrowLeft size={14} /> Back to Store
           </Link>
 
@@ -161,87 +180,109 @@ export default function LoginPage() {
           >
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-brand-gold shadow-sm">
               G
-            </span>{" "}Continue with Google
+            </span>{" "}
+            Continue with Google
           </button>
 
           <div className="my-4 flex items-center">
             <div className="flex-1 h-px bg-brand-gold/20" />
-            <span className="px-2 text-xs font-medium text-brand-brown/50">or</span>
+            <span className="px-2 text-xs font-medium text-brand-brown/50">
+              or
+            </span>
             <div className="flex-1 h-px bg-brand-gold/20" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-xs font-bold uppercase text-brand-brown/70 mb-1" htmlFor="email">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setFormError(null);
-                  clearError();
-                }}
-                onBlur={() =>
-                  setTouchedFields((fields) => ({ ...fields, email: true }))
-                }
-                aria-invalid={Boolean(touchedFields.email && emailError)}
-                aria-describedby={
-                  touchedFields.email && emailError ? "email-error" : undefined
-                }
-                className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
-                placeholder="you@example.com"
-              />
-              {touchedFields.email && emailError && (
-                <p
-                  id="email-error"
-                  className="mt-1 text-xs font-medium text-brand-terracotta"
-                >
-                  {emailError}
-                </p>
-              )}
-            </div>
+            {!isConfirmEmailState && (
+              <>
+                <div>
+                  <label
+                    className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                    htmlFor="email"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setFormError(null);
+                      clearError();
+                    }}
+                    onBlur={() =>
+                      setTouchedFields((fields) => ({ ...fields, email: true }))
+                    }
+                    aria-invalid={Boolean(touchedFields.email && emailError)}
+                    aria-describedby={
+                      touchedFields.email && emailError
+                        ? "email-error"
+                        : undefined
+                    }
+                    className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
+                    placeholder="you@example.com"
+                  />
+                  {touchedFields.email && emailError && (
+                    <p
+                      id="email-error"
+                      className="mt-1 text-xs font-medium text-brand-terracotta"
+                    >
+                      {emailError}
+                    </p>
+                  )}
+                </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase text-brand-brown/70 mb-1" htmlFor="password">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setFormError(null);
-                  clearError();
-                }}
-                onBlur={() =>
-                  setTouchedFields((fields) => ({ ...fields, password: true }))
-                }
-                aria-invalid={Boolean(touchedFields.password && passwordError)}
-                aria-describedby={
-                  touchedFields.password && passwordError
-                    ? "password-error"
-                    : undefined
-                }
-                className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
-                placeholder="Minimum 6 characters"
-              />
-              {touchedFields.password && passwordError && (
-                <p
-                  id="password-error"
-                  className="mt-1 text-xs font-medium text-brand-terracotta"
-                >
-                  {passwordError}
-                </p>
-              )}
-            </div>
+                <div>
+                  <label
+                    className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                    htmlFor="password"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    autoComplete={
+                      isSignUp ? "new-password" : "current-password"
+                    }
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setFormError(null);
+                      clearError();
+                    }}
+                    onBlur={() =>
+                      setTouchedFields((fields) => ({
+                        ...fields,
+                        password: true,
+                      }))
+                    }
+                    aria-invalid={Boolean(
+                      touchedFields.password && passwordError,
+                    )}
+                    aria-describedby={
+                      touchedFields.password && passwordError
+                        ? "password-error"
+                        : undefined
+                    }
+                    className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
+                    placeholder="Minimum 6 characters"
+                  />
+                  {touchedFields.password && passwordError && (
+                    <p
+                      id="password-error"
+                      className="mt-1 text-xs font-medium text-brand-terracotta"
+                    >
+                      {passwordError}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
 
-            {displayError && (
+            {displayError && !isConfirmEmailState && (
               <div
                 role="alert"
                 className="rounded-md border border-brand-terracotta/15 bg-brand-terracotta/5 p-3 text-center text-xs font-medium text-brand-terracotta"
@@ -250,14 +291,68 @@ export default function LoginPage() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-sm font-bold uppercase text-brand-cream transition-all hover:bg-brand-brown-light disabled:opacity-50 hover:shadow-md"
-            >
-              {isLoading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
-              {!isLoading && <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />}
-            </button>
+            {isConfirmEmailState && (
+              <div
+                role="alert"
+                className="rounded-2xl border border-brand-green/30 bg-brand-green/5 p-6 text-center space-y-4 animate-fade-in"
+              >
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-serif text-lg text-brand-brown">
+                    Check your email
+                  </h3>
+                  <p className="text-sm leading-relaxed text-brand-brown/80">
+                    A verification link has been sent to{" "}
+                    <span className="font-bold text-brand-brown">{email}</span>.
+                    Please click the link to activate your account.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(false);
+                    clearError();
+                  }}
+                  className="text-xs font-bold uppercase tracking-widest text-brand-green hover:text-brand-brown transition-colors"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            )}
+
+            {!isConfirmEmailState && (
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-sm font-bold uppercase text-brand-cream transition-all hover:bg-brand-brown-light disabled:opacity-50 hover:shadow-md"
+              >
+                {isLoading
+                  ? "Processing..."
+                  : isSignUp
+                    ? "Create Account"
+                    : "Sign In"}
+                {!isLoading && (
+                  <ArrowRight
+                    size={14}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
+                )}
+              </button>
+            )}
           </form>
 
           <p className="mt-6 text-center text-xs text-brand-brown/50">
