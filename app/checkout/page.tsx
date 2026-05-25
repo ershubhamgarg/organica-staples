@@ -1873,17 +1873,16 @@ export default function CheckoutPage() {
                   </div>
                 ) : (
                   <>
-                    {shipping > 0 && (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-brand-brown/60 font-light">
-                            Shipping
-                          </span>
-                          <span className="text-brand-brown font-bold tracking-tight">
-                            ₹{shipping.toFixed(2)}
-                          </span>
-                        </div>
-                        {/* {dynamicShipping?.courierName && (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-brand-brown/60 font-light">
+                          Shipping
+                        </span>
+                        <span className="text-brand-brown font-bold tracking-tight">
+                          {shipping > 0 ? `₹${shipping.toFixed(2)}` : "Free"}
+                        </span>
+                      </div>
+                      {/* {dynamicShipping?.courierName && (
                           <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
                             {dynamicShipping.courierName}
                             {dynamicShipping.expectedDeliveryDate
@@ -1891,13 +1890,13 @@ export default function CheckoutPage() {
                               : ""}
                           </p>
                         )} */}
-                        {/* {isCapped && (
+                      {/* {isCapped && (
                           <p className="text-[8px] font-bold uppercase tracking-widest text-brand-gold italic">
                             Shipping Capped at ₹{shippingCap}
                           </p>
                         )} */}
-                      </div>
-                    )}
+                    </div>
+
                     {isShippingRateLoading && !launchOffer.isEligible && (
                       <div className="flex justify-between text-xs">
                         <span className="text-brand-brown/60 font-light">
