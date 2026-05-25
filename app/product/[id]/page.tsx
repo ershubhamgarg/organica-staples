@@ -263,7 +263,7 @@ export default function ProductPage({
       <section className="relative pt-8 lg:pt-16 pb-16 px-4 sm:px-6 lg:px-12">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb - Mobile (above image) */}
-          <nav className="flex lg:hidden items-center gap-2 mb-4 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-brown/40 flex-wrap">
+          <nav className="flex lg:hidden items-center gap-2 mb-4 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-brown/60 flex-wrap">
             <Link href="/" className="hover:text-brand-brown transition-colors">
               Home
             </Link>
@@ -275,7 +275,7 @@ export default function ProductPage({
               Shop
             </Link>
             <span className="text-brand-brown/20">/</span>
-            <span className="text-brand-brown/50">{product.category}</span>
+            <span className="text-brand-brown/70">{product.category}</span>
             <span className="text-brand-brown/20">/</span>
             <span className="text-brand-gold/80 truncate max-w-[120px]">
               {product.name}
@@ -325,7 +325,7 @@ export default function ProductPage({
             {/* Right: Product Info */}
             <div className="flex flex-col lg:pl-12">
               {/* Breadcrumb - Desktop (in right column) */}
-              <nav className="hidden lg:flex items-center gap-3 mb-8 text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
+              <nav className="hidden lg:flex items-center gap-3 mb-8 text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/60">
                 <Link
                   href="/"
                   className="hover:text-brand-brown transition-colors"
@@ -340,7 +340,7 @@ export default function ProductPage({
                   Shop
                 </Link>
                 <span>/</span>
-                <span className="text-brand-brown/60">{product.category}</span>
+                <span className="text-brand-brown/80">{product.category}</span>
                 <span>/</span>
                 <span className="text-brand-gold">{product.name}</span>
               </nav>
@@ -372,7 +372,7 @@ export default function ProductPage({
                         .getElementById("reviews")
                         ?.scrollIntoView({ behavior: "smooth" });
                     }}
-                    className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/30 pb-0.5 text-left active:scale-95"
+                    className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/50 pb-0.5 text-left active:scale-95"
                   >
                     {reviewCount} Customer Reviews
                   </button>
@@ -383,7 +383,7 @@ export default function ProductPage({
                 </h1>
 
                 {product.name2 && (
-                  <p className="text-lg lg:text-xl font-medium text-brand-brown/40 mb-2 tracking-wide font-devanagari">
+                  <p className="text-lg lg:text-xl font-medium text-brand-brown/60 mb-2 tracking-wide font-devanagari">
                     {product.name2}
                   </p>
                 )}
@@ -401,12 +401,12 @@ export default function ProductPage({
                             ₹{discountedPrice.toFixed(2)}
                           </span>
                           {unitPrice && (
-                            <span className="text-sm text-brand-brown/30 font-light">
+                            <span className="text-sm text-brand-brown/50 font-light">
                               ({unitPrice})
                             </span>
                           )}
                         </div>
-                        <span className="text-lg text-brand-brown/30 line-through font-light">
+                        <span className="text-lg text-brand-brown/50 line-through font-light">
                           ₹{product.price.toFixed(2)}
                         </span>
                       </div>
@@ -421,7 +421,7 @@ export default function ProductPage({
                         ₹{product.price.toFixed(2)}
                       </span>
                       {unitPrice && (
-                        <span className="text-sm text-brand-brown/30 font-light">
+                        <span className="text-sm text-brand-brown/50 font-light">
                           ({unitPrice})
                         </span>
                       )}
@@ -450,9 +450,9 @@ export default function ProductPage({
                     )}
                 </div>
 
-                <p className="text-base text-brand-brown/60 font-light leading-relaxed max-w-xl text-balance">
+                <div className="text-base text-brand-brown/80 font-light leading-relaxed max-w-xl text-balance whitespace-pre-wrap">
                   {product.description}
-                </p>
+                </div>
 
                 {/* Compact Benefits List */}
                 {product.benefits && product.benefits.length > 0 && (
@@ -682,9 +682,9 @@ export default function ProductPage({
                           </div>
                         </div>
                         {review.comment && review.comment.trim() && (
-                          <p className="text-brand-brown/70 font-light leading-relaxed pl-0 mt-1 md:pl-12 text-xs md:text-[13px]">
+                          <div className="text-brand-brown/70 font-light leading-relaxed pl-0 mt-1 md:pl-12 text-xs md:text-[13px] whitespace-pre-wrap">
                             &quot;{review.comment}&quot;
-                          </p>
+                          </div>
                         )}
                       </div>
                     );

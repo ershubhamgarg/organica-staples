@@ -87,7 +87,7 @@ export default function ProductListing() {
           Our <span className="italic text-brand-terracotta">Organic</span>{" "}
           Collection
         </h2>
-        <p className="text-brand-brown/60 max-w-lg mx-auto font-light leading-relaxed text-base text-balance">
+        <p className="text-brand-brown/80 max-w-lg mx-auto font-light leading-relaxed text-base text-balance">
           A selection of India&apos;s finest staples, harvested with respect for
           the earth and delivered with uncompromising purity.
         </p>
@@ -171,10 +171,16 @@ export default function ProductListing() {
                   {/* Premium Corner Badge for Discount */}
                   {available && hasDiscount && (
                     <div className="absolute top-0 right-0 overflow-hidden w-16 h-16 pointer-events-none">
-                      <div className={`absolute top-[12px] right-[-24px] rotate-45 w-24 py-1 text-center text-[7px] font-black uppercase tracking-[0.2em] shadow-lg border-y border-white/20 text-white ${
-                        hasHighDiscount ? "bg-brand-terracotta" : "bg-brand-green-fresh"
-                      }`}>
-                        {hasHighDiscount ? "Special" : `${discountPercent}% Off`}
+                      <div
+                        className={`absolute top-[12px] right-[-24px] rotate-45 w-24 py-1 text-center text-[7px] font-black uppercase tracking-[0.2em] shadow-lg border-y border-white/20 text-white ${
+                          hasHighDiscount
+                            ? "bg-brand-terracotta"
+                            : "bg-brand-green-fresh"
+                        }`}
+                      >
+                        {hasHighDiscount
+                          ? "Special"
+                          : `${discountPercent}% Off`}
                       </div>
                     </div>
                   )}
@@ -195,13 +201,16 @@ export default function ProductListing() {
                     {product.category}
                   </span>
                 </div>
-                <Link href={`/product/${product.id}`} className="mb-1 sm:mb-2 block">
+                <Link
+                  href={`/product/${product.id}`}
+                  className="mb-1 sm:mb-2 block"
+                >
                   <div className="flex flex-col items-center justify-center min-h-[2.5em] sm:min-h-[3.5em]">
                     <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2">
                       {product.name}
                     </h3>
                     {product.name2 && (
-                      <span className="text-[10px] sm:text-[13px] text-brand-brown/40 font-medium mt-0.5 sm:mt-1 font-devanagari">
+                      <span className="text-[10px] sm:text-[13px] text-brand-brown/60 font-medium mt-0.5 sm:mt-1 font-devanagari">
                         {product.name2}
                       </span>
                     )}
@@ -220,7 +229,7 @@ export default function ProductListing() {
                       {hasDiscount ? (
                         <div className="flex flex-col items-center">
                           <div className="flex items-center gap-3">
-                            <span className="text-xs sm:text-sm text-brand-brown/20 line-through font-light">
+                            <span className="text-xs sm:text-sm text-brand-brown/40 line-through font-light">
                               ₹{product.price.toFixed(2)}
                             </span>
                             <div className="flex items-baseline gap-1 sm:gap-1.5">
@@ -228,7 +237,7 @@ export default function ProductListing() {
                                 ₹{discountedPrice.toFixed(2)}
                               </span>
                               {unitPrice && (
-                                <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">
+                                <span className="text-[8px] sm:text-[10px] text-brand-brown/50 font-light">
                                   ({unitPrice})
                                 </span>
                               )}
@@ -244,7 +253,7 @@ export default function ProductListing() {
                             ₹{product.price.toFixed(2)}
                           </span>
                           {unitPrice && (
-                            <span className="text-[8px] sm:text-[10px] text-brand-brown/30 font-light">
+                            <span className="text-[8px] sm:text-[10px] text-brand-brown/50 font-light">
                               ({unitPrice})
                             </span>
                           )}
@@ -256,7 +265,7 @@ export default function ProductListing() {
                             className={`text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
                               lowStock
                                 ? "text-brand-terracotta"
-                                : "text-brand-green/40"
+                                : "text-brand-green/60"
                             }`}
                           >
                             {lowStock ? "Selling Out Soon" : "In Stock"}

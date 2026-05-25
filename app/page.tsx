@@ -284,7 +284,7 @@ Message: ${formData.message}
                     <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
                       Direct Sourcing
                     </h5>
-                    <p className="text-xs text-brand-brown/50 font-light">
+                    <p className="text-xs text-brand-brown/70 font-light">
                       Eliminating middlemen to ensure farmers get the fair price
                       they deserve.
                     </p>
@@ -293,7 +293,7 @@ Message: ${formData.message}
                     <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
                       Village Hubs
                     </h5>
-                    <p className="text-xs text-brand-brown/50 font-light">
+                    <p className="text-xs text-brand-brown/70 font-light">
                       Processed in small batches within village clusters to
                       retain peak nutrition.
                     </p>

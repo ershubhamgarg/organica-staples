@@ -583,7 +583,7 @@ export default function CartPage() {
                             </div>
                           ) : launchOffer.isEligible ? (
                             <div className="flex flex-col">
-                              <span className="text-[9px] text-brand-brown/30 line-through font-bold">
+                              <span className="text-[9px] text-brand-brown/50 line-through font-bold">
                                 ₹{actualLinePrice.toFixed(2)}
                               </span>
                               <span className="text-lg md:text-xl font-medium text-brand-green-fresh tracking-tight">
@@ -596,7 +596,7 @@ export default function CartPage() {
                           ) : (
                             <div className="flex flex-col">
                               {itemHasDiscount && (
-                                <span className="text-[9px] text-brand-brown/30 line-through font-bold">
+                                <span className="text-[9px] text-brand-brown/50 line-through font-bold">
                                   ₹{actualLinePrice.toFixed(2)}
                                 </span>
                               )}
@@ -621,7 +621,7 @@ export default function CartPage() {
 
                 <div className="space-y-4 mb-8 relative z-10">
                   <div className="flex justify-between text-xs">
-                    <span className="text-brand-brown/60 font-light">
+                    <span className="text-brand-brown/80 font-light">
                       Items subtotal
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
@@ -664,7 +664,7 @@ export default function CartPage() {
                   )}
                   {convenienceFee > 0 && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-brand-brown/60 font-light">
+                      <span className="text-brand-brown/80 font-light">
                         Convenience Fee
                       </span>
                       <span className="text-brand-brown font-bold tracking-tight">

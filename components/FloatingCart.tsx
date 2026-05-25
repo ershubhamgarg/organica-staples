@@ -57,13 +57,13 @@ export default function FloatingCart() {
                   <h3 className="text-sm font-serif text-brand-brown">
                     Empty your cart?
                   </h3>
-                  <p className="text-[10px] text-brand-brown/40 uppercase tracking-widest font-black">
+                  <p className="text-[10px] text-brand-brown/60 uppercase tracking-widest font-black">
                     Action Required
                   </p>
                 </div>
               </div>
 
-              <p className="text-xs text-brand-brown/60 font-light mb-6 leading-relaxed">
+              <p className="text-xs text-brand-brown/80 font-light mb-6 leading-relaxed">
                 This will remove all premium organic items from your selection.
                 This action cannot be reversed.
               </p>

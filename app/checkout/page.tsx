@@ -1808,7 +1808,7 @@ export default function CheckoutPage() {
 
               <div className="space-y-4 mb-8 relative z-10">
                 <div className="flex justify-between text-xs">
-                  <span className="text-brand-brown/60 font-light">
+                  <span className="text-brand-brown/80 font-light">
                     Subtotal
                   </span>
                   <span className="text-brand-brown font-bold tracking-tight">
@@ -1851,7 +1851,7 @@ export default function CheckoutPage() {
 
                 {addressConfirmed && convenienceFee > 0 && (
                   <div className="flex justify-between text-xs">
-                    <span className="text-brand-brown/60 font-light">
+                    <span className="text-brand-brown/80 font-light">
                       Convenience Fee
                     </span>
                     <span className="text-brand-brown font-bold tracking-tight">
@@ -1875,7 +1875,7 @@ export default function CheckoutPage() {
                   <>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
-                        <span className="text-brand-brown/60 font-light">
+                        <span className="text-brand-brown/80 font-light">
                           Shipping
                         </span>
                         <span className="text-brand-brown font-bold tracking-tight">
@@ -1913,7 +1913,7 @@ export default function CheckoutPage() {
                     )}
                     {currentCodFee > 0 && (
                       <div className="flex justify-between text-xs">
-                        <span className="text-brand-brown/60 font-light">
+                        <span className="text-brand-brown/80 font-light">
                           COD Charge
                         </span>
                         <span className="text-brand-brown font-bold tracking-tight">

@@ -505,7 +505,7 @@ export default function ProfilePage() {
                                       {item.name}
                                     </h4>
                                     {item.name2 && (
-                                      <p className="text-[10px] text-brand-brown/40 font-medium truncate font-devanagari">
+                                      <p className="text-[10px] text-brand-brown/60 font-medium truncate font-devanagari">
                                         {item.name2}
                                       </p>
                                     )}
@@ -556,7 +556,7 @@ export default function ProfilePage() {
                               )}
 
                               <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                                <span className="text-brand-brown/40 font-bold">
+                                <span className="text-brand-brown/60 font-bold">
                                   Items Subtotal
                                 </span>
                                 <span className="text-brand-brown font-black">
@@ -591,7 +591,7 @@ export default function ProfilePage() {
 
                               {breakdown.shipping > 0 && (
                                 <div className="flex justify-between items-center text-[10px] uppercase tracking-widest">
-                                  <span className="text-brand-brown/40 font-bold">
+                                  <span className="text-brand-brown/60 font-bold">
                                     Shipping
                                   </span>
                                   <span className="text-brand-brown font-black">
