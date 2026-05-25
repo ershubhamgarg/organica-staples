@@ -131,7 +131,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
     [tracking.currentStatus, tracking.shippingStatus],
   );
   const latestActivities = tracking.activities.slice(0, 3);
-  const canRefresh = Boolean(order.shiprocket_awb_code);
+  const canRefresh = true; // Always allow refresh to check for new AWB assignments
 
   const refreshTracking = async () => {
     if (!canRefresh) return;
