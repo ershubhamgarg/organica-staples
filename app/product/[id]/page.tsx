@@ -621,15 +621,18 @@ export default function ProductPage({
 
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12">
             {/* Review List */}
-            <div className="space-y-4 md:space-y-6">
+            <div className="flex flex-col">
               {reviews.length === 0 ? (
-                <div className="p-10 text-center border border-dashed border-brand-gold/15 rounded-3xl bg-white/30">
+                <div className="flex-grow flex items-center justify-center p-8 md:p-12 text-center border border-dashed border-brand-gold/15 rounded-3xl bg-white/30 min-h-[200px]">
                   <p className="text-brand-brown/40 text-sm font-light italic">
-                    Be the first to share your experience.
+                    No customer reviews yet. Be the first to share your
+                    experience!
                   </p>
                 </div>
               ) : (
-                <>
+                <div
+                  className={`space-y-4 md:space-y-6 ${reviews.length >= 3 ? "max-h-[600px] overflow-y-auto pr-2 custom-scrollbar" : ""}`}
+                >
                   {paginatedReviews.map((review) => {
                     const isOwnReview = user && review.user_id === user.id;
                     return (
@@ -720,7 +723,7 @@ export default function ProductPage({
                       </button>
                     </div>
                   )}
-                </>
+                </div>
               )}
             </div>
 
@@ -819,22 +822,22 @@ export default function ProductPage({
 
       {/* Related Products */}
       {recommendedProducts.length > 0 && (
-        <section className="py-16 px-6 overflow-hidden relative">
+        <section className="py-12 md:py-16 px-4 md:px-6 overflow-hidden relative border-t border-brand-gold/5 bg-brand-cream/30">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col items-center text-center mb-12">
+            <div className="flex flex-col items-center text-center mb-8 md:mb-12">
               <div className="inline-flex items-center gap-4 mb-3">
-                <span className="h-[1px] w-8 bg-brand-gold" />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-gold">
+                <span className="h-[1px] w-6 bg-brand-gold/20" />
+                <span className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold">
                   You May Also Like
                 </span>
-                <span className="h-[1px] w-8 bg-brand-gold" />
+                <span className="h-[1px] w-6 bg-brand-gold/20" />
               </div>
-              <h2 className="text-3xl lg:text-4xl font-serif text-brand-brown tracking-tight">
+              <h2 className="text-2xl lg:text-3xl font-serif text-brand-brown tracking-tight">
                 Related <span className="italic">Products</span>
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
               {recommendedProducts.map((p) => {
                 const available = isProductAvailable(p);
                 const lowStock = isProductLowStock(p);
@@ -842,69 +845,67 @@ export default function ProductPage({
                 return (
                   <div
                     key={p.id}
-                    className="group flex flex-col items-center text-center"
+                    className="group flex flex-col items-center text-center bg-white/40 p-3 md:p-4 rounded-3xl border border-brand-gold/5 hover:border-brand-gold/20 transition-all duration-500"
                   >
                     <Link
                       href={`/product/${p.id}`}
-                      className="relative block w-full aspect-square rounded-3xl bg-brand-sand overflow-hidden mb-4 shadow-xl shadow-brand-brown/5 transition-transform duration-700 hover:scale-[1.02]"
+                      className="relative block w-full aspect-square rounded-2xl bg-brand-sand overflow-hidden mb-4 shadow-sm group-hover:shadow-md transition-all duration-700"
                     >
                       <ProductImageCarousel
                         product={p}
-                        imageClassName={`object-cover ${!available ? "blur-[2px] opacity-60" : ""}`}
-                        sizes="25vw"
+                        imageClassName={`object-cover transition-transform duration-700 group-hover:scale-110 ${!available ? "blur-[2px] opacity-60" : ""}`}
+                        sizes="(max-width: 768px) 50vw, 25vw"
                       />
                       <div className="absolute inset-0 bg-brand-brown/0 group-hover:bg-brand-brown/5 transition-colors" />
 
                       {!available && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
-                          <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
+                        <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/10 backdrop-blur-[1px]">
+                          <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-3 py-1 text-[7px] font-black uppercase tracking-[0.2em] rounded-full shadow-sm border border-brand-gold/10">
                             Available Soon
                           </span>
                         </div>
                       )}
                       {available && lowStock && (
-                        <div className="absolute top-3 left-3 bg-brand-terracotta text-white px-3 py-1 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-white/20">
+                        <div className="absolute top-2 left-2 bg-brand-terracotta text-white px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full shadow-sm border border-white/20">
                           Few Left
                         </div>
                       )}
                     </Link>
-                    <Link href={`/product/${p.id}`} className="mb-2">
-                      <h4
-                        className={`text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-[1.1] line-clamp-2 min-h-[2.2em] flex items-center justify-center ${!available ? "opacity-40" : ""}`}
-                      >
-                        {p.name}
-                      </h4>
+                    <Link
+                      href={`/product/${p.id}`}
+                      className="mb-2 block w-full"
+                    >
+                      <div className="flex flex-col items-center justify-center min-h-[3.5em]">
+                        <h4
+                          className={`text-sm sm:text-base lg:text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2 text-center ${!available ? "opacity-40" : ""}`}
+                        >
+                          {p.name}
+                        </h4>
+                        {p.name2 && (
+                          <span className="text-[9px] sm:text-[11px] text-brand-brown/40 font-medium mt-1 text-center line-clamp-1">
+                            {p.name2}
+                          </span>
+                        )}
+                      </div>
                     </Link>
                     {available ? (
-                      <div className="flex flex-col items-center gap-1">
-                        <p className="text-[10px] text-brand-gold italic font-medium tracking-wide">
+                      <div className="flex flex-col items-center gap-0.5">
+                        <p className="text-[9px] text-brand-gold italic font-medium tracking-wide">
                           {p.weight}
                         </p>
-                        <div className="flex items-baseline gap-1.5">
-                          <p className="text-2xl font-medium text-brand-brown tracking-tighter">
+                        <div className="flex items-baseline gap-1">
+                          <p className="text-lg md:text-xl font-medium text-brand-brown tracking-tighter">
                             ₹{p.price.toFixed(2)}
                           </p>
                           {unitPrice && (
-                            <span className="text-[10px] text-brand-brown/30 font-light">
+                            <span className="text-[9px] text-brand-brown/30 font-light">
                               ({unitPrice})
                             </span>
                           )}
                         </div>
-                        {p.stock_quantity !== undefined &&
-                          p.stock_quantity !== null && (
-                            <span
-                              className={`text-[7px] uppercase tracking-[0.2em] font-black ${
-                                lowStock
-                                  ? "text-brand-terracotta"
-                                  : "text-brand-green/40"
-                              }`}
-                            >
-                              {lowStock ? "Selling Out Soon" : "In Stock"}
-                            </span>
-                          )}
                       </div>
                     ) : (
-                      <div className="h-10" /> // Spacer for layout consistency
+                      <div className="h-10" />
                     )}
                   </div>
                 );

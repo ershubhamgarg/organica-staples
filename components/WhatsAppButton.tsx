@@ -22,10 +22,10 @@ export default function WhatsAppButton() {
 
   // On cart and checkout pages, lift the button slightly higher to avoid overlapping the new floating checkout bars
   const isCartOrCheckout = pathname === "/cart" || pathname === "/checkout";
-  const hasMobileFloatingCart = mounted && totalItems > 0 && !isCartOrCheckout;
+  const hasFloatingCart = mounted && totalItems > 0 && !isCartOrCheckout;
   const bottomOffset = isCartOrCheckout
     ? "bottom-[108px]"
-    : hasMobileFloatingCart
+    : hasFloatingCart
       ? "bottom-[104px]"
       : "bottom-6";
 
