@@ -20,6 +20,7 @@ export interface Order {
   coupon_discount_amount?: number | null;
   discount_amount?: number | null;
   shipping_amount?: number | null;
+  extra_shipping_amount?: number | null;
   convenience_fee_amount?: number | null;
   cod_amount?: number | null;
   total_amount: number;
@@ -68,6 +69,7 @@ export type OrderPricingDetails = {
   discountPercent: number;
   couponDiscountAmount: number;
   shippingAmount: number;
+  extraShippingAmount?: number;
   convenienceFeeAmount: number;
   codAmount?: number;
 };

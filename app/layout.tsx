@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Fraunces } from "next/font/google";
+import {
+  Plus_Jakarta_Sans,
+  Fraunces,
+  Noto_Sans_Devanagari,
+} from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -15,6 +19,12 @@ const serif = Fraunces({
   variable: "--font-serif",
   subsets: ["latin"],
   axes: ["SOFT"],
+});
+
+const devanagari = Noto_Sans_Devanagari({
+  variable: "--font-devanagari",
+  subsets: ["devanagari"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -34,9 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${sans.variable} ${serif.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
-      >
+      <body className="${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen">
         <Header />
 
         <main className="flex-grow">{children}</main>

@@ -31,10 +31,7 @@ import {
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
-import {
-  LAUNCH_OFFER_CODE,
-  getLaunchOfferState,
-} from "@/lib/launchOffer";
+import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
@@ -239,29 +236,29 @@ export default function CheckoutPage() {
   const launchOffer =
     launchOfferClaim.hasClaimed || (user && launchOfferClaim.isLoading)
       ? {
-        ...rawLaunchOffer,
-        isEligible: false,
-        message: launchOfferClaim.hasClaimed
-          ? "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment."
-          : "Checking your launch offer claim status.",
-      }
+          ...rawLaunchOffer,
+          isEligible: false,
+          message: launchOfferClaim.hasClaimed
+            ? "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment."
+            : "Checking your launch offer claim status.",
+        }
       : rawLaunchOffer;
   const usableOrderSummary =
     orderSummary?.couponDiscount.code === LAUNCH_OFFER_CODE &&
-      !launchOffer.isEligible
+    !launchOffer.isEligible
       ? null
       : orderSummary;
   const launchOfferDiscount = launchOffer.isEligible
     ? fallbackActualSubtotal
     : 0;
-  const totalPrice = usableOrderSummary?.actualSubtotal ?? fallbackActualSubtotal;
+  const totalPrice =
+    usableOrderSummary?.actualSubtotal ?? fallbackActualSubtotal;
   const actualSubtotal =
     usableOrderSummary?.actualSubtotal ?? fallbackActualSubtotal;
-  const productDiscount =
-    launchOffer.isEligible
-      ? launchOfferDiscount
-      : (usableOrderSummary?.productDiscount ??
-        Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0));
+  const productDiscount = launchOffer.isEligible
+    ? launchOfferDiscount
+    : (usableOrderSummary?.productDiscount ??
+      Math.max(fallbackActualSubtotal - fallbackEffectiveSubtotal, 0));
 
   // Fallback calculation if orderSummary is missing
   const fallbackCartDiscount = calculateDiscount(
@@ -269,41 +266,40 @@ export default function CheckoutPage() {
     launchOffer.isEligible ? null : appliedDiscountCoupon,
   );
 
-  const subtotalAfterDiscount =
-    launchOffer.isEligible
+  const subtotalAfterDiscount = launchOffer.isEligible
+    ? 0
+    : (usableOrderSummary?.subtotalAfterDiscount ??
+      fallbackCartDiscount.subtotalAfterDiscount);
+  const baseShipping = launchOffer.isEligible
+    ? 0
+    : subtotalAfterDiscount >= 1000
       ? 0
-      : (usableOrderSummary?.subtotalAfterDiscount ??
-        fallbackCartDiscount.subtotalAfterDiscount);
-  const baseShipping =
-    launchOffer.isEligible
-      ? 0
-      : subtotalAfterDiscount >= 1000
-        ? 0
-        : subtotalAfterDiscount >= 500
-          ? 99
-          : subtotalAfterDiscount > 0
-            ? 149
-            : 0;
-  const convenienceFee =
-    launchOffer.isEligible ? 0 : (usableOrderSummary?.convenienceFee ?? 10);
+      : subtotalAfterDiscount >= 500
+        ? 99
+        : subtotalAfterDiscount > 0
+          ? 149
+          : 0;
+  const convenienceFee = launchOffer.isEligible
+    ? 0
+    : (usableOrderSummary?.convenienceFee ?? (actualSubtotal <= 300 ? 5 : 10));
 
   const cartDiscount = usableOrderSummary
     ? {
-      amount: launchOffer.isEligible
-        ? 0
-        : usableOrderSummary.couponDiscount.amount,
-      percent: launchOffer.isEligible
-        ? 100
-        : usableOrderSummary.couponDiscount.percent,
-      code: launchOffer.isEligible
-        ? LAUNCH_OFFER_CODE
-        : usableOrderSummary.couponDiscount.code,
-      isEligible: true, // If it's in orderSummary, it was eligible on cart page
-      shortfall: 0,
-      subtotalAfterDiscount: launchOffer.isEligible
-        ? 0
-        : usableOrderSummary.subtotalAfterDiscount,
-    }
+        amount: launchOffer.isEligible
+          ? 0
+          : usableOrderSummary.couponDiscount.amount,
+        percent: launchOffer.isEligible
+          ? 100
+          : usableOrderSummary.couponDiscount.percent,
+        code: launchOffer.isEligible
+          ? LAUNCH_OFFER_CODE
+          : usableOrderSummary.couponDiscount.code,
+        isEligible: true, // If it's in orderSummary, it was eligible on cart page
+        shortfall: 0,
+        subtotalAfterDiscount: launchOffer.isEligible
+          ? 0
+          : usableOrderSummary.subtotalAfterDiscount,
+      }
     : fallbackCartDiscount;
 
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
@@ -351,16 +347,30 @@ export default function CheckoutPage() {
     null,
   );
   const [isShippingRateLoading, setIsShippingRateLoading] = useState(false);
+
+  // Real-time shipping logic with capping
+  const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
+  const shippingCap = 149;
+  const isCapped =
+    !launchOffer.isEligible &&
+    subtotalAfterDiscount < 1000 &&
+    rawShippingAmount > shippingCap;
+
   const shipping = launchOffer.isEligible
     ? 0
     : subtotalAfterDiscount >= 1000
       ? 0
-      : (dynamicShipping?.shippingAmount ?? baseShipping);
+      : isCapped
+        ? shippingCap
+        : rawShippingAmount;
 
-  const finalTotal =
-    launchOffer.isEligible
-      ? 0
-      : subtotalAfterDiscount + shipping + convenienceFee + currentCodFee;
+  const extraShippingAmount = isCapped
+    ? Number((rawShippingAmount - shippingCap).toFixed(2))
+    : 0;
+
+  const finalTotal = launchOffer.isEligible
+    ? 0
+    : subtotalAfterDiscount + shipping + convenienceFee + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [placedOrderDetails, setPlacedOrderDetails] =
     useState<PlacedOrderDetails | null>(null);
@@ -435,7 +445,7 @@ export default function CheckoutPage() {
           setDynamicShipping(null);
           setShippingRateError(
             result.estimate.error ??
-            "Shiprocket does not show a serviceable courier for this pincode.",
+              "Shiprocket does not show a serviceable courier for this pincode.",
           );
           return;
         }
@@ -761,6 +771,7 @@ export default function CheckoutPage() {
             : 0,
         couponDiscountAmount: launchOffer.isEligible ? 0 : cartDiscount.amount,
         shippingAmount: shipping,
+        extraShippingAmount: extraShippingAmount,
         convenienceFeeAmount: convenienceFee,
         codAmount: currentCodFee,
       },
@@ -1095,11 +1106,23 @@ export default function CheckoutPage() {
                       {checkoutAddresses.map((addr) => (
                         <button
                           key={addr.id}
-                          onClick={() => setSelectedAddressId(addr.id)}
-                          className={`p-6 text-left rounded-2xl border transition-all duration-500 relative group ${selectedAddressId === addr.id
-                            ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
-                            : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                            }`}
+                          onClick={() => {
+                            setSelectedAddressId(addr.id);
+                            setAddressConfirmed(true);
+                            window.setTimeout(() => {
+                              document
+                                .getElementById("checkout-payment-step")
+                                ?.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "start",
+                                });
+                            }, 100);
+                          }}
+                          className={`p-6 text-left rounded-2xl border transition-all duration-500 relative group ${
+                            selectedAddressId === addr.id
+                              ? "bg-brand-brown text-brand-cream border-brand-brown shadow-xl"
+                              : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                          }`}
                         >
                           <div className="relative z-10">
                             <h4 className="text-[9px] uppercase tracking-[0.2em] font-black mb-3 opacity-60">
@@ -1345,6 +1368,15 @@ export default function CheckoutPage() {
                               );
                               if (addedAddress?.id) {
                                 setSelectedAddressId(addedAddress.id);
+                                setAddressConfirmed(true);
+                                window.setTimeout(() => {
+                                  document
+                                    .getElementById("checkout-payment-step")
+                                    ?.scrollIntoView({
+                                      behavior: "smooth",
+                                      block: "start",
+                                    });
+                                }, 100);
                               }
                               setShowNewAddressForm(false);
                             } else {
@@ -1361,57 +1393,32 @@ export default function CheckoutPage() {
                               };
                               setGuestAddress(tempAddr);
                               setSelectedAddressId("guest");
+                              setAddressConfirmed(true);
+                              window.setTimeout(() => {
+                                document
+                                  .getElementById("checkout-payment-step")
+                                  ?.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "start",
+                                  });
+                              }, 100);
                               setShowNewAddressForm(false);
                             }
                           }}
-                          className="flex-1 bg-brand-brown text-brand-cream py-4 rounded-xl lg:rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light min-h-[48px]"
+                          className="flex-1 bg-brand-brown text-brand-cream py-3 rounded-xl lg:rounded-full text-[9px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light min-h-[42px]"
                         >
                           Confirm Address
                         </button>
                         {checkoutAddresses.length > 0 && (
                           <button
                             onClick={() => setShowNewAddressForm(false)}
-                            className="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors min-h-[48px]"
+                            className="px-6 py-3 text-[9px] uppercase tracking-widest font-black text-brand-brown/40 hover:text-brand-brown transition-colors min-h-[42px]"
                           >
                             Cancel
                           </button>
                         )}
                       </div>
                     </div>
-                  )}
-
-                  {selectedAddressId && !showNewAddressForm && (
-                    <button
-                      onClick={() => {
-                        setAddressConfirmed(true);
-                        window.setTimeout(() => {
-                          document
-                            .getElementById("checkout-payment-step")
-                            ?.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            });
-                        }, 100);
-                      }}
-                      className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-5 rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.4)]"
-                    >
-                      <span className="relative z-10 flex items-center gap-3">
-                        {launchOffer.isEligible
-                          ? "Proceed to Verification"
-                          : "Proceed to Payment"}
-                        <ChevronRight
-                          size={16}
-                          className="group-hover:translate-x-1 transition-transform"
-                        />
-                      </span>
-                      <span className="relative z-10 text-[7px] tracking-[0.2em] opacity-50 font-bold uppercase">
-                        {launchOffer.isEligible
-                          ? "Place Launch Order Next"
-                          : "Select Payment Method Next"}
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
-                      <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
-                    </button>
                   )}
                 </div>
               ) : (
@@ -1504,10 +1511,11 @@ export default function CheckoutPage() {
                         setSelectedPayment("razorpay");
                         setPaymentError(null);
                       }}
-                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${selectedPayment === "razorpay"
-                        ? "bg-brand-brown text-brand-cream border-brand-brown"
-                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                        }`}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
+                        selectedPayment === "razorpay"
+                          ? "bg-brand-brown text-brand-cream border-brand-brown"
+                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                      }`}
                     >
                       <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                         <CreditCard
@@ -1540,10 +1548,11 @@ export default function CheckoutPage() {
                         setSelectedPayment("cod");
                         setPaymentError(null);
                       }}
-                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${selectedPayment === "cod"
-                        ? "bg-brand-brown text-brand-cream border-brand-brown"
-                        : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
-                        }`}
+                      className={`w-full p-6 text-left rounded-2xl border shadow-xl flex items-center gap-5 relative transition-all ${
+                        selectedPayment === "cod"
+                          ? "bg-brand-brown text-brand-cream border-brand-brown"
+                          : "bg-brand-cream text-brand-brown border-brand-gold/10 hover:border-brand-gold/40"
+                      }`}
                     >
                       <div className="w-12 h-12 rounded-full bg-brand-gold/10 flex items-center justify-center shrink-0">
                         <Banknote
@@ -1580,7 +1589,12 @@ export default function CheckoutPage() {
 
                   {/* Background organic SVG Leaf/Vine illustration for luxury feel */}
                   <div className="absolute right-0 top-0 -translate-y-4 translate-x-4 opacity-[0.08] pointer-events-none text-brand-gold">
-                    <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
+                    <svg
+                      width="120"
+                      height="120"
+                      viewBox="0 0 100 100"
+                      fill="currentColor"
+                    >
                       <path d="M50,10 C60,25 90,35 90,55 C90,75 75,90 50,90 C25,90 10,75 10,55 C10,35 40,25 50,10 Z M50,22 C43,32 22,41 22,55 C22,69 35,80 50,80 C65,80 78,69 78,55 C78,41 57,32 50,22 Z" />
                     </svg>
                   </div>
@@ -1602,7 +1616,11 @@ export default function CheckoutPage() {
                         </span>
                       ) : selectedPayment ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
-                          <span>{selectedPayment === "razorpay" ? "Secure Online" : "Cash on Delivery"}</span>
+                          <span>
+                            {selectedPayment === "razorpay"
+                              ? "Secure Online"
+                              : "Cash on Delivery"}
+                          </span>
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-terracotta bg-brand-terracotta/8 px-2.5 py-0.5 rounded-full border border-brand-terracotta/20 w-fit mt-0.5">
@@ -1626,10 +1644,12 @@ export default function CheckoutPage() {
                         isShippingRateLoading ||
                         (!launchOffer.isEligible && !selectedPayment)
                       }
-                      className="flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
+                      className="flex-1 max-w-[180px] group relative flex items-center justify-center gap-2 py-3 px-4 bg-brand-green text-brand-cream rounded-full text-[9px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-1.5 w-full text-center">
-                        {isPlacingOrder || isStartingPayment || isShippingRateLoading ? (
+                        {isPlacingOrder ||
+                        isStartingPayment ||
+                        isShippingRateLoading ? (
                           <div className="w-3.5 h-3.5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin flex-shrink-0" />
                         ) : launchOffer.isEligible ? (
                           <Share2
@@ -1637,7 +1657,10 @@ export default function CheckoutPage() {
                             className="text-brand-gold flex-shrink-0"
                           />
                         ) : selectedPayment === "razorpay" ? (
-                          <Lock size={12} className="text-brand-gold animate-pulse flex-shrink-0" />
+                          <Lock
+                            size={12}
+                            className="text-brand-gold animate-pulse flex-shrink-0"
+                          />
                         ) : (
                           <Banknote
                             size={12}
@@ -1645,7 +1668,9 @@ export default function CheckoutPage() {
                           />
                         )}
                         <span className="whitespace-nowrap">
-                          {isPlacingOrder || isStartingPayment || isShippingRateLoading
+                          {isPlacingOrder ||
+                          isStartingPayment ||
+                          isShippingRateLoading
                             ? "Verifying..."
                             : launchOffer.isEligible
                               ? user
@@ -1684,14 +1709,11 @@ export default function CheckoutPage() {
                       isShippingRateLoading ||
                       (!launchOffer.isEligible && !selectedPayment)
                     }
-                    className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-4 lg:py-6 rounded-xl lg:rounded-2xl text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
+                    className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-3 lg:py-4 rounded-xl lg:rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
                   >
                     <span className="relative z-10 flex items-center gap-4">
                       {launchOffer.isEligible ? (
-                        <Share2
-                          size={18}
-                          className="text-brand-green-fresh"
-                        />
+                        <Share2 size={18} className="text-brand-green-fresh" />
                       ) : selectedPayment === "razorpay" ? (
                         <Lock size={18} className="text-brand-green-fresh" />
                       ) : (
@@ -1700,7 +1722,9 @@ export default function CheckoutPage() {
                           className="text-brand-green-fresh"
                         />
                       )}
-                      {isPlacingOrder || isStartingPayment || isShippingRateLoading
+                      {isPlacingOrder ||
+                      isStartingPayment ||
+                      isShippingRateLoading
                         ? "Verifying Securely..."
                         : launchOffer.isEligible
                           ? user
@@ -1762,7 +1786,7 @@ export default function CheckoutPage() {
                           {item.name}
                         </h4>
                         {item.name2 && (
-                          <p className="text-[9px] text-brand-brown/40 font-medium truncate">
+                          <p className="text-[9px] text-brand-brown/40 font-medium truncate font-devanagari">
                             {item.name2}
                           </p>
                         )}
@@ -1824,41 +1848,8 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                 )}
-                {shipping > 0 && (
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-brand-brown/60 font-light">
-                        {dynamicShipping ? "Shipping" : "Shipping"}
-                      </span>
-                      <span className="text-brand-brown font-bold tracking-tight">
-                        ₹{shipping.toFixed(2)}
-                      </span>
-                    </div>
-                    {dynamicShipping?.courierName && (
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
-                        {dynamicShipping.courierName}
-                        {dynamicShipping.expectedDeliveryDate
-                          ? ` • ETA ${dynamicShipping.expectedDeliveryDate}`
-                          : ""}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {isShippingRateLoading && !launchOffer.isEligible && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-brand-brown/60 font-light">
-                      Checking live shipping
-                    </span>
-                    <span className="h-3.5 w-3.5 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
-                  </div>
-                )}
-                {shippingRateError && !launchOffer.isEligible && (
-                  <p className="rounded-2xl border border-brand-gold/10 bg-brand-cream/60 px-3 py-2 text-[9px] font-semibold leading-relaxed text-brand-brown/50">
-                    {shippingRateError} Using standard shipping estimate for
-                    now.
-                  </p>
-                )}
-                {convenienceFee > 0 && (
+
+                {addressConfirmed && convenienceFee > 0 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-brown/60 font-light">
                       Convenience Fee
@@ -1868,15 +1859,70 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                 )}
-                {currentCodFee > 0 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-brand-brown/60 font-light">
-                      COD Charge
-                    </span>
-                    <span className="text-brand-brown font-bold tracking-tight">
-                      ₹{currentCodFee.toFixed(2)}
-                    </span>
+
+                {!addressConfirmed ? (
+                  <div className="bg-brand-cream/50 border border-brand-gold/10 rounded-2xl p-4 text-center mt-2">
+                    <div className="w-6 h-6 rounded-full bg-brand-gold/10 flex items-center justify-center mx-auto mb-2 text-brand-gold">
+                      <MapPin size={12} />
+                    </div>
+                    <p className="text-[9px] text-brand-brown/40 uppercase tracking-widest font-black leading-relaxed">
+                      Select delivery address to
+                      <br />
+                      calculate shipping charges
+                    </p>
                   </div>
+                ) : (
+                  <>
+                    {shipping > 0 && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-brand-brown/60 font-light">
+                            Shipping
+                          </span>
+                          <span className="text-brand-brown font-bold tracking-tight">
+                            ₹{shipping.toFixed(2)}
+                          </span>
+                        </div>
+                        {/* {dynamicShipping?.courierName && (
+                          <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
+                            {dynamicShipping.courierName}
+                            {dynamicShipping.expectedDeliveryDate
+                              ? ` • ETA ${dynamicShipping.expectedDeliveryDate}`
+                              : ""}
+                          </p>
+                        )} */}
+                        {/* {isCapped && (
+                          <p className="text-[8px] font-bold uppercase tracking-widest text-brand-gold italic">
+                            Shipping Capped at ₹{shippingCap}
+                          </p>
+                        )} */}
+                      </div>
+                    )}
+                    {isShippingRateLoading && !launchOffer.isEligible && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-brand-brown/60 font-light">
+                          Checking live shipping
+                        </span>
+                        <span className="h-3.5 w-3.5 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
+                      </div>
+                    )}
+                    {shippingRateError && !launchOffer.isEligible && (
+                      <p className="rounded-2xl border border-brand-gold/10 bg-brand-cream/60 px-3 py-2 text-[9px] font-semibold leading-relaxed text-brand-brown/50">
+                        {shippingRateError} Using standard shipping estimate for
+                        now.
+                      </p>
+                    )}
+                    {currentCodFee > 0 && (
+                      <div className="flex justify-between text-xs">
+                        <span className="text-brand-brown/60 font-light">
+                          COD Charge
+                        </span>
+                        <span className="text-brand-brown font-bold tracking-tight">
+                          ₹{currentCodFee.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
@@ -1885,7 +1931,7 @@ export default function CheckoutPage() {
                   Final Total
                 </span>
                 <span className="text-3xl font-medium text-brand-brown tracking-tighter">
-                  ₹{finalTotal.toFixed(2)}
+                  {addressConfirmed ? `₹${finalTotal.toFixed(2)}` : "—"}
                 </span>
               </div>
 

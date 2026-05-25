@@ -146,6 +146,7 @@ export async function POST(request: Request) {
       (pricingDetails?.productDiscountAmount ?? 0) +
       (pricingDetails?.couponDiscountAmount ?? 0),
     shipping_amount: pricingDetails?.shippingAmount ?? 0,
+    extra_shipping_amount: pricingDetails?.extraShippingAmount ?? 0,
     convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? 0,
     cod_amount: pricingDetails?.codAmount ?? 0,
     total_amount: totalAmount,

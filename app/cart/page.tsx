@@ -122,7 +122,11 @@ export default function CartPage() {
     ? 0
     : cartDiscount.subtotalAfterDiscount;
   const shipping = 0;
-  const convenienceFee = launchOffer.isEligible ? 0 : 10;
+  const convenienceFee = launchOffer.isEligible
+    ? 0
+    : actualSubtotal <= 300
+      ? 5
+      : 10;
   const totalPayable = subtotalAfterDiscount + convenienceFee;
   const freeShippingThreshold = 1000;
   const freeShippingShortfall = Math.max(
@@ -500,7 +504,7 @@ export default function CartPage() {
                             {item.name}
                           </h3>
                           {item.name2 && (
-                            <p className="text-[10px] md:text-xs text-brand-brown/40 font-medium mb-1 truncate">
+                            <p className="text-[10px] md:text-xs text-brand-brown/40 font-medium mb-1 truncate font-devanagari">
                               {item.name2}
                             </p>
                           )}
@@ -658,7 +662,7 @@ export default function CartPage() {
                       </span>
                     </div>
                   )}
-                  {/* {convenienceFee > 0 && (
+                  {convenienceFee > 0 && (
                     <div className="flex justify-between text-xs">
                       <span className="text-brand-brown/60 font-light">
                         Convenience Fee
@@ -667,7 +671,7 @@ export default function CartPage() {
                         ₹{convenienceFee.toFixed(2)}
                       </span>
                     </div>
-                  )} */}
+                  )}
                 </div>
 
                 {!launchOffer.isEligible && (

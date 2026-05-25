@@ -505,7 +505,7 @@ export default function ProfilePage() {
                                       {item.name}
                                     </h4>
                                     {item.name2 && (
-                                      <p className="text-[10px] text-brand-brown/40 font-medium truncate">
+                                      <p className="text-[10px] text-brand-brown/40 font-medium truncate font-devanagari">
                                         {item.name2}
                                       </p>
                                     )}

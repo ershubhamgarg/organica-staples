@@ -390,7 +390,7 @@ export default function ProductPage({
                 </h1>
 
                 {product.name2 && (
-                  <p className="text-lg lg:text-xl font-medium text-brand-brown/40 mb-2 tracking-wide">
+                  <p className="text-lg lg:text-xl font-medium text-brand-brown/40 mb-2 tracking-wide font-devanagari">
                     {product.name2}
                   </p>
                 )}

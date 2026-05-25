@@ -3,6 +3,7 @@
 @theme {
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
+  --font-devanagari: var(--font-devanagari);
   
   --color-brand-brown: #3C362A; /* Deep Earthy Umber */
   --color-brand-brown-light: #5C5446;

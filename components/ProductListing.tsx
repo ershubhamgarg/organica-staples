@@ -209,7 +209,7 @@ export default function ProductListing() {
                       {product.name}
                     </h3>
                     {product.name2 && (
-                      <span className="text-[10px] sm:text-[13px] text-brand-brown/40 font-medium mt-0.5 sm:mt-1">
+                      <span className="text-[10px] sm:text-[13px] text-brand-brown/40 font-medium mt-0.5 sm:mt-1 font-devanagari">
                         {product.name2}
                       </span>
                     )}
