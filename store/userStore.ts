@@ -7,12 +7,17 @@ import { User } from "@supabase/supabase-js";
 import { useCartStore } from "./cartStore";
 
 const getSiteUrl = () => {
+  // 1. If in browser, use current origin (critical for mobile/local network testing)
+  if (typeof window !== "undefined") {
+    const origin = window.location.origin;
+    return origin.endsWith("/") ? origin : `${origin}/`;
+  }
+
+  // 2. Fallback for server-side
   let url =
     process.env.NEXT_PUBLIC_SITE_URL ??
     process.env.NEXT_PUBLIC_VERCEL_URL ??
-    (typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost:3000");
+    "http://localhost:3000";
 
   if (!url.startsWith("http")) {
     url = `https://${url}`;
