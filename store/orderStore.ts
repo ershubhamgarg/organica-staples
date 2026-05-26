@@ -75,6 +75,7 @@ export type OrderPricingDetails = {
   extraShippingAmount?: number;
   convenienceFeeAmount: number;
   codAmount?: number;
+  freightCharge?: number;
 };
 
 const getErrorMessage = (error: unknown) =>

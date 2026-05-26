@@ -775,6 +775,7 @@ export default function CheckoutPage() {
         extraShippingAmount: extraShippingAmount,
         convenienceFeeAmount: convenienceFee,
         codAmount: currentCodFee,
+        freightCharge: dynamicShipping?.freightCharge ?? 0,
       },
     );
 

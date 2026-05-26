@@ -146,8 +146,12 @@ export async function POST(request: Request) {
     extra_shipping_amount: pricingDetails?.extraShippingAmount ?? 0,
     convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? 0,
     cod_amount: pricingDetails?.codAmount ?? 0,
+    freight_charge: pricingDetails?.freightCharge ?? 0,
     total_amount: totalAmount,
-    status: "pending",
+    status:
+      paymentMethod === "instagram_story_verification"
+        ? "verification_pending"
+        : "pending",
   };
 
   const { data, error } = await supabaseAdmin.rpc(
