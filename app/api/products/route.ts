@@ -41,8 +41,9 @@ const mapProduct = (row: ProductRow): Product => {
   const inventory = getInventory(row);
   const stockQuantity = inventory?.available_quantity;
   const lowStockThreshold = inventory?.low_stock_threshold;
-  const product = { ...row } as any;
-  delete product.product_inventory;
+  const product = Object.fromEntries(
+    Object.entries(row).filter(([key]) => key !== "product_inventory"),
+  ) as Product;
 
   if (product.name === "Cold Pressed Mustard Oil") {
     product.name2 = "सरसों का तेल (Sarson ka Tel)";
