@@ -1070,7 +1070,11 @@ export default function CheckoutPage() {
                 </div>
                 {addressConfirmed && (
                   <button
-                    onClick={() => setAddressConfirmed(false)}
+                    onClick={() => {
+                      setAddressConfirmed(false);
+                      setSelectedAddressId(null);
+                      setDynamicShipping(null);
+                    }}
                     className="text-[10px] uppercase tracking-widest font-black text-brand-gold hover:text-brand-terracotta transition-colors"
                   >
                     Change
@@ -1930,7 +1934,7 @@ export default function CheckoutPage() {
                   Final Total
                 </span>
                 <span className="text-3xl font-medium text-brand-brown tracking-tighter">
-                  ₹{finalTotal.toFixed(2)}
+                  {addressConfirmed ? `₹${finalTotal.toFixed(2)}` : "—"}
                 </span>
               </div>
 
