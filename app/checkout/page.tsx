@@ -365,9 +365,13 @@ export default function CheckoutPage() {
         ? shippingCap
         : rawShippingAmount;
 
-  const extraShippingAmount = isCapped
-    ? Number((rawShippingAmount - shippingCap).toFixed(2))
-    : 0;
+  const extraShippingAmount = launchOffer.isEligible
+    ? (dynamicShipping?.freightCharge ?? 0)
+    : subtotalAfterDiscount >= 1000
+      ? (dynamicShipping?.freightCharge ?? 0)
+      : isCapped
+        ? Number((rawShippingAmount - shippingCap).toFixed(2))
+        : 0;
 
   const finalTotal = launchOffer.isEligible
     ? 0
@@ -398,13 +402,6 @@ export default function CheckoutPage() {
   }, [user, newAddress.email]);
 
   useEffect(() => {
-    if (launchOffer.isEligible || subtotalAfterDiscount >= 1000) {
-      setDynamicShipping(null);
-      setShippingRateError(null);
-      setIsShippingRateLoading(false);
-      return;
-    }
-
     const deliveryPostcode = selectedAddress?.zipCode.replace(/\D/g, "") ?? "";
 
     if (deliveryPostcode.length !== 6) {
@@ -431,7 +428,7 @@ export default function CheckoutPage() {
             deliveryPostcode,
             items,
             paymentMethod: selectedPayment,
-            declaredValue: subtotalAfterDiscount,
+            declaredValue: actualSubtotal,
           }),
         });
         const result = (await response.json()) as ShippingRateResponse;
@@ -471,13 +468,7 @@ export default function CheckoutPage() {
     void fetchShippingRate();
 
     return () => controller.abort();
-  }, [
-    items,
-    launchOffer.isEligible,
-    selectedAddress,
-    selectedPayment,
-    subtotalAfterDiscount,
-  ]);
+  }, [items, selectedAddress, selectedPayment, actualSubtotal]);
 
   useEffect(() => {
     if (!orderPlaced) return;
