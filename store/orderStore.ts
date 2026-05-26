@@ -23,6 +23,9 @@ export interface Order {
   extra_shipping_amount?: number | null;
   convenience_fee_amount?: number | null;
   cod_amount?: number | null;
+  wholesale_total_amount?: number | null;
+  cost_to_company?: number | null;
+  profit_loss?: number | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   shiprocket_order_id?: string | null;
