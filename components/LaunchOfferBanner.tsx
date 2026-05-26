@@ -56,7 +56,7 @@ export default function LaunchOfferBanner() {
     };
   }, [showOfferDetails]);
 
-  if (isDismissed || !hasRevealDelayElapsed) {
+  if (isDismissed || !hasRevealDelayElapsed || hasClaimed) {
     return null;
   }
 

@@ -67,6 +67,10 @@ export default function CartPage() {
   const launchOfferClaim = useLaunchOfferClaimStatus(user);
   const [discountInput, setDiscountInput] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [discountMessage, setDiscountMessage] = useState<string | null>(null);
   const [publicCoupons, setPublicCoupons] = useState<DiscountCode[]>([]);
@@ -90,8 +94,7 @@ export default function CartPage() {
       return {
         ...rawLaunchOffer,
         isEligible: false,
-        message:
-          "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment.",
+        message: "",
       };
     }
 
@@ -99,7 +102,7 @@ export default function CartPage() {
       return {
         ...rawLaunchOffer,
         isEligible: false,
-        message: "Checking your launch offer claim status.",
+        message: "Checking status...",
       };
     }
 
@@ -127,7 +130,7 @@ export default function CartPage() {
     : actualSubtotal <= 300
       ? 5
       : 10;
-  const totalPayable = subtotalAfterDiscount + convenienceFee;
+  const totalPayable = subtotalAfterDiscount;
   const freeShippingThreshold = 1000;
   const freeShippingShortfall = Math.max(
     freeShippingThreshold - subtotalAfterDiscount,
@@ -150,7 +153,7 @@ export default function CartPage() {
       subtotalAfterDiscount,
       shipping,
       convenienceFee,
-      totalPayable,
+      totalPayable: subtotalAfterDiscount + convenienceFee,
     });
   }, [
     mounted,
@@ -160,7 +163,6 @@ export default function CartPage() {
     subtotalAfterDiscount,
     shipping,
     convenienceFee,
-    totalPayable,
     launchOffer.isEligible,
     setOrderSummary,
   ]);
@@ -378,6 +380,56 @@ export default function CartPage() {
               </div>
             </div>
           )}
+
+          {/* Individual Item Delete Confirmation Overlay */}
+          {itemToDelete && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-brand-brown/40 backdrop-blur-md animate-reveal-fade">
+              <div className="bg-white rounded-[2.5rem] border border-brand-gold/20 p-8 md:p-12 shadow-2xl shadow-brand-brown/40 max-w-md w-full relative overflow-hidden animate-reveal-up">
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
+                  <Trash2
+                    size={120}
+                    className="text-brand-terracotta rotate-12"
+                  />
+                </div>
+
+                <div className="relative z-10 text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-brand-terracotta/10 flex items-center justify-center text-brand-terracotta mx-auto mb-6">
+                    <AlertCircle size={32} />
+                  </div>
+
+                  <h3 className="text-2xl font-serif text-brand-brown mb-2">
+                    Remove last item?
+                  </h3>
+                  <p className="text-[10px] text-brand-brown/40 uppercase tracking-[0.3em] font-black mb-6">
+                    {itemToDelete.name}
+                  </p>
+
+                  <p className="text-sm text-brand-brown/60 font-light mb-8 leading-relaxed">
+                    Removing this will leave your basket empty. Are you sure you
+                    want to remove your last item?
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={() => setItemToDelete(null)}
+                      className="flex-1 py-4 rounded-full border border-brand-gold/20 text-[10px] uppercase tracking-[0.25em] font-black text-brand-brown hover:bg-brand-cream transition-colors"
+                    >
+                      Keep Item
+                    </button>
+                    <button
+                      onClick={() => {
+                        removeFromCart(itemToDelete.id, user?.id);
+                        setItemToDelete(null);
+                      }}
+                      className="flex-1 py-4 rounded-full bg-brand-terracotta text-[10px] uppercase tracking-[0.25em] font-black text-white hover:bg-brand-terracotta/90 transition-colors shadow-xl shadow-brand-terracotta/20"
+                    >
+                      Remove Item
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <Link
             href="/#shop"
             className="inline-flex items-center gap-3 text-brand-brown/60 hover:text-brand-brown transition-all text-[9px] uppercase tracking-[0.2em] font-black"
@@ -387,55 +439,34 @@ export default function CartPage() {
         </div>
 
         <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
-                {launchOfferClaim.hasClaimed
-                  ? "Launch Story Offer Claimed"
-                  : "Limited Launch Story Offer"}
-              </p>
-              <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
-                {launchOfferClaim.hasClaimed ? (
-                  "Congratulations on claiming the launch offer."
-                ) : (
-                  <>
-                    Get any 2 products at{" "}
-                    <span className="italic text-brand-green-fresh">
-                      ₹0 product cost
-                    </span>
-                  </>
-                )}
-              </h2>
-              <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
-                {launchOfferClaim.hasClaimed
-                  ? "Your one-time launch offer claim is confirmed. Our team is working toward fulfilment, so this cart will continue as a regular paid order."
-                  : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @amritya_organics for verification."}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">
-              <p className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
-                {launchOfferClaim.hasClaimed
-                  ? "Claim Confirmed"
-                  : launchOffer.isEligible
-                    ? "Unlocked"
-                    : "How to unlock"}
-              </p>
-              <p
-                className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${
-                  launchOffer.isEligible || launchOfferClaim.hasClaimed
-                    ? "text-brand-green-fresh"
-                    : "text-brand-brown/50"
-                }`}
-              >
-                {launchOffer.message}
-              </p>
-              {!launchOfferClaim.hasClaimed && (
+          {!launchOfferClaim.hasClaimed && (
+            <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
+              <div className="flex-1">
+                <p className="text-xs text-brand-brown/40 font-light leading-relaxed text-balance">
+                  {launchOffer.isEligible
+                    ? "Your order qualifies for the one-time launch offer. Place your order and complete Instagram verification to proceed."
+                    : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @amritya_organics for verification."}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">
+                <p className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
+                  {launchOffer.isEligible ? "Unlocked" : "How to unlock"}
+                </p>
+                <p
+                  className={`mt-1 text-[10px] font-bold uppercase tracking-widest ${
+                    launchOffer.isEligible
+                      ? "text-brand-green-fresh"
+                      : "text-brand-brown/50"
+                  }`}
+                >
+                  {launchOffer.message}
+                </p>
                 <p className="mt-2 text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
                   Only {LAUNCH_OFFER_PACK_LIMIT} packs per item available.
                 </p>
-              )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {items.length === 0 ? (
@@ -533,7 +564,16 @@ export default function CartPage() {
                           </div>
                         </Link>
                         <button
-                          onClick={() => removeFromCart(item.id, user?.id)}
+                          onClick={() => {
+                            if (items.length === 1) {
+                              setItemToDelete({
+                                id: item.id,
+                                name: item.name,
+                              });
+                            } else {
+                              removeFromCart(item.id, user?.id);
+                            }
+                          }}
                           className="text-brand-brown/20 hover:text-brand-terracotta transition-all p-2 hover:scale-110 shrink-0"
                         >
                           <Trash2 size={18} strokeWidth={1.5} />
@@ -543,13 +583,20 @@ export default function CartPage() {
                       <div className="flex flex-row items-center justify-between mt-4 pt-4 border-t border-brand-gold/10 gap-4">
                         <div className="flex items-center border border-brand-brown rounded-full bg-brand-cream/50 p-0.5 scale-90 sm:scale-100 origin-left">
                           <button
-                            onClick={() =>
-                              updateQuantity(
-                                item.id,
-                                item.quantity - 1,
-                                user?.id,
-                              )
-                            }
+                            onClick={() => {
+                              if (item.quantity === 1 && items.length === 1) {
+                                setItemToDelete({
+                                  id: item.id,
+                                  name: item.name,
+                                });
+                              } else {
+                                updateQuantity(
+                                  item.id,
+                                  item.quantity - 1,
+                                  user?.id,
+                                );
+                              }
+                            }}
                             className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-terracotta transition-all rounded-full hover:bg-brand-cream"
                             aria-label="Decrease quantity"
                           >
@@ -662,25 +709,40 @@ export default function CartPage() {
                       </span>
                     </div>
                   )}
-                  {convenienceFee > 0 && (
-                    <div className="flex justify-between text-xs">
-                      <span className="text-brand-brown/80 font-light">
-                        Convenience Fee
-                      </span>
-                      <span className="text-brand-brown font-bold tracking-tight">
-                        ₹{convenienceFee.toFixed(2)}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {!launchOffer.isEligible && (
-                  <div className="mb-8 rounded-2xl border border-brand-green/10 bg-brand-green/5 p-4 text-center">
-                    <p className="text-[8px] uppercase tracking-[0.2em] font-black text-brand-green-fresh">
-                      {subtotalAfterDiscount >= freeShippingThreshold
-                        ? "Shipping unlocks free at checkout for this order"
-                        : `Shipping will be calculated at checkout after delivery address. Add ₹${freeShippingShortfall.toFixed(2)} more for free shipping.`}
-                    </p>
+                  <div className="mb-8 rounded-2xl border border-brand-gold/10 bg-brand-cream/50 p-5 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-brand-gold shadow-sm">
+                        <Truck size={14} strokeWidth={2} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-gold mb-1.5">
+                          Shipping Information
+                        </p>
+                        <p className="text-[11px] leading-relaxed text-brand-brown/70 font-medium">
+                          {subtotalAfterDiscount >= freeShippingThreshold ? (
+                            <span className="flex items-center gap-1.5 text-brand-green-fresh font-bold">
+                              <Sparkles size={10} />
+                              Your order qualifies for Free Shipping!
+                            </span>
+                          ) : (
+                            <>
+                              Calculated at checkout. Add{" "}
+                              <span className="text-brand-green-fresh font-bold">
+                                ₹{freeShippingShortfall.toFixed(2)}
+                              </span>{" "}
+                              more to unlock{" "}
+                              <span className="text-brand-green-fresh font-bold">
+                                Free Delivery
+                              </span>
+                              .
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
 

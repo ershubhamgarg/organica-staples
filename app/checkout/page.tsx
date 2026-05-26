@@ -59,6 +59,8 @@ type ShippingRateEstimate = {
   courierName: string | null;
   courierCompanyId: number | null;
   expectedDeliveryDate: string | null;
+  codCharges: number;
+  freightCharge: number;
   chargeableWeightKg: number;
   error: string | null;
 };
@@ -238,9 +240,7 @@ export default function CheckoutPage() {
       ? {
           ...rawLaunchOffer,
           isEligible: false,
-          message: launchOfferClaim.hasClaimed
-            ? "Congratulations, your launch offer is already claimed. Our team is working toward fulfilment."
-            : "Checking your launch offer claim status.",
+          message: launchOfferClaim.hasClaimed ? "" : "Checking status...",
         }
       : rawLaunchOffer;
   const usableOrderSummary =
@@ -338,11 +338,12 @@ export default function CheckoutPage() {
     "razorpay",
   );
 
-  const codCharge = 15;
-  const currentCodFee =
-    selectedPayment === "cod" && !launchOffer.isEligible ? codCharge : 0;
   const [dynamicShipping, setDynamicShipping] =
     useState<ShippingRateEstimate | null>(null);
+  const currentCodFee =
+    selectedPayment === "cod" && !launchOffer.isEligible
+      ? (dynamicShipping?.codCharges ?? 0)
+      : 0;
   const [shippingRateError, setShippingRateError] = useState<string | null>(
     null,
   );
@@ -1029,28 +1030,6 @@ export default function CheckoutPage() {
           </Link>
         </div>
 
-        {launchOfferClaim.hasClaimed && (
-          <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
-            <div className="flex items-start gap-4">
-              <div className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-green-fresh">
-                <CheckCircle2 size={20} strokeWidth={1.5} />
-              </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-green-fresh">
-                  Launch Story Offer Claimed
-                </p>
-                <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
-                  Congratulations on claiming the launch offer.
-                </h2>
-                <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
-                  Our team is working toward fulfilment. This checkout will
-                  continue as a regular paid order.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {launchOffer.isEligible && (
           <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
             <div className="flex items-start gap-4">
@@ -1569,7 +1548,7 @@ export default function CheckoutPage() {
                           Cash on Delivery
                         </p>
                         <p className="text-[10px] font-light opacity-70 mt-1">
-                          Pay at your doorstep (Extra ₹15 charge)
+                          Pay at your doorstep
                         </p>
                       </div>
                       {selectedPayment === "cod" && (
@@ -1849,7 +1828,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
-                {addressConfirmed && convenienceFee > 0 && (
+                {convenienceFee > 0 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-brand-brown/80 font-light">
                       Convenience Fee
@@ -1897,6 +1876,37 @@ export default function CheckoutPage() {
                         )} */}
                     </div>
 
+                    {currentCodFee > 0 && (
+                      <div className="mt-4 rounded-2xl border border-brand-gold/10 bg-brand-gold/5 p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <ShieldCheck
+                              size={14}
+                              className="text-brand-gold"
+                            />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-brand-gold">
+                              COD Handling Fee
+                            </span>
+                          </div>
+                          <span className="text-brand-brown font-bold tracking-tight text-xs">
+                            ₹{currentCodFee.toFixed(2)}
+                          </span>
+                        </div>
+                        <p className="text-[10px] leading-relaxed text-brand-brown/60 font-medium">
+                          These charges are taken by our shipping partner for
+                          handling cash. Please make an{" "}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPayment("razorpay")}
+                            className="text-brand-green-fresh font-bold hover:underline"
+                          >
+                            online payment
+                          </button>{" "}
+                          to avoid these extra charges.
+                        </p>
+                      </div>
+                    )}
+
                     {isShippingRateLoading && !launchOffer.isEligible && (
                       <div className="flex justify-between text-xs">
                         <span className="text-brand-brown/60 font-light">
@@ -1911,16 +1921,6 @@ export default function CheckoutPage() {
                         now.
                       </p>
                     )}
-                    {currentCodFee > 0 && (
-                      <div className="flex justify-between text-xs">
-                        <span className="text-brand-brown/80 font-light">
-                          COD Charge
-                        </span>
-                        <span className="text-brand-brown font-bold tracking-tight">
-                          ₹{currentCodFee.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
                   </>
                 )}
               </div>
@@ -1930,7 +1930,7 @@ export default function CheckoutPage() {
                   Final Total
                 </span>
                 <span className="text-3xl font-medium text-brand-brown tracking-tighter">
-                  {addressConfirmed ? `₹${finalTotal.toFixed(2)}` : "—"}
+                  ₹{finalTotal.toFixed(2)}
                 </span>
               </div>
 

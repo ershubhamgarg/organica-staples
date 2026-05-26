@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Star, ChevronDown } from "lucide-react";
+import { Star, ChevronDown, Hourglass } from "lucide-react";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -301,6 +301,25 @@ export default function ProductListing() {
             </div>
           );
         })}
+
+        {/* Coming Soon Placeholder */}
+        <div className="group flex flex-col animate-fade-in">
+          <div className="block relative mb-3 sm:mb-6">
+            <div className="absolute -inset-1 sm:-inset-2 border border-brand-gold/15 organic-border-alt pointer-events-none opacity-50" />
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand/10 flex flex-col items-center justify-center p-6 text-center group-hover:bg-brand-sand/30 transition-all duration-1000 border border-brand-gold/5 bg-jute">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-4 text-brand-gold/40 group-hover:scale-110 group-hover:text-brand-gold/60 transition-all duration-1000">
+                <Hourglass size={20} strokeWidth={1.5} />
+              </div>
+              <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold/30 mb-2">
+                Growing Soon
+              </p>
+              <h4 className="font-serif text-sm sm:text-lg text-brand-brown/30 group-hover:text-brand-brown/50 transition-colors duration-1000 leading-tight px-4">
+                More healthy products are on the way...
+              </h4>
+              <div className="mt-4 w-12 h-[1px] bg-brand-gold/10 group-hover:w-20 group-hover:bg-brand-gold/20 transition-all duration-1000" />
+            </div>
+          </div>
+        </div>
       </ScrollReveal>
     </section>
   );

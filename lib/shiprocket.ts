@@ -309,16 +309,9 @@ const getRecommendedCourier = (
   ) ?? couriers[0];
 
 const getCourierRate = (courier: ShiprocketCourierCompany) => {
-  const rate = Number(courier.rate);
   const freightCharge = Number(courier.freight_charge);
-  const codCharges = Number(courier.cod_charges);
 
-  if (Number.isFinite(rate) && rate > 0) return rate;
-
-  return (
-    (Number.isFinite(freightCharge) ? freightCharge : 0) +
-    (Number.isFinite(codCharges) ? codCharges : 0)
-  );
+  return Number.isFinite(freightCharge) ? freightCharge : 0;
 };
 
 const getPaymentMethod = (paymentMethod: string) =>
