@@ -12,11 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import ScrollReveal from "./ScrollReveal";
-import {
-  isProductAvailable,
-  isProductLowStock,
-  Product,
-} from "@/lib/data";
+import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import { getDiscountedPrice } from "@/lib/pricing";
 
 type ActivityLevel = "low" | "moderate" | "high";
@@ -125,7 +121,8 @@ const recommendationDataset: Recommendation[] = [
       {
         label: "Meal stability",
         value: "High",
-        detail: "Best for repeated daily meals where consistency beats novelty.",
+        detail:
+          "Best for repeated daily meals where consistency beats novelty.",
       },
       {
         label: "Lifestyle friction",
@@ -148,7 +145,8 @@ const recommendationDataset: Recommendation[] = [
     title: "Heart-smart oil rotation",
     product: "Extra Virgin Olive Oil",
     productSearchTerms: ["olive oil", "extra virgin olive"],
-    bestFor: "Customers reducing heavy or highly saturated cooking-fat patterns",
+    bestFor:
+      "Customers reducing heavy or highly saturated cooking-fat patterns",
     reason:
       "Oil is one of the highest-leverage pantry choices because it touches vegetables, grains, dressings, marinades, and snacks across the week.",
     action:
@@ -264,7 +262,8 @@ const recommendationDataset: Recommendation[] = [
     title: "Satiety-led pantry rhythm",
     product: "High-fibre flours and pulses",
     productSearchTerms: ["pulse", "dal", "flour", "atta", "millet"],
-    bestFor: "Customers who want fuller meals without relying on larger portions",
+    bestFor:
+      "Customers who want fuller meals without relying on larger portions",
     reason:
       "Fibre-forward staples help the customer build plates around structure: vegetables, pulses, grains, and protein-rich sides.",
     action:
@@ -322,7 +321,8 @@ const recommendationDataset: Recommendation[] = [
     title: "Everyday cooking foundation",
     product: "Cold Pressed Mustard Oil",
     productSearchTerms: ["mustard oil", "cold pressed", "sarson"],
-    bestFor: "Households that want a familiar Indian cooking oil with stronger pantry discipline",
+    bestFor:
+      "Households that want a familiar Indian cooking oil with stronger pantry discipline",
     reason:
       "A familiar cold-pressed oil helps customers improve cooking quality without abandoning regional taste, tadka habits, or family recipes.",
     action:
@@ -367,7 +367,8 @@ const recommendationDataset: Recommendation[] = [
       {
         label: "Pantry role",
         value: "Core",
-        detail: "Acts as a daily cooking base rather than an occasional add-on.",
+        detail:
+          "Acts as a daily cooking base rather than an occasional add-on.",
       },
     ],
     signalMatches: ["everyday"],
@@ -406,7 +407,9 @@ function getProductMatch(
   recommendation: Recommendation,
   products: Product[],
 ): Product | null {
-  const visibleProducts = products.filter((product) => product.isVisible !== false);
+  const visibleProducts = products.filter(
+    (product) => product.isVisible !== false,
+  );
 
   return (
     visibleProducts.find((product) => {
@@ -432,7 +435,9 @@ function getRecommendationProductKey(
   recommendation: Recommendation,
   product: Product | null,
 ) {
-  return String(product?.id ?? recommendation.product).trim().toLowerCase();
+  return String(product?.id ?? recommendation.product)
+    .trim()
+    .toLowerCase();
 }
 
 function getAvailabilityLabel(product: Product | null) {
@@ -634,15 +639,21 @@ export default function HelpMeDecide() {
           </p>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10 items-start">
-          <ScrollReveal className="lg:col-span-4">
+        <div
+          className={`grid grid-cols-1 ${hasSubmitted ? "lg:grid-cols-12" : "lg:grid-cols-1"} gap-8 xl:gap-10 items-start`}
+        >
+          <ScrollReveal
+            className={hasSubmitted ? "lg:col-span-4" : "lg:col-span-12"}
+          >
             <form
               onSubmit={handleSubmit}
-              className="bg-white rounded-3xl border border-brand-gold/10 p-8 md:p-10 shadow-2xl shadow-brand-brown/5 relative overflow-hidden"
+              className={`bg-white rounded-3xl border border-brand-gold/10 p-8 md:p-10 shadow-2xl shadow-brand-brown/5 relative overflow-hidden transition-all duration-700 ${!hasSubmitted ? "max-w-5xl mx-auto" : ""}`}
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full translate-x-1/2 -translate-y-1/2" />
 
-              <div className="relative z-10 flex items-start justify-between gap-6 mb-10 pb-4 border-b border-brand-gold/5">
+              <div
+                className={`relative z-10 flex ${!hasSubmitted ? "flex-col md:flex-row items-center text-center md:text-left" : "items-start"} justify-between gap-6 mb-10 pb-4 border-b border-brand-gold/5`}
+              >
                 <div>
                   <h3 className="text-2xl font-serif text-brand-brown tracking-tight">
                     Wellness Profile
@@ -651,12 +662,14 @@ export default function HelpMeDecide() {
                     Shopping guidance only, not medical advice.
                   </p>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-brand-sand flex items-center justify-center text-brand-gold">
+                <div className="w-12 h-12 rounded-full bg-brand-sand flex items-center justify-center text-brand-gold shrink-0">
                   <HeartPulse size={20} strokeWidth={1.5} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-8 gap-y-10 relative z-10">
+              <div
+                className={`grid ${hasSubmitted ? "grid-cols-2" : "grid-cols-2 md:grid-cols-4 lg:grid-cols-7"} gap-x-6 gap-y-8 relative z-10`}
+              >
                 <div className="col-span-1">
                   <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3">
                     Age
@@ -724,14 +737,14 @@ export default function HelpMeDecide() {
                   />
                 </div>
 
-                <div className="col-span-2">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-gold mb-8 mt-4 flex items-center gap-3">
-                    Optional Bio-Markers
-                    <span className="h-px flex-grow bg-brand-gold/10" />
-                  </h4>
-                  <div className="grid grid-cols-3 gap-6">
+                <div
+                  className={`${hasSubmitted ? "col-span-2" : "col-span-2 md:col-span-4 lg:col-span-3"}`}
+                >
+                  <div
+                    className={`grid ${hasSubmitted ? "grid-cols-3" : "grid-cols-3"} gap-4`}
+                  >
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3 whitespace-nowrap">
                         Sugar
                       </label>
                       <input
@@ -739,12 +752,12 @@ export default function HelpMeDecide() {
                         name="fastingSugar"
                         value={profile.fastingSugar}
                         onChange={handleChange}
-                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                         placeholder="mg/dL"
                       />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3 whitespace-nowrap">
                         HbA1c
                       </label>
                       <input
@@ -753,12 +766,12 @@ export default function HelpMeDecide() {
                         name="hba1c"
                         value={profile.hba1c}
                         onChange={handleChange}
-                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                         placeholder="%"
                       />
                     </div>
                     <div>
-                      <label className="block text-[9px] font-bold uppercase tracking-widest text-brand-brown/40 mb-2">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-brand-brown/40 mb-3 whitespace-nowrap">
                         Chol.
                       </label>
                       <input
@@ -766,7 +779,7 @@ export default function HelpMeDecide() {
                         name="totalCholesterol"
                         value={profile.totalCholesterol}
                         onChange={handleChange}
-                        className="w-full bg-transparent border-b border-brand-gold/20 py-2 text-xs focus:outline-none focus:border-brand-brown transition-colors"
+                        className="w-full bg-brand-cream/50 border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/50 font-light px-2"
                         placeholder="mg/dL"
                       />
                     </div>
@@ -774,15 +787,20 @@ export default function HelpMeDecide() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full group relative mt-16 flex items-center justify-center gap-4 bg-brand-brown text-brand-cream py-5 rounded-full text-[11px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px]"
+              <div
+                className={`flex ${!hasSubmitted ? "justify-center" : "justify-start"} mt-12`}
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  See Recommendations <ArrowRight size={14} />
-                </span>
-                <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
-              </button>
+                <button
+                  type="submit"
+                  className={`${!hasSubmitted ? "w-full md:w-auto px-12" : "w-full"} group relative flex items-center justify-center gap-4 bg-brand-brown text-brand-cream py-5 rounded-full text-[11px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px]`}
+                >
+                  <span className="relative z-10 flex items-center gap-3">
+                    {hasSubmitted ? "Update Results" : "Reveal Suggestions"}{" "}
+                    <ArrowRight size={14} />
+                  </span>
+                  <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
+                </button>
+              </div>
 
               {hasSubmitted && (
                 <div className="relative z-10 mt-8 rounded-2xl bg-brand-cream/70 border border-brand-gold/10 p-5">
@@ -822,371 +840,385 @@ export default function HelpMeDecide() {
             </form>
           </ScrollReveal>
 
-          <ScrollReveal
-            animation="reveal-fade"
-            delay={200}
-            className="lg:col-span-8"
-          >
-            {!hasSubmitted ? (
-              <div className="min-h-[520px] bg-white/40 rounded-3xl border-2 border-dashed border-brand-gold/10 flex flex-col items-center justify-center p-16 text-center">
-                <div className="w-20 h-20 rounded-full bg-brand-sand flex items-center justify-center mb-8 text-brand-gold/30">
-                  <Scale size={32} strokeWidth={1} />
-                </div>
-                <h4 className="text-2xl font-serif text-brand-brown/40 mb-4 tracking-tight">
-                  Awaiting Your Profile
-                </h4>
-                <p className="text-brand-brown/30 font-light max-w-sm text-balance">
-                  Fill your wellness profile to receive a structured product
-                  comparison with match scores, benefits, use cases, and catalog
-                  signals.
-                </p>
-              </div>
-            ) : activeRecommendation ? (
-              <div className="animate-fade-in bg-white rounded-3xl border border-brand-gold/5 shadow-2xl shadow-brand-brown/5 overflow-hidden">
-                {(() => {
-                  const activeProduct = activeRecommendation.catalogProduct;
-                  const productIsOpenable = canOpenProduct(activeProduct);
-                  const productHref = activeProduct
-                    ? `/product/${activeProduct.id}`
-                    : "#shop";
+          {hasSubmitted && (
+            <ScrollReveal
+              animation="reveal-fade"
+              delay={200}
+              className="lg:col-span-8"
+            >
+              {activeRecommendation ? (
+                <div className="animate-fade-in bg-white rounded-3xl border border-brand-gold/5 shadow-2xl shadow-brand-brown/5 overflow-hidden">
+                  {(() => {
+                    const activeProduct = activeRecommendation.catalogProduct;
+                    const productIsOpenable = canOpenProduct(activeProduct);
+                    const productHref = activeProduct
+                      ? `/product/${activeProduct.id}`
+                      : "#shop";
 
-                  return (
-                <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr]">
-                  <div className="bg-brand-brown text-brand-cream p-5 flex flex-col gap-6">
-                    <div>
-                      <div className="flex items-center gap-3 text-brand-gold mb-5">
-                        <BarChart3 size={16} />
-                        <p className="text-[9px] font-black uppercase tracking-[0.24em]">
-                          Match Board
-                        </p>
-                      </div>
-                      <div className="space-y-3">
-                        {insights.map((rec, index) => {
-                          const isActive = rec.id === activeRecommendation.id;
-
-                          return (
-                            <button
-                              key={rec.id}
-                              type="button"
-                              onClick={() => setActiveRecommendationId(rec.id)}
-                              className={`w-full rounded-2xl border p-4 text-left transition-all ${
-                                isActive
-                                  ? "bg-brand-cream text-brand-brown border-brand-gold"
-                                  : "bg-white/5 text-brand-cream border-white/10 hover:border-brand-gold/50"
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <span className="text-[9px] font-black uppercase tracking-[0.22em] opacity-60">
-                                  Pick {index + 1}
-                                </span>
-                                <span className="font-serif text-2xl">
-                                  {rec.matchScore}%
-                                </span>
-                              </div>
-                              <p className="mt-2 font-serif text-base leading-tight">
-                                {rec.catalogProduct?.name ?? rec.product}
+                    return (
+                      <div className="grid grid-cols-1 xl:grid-cols-[220px_1fr]">
+                        <div className="bg-brand-brown text-brand-cream p-5 flex flex-col gap-6">
+                          <div>
+                            <div className="flex items-center gap-3 text-brand-gold mb-5">
+                              <BarChart3 size={16} />
+                              <p className="text-[9px] font-black uppercase tracking-[0.24em]">
+                                Match Board
                               </p>
-                              <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/15">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    isActive ? "bg-brand-green" : "bg-brand-gold"
-                                  }`}
-                                  style={{ width: `${rec.matchScore}%` }}
-                                />
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[9px] font-black uppercase tracking-[0.24em] text-brand-cream/50">
-                        Profile Signals
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {activeSignalLabels.slice(0, 4).map((label) => (
-                          <span
-                            key={label}
-                            className="rounded-full bg-white/10 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-brand-cream/80"
-                          >
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-5 md:p-7">
-                    <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 items-start">
-                      <div className="rounded-3xl bg-brand-cream/70 border border-brand-gold/10 p-5 flex flex-col items-center justify-center text-center">
-                        <div
-                          className="relative grid h-36 w-36 place-items-center rounded-full"
-                          style={{
-                            background: `conic-gradient(#2D3A26 ${
-                              activeRecommendation.matchScore * 3.6
-                            }deg, rgba(212,175,55,0.18) 0deg)`,
-                          }}
-                        >
-                          <div className="absolute inset-3 rounded-full bg-white" />
-                          <div className="relative">
-                            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-gold">
-                              Match
-                            </p>
-                            <p className="text-4xl font-serif text-brand-brown">
-                              {activeRecommendation.matchScore}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="mt-5 text-[9px] font-black uppercase tracking-[0.18em] text-brand-terracotta">
-                          {activeRecommendation.title}
-                        </p>
-                        {productIsOpenable ? (
-                          <Link
-                            href={productHref}
-                            className="mt-2 font-serif text-xl leading-tight text-brand-brown hover:text-brand-terracotta transition-colors"
-                          >
-                            {activeProduct?.name ?? activeRecommendation.product}
-                          </Link>
-                        ) : (
-                          <p className="mt-2 font-serif text-xl leading-tight text-brand-brown">
-                            {activeProduct?.name ?? activeRecommendation.product}
-                          </p>
-                        )}
-                        <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-green">
-                          {getAvailabilityLabel(activeProduct)}
-                        </p>
-                        {!productIsOpenable && (
-                          <p className="mt-3 max-w-44 text-xs leading-relaxed text-brand-brown/55">
-                            This product will soon be available in the catalog.
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {[
-                            {
-                              label: "Fit",
-                              score: activeRecommendation.matchScore,
-                            },
-                            {
-                              label: "Trust",
-                              score: getSatisfactionScore(
-                                activeRecommendation.catalogProduct,
-                              ),
-                            },
-                            {
-                              label: "Value",
-                              score: getValueScore(
-                                activeRecommendation.catalogProduct,
-                              ),
-                            },
-                          ].map((metric) => (
-                            <div
-                              key={metric.label}
-                              className="rounded-2xl border border-brand-gold/10 bg-white p-4 min-w-0"
-                            >
-                              <div className="flex flex-col gap-1">
-                                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-brown/40">
-                                  {metric.label}
-                                </p>
-                                <p className="font-serif text-2xl leading-none text-brand-brown">
-                                  {metric.score}
-                                </p>
-                              </div>
-                              <div className="mt-3 h-2 overflow-hidden rounded-full bg-brand-sand">
-                                <div
-                                  className="h-full rounded-full bg-brand-green"
-                                  style={{ width: `${metric.score}%` }}
-                                />
-                              </div>
                             </div>
-                          ))}
-                        </div>
+                            <div className="space-y-3">
+                              {insights.map((rec, index) => {
+                                const isActive =
+                                  rec.id === activeRecommendation.id;
 
-                        <div className="rounded-3xl border border-brand-gold/10 bg-brand-cream/60 p-5">
-                          <div className="mb-4 flex items-center justify-between gap-4">
-                            <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-gold">
-                              Signal Map
+                                return (
+                                  <button
+                                    key={rec.id}
+                                    type="button"
+                                    onClick={() =>
+                                      setActiveRecommendationId(rec.id)
+                                    }
+                                    className={`w-full rounded-2xl border p-4 text-left transition-all ${
+                                      isActive
+                                        ? "bg-brand-cream text-brand-brown border-brand-gold"
+                                        : "bg-white/5 text-brand-cream border-white/10 hover:border-brand-gold/50"
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between gap-3">
+                                      <span className="text-[9px] font-black uppercase tracking-[0.22em] opacity-60">
+                                        Pick {index + 1}
+                                      </span>
+                                      <span className="font-serif text-2xl">
+                                        {rec.matchScore}%
+                                      </span>
+                                    </div>
+                                    <p className="mt-2 font-serif text-base leading-tight">
+                                      {rec.catalogProduct?.name ?? rec.product}
+                                    </p>
+                                    <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/15">
+                                      <div
+                                        className={`h-full rounded-full ${
+                                          isActive
+                                            ? "bg-brand-green"
+                                            : "bg-brand-gold"
+                                        }`}
+                                        style={{ width: `${rec.matchScore}%` }}
+                                      />
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <p className="text-[9px] font-black uppercase tracking-[0.24em] text-brand-cream/50">
+                              Profile Signals
                             </p>
-                            <ShieldCheck size={16} className="text-brand-green" />
-                          </div>
-                          <div className="grid grid-cols-5 gap-3 items-end h-32">
-                            {(
-                              [
-                                "sugar",
-                                "cholesterol",
-                                "weight",
-                                "active",
-                                "everyday",
-                              ] as RecommendationSignal[]
-                            ).map((signal) => {
-                              const isMatched =
-                                activeRecommendation.signalMatches.includes(
-                                  signal,
-                                ) && signals[signal];
-                              const height = isMatched ? 92 : signals[signal] ? 52 : 22;
-
-                              return (
-                                <div
-                                  key={signal}
-                                  className="flex h-full flex-col items-center justify-end gap-2"
+                            <div className="flex flex-wrap gap-2">
+                              {activeSignalLabels.slice(0, 4).map((label) => (
+                                <span
+                                  key={label}
+                                  className="rounded-full bg-white/10 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.12em] text-brand-cream/80"
                                 >
-                                  <div
-                                    className={`w-full max-w-10 rounded-t-full transition-all ${
-                                      isMatched
-                                        ? "bg-brand-green"
-                                        : signals[signal]
-                                          ? "bg-brand-gold/70"
-                                          : "bg-brand-sand"
-                                    }`}
-                                    style={{ height: `${height}%` }}
-                                  />
-                                  <span className="text-[8px] font-black uppercase tracking-[0.12em] text-brand-brown/45">
-                                    {getSignalLabel(signal)}
-                                  </span>
-                                </div>
-                              );
-                            })}
+                                  {label}
+                                </span>
+                              ))}
+                            </div>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {[
-                            {
-                              label: "Reliability",
-                              score: getReliabilityScore(
-                                activeRecommendation.catalogProduct,
-                              ),
-                            },
-                            {
-                              label: "Catalog",
-                              score: getSatisfactionScore(
-                                activeRecommendation.catalogProduct,
-                              ),
-                            },
-                          ].map((metric) => (
-                            <div
-                              key={metric.label}
-                              className="rounded-2xl border border-brand-gold/10 bg-white p-4"
-                            >
-                              <div className="flex items-start justify-between gap-3">
-                                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-brown/40">
-                                  {metric.label}
-                                </p>
-                                <p className="font-serif text-lg leading-none text-brand-brown">
-                                  {metric.score}/100
-                                </p>
+                        <div className="p-5 md:p-7">
+                          <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6 items-start">
+                            <div className="rounded-3xl bg-brand-cream/70 border border-brand-gold/10 p-5 flex flex-col items-center justify-center text-center">
+                              <div
+                                className="relative grid h-36 w-36 place-items-center rounded-full"
+                                style={{
+                                  background: `conic-gradient(#2D3A26 ${
+                                    activeRecommendation.matchScore * 3.6
+                                  }deg, rgba(212,175,55,0.18) 0deg)`,
+                                }}
+                              >
+                                <div className="absolute inset-3 rounded-full bg-white" />
+                                <div className="relative">
+                                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-gold">
+                                    Match
+                                  </p>
+                                  <p className="text-4xl font-serif text-brand-brown">
+                                    {activeRecommendation.matchScore}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="mt-3 grid grid-cols-10 gap-1">
-                                {Array.from({ length: 10 }).map((_, index) => (
-                                  <span
-                                    key={index}
-                                    className={`h-8 rounded-full ${
-                                      index < Math.round(metric.score / 10)
-                                        ? "bg-brand-green"
-                                        : "bg-brand-sand"
-                                    }`}
+                              <p className="mt-5 text-[9px] font-black uppercase tracking-[0.18em] text-brand-terracotta">
+                                {activeRecommendation.title}
+                              </p>
+                              {productIsOpenable ? (
+                                <Link
+                                  href={productHref}
+                                  className="mt-2 font-serif text-xl leading-tight text-brand-brown hover:text-brand-terracotta transition-colors"
+                                >
+                                  {activeProduct?.name ??
+                                    activeRecommendation.product}
+                                </Link>
+                              ) : (
+                                <p className="mt-2 font-serif text-xl leading-tight text-brand-brown">
+                                  {activeProduct?.name ??
+                                    activeRecommendation.product}
+                                </p>
+                              )}
+                              <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-green">
+                                {getAvailabilityLabel(activeProduct)}
+                              </p>
+                              {!productIsOpenable && (
+                                <p className="mt-3 max-w-44 text-xs leading-relaxed text-brand-brown/55">
+                                  This product will soon be available in the
+                                  catalog.
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                {[
+                                  {
+                                    label: "Fit",
+                                    score: activeRecommendation.matchScore,
+                                  },
+                                  {
+                                    label: "Trust",
+                                    score: getSatisfactionScore(
+                                      activeRecommendation.catalogProduct,
+                                    ),
+                                  },
+                                  {
+                                    label: "Value",
+                                    score: getValueScore(
+                                      activeRecommendation.catalogProduct,
+                                    ),
+                                  },
+                                ].map((metric) => (
+                                  <div
+                                    key={metric.label}
+                                    className="rounded-2xl border border-brand-gold/10 bg-white p-4 min-w-0"
+                                  >
+                                    <div className="flex flex-col gap-1">
+                                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-brown/40">
+                                        {metric.label}
+                                      </p>
+                                      <p className="font-serif text-2xl leading-none text-brand-brown">
+                                        {metric.score}
+                                      </p>
+                                    </div>
+                                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-brand-sand">
+                                      <div
+                                        className="h-full rounded-full bg-brand-green"
+                                        style={{ width: `${metric.score}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              <div className="rounded-3xl border border-brand-gold/10 bg-brand-cream/60 p-5">
+                                <div className="mb-4 flex items-center justify-between gap-4">
+                                  <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-gold">
+                                    Signal Map
+                                  </p>
+                                  <ShieldCheck
+                                    size={16}
+                                    className="text-brand-green"
                                   />
+                                </div>
+                                <div className="grid grid-cols-5 gap-3 items-end h-32">
+                                  {(
+                                    [
+                                      "sugar",
+                                      "cholesterol",
+                                      "weight",
+                                      "active",
+                                      "everyday",
+                                    ] as RecommendationSignal[]
+                                  ).map((signal) => {
+                                    const isMatched =
+                                      activeRecommendation.signalMatches.includes(
+                                        signal,
+                                      ) && signals[signal];
+                                    const height = isMatched
+                                      ? 92
+                                      : signals[signal]
+                                        ? 52
+                                        : 22;
+
+                                    return (
+                                      <div
+                                        key={signal}
+                                        className="flex h-full flex-col items-center justify-end gap-2"
+                                      >
+                                        <div
+                                          className={`w-full max-w-10 rounded-t-full transition-all ${
+                                            isMatched
+                                              ? "bg-brand-green"
+                                              : signals[signal]
+                                                ? "bg-brand-gold/70"
+                                                : "bg-brand-sand"
+                                          }`}
+                                          style={{ height: `${height}%` }}
+                                        />
+                                        <span className="text-[8px] font-black uppercase tracking-[0.12em] text-brand-brown/45">
+                                          {getSignalLabel(signal)}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {[
+                                  {
+                                    label: "Reliability",
+                                    score: getReliabilityScore(
+                                      activeRecommendation.catalogProduct,
+                                    ),
+                                  },
+                                  {
+                                    label: "Catalog",
+                                    score: getSatisfactionScore(
+                                      activeRecommendation.catalogProduct,
+                                    ),
+                                  },
+                                ].map((metric) => (
+                                  <div
+                                    key={metric.label}
+                                    className="rounded-2xl border border-brand-gold/10 bg-white p-4"
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-brand-brown/40">
+                                        {metric.label}
+                                      </p>
+                                      <p className="font-serif text-lg leading-none text-brand-brown">
+                                        {metric.score}/100
+                                      </p>
+                                    </div>
+                                    <div className="mt-3 grid grid-cols-10 gap-1">
+                                      {Array.from({ length: 10 }).map(
+                                        (_, index) => (
+                                          <span
+                                            key={index}
+                                            className={`h-8 rounded-full ${
+                                              index <
+                                              Math.round(metric.score / 10)
+                                                ? "bg-brand-green"
+                                                : "bg-brand-sand"
+                                            }`}
+                                          />
+                                        ),
+                                      )}
+                                    </div>
+                                  </div>
                                 ))}
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
+                          </div>
 
-                    <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-start">
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          ...activeRecommendation.useCases.slice(0, 3),
-                          ...activeRecommendation.compatibility.slice(0, 2),
-                        ].map((item) => (
-                          <span
-                            key={item}
-                            className="px-3 py-1.5 rounded-full bg-brand-green/5 text-brand-green border border-brand-green/10 text-[10px] font-bold"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      {productIsOpenable ? (
-                        <Link
-                          href={productHref}
-                          className="inline-flex items-center justify-center gap-3 rounded-full bg-brand-brown px-8 py-4 text-[10px] font-black uppercase tracking-[0.24em] text-brand-cream transition-all hover:bg-brand-brown-light"
-                        >
-                          View Product <ArrowRight size={14} />
-                        </Link>
-                      ) : (
-                        <div className="rounded-full border border-brand-gold/20 bg-brand-gold/5 px-8 py-4 text-center text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/55">
-                          Available Soon
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-5 rounded-2xl border border-brand-gold/10 bg-white">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setExpandedRecommendationId((current) =>
-                            current === activeRecommendation.id
-                              ? ""
-                              : activeRecommendation.id,
-                          )
-                        }
-                        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                      >
-                        <span className="text-[10px] font-black uppercase tracking-[0.22em] text-brand-brown/50">
-                          Why this pick
-                        </span>
-                        <ChevronDown
-                          size={16}
-                          className={`text-brand-gold transition-transform ${
-                            expandedRecommendationId === activeRecommendation.id
-                              ? "rotate-180"
-                              : ""
-                          }`}
-                        />
-                      </button>
-
-                      {expandedRecommendationId === activeRecommendation.id && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-brand-gold/10 p-5">
-                          {activeRecommendation.benefits
-                            .slice(0, 2)
-                            .map((benefit) => (
-                              <div key={benefit.label} className="flex gap-3">
-                                <CheckCircle2
-                                  size={16}
-                                  className="mt-0.5 shrink-0 text-brand-green"
-                                  strokeWidth={1.8}
-                                />
-                                <div>
-                                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-brand-brown/45">
-                                    {benefit.label}
-                                  </p>
-                                  <p className="mt-1 text-xs leading-relaxed text-brand-brown/65">
-                                    {benefit.detail}
-                                  </p>
-                                </div>
+                          <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-start">
+                            <div className="flex flex-wrap gap-2">
+                              {[
+                                ...activeRecommendation.useCases.slice(0, 3),
+                                ...activeRecommendation.compatibility.slice(
+                                  0,
+                                  2,
+                                ),
+                              ].map((item) => (
+                                <span
+                                  key={item}
+                                  className="px-3 py-1.5 rounded-full bg-brand-green/5 text-brand-green border border-brand-green/10 text-[10px] font-bold"
+                                >
+                                  {item}
+                                </span>
+                              ))}
+                            </div>
+                            {productIsOpenable ? (
+                              <Link
+                                href={productHref}
+                                className="inline-flex items-center justify-center gap-3 rounded-full bg-brand-brown px-8 py-4 text-[10px] font-black uppercase tracking-[0.24em] text-brand-cream transition-all hover:bg-brand-brown-light"
+                              >
+                                View Product <ArrowRight size={14} />
+                              </Link>
+                            ) : (
+                              <div className="rounded-full border border-brand-gold/20 bg-brand-gold/5 px-8 py-4 text-center text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/55">
+                                Available Soon
                               </div>
-                            ))}
+                            )}
+                          </div>
+
+                          <div className="mt-5 rounded-2xl border border-brand-gold/10 bg-white">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedRecommendationId((current) =>
+                                  current === activeRecommendation.id
+                                    ? ""
+                                    : activeRecommendation.id,
+                                )
+                              }
+                              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                            >
+                              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-brand-brown/50">
+                                Why this pick
+                              </span>
+                              <ChevronDown
+                                size={16}
+                                className={`text-brand-gold transition-transform ${
+                                  expandedRecommendationId ===
+                                  activeRecommendation.id
+                                    ? "rotate-180"
+                                    : ""
+                                }`}
+                              />
+                            </button>
+
+                            {expandedRecommendationId ===
+                              activeRecommendation.id && (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-brand-gold/10 p-5">
+                                {activeRecommendation.benefits
+                                  .slice(0, 2)
+                                  .map((benefit) => (
+                                    <div
+                                      key={benefit.label}
+                                      className="flex gap-3"
+                                    >
+                                      <CheckCircle2
+                                        size={16}
+                                        className="mt-0.5 shrink-0 text-brand-green"
+                                        strokeWidth={1.8}
+                                      />
+                                      <div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-brand-brown/45">
+                                          {benefit.label}
+                                        </p>
+                                        <p className="mt-1 text-xs leading-relaxed text-brand-brown/65">
+                                          {benefit.detail}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    );
+                  })()}
                 </div>
-                  );
-                })()}
-              </div>
-            ) : (
-              <div className="min-h-[520px] rounded-3xl border border-brand-gold/10 bg-white/60 p-12 text-center">
-                <p className="font-serif text-2xl text-brand-brown">
-                  No recommendation available yet.
-                </p>
-              </div>
-            )}
-          </ScrollReveal>
+              ) : (
+                <div className="min-h-[520px] rounded-3xl border border-brand-gold/10 bg-white/60 p-12 text-center">
+                  <p className="font-serif text-2xl text-brand-brown">
+                    No recommendation available yet.
+                  </p>
+                </div>
+              )}
+            </ScrollReveal>
+          )}
         </div>
       </div>
     </section>
