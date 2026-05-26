@@ -5,7 +5,8 @@ import { createClient } from "@supabase/supabase-js";
  * Base URL of the website.
  * In production, this should be the actual domain.
  */
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://amritya.com";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "https://amrityaorganics.com";
 
 /**
  * Helper to get Supabase client on the server.
