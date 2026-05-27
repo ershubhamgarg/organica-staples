@@ -43,10 +43,22 @@ export default function ProductListing() {
     return products.filter((p) => p.isVisible !== false);
   }, [products]);
 
-  const categories: string[] = useMemo(() => {
+  const categories = useMemo(() => {
+    const counts: Record<string, number> = {};
+    visibleProducts.forEach((p) => {
+      counts[p.category] = (counts[p.category] || 0) + 1;
+    });
+
+    const uniqueCategories = Array.from(
+      new Set(visibleProducts.map((p) => p.category)),
+    );
+
     return [
-      "All",
-      ...Array.from(new Set(visibleProducts.map((p: Product) => p.category))),
+      { name: "All", count: visibleProducts.length },
+      ...uniqueCategories.map((name) => ({
+        name,
+        count: counts[name] || 0,
+      })),
     ];
   }, [visibleProducts]);
 
@@ -57,11 +69,52 @@ export default function ProductListing() {
       result = result.filter((p) => p.category === selectedCategory);
     }
 
-    if (sortOrder === "price-asc") {
-      result.sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
-    } else if (sortOrder === "price-desc") {
-      result.sort((a, b) => getDiscountedPrice(b) - getDiscountedPrice(a));
-    }
+    // Custom sorting logic:
+    // 1. Available products with images first
+    // 2. Available products without images second
+    // 3. Unavailable products with images third
+    // 4. Unavailable products without images fourth
+    result.sort((a, b) => {
+      const availA = isProductAvailable(a);
+      const availB = isProductAvailable(b);
+
+      const hasImages = (p: Product) => {
+        if (p.image && p.image.trim() !== "") return true;
+        if (Array.isArray(p.images) && p.images.length > 0) {
+          return p.images.some((img) => img && img.trim() !== "");
+        }
+        if (
+          typeof p.images === "string" &&
+          p.images.trim() !== "" &&
+          p.images !== "[]"
+        ) {
+          return true;
+        }
+        return false;
+      };
+
+      const imgA = hasImages(a);
+      const imgB = hasImages(b);
+
+      // Sort by Availability (Available first)
+      if (availA !== availB) {
+        return availA ? -1 : 1;
+      }
+
+      // Sort by Image presence (Has images first)
+      if (imgA !== imgB) {
+        return imgA ? -1 : 1;
+      }
+
+      // Within the same group, apply user-selected sort order
+      if (sortOrder === "price-asc") {
+        return getDiscountedPrice(a) - getDiscountedPrice(b);
+      } else if (sortOrder === "price-desc") {
+        return getDiscountedPrice(b) - getDiscountedPrice(a);
+      }
+
+      return 0;
+    });
 
     return result;
   }, [selectedCategory, sortOrder, visibleProducts]);
@@ -96,19 +149,30 @@ export default function ProductListing() {
       {/* Filters & Sorting */}
       <div className="relative flex flex-col lg:flex-row justify-between items-center mb-20 gap-8">
         {/* Categories */}
-        <div className="flex flex-wrap items-center justify-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           {categories.map((category) => (
             <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`group relative px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden ${
-                selectedCategory === category
-                  ? "bg-brand-brown text-brand-cream shadow-xl shadow-brand-brown/20"
-                  : "bg-brand-cream text-brand-brown border border-brand-gold/20 hover:border-brand-gold/40"
+              key={category.name}
+              onClick={() => setSelectedCategory(category.name)}
+              className={`group relative px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-500 overflow-hidden ${
+                selectedCategory === category.name
+                  ? "bg-brand-brown text-brand-cream shadow-lg shadow-brand-brown/10"
+                  : "bg-brand-cream text-brand-brown border border-brand-gold/15 hover:border-brand-gold/30"
               }`}
             >
-              <span className="relative z-10">{category}</span>
-              {selectedCategory !== category && (
+              <span className="relative z-10 flex items-center gap-1.5">
+                {category.name}
+                <span
+                  className={`text-[7px] px-1.5 py-0.5 rounded-full ${
+                    selectedCategory === category.name
+                      ? "bg-brand-cream/20 text-brand-cream"
+                      : "bg-brand-gold/10 text-brand-gold"
+                  }`}
+                >
+                  {category.count}
+                </span>
+              </span>
+              {selectedCategory !== category.name && (
                 <div className="absolute inset-0 bg-brand-gold/5 translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
               )}
             </button>
