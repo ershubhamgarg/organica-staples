@@ -281,14 +281,14 @@ export default function ProductListing() {
                   </div>
                 </Link>
 
-                <div className="flex flex-col items-center gap-1 mb-4 sm:mb-6">
+                <div
+                  className={`flex flex-col items-center gap-1 ${available ? "mb-4 sm:mb-6" : "mb-2"}`}
+                >
                   <p className="text-[8px] sm:text-[10px] text-brand-gold italic font-medium tracking-wide">
                     {product.weight}
                   </p>
 
-                  {!available ? (
-                    <div className="h-8" />
-                  ) : (
+                  {available && (
                     <div className="flex flex-col items-center">
                       {hasDiscount ? (
                         <div className="flex flex-col items-center">
@@ -339,7 +339,7 @@ export default function ProductListing() {
                   )}
                 </div>
 
-                <div className="mt-auto pt-2">
+                <div className={`${available ? "mt-auto" : ""} pt-2`}>
                   <QuickAddButton product={product} className="w-full" />
                 </div>
 
