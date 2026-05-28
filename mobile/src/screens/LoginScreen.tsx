@@ -26,7 +26,7 @@ export function LoginScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.content}>
         <Card style={styles.card}>
           <AppText variant="eyebrow">Account</AppText>
-          <AppText variant="heading">Login to Amritya</AppText>
+          <AppText variant="heading">Login to Urban Kisan</AppText>
           <AppText variant="small">Sync your cart, addresses, orders, and profile across devices.</AppText>
           <AppInput placeholder="Email" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
           <AppInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />

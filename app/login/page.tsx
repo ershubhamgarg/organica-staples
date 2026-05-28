@@ -16,8 +16,16 @@ export default function LoginPage() {
     password: false,
   });
   const [formError, setFormError] = useState<string | null>(null);
-  const { signIn, signInWithGoogle, signUp, isLoading, error, clearError, user, isInitialized } =
-    useUserStore();
+  const {
+    signIn,
+    signInWithGoogle,
+    signUp,
+    isLoading,
+    error,
+    clearError,
+    user,
+    isInitialized,
+  } = useUserStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -126,11 +134,11 @@ export default function LoginPage() {
         <div className="flex flex-col items-center justify-center bg-brand-green text-brand-cream p-8 lg:p-12">
           <Image
             src="/logo-white.png"
-            alt="Amritya Organics"
+            alt="Urban Kisan"
             width={580}
             height={280}
             priority
-          // className="mb-5 h-auto w-36 sm:w-44"
+            // className="mb-5 h-auto w-36 sm:w-44"
           />
           {/* <p className="text-sm text-brand-cream/80 text-center max-w-xs">
             Premium organic pantry for a healthier lifestyle.
@@ -139,7 +147,10 @@ export default function LoginPage() {
 
         {/* Right column - authentication form */}
         <div className="p-8 lg:p-12 space-y-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-brown transition-colors mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-brown transition-colors mb-4"
+          >
             <ArrowLeft size={14} /> Back to Store
           </Link>
 
@@ -161,18 +172,24 @@ export default function LoginPage() {
           >
             <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-brand-gold shadow-sm">
               G
-            </span>{" "}Continue with Google
+            </span>{" "}
+            Continue with Google
           </button>
 
           <div className="my-4 flex items-center">
             <div className="flex-1 h-px bg-brand-gold/20" />
-            <span className="px-2 text-xs font-medium text-brand-brown/50">or</span>
+            <span className="px-2 text-xs font-medium text-brand-brown/50">
+              or
+            </span>
             <div className="flex-1 h-px bg-brand-gold/20" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-xs font-bold uppercase text-brand-brown/70 mb-1" htmlFor="email">
+              <label
+                className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                htmlFor="email"
+              >
                 Email Address
               </label>
               <input
@@ -206,7 +223,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase text-brand-brown/70 mb-1" htmlFor="password">
+              <label
+                className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                htmlFor="password"
+              >
                 Password
               </label>
               <input
@@ -255,13 +275,22 @@ export default function LoginPage() {
               disabled={!canSubmit}
               className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-sm font-bold uppercase text-brand-cream transition-all hover:bg-brand-brown-light disabled:opacity-50 hover:shadow-md"
             >
-              {isLoading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
-              {!isLoading && <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />}
+              {isLoading
+                ? "Processing..."
+                : isSignUp
+                  ? "Create Account"
+                  : "Sign In"}
+              {!isLoading && (
+                <ArrowRight
+                  size={14}
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              )}
             </button>
           </form>
 
           <p className="mt-6 text-center text-xs text-brand-brown/50">
-            {isSignUp ? "Already have an account?" : "New to Amritya?"}
+            {isSignUp ? "Already have an account?" : "New to Urban Kisan?"}
             <button
               type="button"
               onClick={() => {

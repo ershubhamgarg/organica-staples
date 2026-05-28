@@ -95,7 +95,7 @@ export const useCartStore = create<CartState>()(
       getTotalPrice: () => getCartTotals(get().items).subtotal,
     }),
     {
-      name: "amritya-mobile-cart",
+      name: "urbankisan-mobile-cart",
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

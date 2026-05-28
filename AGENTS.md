@@ -1,6 +1,6 @@
 # Agent Brief
 
-Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. App Router only; `pages/` is empty.
+Next 16 + React 19 ecommerce app for Urban Kisan, an organic pantry store. App Router only; `pages/` is empty.
 
 ## Commands
 
@@ -44,8 +44,8 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 - **Claim Enforcement**: `/api/orders` validates the authenticated Supabase bearer token for launch-offer orders and passes the normalized user email to the `place_order_with_inventory` RPC. The database table `launch_offer_claims` has a unique constraint on normalized email to prevent duplicate claims.
 - **Claim Status UI Gate**: `lib/useLaunchOfferClaimStatus.ts` calls `/api/launch-offer-claim` to check whether the signed-in user's normalized email has already claimed the offer. Cart and checkout must use this status to disable ₹0 launch-offer pricing for already-claimed customers, even if their cart shape is otherwise eligible.
 - **Inventory Enforcement**: Orders go through `/api/orders` and the `place_order_with_inventory` RPC, which checks `product_inventory.available_quantity`, inserts the order, creates `order_items`, decrements stock, and creates the launch-offer claim atomically.
-- **Financial Metrics**: The `place_order_with_inventory` RPC calculates financial metrics. 
-  - `Cost to Company (CTC)` = `Wholesale Total` + `extra_shipping_amount` + `Packing (₹20)` + `Gateway Charge (2%)`. 
+- **Financial Metrics**: The `place_order_with_inventory` RPC calculates financial metrics.
+  - `Cost to Company (CTC)` = `Wholesale Total` + `extra_shipping_amount` + `Packing (₹20)` + `Gateway Charge (2%)`.
   - `extra_shipping_amount` represents the net loss on shipping (Full Freight - Customer Payment).
   - `Profit/Loss` = `Total Received` - `CTC`.
 - **Promotion UI**: `components/LaunchOfferBanner.tsx` renders directly below `Header`. For unclaimed users it uses the red/dark premium banner with a "Learn More" CTA that opens a centered modal and is not dismissible. For already-claimed signed-in users it changes to a green fulfilment-style banner, congratulates them, says the team is working on fulfilment, and can be closed with the `X` button.
@@ -53,7 +53,7 @@ Next 16 + React 19 ecommerce app for Amritya Organics, an organic pantry store. 
 - **Cart/Checkout Claimed State**: Already-claimed users must not see waived product pricing, `LAUNCHSTORY` discounts, `instagram_story_verification`, or ₹0 launch-offer totals. Cart and checkout should continue as regular paid orders and show fulfilment/congratulations messaging.
 - **Order History**: Launch-offer orders are identified by `payment_method === "instagram_story_verification"` or `discount_code === LAUNCHSTORY`; show a launch-offer badge and story-verification detail panel in `/profile`.
 - **Error UX**: Checkout uses a premium closable alert/toast for order-placement errors. Preserve backend messages, especially duplicate launch-offer claim errors, and avoid replacing them with generic failure copy.
-- **Instagram Verification**: Launch-offer confirmation asks the customer to photograph the receipt, upload it to Instagram Story, and tag `@amritya_organics`. Keep these instructions outside the receipt or closable so the customer can hide them before taking the photo.
+- **Instagram Verification**: Launch-offer confirmation asks the customer to photograph the receipt, upload it to Instagram Story, and tag `@urban_kisan`. Keep these instructions outside the receipt or closable so the customer can hide them before taking the photo.
 
 ### To Stop Or Remove The Launch Offer
 

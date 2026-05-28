@@ -71,7 +71,7 @@ export function HomeScreen({ navigation }: Props) {
 
   const sendWhatsapp = () => {
     const message = encodeURIComponent(
-      `[Amritya Organics]\nName: ${contact.name}\nEmail: ${contact.email}\nSubject: ${contact.subject}\nMessage: ${contact.message}`,
+      `[Urban Kisan]\nName: ${contact.name}\nEmail: ${contact.email}\nSubject: ${contact.subject}\nMessage: ${contact.message}`,
     );
     Linking.openURL(`https://wa.me/${BRAND.whatsappPhone}?text=${message}`);
   };

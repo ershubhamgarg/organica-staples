@@ -125,7 +125,7 @@ export async function POST(request: Request) {
       amount: amountInPaise,
       currency: "INR",
       receipt:
-        payload.receipt?.slice(0, 40) ?? `amritya_${Date.now().toString(36)}`,
+        payload.receipt?.slice(0, 40) ?? `urbankisan_${Date.now().toString(36)}`,
       notes: payload.notes,
       ...(process.env.RAZORPAY_CHECKOUT_CONFIG_ID
         ? { checkout_config_id: process.env.RAZORPAY_CHECKOUT_CONFIG_ID }

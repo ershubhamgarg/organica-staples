@@ -94,7 +94,7 @@ export const useAddressStore = create<AddressState>()(
       clearAddresses: () => set({ addresses: [], error: null }),
     }),
     {
-      name: "amritya-mobile-addresses",
+      name: "urbankisan-mobile-addresses",
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

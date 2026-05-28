@@ -53,7 +53,8 @@ export const createInstagramStoryReceiptImage = async (
     const imageRatio = image.naturalWidth / image.naturalHeight;
     const boxRatio = boxWidth / boxHeight;
     const drawWidth = imageRatio > boxRatio ? boxWidth : boxHeight * imageRatio;
-    const drawHeight = imageRatio > boxRatio ? boxWidth / imageRatio : boxHeight;
+    const drawHeight =
+      imageRatio > boxRatio ? boxWidth / imageRatio : boxHeight;
     const drawX = x + (boxWidth - drawWidth) / 2;
     const drawY = y + (boxHeight - drawHeight) / 2;
 
@@ -126,7 +127,14 @@ export const createInstagramStoryReceiptImage = async (
   paperGlow.addColorStop(0, "rgba(255,255,255,0.86)");
   paperGlow.addColorStop(0.5, "rgba(255,248,235,0.38)");
   paperGlow.addColorStop(1, "rgba(255,255,255,0.72)");
-  drawRoundedRect(receiptX, receiptY, receiptWidth, receiptHeight, 58, paperGlow);
+  drawRoundedRect(
+    receiptX,
+    receiptY,
+    receiptWidth,
+    receiptHeight,
+    58,
+    paperGlow,
+  );
 
   if (logo.complete && logo.naturalWidth > 0) {
     drawContainedImage(logo, 355, 288, 370, 148);
@@ -134,18 +142,20 @@ export const createInstagramStoryReceiptImage = async (
     context.fillStyle = "#2F2A20";
     context.textAlign = "center";
     context.font = "700 42px Arial";
-    context.fillText("Amritya Organics", width / 2, 380);
+    context.fillText("Urban Kisan", width / 2, 380);
   }
 
+  // Tag text
+  context.fillStyle = "#A65D47";
+  context.font = 'bold 32px "Plus Jakarta Sans"';
   context.textAlign = "center";
-  context.font = "700 76px Georgia";
-  context.fillStyle = "#3C362A";
-  context.fillText("Healthy Order", width / 2, 540);
-  context.fillText("Placed", width / 2, 625);
+  context.fillText("@urban_kisan", width / 2, 440);
 
-  context.font = "400 30px Arial";
-  context.fillStyle = "#7A7165";
-  context.fillText("I just placed my order from Amritya Organics.", width / 2, 705);
+  // Message
+  context.fillStyle = "#3C362A";
+  context.font = '300 38px "Plus Jakarta Sans"';
+  context.textAlign = "center";
+  context.fillText("I just placed my order from Urban Kisan.", width / 2, 705);
   context.fillText("Smooth checkout. Pure organic goodness.", width / 2, 755);
 
   context.strokeStyle = "rgba(212,175,55,0.45)";
@@ -170,8 +180,7 @@ export const createInstagramStoryReceiptImage = async (
 
   context.fillStyle = "#2D7A44";
   context.font = "700 40px Georgia";
-  context.fillText("Amritya", 650, 980);
-  context.fillText("Organics", 650, 1028);
+  context.fillText("Urban Kisan", 650, 980);
 
   let itemY = 1150;
   order.items.slice(0, 2).forEach((item) => {
@@ -216,7 +225,7 @@ export const createInstagramStoryReceiptImage = async (
       resolve(
         new File(
           [blob],
-          `amritya-launch-order-${shortOrderId}-${Date.now()}.png`,
+          `urbankisan-launch-order-${shortOrderId}-${Date.now()}.png`,
           { type: "image/png" },
         ),
       );

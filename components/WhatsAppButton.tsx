@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 
-const WHATSAPP_NUMBER = "918295433041"; // Replace with actual Amritya number
-const DEFAULT_MESSAGE = "Hey Amritya team, I would like to know more.";
+const WHATSAPP_NUMBER = "918295433041"; // Replace with actual Urban Kisan number
+const DEFAULT_MESSAGE = "Hey Urban Kisan team, I would like to know more.";
 
 export default function WhatsAppButton() {
   const pathname = usePathname();

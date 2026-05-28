@@ -91,7 +91,7 @@ export const useOrderStore = create<OrderState>()(
       clearOrders: () => set({ orders: [], error: null }),
     }),
     {
-      name: "amritya-mobile-orders",
+      name: "urbankisan-mobile-orders",
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

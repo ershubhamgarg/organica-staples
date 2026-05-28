@@ -79,7 +79,7 @@ export default function Home() {
     e.preventDefault();
 
     const whatsappMessage = `
-[Amritya Organics]
+[Urban Kisan]
 Name: ${formData.name}
 Email: ${formData.email}
 Subject: ${formData.subject}
@@ -242,7 +242,11 @@ Message: ${formData.message}
             </ScrollReveal>
 
             {/* Right: Story Content */}
-            <ScrollReveal animation="reveal-fade" delay={200} className="w-full lg:w-1/2 relative">
+            <ScrollReveal
+              animation="reveal-fade"
+              delay={200}
+              className="w-full lg:w-1/2 relative"
+            >
               {/* Floating Sprout Icon */}
               <div className="absolute -top-12 -right-4 opacity-10 rotate-12 pointer-events-none hidden lg:block">
                 <svg
@@ -273,10 +277,10 @@ Message: ${formData.message}
               </h2>
               <div className="space-y-6">
                 <p className="text-brand-brown/70 font-light leading-relaxed text-lg">
-                  Every staple at Amritya Organics tells a story of a small
-                  village farm, where tradition is preserved and nature is
-                  respected. We work directly with farmers who still use the
-                  ancient wisdom of their ancestors.
+                  Every staple at Urban Kisan tells a story of a small village
+                  farm, where tradition is preserved and nature is respected. We
+                  work directly with farmers who still use the ancient wisdom of
+                  their ancestors.
                 </p>
 
                 <div className="grid grid-cols-2 gap-8 pt-8">
@@ -380,8 +384,16 @@ Message: ${formData.message}
                   >
                     <div className="flex items-center gap-4 sm:block">
                       <div className="w-10 h-10 sm:w-14 sm:h-14 shrink-0 rounded-full bg-brand-sand flex items-center justify-center sm:mb-10 text-brand-gold group-hover:bg-brand-brown group-hover:text-brand-cream transition-all duration-500">
-                        <Icon size={20} className="sm:hidden" strokeWidth={1.5} />
-                        <Icon size={24} className="hidden sm:block" strokeWidth={1.5} />
+                        <Icon
+                          size={20}
+                          className="sm:hidden"
+                          strokeWidth={1.5}
+                        />
+                        <Icon
+                          size={24}
+                          className="hidden sm:block"
+                          strokeWidth={1.5}
+                        />
                       </div>
                       <div>
                         <h3 className="text-base sm:text-xl font-serif text-brand-brown mb-1 sm:mb-4 tracking-tight">

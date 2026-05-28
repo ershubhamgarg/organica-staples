@@ -53,7 +53,7 @@ export const useThemeStore = create<ThemeState>()(
         }),
     }),
     {
-      name: "amritya-mobile-theme",
+      name: "urbankisan-mobile-theme",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ colorScheme: state.colorScheme }),
       onRehydrateStorage: () => (state) => {

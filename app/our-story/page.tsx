@@ -21,9 +21,7 @@ export default function OurStory() {
           </div>
           <h1 className="text-6xl md:text-8xl font-serif text-brand-brown mb-10 tracking-tight leading-[0.9]">
             The Story of <br />
-            <span className="italic text-brand-terracotta">
-              Amritya Organics
-            </span>
+            <span className="italic text-brand-terracotta">Urban Kisan</span>
           </h1>
           <p className="text-xl md:text-2xl text-brand-brown/60 font-light leading-relaxed max-w-2xl mx-auto text-balance">
             Born from a lifelong bond and a shared vision to restore the purity
@@ -69,8 +67,8 @@ export default function OurStory() {
               <p className="text-lg text-brand-brown/60 font-light leading-relaxed text-balance">
                 Disillusioned by the industrialization of our staples, we
                 journeyed into the heartlands of India to rediscover the ancient
-                grains and unadulterated oils our ancestors thrived upon.
-                Amritya was born to restore that pure bond.
+                grains and unadulterated oils our ancestors thrived upon. Urban
+                Kisan was born to restore that pure bond.
               </p>
             </div>
           </div>

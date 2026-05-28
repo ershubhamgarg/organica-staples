@@ -1,10 +1,10 @@
-# Amritya Organics - Premium Pantry Store
+# Urban Kisan - Premium Pantry Store
 
-A premium ecommerce experience for Amritya Organics, built with Next.js 16, React 19, and Supabase.
+A premium ecommerce experience for Urban Kisan, built with Next.js 16, React 19, and Supabase.
 
-## Project Overview
+## About
 
-Amritya Organics is an organic pantry store focused on providing premium, ethically sourced staples. This application provides a seamless shopping experience from product discovery to checkout.
+Urban Kisan is an organic pantry store focused on providing premium, ethically sourced staples. This application provides a seamless shopping experience from product discovery to checkout.
 
 ## Getting Started
 

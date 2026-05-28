@@ -172,7 +172,7 @@ export default function Header() {
               <div className="p-1 sm:p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
                 <Image
                   src="/logo-horizon.png"
-                  alt="Amritya Organics"
+                  alt="Urban Kisan"
                   width={90}
                   height={110}
                   className="object-contain w-20 lg:w-28 h-auto"

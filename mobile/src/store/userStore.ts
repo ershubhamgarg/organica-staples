@@ -82,7 +82,7 @@ export const useUserStore = create<UserState>()(
       },
     }),
     {
-      name: "amritya-mobile-user",
+      name: "urbankisan-mobile-user",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ user: state.user }),
     },

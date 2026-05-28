@@ -1,8 +1,8 @@
 export const BRAND = {
-  name: "Amritya Organics",
+  name: "Urban Kisan",
   whatsappPhone: "918295433041",
-  supportEmail: "amrityaorganics@gmail.com",
-  instagramUrl: "https://www.instagram.com/amritya_organics/",
+  supportEmail: "urbankisan@gmail.com",
+  instagramUrl: "https://www.instagram.com/urban_kisan/",
   freeShippingThreshold: 500,
   shippingFee: 50,
   heroImage:

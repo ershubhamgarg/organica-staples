@@ -28,7 +28,7 @@ const devanagari = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
-  title: "Amritya Organics | Premium Organic Goods",
+  title: "Urban Kisan | Premium Organic Goods",
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
@@ -57,7 +57,7 @@ export default function RootLayout({
             <div>
               <Image
                 src="/logo-white.png"
-                alt="Amritya Organics"
+                alt="Urban Kisan"
                 width={250}
                 height={10}
               />
@@ -90,7 +90,7 @@ export default function RootLayout({
               <ul className="space-y-2 text-sm">
                 <li>
                   <a
-                    href="https://www.instagram.com/amritya_organics/"
+                    href="https://www.instagram.com/urban_kisan/"
                     className="hover:text-white transition-colors"
                   >
                     Instagram
@@ -98,7 +98,7 @@ export default function RootLayout({
                 </li>
                 <li>
                   <a
-                    href="mailto:amrityaorganics@gmail.com"
+                    href="mailto:urbankisan@gmail.com"
                     className="hover:text-white transition-colors"
                   >
                     Contact Us
@@ -108,8 +108,7 @@ export default function RootLayout({
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-stone-800 text-xs text-stone-500 text-center">
-            &copy; {new Date().getFullYear()} Amritya Organics. All rights
-            reserved.
+            &copy; {new Date().getFullYear()} Urban Kisan. All rights reserved.
           </div>
         </footer>
       </body>

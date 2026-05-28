@@ -9,7 +9,7 @@ export function OurStoryScreen() {
           <AppText variant="eyebrow">Our story</AppText>
           <AppText variant="title">From the soil to a more mindful pantry.</AppText>
           <AppText>
-            Amritya Organics curates premium organic staples with a focus on integrity,
+            Urban Kisan curates premium organic staples with a focus on integrity,
             provenance, and everyday nourishment. The grains, oils, and pantry essentials
             are selected for homes that care about what goes into daily meals.
           </AppText>

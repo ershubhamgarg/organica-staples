@@ -63,22 +63,25 @@ export default function LaunchOfferBanner() {
   return (
     <>
       <div
-        className={`animate-reveal-down relative z-40 border-y text-white shadow-[0_12px_30px_rgba(17,24,39,0.22)] ${hasClaimed
-          ? "border-brand-green/20 bg-brand-green"
-          : "border-white/15 bg-[#111827]"
-          }`}
+        className={`animate-reveal-down relative z-40 border-y text-white shadow-[0_12px_30px_rgba(17,24,39,0.22)] ${
+          hasClaimed
+            ? "border-brand-green/20 bg-brand-green"
+            : "border-white/15 bg-[#111827]"
+        }`}
       >
         <div
-          className={`absolute inset-0 opacity-95 ${hasClaimed
-            ? "bg-[linear-gradient(90deg,#2D3A26_0%,#4A5D3F_55%,#D4AF37_140%)]"
-            : "bg-[linear-gradient(90deg,#111827_0%,#7f1d1d_48%,#facc15_120%)]"
-            }`}
+          className={`absolute inset-0 opacity-95 ${
+            hasClaimed
+              ? "bg-[linear-gradient(90deg,#2D3A26_0%,#4A5D3F_55%,#D4AF37_140%)]"
+              : "bg-[linear-gradient(90deg,#111827_0%,#7f1d1d_48%,#facc15_120%)]"
+          }`}
         />
         <div className="relative mx-auto flex max-w-[95rem] flex-col items-center justify-between gap-3 px-5 py-3 text-center sm:flex-row sm:text-left lg:px-10">
           <div className="flex min-w-0 items-center gap-3">
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-lg ${hasClaimed ? "text-brand-green" : "text-[#7f1d1d]"
-                }`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-lg ${
+                hasClaimed ? "text-brand-green" : "text-[#7f1d1d]"
+              }`}
             >
               {hasClaimed ? (
                 <CheckCircle2 size={20} strokeWidth={1.8} />
@@ -145,10 +148,11 @@ export default function LaunchOfferBanner() {
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
                   <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-brand-gold shadow-xl sm:h-12 sm:w-12 ${hasClaimed
-                      ? "bg-brand-green shadow-brand-green/20"
-                      : "bg-[#7f1d1d] shadow-[#7f1d1d]/20"
-                      }`}
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-brand-gold shadow-xl sm:h-12 sm:w-12 ${
+                      hasClaimed
+                        ? "bg-brand-green shadow-brand-green/20"
+                        : "bg-[#7f1d1d] shadow-[#7f1d1d]/20"
+                    }`}
                   >
                     {hasClaimed ? (
                       <CheckCircle2 size={22} strokeWidth={1.7} />
@@ -185,7 +189,7 @@ export default function LaunchOfferBanner() {
               <p className="max-w-2xl text-xs font-light leading-relaxed text-brand-brown/70 sm:text-sm">
                 {hasClaimed
                   ? "Your one-time launch offer claim is confirmed. Our team is working toward fulfilment and will process it after verification."
-                  : "Choose exactly 2 different products, keep quantity 1 each, and place a ₹0 launch order. Share the receipt on Instagram Story and tag @amritya_organics for verification."}
+                  : "Choose exactly 2 different products, keep quantity 1 each, and place a ₹0 launch order. Share the receipt on Instagram Story and tag @urban_kisan for verification."}
               </p>
 
               {!hasClaimed && (
@@ -205,7 +209,7 @@ export default function LaunchOfferBanner() {
                       {
                         icon: Camera,
                         title: "Story Tag",
-                        body: "Upload receipt and tag @amritya_organics.",
+                        body: "Upload receipt and tag @urban_kisan.",
                       },
                     ].map((item) => (
                       <div
