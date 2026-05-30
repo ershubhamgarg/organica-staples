@@ -5,15 +5,17 @@
   --font-serif: var(--font-serif);
   --font-devanagari: var(--font-devanagari);
   
-  --color-brand-brown: #3C362A; /* Deep Earthy Umber */
-  --color-brand-brown-light: #5C5446;
-  --color-brand-green: #2D3A26; /* Deep Forest Green */
-  --color-brand-green-light: #4A5D3F;
-  --color-brand-green-fresh: #7FB069; /* Lighter vibrant green for discounts */
-  --color-brand-gold: #D4AF37; /* Rich Metallic Gold */
+  --color-brand-brown: #112C24; /* Updated to Primary Green for consistency */
+  --color-brand-brown-light: #153128; /* Updated to Secondary Green */
+  --color-brand-green: #112C24; /* Primary Green */
+  --color-brand-green-light: #153128; /* Secondary Green */
+  --color-brand-green-fresh: #7FB069; /* Keep for discounts unless requested */
+  --color-brand-gold: #E8D090; /* Primary Gold */
+  --color-brand-gold-accent: #F8C878; /* Accent Gold */
+  --color-brand-gold-light: #F0D8A0; /* Light Gold */
   --color-brand-cream: #FDFBF7; /* Pure Off-White */
   --color-brand-terracotta: #A65D47; /* Earthy Red */
-  --color-brand-sand: #E6DFD1;
+  --color-brand-sand: #F0D8A0; /* Updated to Light Gold */
 }
 
 html {

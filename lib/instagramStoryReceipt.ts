@@ -139,26 +139,26 @@ export const createInstagramStoryReceiptImage = async (
   if (logo.complete && logo.naturalWidth > 0) {
     drawContainedImage(logo, 355, 288, 370, 148);
   } else {
-    context.fillStyle = "#2F2A20";
+    context.fillStyle = "#112C24";
     context.textAlign = "center";
     context.font = "700 42px Arial";
     context.fillText("Urban Kisan", width / 2, 380);
   }
 
   // Tag text
-  context.fillStyle = "#A65D47";
+  context.fillStyle = "#E8D090";
   context.font = 'bold 32px "Plus Jakarta Sans"';
   context.textAlign = "center";
   context.fillText("@urban_kisan", width / 2, 440);
 
   // Message
-  context.fillStyle = "#3C362A";
+  context.fillStyle = "#112C24";
   context.font = '300 38px "Plus Jakarta Sans"';
   context.textAlign = "center";
   context.fillText("I just placed my order from Urban Kisan.", width / 2, 705);
   context.fillText("Smooth checkout. Pure organic goodness.", width / 2, 755);
 
-  context.strokeStyle = "rgba(212,175,55,0.45)";
+  context.strokeStyle = "rgba(232,208,144,0.45)";
   context.setLineDash([18, 18]);
   context.beginPath();
   context.moveTo(170, 840);
@@ -174,11 +174,11 @@ export const createInstagramStoryReceiptImage = async (
   context.fillText("ORDER ID", 170, 925);
   context.fillText("FROM", 650, 925);
 
-  context.fillStyle = "#3C362A";
+  context.fillStyle = "#112C24";
   context.font = "700 52px Georgia";
   context.fillText(`#${shortOrderId}`, 170, 990);
 
-  context.fillStyle = "#2D7A44";
+  context.fillStyle = "#112C24";
   context.font = "700 40px Georgia";
   context.fillText("Urban Kisan", 650, 980);
 
@@ -186,13 +186,13 @@ export const createInstagramStoryReceiptImage = async (
   order.items.slice(0, 2).forEach((item) => {
     drawRoundedRect(155, itemY - 56, 770, 105, 28, "rgba(245,238,222,0.64)");
     context.textAlign = "left";
-    context.fillStyle = "#3C362A";
+    context.fillStyle = "#112C24";
     context.font = "700 32px Georgia";
     drawFittedText(item.name, 190, itemY, 470);
     context.font = "700 22px Arial";
     context.fillStyle = "#8A7E70";
     context.fillText(`Qty ${item.quantity} / ${item.weight}`, 190, itemY + 40);
-    context.fillStyle = "#2D7A44";
+    context.fillStyle = "#153128";
     context.textAlign = "right";
     context.font = "800 22px Arial";
     context.fillText("RESERVED", 885, itemY + 12);

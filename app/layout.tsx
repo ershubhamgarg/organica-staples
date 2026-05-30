@@ -52,62 +52,84 @@ export default function RootLayout({
         <WhatsAppButton />
         <FloatingCart />
 
-        <footer className="bg-stone-900 text-stone-300 py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
+        <footer className="bg-brand-green text-brand-cream/80 py-16 relative overflow-hidden">
+          <div className="absolute inset-0 bg-organic-texture opacity-[0.03] pointer-events-none" />
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+            <div className="space-y-6">
               <Image
-                src="/uk-logo-new.png"
+                src="/uk-footer.png"
                 alt="Urban Kisan"
-                width={250}
-                height={140}
+                width={180}
+                height={100}
               />
-              <p className="text-sm text-stone-400 max-w-xs">
+              {/* <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed">
                 Curating the finest organic goods for your everyday nourishment.
-              </p>
+                Harvested with integrity, delivered with care.
+              </p> */}
             </div>
             <div>
-              <h4 className="text-white font-medium mb-4">Explore</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
+                Explore
+              </h4>
+              <ul className="space-y-3 text-sm font-light">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <a
+                    href="/#shop"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
                     Shop All
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Store
+                  <a
+                    href="/our-story"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
+                    Our Story
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Grains & Seeds
+                  <a
+                    href="/#contact"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
+                    Contact Us
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-medium mb-4">Connect</h4>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
+                Connect
+              </h4>
+              <ul className="space-y-3 text-sm font-light">
                 <li>
                   <a
                     href="https://www.instagram.com/urban_kisan/"
-                    className="hover:text-white transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
                     Instagram
                   </a>
                 </li>
                 <li>
                   <a
                     href="mailto:urbankisan@gmail.com"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
-                    Contact Us
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
+                    Email Us
                   </a>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-stone-800 text-xs text-stone-500 text-center">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 text-[10px] uppercase tracking-[0.2em] text-brand-cream/40 text-center relative z-10 font-bold">
             &copy; {new Date().getFullYear()} Urban Kisan. All rights reserved.
           </div>
         </footer>

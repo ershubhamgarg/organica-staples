@@ -138,7 +138,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(45 20 30)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.6"
               />
               <ellipse
@@ -147,7 +147,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(-20 50 10)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.4"
               />
               <ellipse
@@ -156,7 +156,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(10 80 40)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.5"
               />
               <ellipse
@@ -165,7 +165,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(60 110 20)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.3"
               />
               <ellipse
@@ -174,7 +174,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(-45 40 60)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.5"
               />
               <ellipse
@@ -183,7 +183,7 @@ Message: ${formData.message}
                 rx="6"
                 ry="3"
                 transform="rotate(30 130 50)"
-                fill="#D4AF37"
+                fill="#E8D090"
                 opacity="0.4"
               />
             </svg>
@@ -200,7 +200,7 @@ Message: ${formData.message}
             >
               <path
                 d="M20 80C20 80 40 75 80 75M30 80L30 40M30 50L60 50M60 50V75"
-                stroke="#3C362A"
+                stroke="#112C24"
                 strokeWidth="2"
                 strokeLinecap="round"
               />
@@ -258,7 +258,7 @@ Message: ${formData.message}
                 >
                   <path
                     d="M50 90V60M50 60C50 60 20 50 10 30M50 60C50 60 80 50 90 30"
-                    stroke="#2D3A26"
+                    stroke="#112C24"
                     strokeWidth="4"
                     strokeLinecap="round"
                   />
@@ -333,7 +333,7 @@ Message: ${formData.message}
           >
             <path
               d="M50 80C50 80 85 60 85 35C85 20 70 15 50 35C30 15 15 20 15 35C15 60 50 80 50 80Z"
-              fill="#2D3A26"
+              fill="#112C24"
             />
           </svg>
         </div>

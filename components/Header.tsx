@@ -175,11 +175,12 @@ export default function Header() {
               onClick={handleHomeClick}
             >
               <Image
-                src="/uk-header-logo.png"
+                src="/uk-footer.png"
                 alt="Urban Kisan"
-                width={240}
-                height={200}
-                className="object-contain"
+                // style={{ backgroundColor: "red" }}
+                width={200}
+                height={10}
+                className="object-contain "
                 priority
               />
             </Link>

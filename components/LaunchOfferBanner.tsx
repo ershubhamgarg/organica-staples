@@ -72,8 +72,8 @@ export default function LaunchOfferBanner() {
         <div
           className={`absolute inset-0 opacity-95 ${
             hasClaimed
-              ? "bg-[linear-gradient(90deg,#2D3A26_0%,#4A5D3F_55%,#D4AF37_140%)]"
-              : "bg-[linear-gradient(90deg,#111827_0%,#7f1d1d_48%,#facc15_120%)]"
+              ? "bg-[linear-gradient(90deg,#112C24_0%,#153128_55%,#E8D090_140%)]"
+              : "bg-[linear-gradient(90deg,#112C24_0%,#7f1d1d_48%,#F8C878_120%)]"
           }`}
         />
         <div className="relative mx-auto flex max-w-[95rem] flex-col items-center justify-between gap-3 px-5 py-3 text-center sm:flex-row sm:text-left lg:px-10">
@@ -92,7 +92,7 @@ export default function LaunchOfferBanner() {
               )}
             </div>
             <div className="min-w-0">
-              <p className="font-serif text-[12px] font-semibold uppercase tracking-[0.28em] text-yellow-200 sm:text-[13px]">
+              <p className="font-serif text-[12px] font-semibold uppercase tracking-[0.28em] text-brand-gold-accent sm:text-[13px]">
                 Launch Story Offer
               </p>
               <p className="mt-0.5 font-serif text-lg font-medium leading-tight tracking-normal text-white sm:text-xl">
@@ -142,7 +142,7 @@ export default function LaunchOfferBanner() {
 
           <div className="relative w-full max-w-3xl overflow-hidden rounded-[1.5rem] border border-brand-gold/25 bg-brand-cream shadow-[0_40px_120px_-35px_rgba(17,24,39,0.85)] sm:rounded-[2rem]">
             <div className="absolute inset-0 bg-organic-texture opacity-40" />
-            <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#7f1d1d,#D4AF37,#2D3A26)]" />
+            <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#7f1d1d,#E8D090,#112C24)]" />
 
             <div className="relative p-4 sm:p-6">
               <div className="mb-4 flex items-start justify-between gap-3">

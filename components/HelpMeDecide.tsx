@@ -633,8 +633,8 @@ export default function HelpMeDecide() {
             Help Me <span className="italic text-brand-terracotta">Decide</span>
           </h2>
           <p className="text-xs text-brand-brown/60 font-light leading-relaxed text-balance max-w-xl">
-            Share your wellness markers for a personalized Urban Kisan guide. The
-            recommendations combine public wellness thresholds, live catalog
+            Share your wellness markers for a personalized Urban Kisan guide.
+            The recommendations combine public wellness thresholds, live catalog
             signals, and practical kitchen-fit data.
           </p>
         </ScrollReveal>
@@ -933,9 +933,9 @@ export default function HelpMeDecide() {
                               <div
                                 className="relative grid h-36 w-36 place-items-center rounded-full"
                                 style={{
-                                  background: `conic-gradient(#2D3A26 ${
+                                  background: `conic-gradient(#112C24 ${
                                     activeRecommendation.matchScore * 3.6
-                                  }deg, rgba(212,175,55,0.18) 0deg)`,
+                                  }deg, rgba(232,208,144,0.18) 0deg)`,
                                 }}
                               >
                                 <div className="absolute inset-3 rounded-full bg-white" />

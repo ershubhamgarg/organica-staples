@@ -155,7 +155,7 @@ function CheckoutIssueAlert({ message, onClose }: CheckoutIssueAlertProps) {
       className="animate-reveal-down overflow-hidden rounded-3xl border border-brand-terracotta/25 bg-white shadow-[0_24px_70px_-30px_rgba(60,54,42,0.45)]"
     >
       <div className="relative p-1">
-        <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#A65D47,#D4AF37,#7FB069)]" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#F8C878,#E8D090,#7FB069)]" />
         <div className="absolute inset-0 bg-organic-texture opacity-30" />
         <div className="relative flex items-start gap-4 rounded-[1.35rem] bg-brand-cream/75 px-4 py-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-brand-terracotta/20 bg-white text-brand-terracotta shadow-lg shadow-brand-terracotta/10">
@@ -575,7 +575,7 @@ export default function CheckoutPage() {
         <div className="mx-auto flex w-full max-w-[430px] flex-col gap-4">
           <div className="order-confirmation-card relative overflow-hidden rounded-[1.65rem] border border-brand-gold/20 bg-white shadow-[0_30px_90px_-45px_rgba(60,54,42,0.45)]">
             <div className="absolute inset-0 bg-organic-texture opacity-35" />
-            <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#A65D47,#D4AF37,#2D3A26)]" />
+            <div className="absolute left-0 top-0 h-1.5 w-full bg-[linear-gradient(90deg,#F8C878,#E8D090,#112C24)]" />
             <div className="relative z-10 px-5 py-5 text-center">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
