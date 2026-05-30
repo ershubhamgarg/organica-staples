@@ -56,14 +56,14 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <Image
-                src="/logo-white.png"
+                src="/uk-logo-new.png"
                 alt="Urban Kisan"
                 width={250}
-                height={10}
+                height={140}
               />
-              {/* <p className="text-sm text-stone-400 max-w-xs">
+              <p className="text-sm text-stone-400 max-w-xs">
                 Curating the finest organic goods for your everyday nourishment.
-              </p> */}
+              </p>
             </div>
             <div>
               <h4 className="text-white font-medium mb-4">Explore</h4>

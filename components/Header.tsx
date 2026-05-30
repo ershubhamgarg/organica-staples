@@ -14,7 +14,12 @@ import {
   UserCircle,
   X,
 } from "lucide-react";
-import { useEffect, useState, useRef, type MouseEvent as ReactMouseEvent } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { scrollToHomeTop } from "@/utils/scrollToHomeTop";
 
@@ -169,16 +174,14 @@ export default function Header() {
               className="relative z-50 transition-all duration-700 hover:scale-105"
               onClick={handleHomeClick}
             >
-              <div className="p-1 sm:p-1.5 bg-brand-cream organic-border border border-brand-gold/10 shadow-lg shadow-brand-brown/5">
-                <Image
-                  src="/logo-horizon.png"
-                  alt="Urban Kisan"
-                  width={90}
-                  height={110}
-                  className="object-contain w-20 lg:w-28 h-auto"
-                  priority
-                />
-              </div>
+              <Image
+                src="/uk-header-logo.png"
+                alt="Urban Kisan"
+                width={240}
+                height={200}
+                className="object-contain"
+                priority
+              />
             </Link>
           </div>
 

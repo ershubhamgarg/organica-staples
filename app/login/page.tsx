@@ -133,7 +133,7 @@ export default function LoginPage() {
         {/* Left column - branding */}
         <div className="flex flex-col items-center justify-center bg-brand-green text-brand-cream p-8 lg:p-12">
           <Image
-            src="/logo-white.png"
+            src="/logo-horizon-new.png"
             alt="Urban Kisan"
             width={580}
             height={280}
