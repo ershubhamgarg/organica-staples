@@ -107,7 +107,7 @@ export default function Header() {
     });
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
 
@@ -142,68 +142,65 @@ export default function Header() {
       <header
         className={`sticky top-0 w-full z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-brand-cream/80 backdrop-blur-xl border-b border-brand-gold/10 py-2 shadow-[0_10px_30px_-15px_rgba(60,54,42,0.15)]"
-            : "bg-transparent py-3 lg:py-6"
+            ? "bg-brand-cream border-b border-brand-gold/10 py-0 shadow-[0_10px_30px_-15px_rgba(60,54,42,0.15)]"
+            : "bg-transparent py-0"
         }`}
       >
         <div className="max-w-[95rem] mx-auto px-6 sm:px-10 flex items-center justify-between">
-          {/* Desktop Navigation - Left */}
-          <nav className="hidden lg:flex items-center gap-12 flex-1">
+          {/* Logo - Left */}
+          <div className="flex items-center">
             <Link
               href="/"
-              onClick={handleHomeClick}
-              className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
-            >
-              Home
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-            </Link>
-            <Link
-              href="/#shop"
-              onClick={(event) => handleSectionClick(event, "shop")}
-              className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
-            >
-              Shop
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-            </Link>
-          </nav>
-
-          {/* Logo - Center */}
-          <div className="flex justify-center">
-            <Link
-              href="/"
-              className="relative z-50 transition-all duration-700 hover:scale-105"
+              className="relative z-50 transition-transform duration-700 origin-left"
               onClick={handleHomeClick}
             >
               <Image
-                src="/uk-footer.png"
+                src="/uk-logo-transparent.png"
                 alt="Urban Kisan"
-                // style={{ backgroundColor: "red" }}
-                width={200}
-                height={10}
-                className="object-contain "
+                width={140}
+                height={140}
+                className="object-contain w-24 lg:w-32 h-auto drop-shadow-[0_4px_12px_rgba(17,44,36,0.12)]"
                 priority
               />
             </Link>
           </div>
 
           {/* Actions & Navigation - Right */}
-          <div className="flex items-center justify-end gap-3 sm:gap-6 lg:gap-10 flex-1">
-            <Link
-              href="/our-story"
-              className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
-            >
-              Our Story
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-            </Link>
+          <div className="flex items-center justify-end gap-3 sm:gap-6 lg:gap-8 flex-1">
+            <nav className="hidden lg:flex items-center gap-8 mr-4">
+              <Link
+                href="/"
+                onClick={handleHomeClick}
+                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+              >
+                Home
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+              </Link>
+              <Link
+                href="/#shop"
+                onClick={(event) => handleSectionClick(event, "shop")}
+                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+              >
+                The Pantry
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+              </Link>
+              <Link
+                href="/our-story"
+                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+              >
+                The Kisan Story
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+              </Link>
 
-            <Link
-              href="/#contact"
-              onClick={(event) => handleSectionClick(event, "contact")}
-              className="hidden lg:group lg:relative lg:block text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
-            >
-              Contact Us
-              <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-            </Link>
+              <Link
+                href="/#contact"
+                onClick={(event) => handleSectionClick(event, "contact")}
+                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+              >
+                Contact Us
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+              </Link>
+            </nav>
 
             <div className="h-4 w-[1px] bg-brand-gold/20 hidden lg:block" />
 

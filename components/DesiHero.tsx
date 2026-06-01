@@ -13,19 +13,18 @@ const DesiHero = () => {
             <div className="inline-flex items-center justify-start gap-3 mb-6 text-brand-green/80">
               <span className="h-[1px] w-8 sm:w-12 bg-brand-gold" />
               <span className="uppercase tracking-[0.3em] text-[7px] sm:text-[9px] font-black">
-                Ethically Sourced Organic Staples
+                Honest, Earthy, and Unadulterated
               </span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-brand-brown font-medium mb-4 leading-[1.1] tracking-tight">
               Purity in <br />
-              <span className="text-brand-gold italic">every grain.</span>
+              <span className="text-brand-gold italic">every harvest.</span>
             </h1>
 
             <p className="text-sm sm:text-base text-brand-brown/70 mb-6 sm:mb-8 max-w-md font-light leading-relaxed">
-              Experience the authentic taste of tradition with our ethically
-              sourced, 100% organic pantry staples. Pure, potent, and close to
-              nature.
+              Bringing back the lost flavors of traditional Indian kitchens. 
+              Ethically sourced, 100% organic staples that nourish both body and soul.
             </p>
 
             <div className="flex flex-wrap items-center justify-start gap-4">
@@ -34,7 +33,7 @@ const DesiHero = () => {
                 className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-green text-brand-cream rounded-full transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20"
               >
                 <span className="font-black uppercase tracking-widest text-[10px]">
-                  Shop Collection
+                  Explore The Pantry
                 </span>
                 <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
               </Link>

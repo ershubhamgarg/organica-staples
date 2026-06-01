@@ -10,12 +10,12 @@
   --color-brand-green: #112C24; /* Primary Green */
   --color-brand-green-light: #153128; /* Secondary Green */
   --color-brand-green-fresh: #7FB069; /* Keep for discounts unless requested */
-  --color-brand-gold: #E8D090; /* Primary Gold */
-  --color-brand-gold-accent: #F8C878; /* Accent Gold */
-  --color-brand-gold-light: #F0D8A0; /* Light Gold */
+  --color-brand-gold: #C5A028; /* Deep Rich Gold - More visible */
+  --color-brand-gold-accent: #D4AF37; /* Metallic Gold Accent */
+  --color-brand-gold-light: #E8D090; /* Old Primary Gold as Light variant */
   --color-brand-cream: #FDFBF7; /* Pure Off-White */
   --color-brand-terracotta: #A65D47; /* Earthy Red */
-  --color-brand-sand: #F0D8A0; /* Updated to Light Gold */
+  --color-brand-sand: #E8D090; /* Updated to more visible gold */
 }
 
 html {

@@ -28,11 +28,14 @@ const devanagari = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "https://urbankisan.co",
+  ),
   title: "Urban Kisan | Premium Organic Goods",
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
-    icon: "/favicon.png",
+    icon: "/uk-logo-white.png",
     apple: "/favicon.png",
   },
 };
@@ -55,21 +58,24 @@ export default function RootLayout({
         <footer className="bg-brand-green text-brand-cream/80 py-16 relative overflow-hidden">
           <div className="absolute inset-0 bg-organic-texture opacity-[0.03] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
-            <div className="space-y-6">
-              <Image
-                src="/uk-footer.png"
-                alt="Urban Kisan"
-                width={180}
-                height={100}
-              />
-              {/* <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed">
-                Curating the finest organic goods for your everyday nourishment.
-                Harvested with integrity, delivered with care.
-              </p> */}
+            <div className="space-y-8 flex flex-col items-center md:items-start">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-brand-gold/10 rounded-full blur-2xl group-hover:bg-brand-gold/20 transition-colors duration-700" />
+                <Image
+                  src="/uk-logo-white.png"
+                  alt="Urban Kisan"
+                  width={140}
+                  height={140}
+                  className="relative z-10 w-28 lg:w-32 h-auto opacity-90"
+                />
+              </div>
+              <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
+                "Purity in every grain, harvest in every heart."
+              </p>
             </div>
             <div>
               <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
-                Explore
+                Pauranik Explore
               </h4>
               <ul className="space-y-3 text-sm font-light">
                 <li>
@@ -78,7 +84,7 @@ export default function RootLayout({
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
-                    Shop All
+                    Our Pantry
                   </a>
                 </li>
                 <li>
@@ -87,7 +93,7 @@ export default function RootLayout({
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
-                    Our Story
+                    The Kisan Story
                   </a>
                 </li>
                 <li>
@@ -103,7 +109,7 @@ export default function RootLayout({
             </div>
             <div>
               <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
-                Connect
+                Sammelan (Connect)
               </h4>
               <ul className="space-y-3 text-sm font-light">
                 <li>

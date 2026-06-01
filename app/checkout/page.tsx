@@ -579,11 +579,11 @@ export default function CheckoutPage() {
             <div className="relative z-10 px-5 py-5 text-center">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
-                  src="/logo-horizon.png"
+                  src="/logo-horizon-new1.png"
                   alt="Urban Kisan"
-                  width={122}
-                  height={56}
-                  className="h-auto w-28 object-contain"
+                  width={80}
+                  height={80}
+                  className="h-auto w-16 object-contain"
                   priority
                 />
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-brand-gold/25 bg-brand-cream shadow-xl confirmation-seal">

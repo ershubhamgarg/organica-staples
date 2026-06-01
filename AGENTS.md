@@ -82,7 +82,7 @@ When the promotion ends, remove or disable all of these paths together so the UI
   - Order Summary: Hide any summary item (shipping, convenience fee, discount) if its value is zero.
   - Navigation: Use Next.js `<Link>` for all internal routing, including hash IDs (e.g., `#shop`).
   - Launch offer banner typography should use the theme serif (`font-serif`) for a fancy premium feel.
-  - Login page branding uses the white logo asset (`/logo-white.png`) on the green brand panel.
+  - Login page branding uses the circular logo asset (`/logo-horizon-new1.png`) on the green brand panel.
 
 ## Gotchas & Constraints
 

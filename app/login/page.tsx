@@ -131,18 +131,25 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-brand-cream px-4 py-12">
       <section className="grid w-full max-w-4xl grid-cols-1 lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden shadow-xl border border-brand-gold/10 bg-white">
         {/* Left column - branding */}
-        <div className="flex flex-col items-center justify-center bg-brand-green text-brand-cream p-8 lg:p-12">
-          <Image
-            src="/logo-horizon-new.png"
-            alt="Urban Kisan"
-            width={580}
-            height={280}
-            priority
-            // className="mb-5 h-auto w-36 sm:w-44"
-          />
-          {/* <p className="text-sm text-brand-cream/80 text-center max-w-xs">
-            Premium organic pantry for a healthier lifestyle.
-          </p> */}
+        <div className="flex flex-col items-center justify-center bg-brand-green text-brand-cream p-8 lg:p-12 relative overflow-hidden">
+          <div className="absolute inset-0 bg-organic-texture opacity-5" />
+          <div className="relative z-10 group">
+            <div className="absolute inset-0 bg-brand-gold/20 rounded-full blur-3xl scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <Image
+              src="/logo-horizon-new1.png"
+              alt="Urban Kisan"
+              width={240}
+              height={240}
+              priority
+              className="relative z-10 h-auto w-32 sm:w-40 brightness-0 invert opacity-95 transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+          <div className="mt-8 relative z-10 text-center">
+            <h3 className="font-serif text-brand-gold text-lg mb-2">Urban Kisan</h3>
+            <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-cream/40">
+              Premium Organic Pantry
+            </p>
+          </div>
         </div>
 
         {/* Right column - authentication form */}

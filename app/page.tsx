@@ -18,6 +18,8 @@ import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 
+import ReviewCarousel from "@/components/ReviewCarousel";
+
 export default function Home() {
   const syncCartWithSupabase = useCartStore(
     (state) => state.syncCartWithSupabase,
@@ -268,19 +270,19 @@ Message: ${formData.message}
               <div className="inline-flex items-center gap-4 mb-6">
                 <span className="h-[1px] w-8 bg-brand-terracotta" />
                 <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-terracotta">
-                  From the Village Altar
+                  Direct From Local Khets
                 </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-serif text-brand-brown leading-[1.1] tracking-tight mb-8">
                 Harvested by hands that <br />
-                <span className="italic text-brand-gold">know the earth.</span>
+                <span className="italic text-brand-gold">revere the soil.</span>
               </h2>
               <div className="space-y-6">
                 <p className="text-brand-brown/70 font-light leading-relaxed text-lg">
-                  Every staple at Urban Kisan tells a story of a small village
-                  farm, where tradition is preserved and nature is respected. We
-                  work directly with farmers who still use the ancient wisdom of
-                  their ancestors.
+                  At Urban Kisan, we trace every grain back to the soil it grew
+                  in. By partnering directly with small-scale Indian farmers, we
+                  bypass the industrial complex to bring you the true bounty of
+                  Bharat.
                 </p>
 
                 <div className="grid grid-cols-2 gap-8 pt-8">
@@ -289,17 +291,17 @@ Message: ${formData.message}
                       Direct Sourcing
                     </h5>
                     <p className="text-xs text-brand-brown/70 font-light">
-                      Eliminating middlemen to ensure farmers get the fair price
-                      they deserve.
+                      Fair value for the grower, unmatched purity for your
+                      family.
                     </p>
                   </div>
                   <div className="space-y-2">
                     <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
-                      Village Hubs
+                      Village Clusters
                     </h5>
                     <p className="text-xs text-brand-brown/70 font-light">
-                      Processed in small batches within village clusters to
-                      retain peak nutrition.
+                      Small-batch processing to retain the nutrition that nature
+                      intended.
                     </p>
                   </div>
                 </div>
@@ -313,6 +315,8 @@ Message: ${formData.message}
       <ProductListing />
 
       <HelpMeDecide />
+
+      <ReviewCarousel />
 
       {/* Values Section */}
       <section className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
