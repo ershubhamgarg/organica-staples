@@ -211,10 +211,16 @@ export default function ProductPage({
   if ((!hasFetched || isLoading) && !product) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="animate-pulse flex flex-col items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-brand-gold/20" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-24 h-24">
+            <img
+              src="/loader.gif"
+              alt="Loading..."
+              className="w-full h-full object-contain"
+            />
+          </div>
           <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
-            Loading...
+            Fetching the harvest...
           </p>
         </div>
       </div>

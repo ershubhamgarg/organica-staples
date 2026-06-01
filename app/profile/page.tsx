@@ -724,7 +724,7 @@ export default function ProfilePage() {
                                       Tag
                                     </span>
                                     <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
-                                      @urban_kisan
+                                      @urbankisan.co
                                     </span>
                                   </div>
                                   <button

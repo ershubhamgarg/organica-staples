@@ -149,7 +149,7 @@ export const createInstagramStoryReceiptImage = async (
   context.fillStyle = "#E8D090";
   context.font = 'bold 32px "Plus Jakarta Sans"';
   context.textAlign = "center";
-  context.fillText("@urban_kisan", width / 2, 440);
+  context.fillText("@urbankisan.co", width / 2, 440);
 
   // Message
   context.fillStyle = "#112C24";

@@ -189,7 +189,7 @@ export default function LaunchOfferBanner() {
               <p className="max-w-2xl text-xs font-light leading-relaxed text-brand-brown/70 sm:text-sm">
                 {hasClaimed
                   ? "Your one-time launch offer claim is confirmed. Our team is working toward fulfilment and will process it after verification."
-                  : "Choose exactly 2 different products, keep quantity 1 each, and place a ₹0 launch order. Share the receipt on Instagram Story and tag @urban_kisan for verification."}
+                  : "Choose exactly 2 different products, keep quantity 1 each, and place a ₹0 launch order. Share the receipt on Instagram Story and tag @urbankisan.co for verification."}
               </p>
 
               {!hasClaimed && (
@@ -209,7 +209,7 @@ export default function LaunchOfferBanner() {
                       {
                         icon: Camera,
                         title: "Story Tag",
-                        body: "Upload receipt and tag @urban_kisan.",
+                        body: "Upload receipt and tag @urbankisan.co.",
                       },
                     ].map((item) => (
                       <div

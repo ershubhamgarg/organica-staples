@@ -547,11 +547,11 @@ export default function CheckoutPage() {
 
       window.location.href = "instagram://story-camera";
       window.setTimeout(() => {
-        window.open("https://www.instagram.com/urban_kisan/", "_blank");
+        window.open("https://www.instagram.com/urbankisan.co/", "_blank");
       }, 800);
     } catch (error) {
       console.error("Instagram story share error:", error);
-      window.open("https://www.instagram.com/urban_kisan/", "_blank");
+      window.open("https://www.instagram.com/urbankisan.co/", "_blank");
     } finally {
       setIsSharingToInstagram(false);
     }
@@ -664,7 +664,7 @@ export default function CheckoutPage() {
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
                   <Sparkles size={13} strokeWidth={1.8} />
                   <p className="text-[7px] font-black uppercase tracking-[0.2em]">
-                    @urban_kisan
+                    @urbankisan.co
                   </p>
                   <Sparkles size={13} strokeWidth={1.8} />
                 </div>
@@ -675,7 +675,7 @@ export default function CheckoutPage() {
           {isLaunchOfferConfirmation ? (
             <div className="animate-reveal-up space-y-3">
               <p className="rounded-2xl border border-brand-gold/20 bg-white px-4 py-3 text-center text-[10px] font-semibold leading-relaxed text-brand-brown/65 shadow-lg shadow-brand-brown/5">
-                Before posting, add an Instagram mention tag for @urban_kisan on
+                Before posting, add an Instagram mention tag for @urbankisan.co on
                 your Story.
               </p>
               <button
@@ -1037,8 +1037,8 @@ export default function CheckoutPage() {
                 </h2>
                 <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
                   Place the order for ₹0, then upload the final order
-                  confirmation to your Instagram Story and tag @urban_kisan. We
-                  will process the order after verification.
+                  confirmation to your Instagram Story and tag @urbankisan.co.
+                  We will process the order after verification.
                 </p>
               </div>
             </div>
@@ -1472,7 +1472,7 @@ export default function CheckoutPage() {
                         <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
                           No online payment is needed. Your order remains
                           pending until you share the confirmation on Instagram
-                          Story and tag @urban_kisan.
+                          Story and tag @urbankisan.co.
                         </p>
                       </div>
                     </div>

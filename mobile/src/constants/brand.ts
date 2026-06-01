@@ -2,7 +2,7 @@ export const BRAND = {
   name: "Urban Kisan",
   whatsappPhone: "918295433041",
   supportEmail: "urbankisan@gmail.com",
-  instagramUrl: "https://www.instagram.com/urban_kisan/",
+  instagramUrl: "https://www.instagram.com/urbankisan.co/",
   freeShippingThreshold: 500,
   shippingFee: 50,
   heroImage:

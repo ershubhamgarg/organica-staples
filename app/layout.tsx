@@ -109,12 +109,12 @@ export default function RootLayout({
             </div>
             <div>
               <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
-                Sammelan (Connect)
+                Connect
               </h4>
               <ul className="space-y-3 text-sm font-light">
                 <li>
                   <a
-                    href="https://www.instagram.com/urban_kisan/"
+                    href="https://www.instagram.com/urbankisan.co/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
@@ -125,7 +125,7 @@ export default function RootLayout({
                 </li>
                 <li>
                   <a
-                    href="mailto:urbankisan@gmail.com"
+                    href="mailto:care.urbankisan@gmail.com"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
