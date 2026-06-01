@@ -319,7 +319,7 @@ Message: ${formData.message}
       <ReviewCarousel />
 
       {/* Values Section */}
-      <section className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-white py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Decorative Leaf Backgrounds */}
         <div className="absolute top-20 left-0 w-64 h-64 bg-brand-green/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
         <div
