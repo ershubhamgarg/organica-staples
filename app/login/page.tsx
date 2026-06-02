@@ -128,73 +128,65 @@ export default function LoginPage() {
   const canSubmit = !emailError && !passwordError && !isLoading;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-brand-cream px-4 py-12">
-      <section className="grid w-full max-w-4xl grid-cols-1 lg:grid-cols-2 gap-0 rounded-3xl overflow-hidden shadow-xl border border-brand-gold/10 bg-white">
-        {/* Left column - branding */}
-        <div className="flex flex-col items-center justify-center bg-brand-green text-brand-cream p-8 lg:p-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-organic-texture opacity-5" />
-          <div className="relative z-10 group">
-            <div className="absolute inset-0 bg-brand-gold/20 rounded-full blur-3xl scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-            <Image
-              src="/logo-horizon-new1.png"
-              alt="Urban Kisan"
-              width={240}
-              height={240}
-              priority
-              className="relative z-10 h-auto w-32 sm:w-40 brightness-0 invert opacity-95 transition-transform duration-700 group-hover:scale-105"
-            />
-          </div>
-          <div className="mt-8 relative z-10 text-center">
-            <h3 className="font-serif text-brand-gold text-lg mb-2">Urban Kisan</h3>
-            <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-cream/40">
-              Premium Organic Pantry
-            </p>
-          </div>
-        </div>
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-brand-cream px-4 py-12 overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 bg-mandala opacity-[0.03] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-[40%] aspect-square bg-brand-gold/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] aspect-square bg-brand-green/5 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Right column - authentication form */}
-        <div className="p-8 lg:p-12 space-y-6">
+      <section className="relative w-full max-w-[440px] z-10">
+        {/* Back Link */}
+        <div className="mb-8 flex justify-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-brown transition-colors mb-4"
+            className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] text-brand-brown/40 hover:text-brand-brown transition-all"
           >
-            <ArrowLeft size={14} /> Back to Store
+            <ArrowLeft
+              size={12}
+              className="transition-transform group-hover:-translate-x-1"
+            />{" "}
+            The Pantry
           </Link>
+        </div>
 
-          <h1 className="mb-2 text-xl font-serif text-brand-brown">
-            {isSignUp ? "Create Account" : "Welcome Back"}
-          </h1>
+        <div className="bg-white/80 backdrop-blur-xl rounded-[40px] p-8 sm:p-12 shadow-[0_32px_64px_-16px_rgba(17,44,36,0.08)] border border-brand-gold/10 relative overflow-hidden">
+          <div className="absolute inset-0 bg-jute opacity-[0.02] pointer-events-none" />
 
-          <p className="mb-4 text-sm text-brand-brown/70">
-            {isSignUp
-              ? "Join us to enjoy seamless checkout and order history."
-              : "Sign in to manage your addresses and orders."}
-          </p>
+          <div className="relative z-10 text-center mb-10">
+            <h1 className="text-3xl font-serif text-brand-brown mb-3 tracking-tight">
+              {isSignUp ? "Create Account" : "Namaste,"}
+            </h1>
+            <p className="text-xs text-brand-brown/60 font-light leading-relaxed max-w-[280px] mx-auto italic">
+              {isSignUp
+                ? "Join our community for premium organic staples and faster checkout."
+                : "Sign in to access your orders and saved addresses."}
+            </p>
+          </div>
 
           <button
             type="button"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-brand-gold/20 bg-brand-cream px-5 py-3 text-sm font-medium text-brand-brown transition-colors hover:bg-brand-gold/10 disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-3 rounded-2xl border border-brand-gold/10 bg-white px-5 py-4 text-[10px] font-black uppercase tracking-widest text-brand-brown transition-all hover:border-brand-gold/30 hover:shadow-md active:scale-[0.98] disabled:opacity-50"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-brand-gold shadow-sm">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-cream text-brand-gold shadow-sm group-hover:scale-110 transition-transform">
               G
-            </span>{" "}
+            </span>
             Continue with Google
           </button>
 
-          <div className="my-4 flex items-center">
-            <div className="flex-1 h-px bg-brand-gold/20" />
-            <span className="px-2 text-xs font-medium text-brand-brown/50">
+          <div className="my-8 flex items-center">
+            <div className="flex-1 h-px bg-brand-gold/10" />
+            <span className="px-4 text-[9px] font-black uppercase tracking-widest text-brand-brown/20">
               or
             </span>
-            <div className="flex-1 h-px bg-brand-gold/20" />
+            <div className="flex-1 h-px bg-brand-gold/10" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
+            <div className="space-y-1.5">
               <label
-                className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
                 htmlFor="email"
               >
                 Email Address
@@ -212,26 +204,19 @@ export default function LoginPage() {
                 onBlur={() =>
                   setTouchedFields((fields) => ({ ...fields, email: true }))
                 }
-                aria-invalid={Boolean(touchedFields.email && emailError)}
-                aria-describedby={
-                  touchedFields.email && emailError ? "email-error" : undefined
-                }
-                className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
+                className="w-full rounded-2xl border border-brand-gold/10 bg-brand-cream/40 px-5 py-4 text-sm text-brand-brown placeholder:text-brand-brown/30 focus:border-brand-gold/40 focus:bg-white focus:ring-0 transition-all outline-none"
                 placeholder="you@example.com"
               />
               {touchedFields.email && emailError && (
-                <p
-                  id="email-error"
-                  className="mt-1 text-xs font-medium text-brand-terracotta"
-                >
+                <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
                   {emailError}
                 </p>
               )}
             </div>
 
-            <div>
+            <div className="space-y-1.5">
               <label
-                className="block text-xs font-bold uppercase text-brand-brown/70 mb-1"
+                className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
                 htmlFor="password"
               >
                 Password
@@ -249,68 +234,65 @@ export default function LoginPage() {
                 onBlur={() =>
                   setTouchedFields((fields) => ({ ...fields, password: true }))
                 }
-                aria-invalid={Boolean(touchedFields.password && passwordError)}
-                aria-describedby={
-                  touchedFields.password && passwordError
-                    ? "password-error"
-                    : undefined
-                }
-                className="w-full rounded-md border border-brand-gold/15 bg-brand-cream/60 px-4 py-2 text-sm text-brand-brown placeholder:text-brand-brown/70 focus:border-brand-brown focus:ring-2 focus:ring-brand-brown/30 transition"
-                placeholder="Minimum 6 characters"
+                className="w-full rounded-2xl border border-brand-gold/10 bg-brand-cream/40 px-5 py-4 text-sm text-brand-brown placeholder:text-brand-brown/30 focus:border-brand-gold/40 focus:bg-white focus:ring-0 transition-all outline-none"
+                placeholder="••••••••"
               />
               {touchedFields.password && passwordError && (
-                <p
-                  id="password-error"
-                  className="mt-1 text-xs font-medium text-brand-terracotta"
-                >
+                <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
                   {passwordError}
                 </p>
               )}
             </div>
 
             {displayError && (
-              <div
-                role="alert"
-                className="rounded-md border border-brand-terracotta/15 bg-brand-terracotta/5 p-3 text-center text-xs font-medium text-brand-terracotta"
-              >
-                {displayError}
+              <div className="p-4 rounded-xl bg-brand-terracotta/5 border border-brand-terracotta/10">
+                <p className="text-[10px] font-bold text-brand-terracotta text-center uppercase tracking-wider">
+                  {displayError}
+                </p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={!canSubmit}
-              className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-brand-brown px-5 py-3 text-sm font-bold uppercase text-brand-cream transition-all hover:bg-brand-brown-light disabled:opacity-50 hover:shadow-md"
+              className="group w-full relative inline-flex items-center justify-center gap-3 px-8 py-5 bg-brand-green text-brand-cream rounded-2xl transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-xl hover:shadow-brand-green/20 disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
             >
-              {isLoading
-                ? "Processing..."
-                : isSignUp
-                  ? "Create Account"
-                  : "Sign In"}
+              <span className="font-black uppercase tracking-[0.2em] text-[10px]">
+                {isLoading
+                  ? "Verifying..."
+                  : isSignUp
+                    ? "Create Account"
+                    : "Sign In"}
+              </span>
               {!isLoading && (
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-1"
-                />
+                <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-xs text-brand-brown/50">
-            {isSignUp ? "Already have an account?" : "New to Urban Kisan?"}
+          <div className="mt-10 text-center">
             <button
               type="button"
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setFormError(null);
                 clearError();
-                setTouchedFields({ email: false, password: false });
               }}
-              className="ml-2 font-medium text-brand-gold hover:text-brand-brown"
+              className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 hover:text-brand-brown transition-colors"
             >
-              {isSignUp ? "Sign In" : "Create Account"}
+              {isSignUp ? (
+                <>
+                  Already have an account?{" "}
+                  <span className="text-brand-gold">Sign In</span>
+                </>
+              ) : (
+                <>
+                  New to Urban Kisan?{" "}
+                  <span className="text-brand-gold">Create Account</span>
+                </>
+              )}
             </button>
-          </p>
+          </div>
         </div>
       </section>
     </main>

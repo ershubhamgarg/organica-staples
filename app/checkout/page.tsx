@@ -579,7 +579,7 @@ export default function CheckoutPage() {
             <div className="relative z-10 px-5 py-5 text-center">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
-                  src="/logo-horizon-new1.png"
+                  src="/uk-logo-transparent.png"
                   alt="Urban Kisan"
                   width={80}
                   height={80}
@@ -675,8 +675,8 @@ export default function CheckoutPage() {
           {isLaunchOfferConfirmation ? (
             <div className="animate-reveal-up space-y-3">
               <p className="rounded-2xl border border-brand-gold/20 bg-white px-4 py-3 text-center text-[10px] font-semibold leading-relaxed text-brand-brown/65 shadow-lg shadow-brand-brown/5">
-                Before posting, add an Instagram mention tag for @urbankisan.co on
-                your Story.
+                Before posting, add an Instagram mention tag for @urbankisan.co
+                on your Story.
               </p>
               <button
                 type="button"
