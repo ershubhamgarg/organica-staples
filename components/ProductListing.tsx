@@ -6,6 +6,7 @@ import { Star, ChevronDown, Hourglass } from "lucide-react";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
+import { useProductStore } from "@/store/productStore";
 
 import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import {
@@ -21,26 +22,21 @@ type ProductsResponse = {
 };
 
 export default function ProductListing() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { products, fetchProducts } = useProductStore();
 
   useEffect(() => {
-    async function getProducts() {
-      const response = await fetch("/api/products", { cache: "no-store" });
-      const result = (await response.json()) as ProductsResponse;
-
-      if (response.ok && result.products) {
-        setProducts(result.products);
-      }
+    if (products.length === 0) {
+      void fetchProducts();
     }
-
-    getProducts();
-  }, []);
+  }, [products.length, fetchProducts]);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
 
   const visibleProducts = useMemo(() => {
-    return products.filter((p) => p.isVisible !== false);
+    return products.filter(
+      (p) => p.isVisible !== false && p.launch_status !== "launching_soon",
+    );
   }, [products]);
 
   const categories = useMemo(() => {
@@ -120,9 +116,30 @@ export default function ProductListing() {
   }, [selectedCategory, sortOrder, visibleProducts]);
 
   return (
-    <section id="shop" className="max-w-[95rem] mx-auto px-4 sm:px-10 py-10 lg:py-14 bg-brand-cream relative">
+    <section
+      id="shop"
+      className="max-w-[95rem] mx-auto px-4 sm:px-10 py-10 lg:py-14 bg-brand-cream relative"
+    >
       <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
-      
+
+      {/* Premium Header */}
+      <div className="text-center mb-12 lg:mb-16 relative">
+        <div className="inline-flex items-center gap-3 mb-4 text-brand-green/80">
+          <span className="h-[1px] w-8 bg-brand-gold" />
+          <span className="uppercase tracking-[0.3em] text-[9px] font-black">
+            The Urban Kisan Pantry
+          </span>
+          <span className="h-[1px] w-8 bg-brand-gold" />
+        </div>
+        <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight">
+          Pure Staples, <br />
+          <span className="text-brand-gold italic">Sourced Responsibly.</span>
+        </h2>
+        <div className="mt-6 flex justify-center">
+          <div className="w-16 h-1 bg-brand-gold/20 rounded-full" />
+        </div>
+      </div>
+
       <div className="flex flex-col lg:flex-row justify-between items-center mb-10 lg:mb-14 gap-6">
         {/* Categories */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
@@ -208,6 +225,15 @@ export default function ProductListing() {
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
 
+                  {/* Just Launched Badge */}
+                  {product.justLaunched && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span className="bg-brand-green text-brand-cream px-3 py-1 text-[7px] sm:text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-white/20">
+                        Just Launched
+                      </span>
+                    </div>
+                  )}
+
                   {/* Premium Corner Badge for Discount */}
                   {available && hasDiscount && (
                     <div className="absolute top-0 right-0 overflow-hidden w-16 h-16 pointer-events-none">
@@ -228,7 +254,9 @@ export default function ProductListing() {
                   {!available && (
                     <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
                       <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-4 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
-                        Available Soon
+                        {product.isLaunchingSoon
+                          ? "Launching Soon"
+                          : "Available Soon"}
                       </span>
                     </div>
                   )}

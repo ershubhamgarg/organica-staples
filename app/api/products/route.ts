@@ -9,6 +9,9 @@ type ProductInventoryRow = {
 
 type ProductRow = Product & {
   product_inventory?: ProductInventoryRow | ProductInventoryRow[] | null;
+  launch_status?: string | null;
+  launch_date?: string | null;
+  launch_badge_text?: string | null;
 };
 
 const getSupabaseServerClient = () => {
@@ -53,7 +56,7 @@ const mapProduct = (row: ProductRow): Product => {
       "High smoke point for healthy cooking",
       "Natural source of Vitamin E",
       "Promotes heart health and digestion",
-      "Chemical-free and unrefined"
+      "Chemical-free and unrefined",
     ];
   } else if (product.name === "Raw Himalayan Honey") {
     product.name2 = "हिमालयन शहद (Himalayan Shahad)";
@@ -63,7 +66,7 @@ const mapProduct = (row: ProductRow): Product => {
       "Rich in antioxidants and minerals",
       "Anti-bacterial and anti-inflammatory",
       "Unfiltered and unprocessed purity",
-      "Perfect natural sweetener"
+      "Perfect natural sweetener",
     ];
   } else if (product.name === "A2 Desi Cow Ghee") {
     product.name2 = "शुद्ध देसी घी (Shuddh Desi Ghee)";
@@ -73,7 +76,7 @@ const mapProduct = (row: ProductRow): Product => {
       "Improves digestion and metabolism",
       "Rich in fat-soluble vitamins",
       "Promotes healthy skin and hair",
-      "Lactose-free and highly nutritious"
+      "Lactose-free and highly nutritious",
     ];
   }
 
@@ -89,6 +92,11 @@ const mapProduct = (row: ProductRow): Product => {
         : product.low_stock_threshold,
     available:
       typeof stockQuantity === "number" ? stockQuantity > 0 : product.available,
+    // Map new launch status columns to frontend properties
+    justLaunched: row.launch_status === "just_launched",
+    isLaunchingSoon: row.launch_status === "launching_soon",
+    launchDate: row.launch_date,
+    launch_badge_text: row.launch_badge_text,
   };
 };
 

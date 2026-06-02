@@ -99,14 +99,14 @@ Message: ${formData.message}
       <DesiHero />
 
       {/* Farm & Origin Section */}
-      <section className="relative py-12 lg:py-16 bg-white overflow-hidden border-y border-brand-gold/10">
+      <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
         {/* Decorative SVG Illustrations */}
         <div className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-jute">
           {/* Wheat Stalk - Top Left */}
           <div className="absolute top-6 left-[3%] animate-float-slow">
             <svg
-              width="120"
-              height="240"
+              width="100"
+              height="200"
               viewBox="0 0 100 200"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -117,95 +117,6 @@ Message: ${formData.message}
                 strokeWidth="2"
                 strokeLinecap="round"
               />
-              <circle cx="10" cy="20" r="3" fill="#C29F64" />
-              <circle cx="90" cy="40" r="3" fill="#C29F64" />
-              <circle cx="10" cy="60" r="3" fill="#C29F64" />
-              <circle cx="90" cy="80" r="3" fill="#C29F64" />
-              <circle cx="10" cy="100" r="3" fill="#C29F64" />
-            </svg>
-          </div>
-
-          {/* Scattered Grains - Bottom Right */}
-          <div className="absolute bottom-20 right-[10%] animate-pulse-slow">
-            <svg
-              width="150"
-              height="100"
-              viewBox="0 0 150 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <ellipse
-                cx="20"
-                cy="30"
-                rx="6"
-                ry="3"
-                transform="rotate(45 20 30)"
-                fill="#E8D090"
-                opacity="0.6"
-              />
-              <ellipse
-                cx="50"
-                cy="10"
-                rx="6"
-                ry="3"
-                transform="rotate(-20 50 10)"
-                fill="#E8D090"
-                opacity="0.4"
-              />
-              <ellipse
-                cx="80"
-                cy="40"
-                rx="6"
-                ry="3"
-                transform="rotate(10 80 40)"
-                fill="#E8D090"
-                opacity="0.5"
-              />
-              <ellipse
-                cx="110"
-                cy="20"
-                rx="6"
-                ry="3"
-                transform="rotate(60 110 20)"
-                fill="#E8D090"
-                opacity="0.3"
-              />
-              <ellipse
-                cx="40"
-                cy="60"
-                rx="6"
-                ry="3"
-                transform="rotate(-45 40 60)"
-                fill="#E8D090"
-                opacity="0.5"
-              />
-              <ellipse
-                cx="130"
-                cy="50"
-                rx="6"
-                ry="3"
-                transform="rotate(30 130 50)"
-                fill="#E8D090"
-                opacity="0.4"
-              />
-            </svg>
-          </div>
-
-          {/* Traditional Plough - Center Right */}
-          <div className="absolute top-1/2 right-[5%] -translate-y-1/2 opacity-10">
-            <svg
-              width="200"
-              height="200"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 80C20 80 40 75 80 75M30 80L30 40M30 50L60 50M60 50V75"
-                stroke="#112C24"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
             </svg>
           </div>
         </div>
@@ -213,10 +124,10 @@ Message: ${formData.message}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-sand/10 skew-x-[-15deg] translate-x-1/4 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-20">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
             {/* Left: Illustration & Image */}
-            <ScrollReveal className="relative w-full lg:w-1/2">
-              <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl">
+            <ScrollReveal className="relative w-full lg:w-5/12">
+              <div className="relative aspect-[4/4.5] rounded-[2rem] overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1627314129626-c5cf387f351b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Organic Farming in Bharat"
@@ -227,18 +138,18 @@ Message: ${formData.message}
               </div>
 
               {/* Floating Farmer Badge */}
-              <div className="absolute right-4 sm:-right-8 -bottom-8 bg-brand-cream p-8 rounded-3xl shadow-2xl border border-brand-gold/10 max-w-xs animate-float">
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="w-12 h-12 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
-                    <Sprout size={24} />
+              <div className="absolute right-4 sm:-right-4 -bottom-6 bg-brand-cream p-6 rounded-2xl shadow-xl border border-brand-gold/10 max-w-[200px] animate-float">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
+                    <Sprout size={20} />
                   </div>
-                  <h4 className="text-lg font-serif text-brand-brown leading-tight">
+                  <h4 className="text-base font-serif text-brand-brown leading-tight">
                     Farmer <span className="italic">Owned.</span>
                   </h4>
                 </div>
-                <p className="text-[11px] text-brand-brown/60 font-light leading-relaxed">
-                  Supporting over 500+ marginal farming families across the
-                  fertile plains of North India.
+                <p className="text-[10px] text-brand-brown/60 font-light leading-relaxed">
+                  Supporting over 500+ marginal farming families across North
+                  India.
                 </p>
               </div>
             </ScrollReveal>
@@ -247,61 +158,42 @@ Message: ${formData.message}
             <ScrollReveal
               animation="reveal-fade"
               delay={200}
-              className="w-full lg:w-1/2 relative"
+              className="w-full lg:w-7/12 relative"
             >
-              {/* Floating Sprout Icon */}
-              <div className="absolute -top-12 -right-4 opacity-10 rotate-12 pointer-events-none hidden lg:block">
-                <svg
-                  width="120"
-                  height="120"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M50 90V60M50 60C50 60 20 50 10 30M50 60C50 60 80 50 90 30"
-                    stroke="#112C24"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-
-              <div className="inline-flex items-center gap-4 mb-6">
+              <div className="inline-flex items-center gap-4 mb-4">
                 <span className="h-[1px] w-8 bg-brand-terracotta" />
-                <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-terracotta">
+                <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-terracotta">
                   Direct From Local Khets
                 </span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-serif text-brand-brown leading-[1.1] tracking-tight mb-8">
+              <h2 className="text-3xl md:text-4xl font-serif text-brand-brown leading-[1.1] tracking-tight mb-6">
                 Harvested by hands that <br />
                 <span className="italic text-brand-gold">revere the soil.</span>
               </h2>
-              <div className="space-y-6">
-                <p className="text-brand-brown/70 font-light leading-relaxed text-lg">
+              <div className="space-y-5">
+                <p className="text-brand-brown/70 font-light leading-relaxed text-base">
                   At Urban Kisan, we trace every grain back to the soil it grew
                   in. By partnering directly with small-scale Indian farmers, we
                   bypass the industrial complex to bring you the true bounty of
                   Bharat.
                 </p>
 
-                <div className="grid grid-cols-2 gap-8 pt-8">
-                  <div className="space-y-2">
-                    <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
+                <div className="grid grid-cols-2 gap-6 pt-4">
+                  <div className="space-y-1">
+                    <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
                       Direct Sourcing
                     </h5>
-                    <p className="text-xs text-brand-brown/70 font-light">
+                    <p className="text-[11px] text-brand-brown/70 font-light">
                       Fair value for the grower, unmatched purity for your
                       family.
                     </p>
                   </div>
-                  <div className="space-y-2">
-                    <h5 className="text-[10px] uppercase tracking-widest font-black text-brand-brown">
+                  <div className="space-y-1">
+                    <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
                       Village Clusters
                     </h5>
-                    <p className="text-xs text-brand-brown/70 font-light">
-                      Small-batch processing to retain the nutrition that nature
-                      intended.
+                    <p className="text-[11px] text-brand-brown/70 font-light">
+                      Small-batch processing to retain original nutrition.
                     </p>
                   </div>
                 </div>

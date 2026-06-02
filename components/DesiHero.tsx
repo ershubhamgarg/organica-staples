@@ -4,7 +4,27 @@ import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useProductStore } from "@/store/productStore";
+import LaunchCarousel from "./LaunchCarousel";
+import { useEffect } from "react";
+
 const DesiHero = () => {
+  const { products, fetchProducts } = useProductStore();
+
+  useEffect(() => {
+    if (products.length === 0) {
+      void fetchProducts();
+    }
+  }, [products.length, fetchProducts]);
+
+  const launchProducts = products.filter(
+    (p) => p.justLaunched === true || p.isLaunchingSoon === true,
+  );
+
+  if (launchProducts.length > 0) {
+    return <LaunchCarousel products={launchProducts} />;
+  }
+
   return (
     <section className="relative min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh] w-full flex items-center overflow-hidden bg-brand-cream pt-2 sm:pt-4 lg:pt-0">
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-12 sm:pb-16 lg:pt-8 lg:pb-8">

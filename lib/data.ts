@@ -17,6 +17,11 @@ export interface Product {
   stock_quantity?: number | null;
   low_stock_threshold?: number | null;
   isVisible?: boolean | null;
+  justLaunched?: boolean | null;
+  isLaunchingSoon?: boolean | null;
+  launchDate?: string | null;
+  launch_status?: "available" | "just_launched" | "launching_soon" | null;
+  launch_badge_text?: string | null;
 }
 
 export function getProductThumbnail(product: Product): string {
