@@ -619,7 +619,7 @@ export default function HelpMeDecide() {
   };
 
   return (
-    <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-brand-sand/30 overflow-hidden">
+    <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto relative z-10">
         <ScrollReveal className="flex flex-col items-center text-center mb-8">
           <div className="inline-flex items-center justify-center gap-3 text-brand-gold mb-3">

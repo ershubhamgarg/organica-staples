@@ -61,17 +61,17 @@ export default function ReviewCarousel() {
   if (reviews.length === 0) return null;
 
   return (
-    <section className="bg-white py-12 md:py-16 overflow-hidden border-t border-brand-gold/10">
+    <section className="bg-brand-cream py-8 md:py-12 overflow-hidden border-t border-brand-gold/10">
       <div className="max-w-7xl mx-auto px-6">
-        <ScrollReveal className="text-center mb-10">
-          <div className="inline-flex items-center gap-3 mb-3">
+        <ScrollReveal className="text-center mb-6">
+          <div className="inline-flex items-center gap-3 mb-2">
             <span className="h-[1px] w-6 bg-brand-gold" />
-            <span className="text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold">
+            <span className="text-[8px] uppercase tracking-[0.3em] font-black text-brand-gold">
               Community Voices
             </span>
             <span className="h-[1px] w-6 bg-brand-gold" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-serif text-brand-brown tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-serif text-brand-brown tracking-tight">
             Trust in every <span className="italic text-brand-terracotta">shubh-aarambh.</span>
           </h2>
         </ScrollReveal>
@@ -81,7 +81,7 @@ export default function ReviewCarousel() {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          <div className="relative min-h-[320px] md:min-h-[280px] flex items-center justify-center">
+          <div className="relative min-h-[280px] md:min-h-[240px] flex items-center justify-center">
             {reviews.map((review, idx) => {
               const isActive = idx === activeIndex;
               return (

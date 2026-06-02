@@ -95,15 +95,15 @@ Message: ${formData.message}
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in">
+    <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <DesiHero />
 
       {/* Farm & Origin Section */}
-      <section className="relative py-24 bg-white overflow-hidden">
+      <section className="relative py-12 lg:py-16 bg-white overflow-hidden border-y border-brand-gold/10">
         {/* Decorative SVG Illustrations */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-jute">
           {/* Wheat Stalk - Top Left */}
-          <div className="absolute top-10 left-[5%] animate-float-slow">
+          <div className="absolute top-6 left-[3%] animate-float-slow">
             <svg
               width="120"
               height="240"
@@ -218,7 +218,7 @@ Message: ${formData.message}
             <ScrollReveal className="relative w-full lg:w-1/2">
               <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=1000"
+                  src="https://images.unsplash.com/photo-1627314129626-c5cf387f351b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   alt="Organic Farming in Bharat"
                   fill
                   className="object-cover"
@@ -319,15 +319,16 @@ Message: ${formData.message}
       <ReviewCarousel />
 
       {/* Values Section */}
-      <section className="relative bg-white py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-white py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
         {/* Decorative Leaf Backgrounds */}
-        <div className="absolute top-20 left-0 w-64 h-64 bg-brand-green/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
+        <div className="absolute top-10 left-0 w-48 h-48 bg-brand-green/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
         <div
-          className="absolute bottom-20 right-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
+          className="absolute bottom-10 right-0 w-72 h-72 bg-brand-gold/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
           style={{ animationDelay: "2s" }}
         />
 
-        <div className="absolute top-1/4 right-[5%] opacity-[0.03] pointer-events-none">
+        <div className="absolute top-1/4 right-[5%] opacity-[0.02] pointer-events-none">
           <svg
             width="300"
             height="300"
@@ -417,14 +418,15 @@ Message: ${formData.message}
       </section>
 
       {/* Contact Us Section */}
-      <section className="relative bg-brand-cream py-12 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10">
-        <div className="absolute inset-0 bg-stone-texture pointer-events-none" />
+      <section className="relative bg-brand-cream py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10">
+        <div className="absolute inset-0 bg-stone-texture pointer-events-none opacity-[0.05]" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 items-start relative z-10">
-          <ScrollReveal className="lg:pt-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-12 items-start relative z-10">
+          <ScrollReveal className="lg:pt-2">
             <div
               id="contact"
-              className="scroll-mt-32 lg:scroll-mt-40 inline-flex items-center gap-4 mb-4"
+              className="scroll-mt-24 lg:scroll-mt-32 inline-flex items-center gap-4 mb-4"
             >
               <MessageCircle size={20} className="text-brand-gold" />
               <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-gold">

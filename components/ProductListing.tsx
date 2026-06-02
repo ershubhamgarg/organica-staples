@@ -120,43 +120,19 @@ export default function ProductListing() {
   }, [selectedCategory, sortOrder, visibleProducts]);
 
   return (
-    <section className="relative py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-brand-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-brand-green/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
-      <ScrollReveal
-        id="shop"
-        className="relative scroll-mt-32 lg:scroll-mt-40 flex flex-col items-center text-center mb-16"
-      >
-        <div className="inline-flex items-center gap-4 mb-4">
-          <span className="h-[1px] w-8 bg-brand-gold" />
-          <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
-            Purely Curated
-          </span>
-          <span className="h-[1px] w-8 bg-brand-gold" />
-        </div>
-        <h2 className="text-3xl md:text-4xl font-serif text-brand-brown mb-4 tracking-tight">
-          Our <span className="italic text-brand-terracotta">Organic</span>{" "}
-          Collection
-        </h2>
-        <p className="text-brand-brown/80 max-w-lg mx-auto font-light leading-relaxed text-base text-balance">
-          A selection of India&apos;s finest staples, harvested with respect for
-          the earth and delivered with uncompromising purity.
-        </p>
-      </ScrollReveal>
-
-      {/* Filters & Sorting */}
-      <div className="relative flex flex-col lg:flex-row justify-between items-center mb-20 gap-8">
+    <section id="shop" className="max-w-[95rem] mx-auto px-4 sm:px-10 py-10 lg:py-14 bg-brand-cream relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
+      
+      <div className="flex flex-col lg:flex-row justify-between items-center mb-10 lg:mb-14 gap-6">
         {/* Categories */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {categories.map((category) => (
             <button
               key={category.name}
               onClick={() => setSelectedCategory(category.name)}
-              className={`group relative px-5 py-2.5 sm:px-6 sm:py-2.5 rounded-full text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-500 overflow-hidden ${
+              className={`group relative px-4 py-2 sm:px-5 sm:py-2 rounded-full text-[8px] font-bold uppercase tracking-[0.15em] transition-all duration-500 overflow-hidden ${
                 selectedCategory === category.name
-                  ? "bg-brand-brown text-brand-cream shadow-lg shadow-brand-brown/10"
+                  ? "bg-brand-brown text-brand-cream shadow-md"
                   : "bg-brand-cream text-brand-brown border border-brand-gold/15 hover:border-brand-gold/30"
               }`}
             >

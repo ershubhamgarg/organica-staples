@@ -188,7 +188,7 @@ export default function Header() {
                 href="/our-story"
                 className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
               >
-                The Kisan Story
+                About us
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
               </Link>
 

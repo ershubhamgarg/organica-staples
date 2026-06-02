@@ -6,9 +6,9 @@ import Link from "next/link";
 
 const DesiHero = () => {
   return (
-    <section className="relative min-h-[60vh] sm:min-h-[70vh] lg:min-h-[80vh] w-full flex items-center overflow-hidden bg-brand-cream pt-4 sm:pt-8 lg:pt-0">
-      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-2 sm:pt-6 pb-20 sm:pb-24 lg:pt-12 lg:pb-12">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center">
+    <section className="relative min-h-[50vh] sm:min-h-[60vh] lg:min-h-[70vh] w-full flex items-center overflow-hidden bg-brand-cream pt-2 sm:pt-4 lg:pt-0">
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-12 sm:pb-16 lg:pt-8 lg:pb-8">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           <div className="max-w-xl text-left">
             <div className="inline-flex items-center justify-start gap-3 mb-6 text-brand-green/80">
               <span className="h-[1px] w-8 sm:w-12 bg-brand-gold" />
@@ -23,8 +23,9 @@ const DesiHero = () => {
             </h1>
 
             <p className="text-sm sm:text-base text-brand-brown/70 mb-6 sm:mb-8 max-w-md font-light leading-relaxed">
-              Bringing back the lost flavors of traditional Indian kitchens. 
-              Ethically sourced, 100% organic staples that nourish both body and soul.
+              Bringing back the lost flavors of traditional Indian kitchens.
+              Ethically sourced, 100% organic staples that nourish both body and
+              soul.
             </p>
 
             <div className="flex flex-wrap items-center justify-start gap-4">
