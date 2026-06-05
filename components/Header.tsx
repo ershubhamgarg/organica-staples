@@ -156,7 +156,7 @@ export default function Header() {
             >
               <Image
                 src="/uk-logo-transparent.png"
-                alt="Urban Kisan"
+                alt="ANNVRIKSH"
                 width={140}
                 height={140}
                 className="object-contain w-24 lg:w-32 h-auto drop-shadow-[0_4px_12px_rgba(17,44,36,0.12)]"

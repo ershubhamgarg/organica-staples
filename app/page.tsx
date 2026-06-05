@@ -81,7 +81,7 @@ export default function Home() {
     e.preventDefault();
 
     const whatsappMessage = `
-[Urban Kisan]
+[ANNVRIKSH]
 Name: ${formData.name}
 Email: ${formData.email}
 Subject: ${formData.subject}
@@ -172,7 +172,7 @@ Message: ${formData.message}
               </h2>
               <div className="space-y-5">
                 <p className="text-brand-brown/70 font-light leading-relaxed text-base">
-                  At Urban Kisan, we trace every grain back to the soil it grew
+                  At ANNVRIKSH, we trace every grain back to the soil it grew
                   in. By partnering directly with small-scale Indian farmers, we
                   bypass the industrial complex to bring you the true bounty of
                   Bharat.

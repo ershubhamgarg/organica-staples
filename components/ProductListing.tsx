@@ -127,7 +127,7 @@ export default function ProductListing() {
         <div className="inline-flex items-center gap-3 mb-4 text-brand-green/80">
           <span className="h-[1px] w-8 bg-brand-gold" />
           <span className="uppercase tracking-[0.3em] text-[9px] font-black">
-            The Urban Kisan Pantry
+            The ANNVRIKSH Pantry
           </span>
           <span className="h-[1px] w-8 bg-brand-gold" />
         </div>

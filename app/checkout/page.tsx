@@ -529,8 +529,8 @@ export default function CheckoutPage() {
       const storyImage = await createInstagramStoryImage(placedOrderDetails);
       const shareData: ShareData = {
         files: [storyImage],
-        text: "I just ordered some organic goodies from Urban Kisan! 🌿 Check out their website https://www.urbankisan.co and grab amazing launch offers. Don’t forget to tag them when you order! #UrbanKisan #OrganicFood #HealthyLiving #LaunchOffer",
-        title: "Urban Kisan Launch Order",
+        text: "I just ordered some organic goodies from ANNVRIKSH! 🌿 Check out their website https://annvriksh.com and grab amazing launch offers. Don’t forget to tag them when you order! #ANNVRIKSH #OrganicFood #HealthyLiving #LaunchOffer",
+        title: "ANNVRIKSH Launch Order",
       };
 
       if (navigator.canShare?.(shareData)) {
@@ -547,11 +547,11 @@ export default function CheckoutPage() {
 
       window.location.href = "instagram://story-camera";
       window.setTimeout(() => {
-        window.open("https://www.instagram.com/urbankisan.co/", "_blank");
+        window.open("https://www.instagram.com/annvriksh/", "_blank");
       }, 800);
     } catch (error) {
       console.error("Instagram story share error:", error);
-      window.open("https://www.instagram.com/urbankisan.co/", "_blank");
+      window.open("https://www.instagram.com/annvriksh/", "_blank");
     } finally {
       setIsSharingToInstagram(false);
     }
@@ -580,7 +580,7 @@ export default function CheckoutPage() {
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
                   src="/uk-logo-transparent.png"
-                  alt="Urban Kisan"
+                  alt="ANNVRIKSH"
                   width={80}
                   height={80}
                   className="h-auto w-16 object-contain"
@@ -664,7 +664,7 @@ export default function CheckoutPage() {
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
                   <Sparkles size={13} strokeWidth={1.8} />
                   <p className="text-[7px] font-black uppercase tracking-[0.2em]">
-                    @urbankisan.co
+                    @annvriksh
                   </p>
                   <Sparkles size={13} strokeWidth={1.8} />
                 </div>
@@ -675,8 +675,8 @@ export default function CheckoutPage() {
           {isLaunchOfferConfirmation ? (
             <div className="animate-reveal-up space-y-3">
               <p className="rounded-2xl border border-brand-gold/20 bg-white px-4 py-3 text-center text-[10px] font-semibold leading-relaxed text-brand-brown/65 shadow-lg shadow-brand-brown/5">
-                Before posting, add an Instagram mention tag for @urbankisan.co
-                on your Story.
+                Before posting, add an Instagram mention tag for @annvriksh on
+                your Story.
               </p>
               <button
                 type="button"
@@ -866,7 +866,7 @@ export default function CheckoutPage() {
             id: item.id,
             quantity: item.quantity,
           })),
-          receipt: `urbankisan_${Date.now().toString(36)}`,
+          receipt: `annvriksh_${Date.now().toString(36)}`,
           notes: {
             customer_name: deliveryAddress.name,
             customer_phone: deliveryAddress.phone || "",
@@ -899,7 +899,7 @@ export default function CheckoutPage() {
         key: orderData.keyId,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
-        name: "Urban Kisan",
+        name: "ANNVRIKSH",
         description: "Organic pantry order",
         order_id: orderData.order.id,
         prefill: {
@@ -1037,8 +1037,8 @@ export default function CheckoutPage() {
                 </h2>
                 <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
                   Place the order for ₹0, then upload the final order
-                  confirmation to your Instagram Story and tag @urbankisan.co.
-                  We will process the order after verification.
+                  confirmation to your Instagram Story and tag @annvriksh. We
+                  will process the order after verification.
                 </p>
               </div>
             </div>
@@ -1472,7 +1472,7 @@ export default function CheckoutPage() {
                         <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
                           No online payment is needed. Your order remains
                           pending until you share the confirmation on Instagram
-                          Story and tag @urbankisan.co.
+                          Story and tag @annvriksh.
                         </p>
                       </div>
                     </div>

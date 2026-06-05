@@ -287,7 +287,7 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  New to Urban Kisan?{" "}
+                  New to ANNVRIKSH?{" "}
                   <span className="text-brand-gold">Create Account</span>
                 </>
               )}

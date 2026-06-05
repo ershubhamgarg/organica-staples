@@ -142,20 +142,20 @@ export const createInstagramStoryReceiptImage = async (
     context.fillStyle = "#112C24";
     context.textAlign = "center";
     context.font = "700 42px Arial";
-    context.fillText("Urban Kisan", width / 2, 380);
+    context.fillText("ANNVRIKSH", width / 2, 380);
   }
 
   // Tag text
   context.fillStyle = "#E8D090";
   context.font = 'bold 32px "Plus Jakarta Sans"';
   context.textAlign = "center";
-  context.fillText("@urbankisan.co", width / 2, 440);
+  context.fillText("@annvriksh", width / 2, 440);
 
   // Message
   context.fillStyle = "#112C24";
   context.font = '300 38px "Plus Jakarta Sans"';
   context.textAlign = "center";
-  context.fillText("I just placed my order from Urban Kisan.", width / 2, 705);
+  context.fillText("I just placed my order from ANNVRIKSH.", width / 2, 705);
   context.fillText("Smooth checkout. Pure organic goodness.", width / 2, 755);
 
   context.strokeStyle = "rgba(232,208,144,0.45)";
@@ -180,7 +180,7 @@ export const createInstagramStoryReceiptImage = async (
 
   context.fillStyle = "#112C24";
   context.font = "700 40px Georgia";
-  context.fillText("Urban Kisan", 650, 980);
+  context.fillText("ANNVRIKSH", 650, 980);
 
   let itemY = 1150;
   order.items.slice(0, 2).forEach((item) => {
@@ -225,7 +225,7 @@ export const createInstagramStoryReceiptImage = async (
       resolve(
         new File(
           [blob],
-          `urbankisan-launch-order-${shortOrderId}-${Date.now()}.png`,
+          `annvriksh-launch-order-${shortOrderId}-${Date.now()}.png`,
           { type: "image/png" },
         ),
       );

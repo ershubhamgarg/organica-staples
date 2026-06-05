@@ -633,7 +633,7 @@ export default function HelpMeDecide() {
             Help Me <span className="italic text-brand-terracotta">Decide</span>
           </h2>
           <p className="text-xs text-brand-brown/60 font-light leading-relaxed text-balance max-w-xl">
-            Share your wellness markers for a personalized Urban Kisan guide.
+            Share your wellness markers for a personalized ANNVRIKSH guide.
             The recommendations combine public wellness thresholds, live catalog
             signals, and practical kitchen-fit data.
           </p>

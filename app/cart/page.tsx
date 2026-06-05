@@ -445,7 +445,7 @@ export default function CartPage() {
                 <p className="text-xs text-brand-brown/40 font-light leading-relaxed text-balance">
                   {launchOffer.isEligible
                     ? "Your order qualifies for the one-time launch offer. Place your order and complete Instagram verification to proceed."
-                    : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @urbankisan.co for verification."}
+                    : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @annvriksh for verification."}
                 </p>
               </div>
               <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">

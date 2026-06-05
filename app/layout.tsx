@@ -29,9 +29,9 @@ const devanagari = Noto_Sans_Devanagari({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "https://urbankisan.co",
+    process.env.NEXT_PUBLIC_BASE_URL || "https://annvriksh.com",
   ),
-  title: "Urban Kisan | Premium Organic Goods",
+  title: "ANNVRIKSH | Premium Organic Goods",
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
@@ -63,7 +63,7 @@ export default function RootLayout({
                 <div className="absolute inset-0 bg-brand-gold/10 rounded-full blur-2xl group-hover:bg-brand-gold/20 transition-colors duration-700" />
                 <Image
                   src="/uk-logo-white.png"
-                  alt="Urban Kisan"
+                  alt="ANNVRIKSH"
                   width={140}
                   height={140}
                   className="relative z-10 w-28 lg:w-32 h-auto opacity-90"
@@ -114,7 +114,7 @@ export default function RootLayout({
               <ul className="space-y-3 text-sm font-light">
                 <li>
                   <a
-                    href="https://www.instagram.com/urbankisan.co/"
+                    href="https://www.instagram.com/annvriksh/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
@@ -125,7 +125,7 @@ export default function RootLayout({
                 </li>
                 <li>
                   <a
-                    href="mailto:care.urbankisan@gmail.com"
+                    href="mailto:care.annvriksh@gmail.com"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
@@ -136,7 +136,7 @@ export default function RootLayout({
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 text-[10px] uppercase tracking-[0.2em] text-brand-cream/40 text-center relative z-10 font-bold">
-            &copy; {new Date().getFullYear()} Urban Kisan. All rights reserved.
+            &copy; {new Date().getFullYear()} ANNVRIKSH. All rights reserved.
           </div>
         </footer>
       </body>

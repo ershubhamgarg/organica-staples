@@ -1,10 +1,10 @@
-# Urban Kisan - Premium Pantry Store
+# ANNVRIKSH - Premium Pantry Store
 
-A premium ecommerce experience for Urban Kisan, built with Next.js 16, React 19, and Supabase.
+A premium ecommerce experience for ANNVRIKSH, built with Next.js 16, React 19, and Supabase.
 
 ## About
 
-Urban Kisan is an organic pantry store focused on providing premium, ethically sourced staples. This application provides a seamless shopping experience from product discovery to checkout.
+ANNVRIKSH is an organic pantry store focused on providing premium, ethically sourced staples. This application provides a seamless shopping experience from product discovery to checkout.
 
 ## Getting Started
 

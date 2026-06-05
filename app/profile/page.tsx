@@ -105,8 +105,8 @@ export default function ProfilePage() {
       const storyImage = await createInstagramStoryImage(order);
       const shareData: ShareData = {
         files: [storyImage],
-        text: "I just ordered some organic goodies from Urban Kisan! 🌿 Check out their website https://www.urbankisan.co and grab amazing launch offers. Don’t forget to tag them when you order! #UrbanKisan #OrganicFood #HealthyLiving #LaunchOffer",
-        title: "Urban Kisan Launch Order",
+        text: "I just ordered some organic goodies from ANNVRIKSH! 🌿 Check out their website https://annvriksh.com and grab amazing launch offers. Don’t forget to tag them when you order! #ANNVRIKSH #OrganicFood #HealthyLiving #LaunchOffer",
+        title: "ANNVRIKSH Launch Order",
       };
 
       if (navigator.canShare?.(shareData)) {
@@ -724,7 +724,7 @@ export default function ProfilePage() {
                                       Tag
                                     </span>
                                     <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
-                                      @urbankisan.co
+                                      @annvriksh
                                     </span>
                                   </div>
                                   <button

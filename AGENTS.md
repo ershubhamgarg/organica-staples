@@ -1,6 +1,6 @@
 # Agent Brief
 
-Next 16 + React 19 ecommerce app for Urban Kisan, an organic pantry store. App Router only; `pages/` is empty.
+Next 16 + React 19 ecommerce app for ANNVRIKSH, an organic pantry store. App Router only; `pages/` is empty.
 
 ## Commands
 
@@ -53,7 +53,7 @@ Next 16 + React 19 ecommerce app for Urban Kisan, an organic pantry store. App R
 - **Cart/Checkout Claimed State**: Already-claimed users must not see waived product pricing, `LAUNCHSTORY` discounts, `instagram_story_verification`, or ₹0 launch-offer totals. Cart and checkout should continue as regular paid orders and show fulfilment/congratulations messaging.
 - **Order History**: Launch-offer orders are identified by `payment_method === "instagram_story_verification"` or `discount_code === LAUNCHSTORY`; show a launch-offer badge and story-verification detail panel in `/profile`.
 - **Error UX**: Checkout uses a premium closable alert/toast for order-placement errors. Preserve backend messages, especially duplicate launch-offer claim errors, and avoid replacing them with generic failure copy.
-- **Instagram Verification**: Launch-offer confirmation asks the customer to photograph the receipt, upload it to Instagram Story, and tag `@urbankisan.co`. Keep these instructions outside the receipt or closable so the customer can hide them before taking the photo.
+- **Instagram Verification**: Launch-offer confirmation asks the customer to photograph the receipt, upload it to Instagram Story, and tag `@annvriksh`. Keep these instructions outside the receipt or closable so the customer can hide them before taking the photo.
 
 ### To Stop Or Remove The Launch Offer
 
