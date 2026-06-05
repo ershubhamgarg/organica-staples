@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
-    icon: "/uk-logo-white.png",
+    icon: "/logo-footer.png",
     apple: "/favicon.png",
   },
 };
@@ -62,16 +62,16 @@ export default function RootLayout({
               <div className="relative group">
                 <div className="absolute inset-0 bg-brand-gold/10 rounded-full blur-2xl group-hover:bg-brand-gold/20 transition-colors duration-700" />
                 <Image
-                  src="/uk-logo-white.png"
+                  src="/logo-footer.png"
                   alt="ANNVRIKSH"
-                  width={140}
+                  width={600}
                   height={140}
-                  className="relative z-10 w-28 lg:w-32 h-auto opacity-90"
+                  // className="relative z-10 w-28 lg:w-32 h-auto opacity-90"
                 />
               </div>
-              <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
+              {/* <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
                 "Purity in every grain, harvest in every heart."
-              </p>
+              </p> */}
             </div>
             <div>
               <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">

@@ -19,9 +19,9 @@ export default function OurStory() {
             </span>
             <span className="h-[1px] w-12 bg-brand-gold" />
           </div>
-          <h1 className="text-6xl md:text-8xl font-serif text-brand-brown mb-10 tracking-tight leading-[0.9]">
+          <h1 className="text-4xl md:text-8xl font-serif text-brand-brown mb-10 tracking-tight leading-[0.9]">
             The Story of <br />
-            <span className="italic text-brand-terracotta">ANNVRIKSH</span>
+            <span className="italic  text-brand-terracotta">ANNVRIKSH</span>
           </h1>
           <p className="text-xl md:text-2xl text-brand-brown/60 font-light leading-relaxed max-w-2xl mx-auto text-balance">
             Born from a lifelong bond and a shared vision to restore the purity
