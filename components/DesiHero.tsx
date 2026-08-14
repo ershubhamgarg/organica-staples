@@ -4,6 +4,7 @@ import { ArrowRight, Mail, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { isProductAvailable } from "@/lib/data";
 import { useProductStore } from "@/store/productStore";
 import LaunchCarousel from "./LaunchCarousel";
 import { useEffect } from "react";
@@ -17,12 +18,29 @@ const DesiHero = () => {
     }
   }, [products.length, fetchProducts]);
 
-  const launchProducts = products.filter(
-    (p) => p.justLaunched === true || p.isLaunchingSoon === true,
-  );
+  const featuredProducts = [...products]
+    .filter(
+      (p) =>
+        p.isVisible !== false &&
+        (p.isLaunchingSoon ||
+          p.launch_status === "launching_soon" ||
+          !isProductAvailable(p)),
+    )
+    .sort((a, b) => {
+      const launchingSoonA =
+        a.isLaunchingSoon || a.launch_status === "launching_soon";
+      const launchingSoonB =
+        b.isLaunchingSoon || b.launch_status === "launching_soon";
 
-  if (launchProducts.length > 0) {
-    return <LaunchCarousel products={launchProducts} />;
+      if (launchingSoonA !== launchingSoonB) {
+        return launchingSoonA ? -1 : 1;
+      }
+
+      return 0;
+    });
+
+  if (featuredProducts.length > 0) {
+    return <LaunchCarousel products={featuredProducts} />;
   }
 
   return (

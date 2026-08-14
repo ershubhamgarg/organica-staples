@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   Plus_Jakarta_Sans,
   Fraunces,
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
-    icon: "/logo-footer.png",
+    icon: "/logo-annvriksh-new.jpeg",
     apple: "/favicon.png",
   },
 };
@@ -47,7 +48,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen">
+      <body
+        className={`${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
+      >
         <Header />
 
         <main className="flex-grow">{children}</main>
@@ -62,11 +65,11 @@ export default function RootLayout({
               <div className="relative group">
                 <div className="absolute inset-0 bg-brand-gold/10 rounded-full blur-2xl group-hover:bg-brand-gold/20 transition-colors duration-700" />
                 <Image
-                  src="/logo-footer.png"
+                  src="/logo-annvriksh-new.jpeg"
                   alt="ANNVRIKSH"
-                  width={600}
-                  height={140}
-                  // className="relative z-10 w-28 lg:w-32 h-auto opacity-90"
+                  width={240}
+                  height={240}
+                  className="relative z-10 h-auto w-36 rounded-full object-cover opacity-95 lg:w-44"
                 />
               </div>
               {/* <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
@@ -79,31 +82,31 @@ export default function RootLayout({
               </h4>
               <ul className="space-y-3 text-sm font-light">
                 <li>
-                  <a
+                  <Link
                     href="/#shop"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
                     Our Pantry
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="/our-story"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
                     About us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="/#contact"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>

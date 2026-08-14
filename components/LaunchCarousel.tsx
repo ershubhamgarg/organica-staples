@@ -14,7 +14,7 @@ import {
   Check,
   Sparkles,
 } from "lucide-react";
-import { Product, getProductThumbnail } from "@/lib/data";
+import { Product, getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { getUnitPriceInfo } from "@/lib/pricing";
 
 interface LaunchCarouselProps {
@@ -121,7 +121,13 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
             {products.map((product) => {
               const unitPriceInfo = getUnitPriceInfo(product);
               const imageUrl = getProductThumbnail(product);
-              const isJustLaunched = product.launch_status === "just_launched";
+              const isComingSoon =
+                product.isLaunchingSoon ||
+                product.launch_status === "launching_soon";
+              const isJustLaunched =
+                product.justLaunched ||
+                product.launch_status === "just_launched";
+              const isAvailable = isProductAvailable(product) && !isComingSoon;
 
               return (
                 <div
@@ -133,7 +139,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                     {/* Glowing Aura */}
                     <div
                       className={`absolute -inset-8 rounded-full blur-2xl opacity-30 animate-pulse-slow ${
-                        isJustLaunched
+                        isAvailable
                           ? "bg-brand-green/20"
                           : "bg-brand-terracotta/20"
                       }`}
@@ -158,7 +164,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                     <div className="absolute -top-3 -right-3 z-30 transform hover:scale-105 transition-transform">
                       <span
                         className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[9px] font-bold uppercase tracking-[0.2em] shadow-lg border border-white/40 ${
-                          isJustLaunched
+                          isAvailable
                             ? "bg-brand-green text-brand-cream"
                             : "bg-brand-terracotta text-brand-cream"
                         }`}
@@ -167,6 +173,11 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                           <>
                             <Sparkles size={12} strokeWidth={2.5} />
                             Just Launched
+                          </>
+                        ) : isAvailable ? (
+                          <>
+                            <CheckCircle2 size={12} strokeWidth={2.5} />
+                            In Stock
                           </>
                         ) : (
                           <>
@@ -219,7 +230,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                       )}
                     </div>
 
-                    {isJustLaunched ? (
+                    {isAvailable ? (
                       <div className="space-y-6 pt-2">
                         <div className="flex items-center gap-6">
                           <div className="flex flex-col">
@@ -251,7 +262,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                             href={`/product/${product.id}`}
                             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-brown text-brand-cream rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all duration-500 hover:translate-y-[-2px] group active:scale-95"
                           >
-                            Shop Collection
+                            {isJustLaunched ? "Shop Collection" : "Shop Now"}
                             <ArrowRight
                               size={16}
                               className="transition-transform group-hover:translate-x-1"

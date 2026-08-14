@@ -579,11 +579,11 @@ export default function CheckoutPage() {
             <div className="relative z-10 px-5 py-5 text-center">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
-                  src="/uk-logo-transparent.png"
+                  src="/logo-annvriksh-new.jpeg"
                   alt="ANNVRIKSH"
                   width={80}
                   height={80}
-                  className="h-auto w-16 object-contain"
+                  className="h-16 w-16 rounded-full object-cover"
                   priority
                 />
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-brand-gold/25 bg-brand-cream shadow-xl confirmation-seal">

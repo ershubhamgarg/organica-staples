@@ -9,7 +9,7 @@ export const createInstagramStoryReceiptImage = async (
   order: InstagramStoryReceiptOrder,
 ) => {
   const logo = new window.Image();
-  logo.src = `/uk-logo-transparent.png?v=${Date.now()}`;
+  logo.src = `/logo-annvriksh-new.jpeg?v=${Date.now()}`;
   await new Promise<void>((resolve) => {
     logo.onload = () => resolve();
     logo.onerror = () => resolve();
