@@ -6,12 +6,7 @@ import LaunchOfferBanner from "@/components/LaunchOfferBanner";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/utils/supabase";
-import {
-  ShoppingCart,
-  Menu,
-  UserCircle,
-  X,
-} from "lucide-react";
+import { ShoppingCart, Menu, UserCircle, X } from "lucide-react";
 import {
   useEffect,
   useState,
@@ -153,11 +148,11 @@ export default function Header() {
               onClick={handleHomeClick}
             >
               <Image
-                src="/logo-annvriksh-tight.jpeg"
+                src="/ann_logo_header.png"
                 alt="ANNVRIKSH"
-                width={112}
-                height={112}
-                className="h-20 w-20 object-contain sm:h-24 sm:w-24 lg:h-28 lg:w-28"
+                width={212}
+                height={212}
+                className="h-20 w-60 object-contain"
                 priority
               />
             </Link>

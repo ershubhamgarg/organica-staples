@@ -443,9 +443,24 @@ export default function CartPage() {
             <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
               <div className="flex-1">
                 <p className="text-xs text-brand-brown/40 font-light leading-relaxed text-balance">
-                  {launchOffer.isEligible
-                    ? "Your order qualifies for the one-time launch offer. Place your order and complete Instagram verification to proceed."
-                    : "Pick exactly 2 different products, 1 quantity each. Place your order, upload the final order confirmation to your Instagram Story, and tag @annvriksh_in for verification."}
+                  {launchOffer.isEligible ? (
+                    "Your order qualifies for the one-time launch offer. Place your order and complete Instagram verification to proceed."
+                  ) : (
+                    <>
+                      Pick exactly 2 different products, 1 quantity each.
+                      Place your order, upload the final order confirmation to
+                      your Instagram Story, and tag{" "}
+                      <a
+                        href="https://www.instagram.com/annvriksh_in/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-brand-green underline underline-offset-2 hover:text-brand-brown transition-colors"
+                      >
+                        @annvriksh_in
+                      </a>{" "}
+                      for verification.
+                    </>
+                  )}
                 </p>
               </div>
               <div className="rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-left md:max-w-xs">

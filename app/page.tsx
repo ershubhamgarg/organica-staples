@@ -4,11 +4,17 @@ import Image from "next/image";
 import {
   ArrowRight,
   BadgeIndianRupee,
+  FlaskConical,
   Leaf,
+  Lock,
   MapPin,
   MessageCircle,
+  Quote,
   ShieldCheck,
   Sprout,
+  Truck,
+  Users,
+  Wheat,
 } from "lucide-react";
 import HelpMeDecide from "@/components/HelpMeDecide";
 import ProductListing from "@/components/ProductListing";
@@ -97,6 +103,56 @@ Message: ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <DesiHero />
+
+      {/* Trust Strip */}
+      <section className="relative -mt-6 sm:-mt-10 lg:-mt-14 z-30 px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-brand-gold/10 rounded-3xl overflow-hidden border border-brand-gold/10 shadow-[0_30px_60px_-25px_rgba(60,54,42,0.25)]">
+            {[
+              {
+                icon: Users,
+                label: "500+ Farming Families",
+                sub: "Partnered directly",
+              },
+              {
+                icon: MapPin,
+                label: "12+ States Sourced",
+                sub: "Across Bharat's heartland",
+              },
+              {
+                icon: FlaskConical,
+                label: "Every Batch Lab-Tested",
+                sub: "Purity you can verify",
+              },
+              {
+                icon: Leaf,
+                label: "Zero Synthetic Chemicals",
+                sub: "Grown the honest way",
+              },
+            ].map((stat, idx) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className="bg-white p-5 sm:p-7 flex flex-col items-center text-center gap-2 hover:bg-brand-cream/60 transition-colors duration-500"
+                  style={{ animationDelay: `${idx * 120}ms` }}
+                >
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-brand-sand/60 flex items-center justify-center text-brand-gold mb-1">
+                    <Icon size={18} strokeWidth={1.5} />
+                  </div>
+                  <p className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-brand-brown leading-tight">
+                    {stat.label}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] text-brand-brown/45 font-light tracking-wide">
+                    {stat.sub}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
+      </section>
+
       {/* Farm & Origin Section */}
       <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
         {/* Decorative SVG Illustrations */}
@@ -202,8 +258,159 @@ Message: ${formData.message}
         </div>
       </section>
 
+      {/* Farm to Table Process */}
+      <section className="relative bg-brand-cream py-12 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-60" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal className="text-center mb-14 lg:mb-20 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Our Process
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight">
+              From the khet to your{" "}
+              <span className="italic text-brand-terracotta">kitchen.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
+            <div className="hidden lg:block absolute top-[42px] left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-brand-gold/0 via-brand-gold/30 to-brand-gold/0" />
+
+            {[
+              {
+                icon: Sprout,
+                step: "01",
+                title: "Sourced Direct",
+                body: "We partner with small growers across Bharat, paying fair value straight at the farm-gate.",
+              },
+              {
+                icon: Wheat,
+                step: "02",
+                title: "Traditionally Processed",
+                body: "Sun-dried, stone-ground, and cold-pressed using time-honoured methods that protect nutrition.",
+              },
+              {
+                icon: FlaskConical,
+                step: "03",
+                title: "Lab Tested",
+                body: "Every batch is verified for purity, so what reaches you is free of adulteration or pesticides.",
+              },
+              {
+                icon: Truck,
+                step: "04",
+                title: "Delivered Fresh",
+                body: "Small-batch packed and shipped pan-India, carrying the same freshness as the harvest day.",
+              },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <ScrollReveal
+                  key={item.step}
+                  delay={idx * 150}
+                  className="relative flex flex-col items-center text-center gap-4"
+                >
+                  <div className="relative w-[84px] h-[84px] flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border border-dashed border-brand-gold/30 animate-spin-slow" />
+                    <div className="relative w-16 h-16 rounded-full bg-white shadow-lg shadow-brand-brown/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold">
+                      <Icon size={26} strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold/50">
+                    Step {item.step}
+                  </span>
+                  <h3 className="text-lg font-serif text-brand-brown tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-brand-brown/60 font-light leading-relaxed max-w-[220px]">
+                    {item.body}
+                  </p>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Product Grid Section */}
       <ProductListing />
+
+      {/* Voices from the Villages */}
+      <section className="relative bg-brand-brown py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
+        <div
+          className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
+        />
+        <div
+          className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-green-fresh/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
+          style={{ animationDelay: "2.5s" }}
+        />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal className="text-center mb-14 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Voices From The Villages
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-cream tracking-tight leading-tight">
+              The hands behind{" "}
+              <span className="italic text-brand-gold">every harvest.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                quote:
+                  "Our soil has fed generations before us. Farming without chemicals isn't new to us — it is simply how we always worked.",
+                region: "Wheat & Millet Cluster",
+                place: "Bundelkhand, MP",
+              },
+              {
+                quote:
+                  "When a buyer comes straight to the farm-gate, we finally get paid what the harvest is truly worth.",
+                region: "Mustard Growers",
+                place: "Rajasthan",
+              },
+              {
+                quote:
+                  "Cold-pressing the old way takes longer, but the oil still tastes the way it did in my grandfather's time.",
+                region: "Oilseed Cluster",
+                place: "Uttarakhand Hills",
+              },
+            ].map((voice, idx) => (
+              <ScrollReveal
+                key={voice.place}
+                animation="reveal-fade"
+                delay={idx * 150}
+                className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 flex flex-col gap-6 hover:bg-white/10 transition-colors duration-700"
+              >
+                <Quote
+                  className="text-brand-gold/30"
+                  size={32}
+                  strokeWidth={1}
+                />
+                <p className="text-brand-cream/85 font-serif text-lg italic leading-relaxed">
+                  &ldquo;{voice.quote}&rdquo;
+                </p>
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                    {voice.region}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-widest text-brand-cream/50 mt-1">
+                    {voice.place}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <HelpMeDecide />
 
@@ -306,6 +513,31 @@ Message: ${formData.message}
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Assurance Strip */}
+      <section className="relative bg-white py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-b border-brand-gold/10">
+        <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+          {[
+            { icon: ShieldCheck, label: "FSSAI Compliant" },
+            { icon: FlaskConical, label: "Lab Tested Purity" },
+            { icon: Sprout, label: "100% Organic" },
+            { icon: Lock, label: "Secure Payments" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 text-brand-brown/60"
+              >
+                <Icon size={18} className="text-brand-gold" strokeWidth={1.5} />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black">
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
+        </ScrollReveal>
       </section>
 
       {/* Contact Us Section */}

@@ -58,21 +58,18 @@ export default function RootLayout({
         <WhatsAppButton />
         <FloatingCart />
 
-        <footer className="bg-brand-green text-brand-cream/80 py-16 relative overflow-hidden">
+        <footer className="bg-white text-brand-brown/70 py-16 relative overflow-hidden border-t border-brand-gold/10">
           <div className="absolute inset-0 bg-organic-texture opacity-[0.03] pointer-events-none" />
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
             <div className="space-y-8 flex flex-col items-center md:items-start">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-brand-gold/10 rounded-full blur-2xl group-hover:bg-brand-gold/20 transition-colors duration-700" />
-                <Image
-                  src="/logo-annvriksh-new.jpeg"
-                  alt="ANNVRIKSH"
-                  width={240}
-                  height={240}
-                  className="relative z-10 h-auto w-36 rounded-full object-cover opacity-95 lg:w-44"
-                />
-              </div>
-              {/* <p className="text-sm text-brand-cream/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
+              <Image
+                src="/ann_logo_header.png"
+                alt="ANNVRIKSH"
+                width={636}
+                height={212}
+                className="h-auto w-56 sm:w-64 object-contain"
+              />
+              {/* <p className="text-sm text-brand-brown/60 max-w-xs font-light leading-relaxed text-center md:text-left italic">
                 "Purity in every grain, harvest in every heart."
               </p> */}
             </div>
@@ -138,7 +135,7 @@ export default function RootLayout({
               </ul>
             </div>
           </div>
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 text-[10px] uppercase tracking-[0.2em] text-brand-cream/40 text-center relative z-10 font-bold">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 text-[10px] uppercase tracking-[0.2em] text-brand-brown/40 text-center relative z-10 font-bold">
             &copy; {new Date().getFullYear()} ANNVRIKSH. All rights reserved.
           </div>
         </footer>

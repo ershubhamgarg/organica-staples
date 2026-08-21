@@ -723,9 +723,14 @@ export default function ProfilePage() {
                                     <span className="text-[9px] uppercase tracking-widest text-brand-brown/40 font-bold">
                                       Tag
                                     </span>
-                                    <span className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black">
+                                    <a
+                                      href="https://www.instagram.com/annvriksh_in/"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[10px] lowercase tracking-wide text-brand-terracotta font-black underline underline-offset-2 hover:text-brand-brown transition-colors"
+                                    >
                                       @annvriksh_in
-                                    </span>
+                                    </a>
                                   </div>
                                   <button
                                     type="button"
