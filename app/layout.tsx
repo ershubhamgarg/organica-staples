@@ -117,7 +117,7 @@ export default function RootLayout({
               <ul className="space-y-3 text-sm font-light">
                 <li>
                   <a
-                    href="https://www.instagram.com/annvriksh/"
+                    href="https://www.instagram.com/annvriksh_in/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"

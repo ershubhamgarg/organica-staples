@@ -11,7 +11,7 @@ type Review = {
   rating: number | null;
   comment: string | null;
   created_at: string;
-  product_name?: string;
+  product_name?: string | null;
 };
 
 type ReviewRow = Review & {

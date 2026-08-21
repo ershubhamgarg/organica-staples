@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+
 import { ArrowLeft, ArrowRight } from "lucide-react";
 const slides = [
   {
-    title: "Lower pesticide exposure",
+    title: "No pesticide exposure",
     description:
-      "Organic farming restricts the use of many synthetic pesticides, so organic produce generally has lower pesticide residues.",
+      "Organic farming restricts the use of many synthetic pesticides, so organic produce generally has no pesticide residues.",
   },
   {
     title: "Better for the environment",
