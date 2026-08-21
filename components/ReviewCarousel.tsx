@@ -43,7 +43,7 @@ export default function ReviewCarousel() {
           .slice(0, 10)
           .map((r) => ({
             ...r,
-            product_name: r.products?.name,
+            product_name: r.products?.name ?? undefined,
           }));
         setReviews(formattedReviews);
       }
