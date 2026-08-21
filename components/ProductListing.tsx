@@ -34,9 +34,7 @@ export default function ProductListing() {
   const [sortOrder, setSortOrder] = useState<string>("default");
 
   const visibleProducts = useMemo(() => {
-    return products.filter(
-      (p) => p.isVisible !== false && p.launch_status !== "launching_soon",
-    );
+    return products.filter((p) => p.isVisible !== false);
   }, [products]);
 
   const categories = useMemo(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Star, Quote } from "lucide-react";
 import ScrollReveal from "./ScrollReveal";
 import { supabase } from "@/utils/supabase";
@@ -11,7 +11,13 @@ type Review = {
   rating: number | null;
   comment: string | null;
   created_at: string;
-  product_name?: string;
+  product_name?: string | null;
+};
+
+type ReviewRow = Review & {
+  products?: {
+    name?: string | null;
+  } | null;
 };
 
 export default function ReviewCarousel() {
@@ -32,12 +38,12 @@ export default function ReviewCarousel() {
         .limit(20);
 
       if (!error && data) {
-        const formattedReviews = data
-          .filter((r: any) => r.comment && r.comment.trim().length > 0)
+        const formattedReviews = (data as ReviewRow[])
+          .filter((r) => r.comment && r.comment.trim().length > 0)
           .slice(0, 10)
-          .map((r: any) => ({
+          .map((r) => ({
             ...r,
-            product_name: r.products?.name,
+            product_name: r.products?.name ?? undefined,
           }));
         setReviews(formattedReviews);
       }

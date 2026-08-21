@@ -9,7 +9,7 @@ export const createInstagramStoryReceiptImage = async (
   order: InstagramStoryReceiptOrder,
 ) => {
   const logo = new window.Image();
-  logo.src = `/uk-logo-transparent.png?v=${Date.now()}`;
+  logo.src = `/logo-annvriksh-new.jpeg?v=${Date.now()}`;
   await new Promise<void>((resolve) => {
     logo.onload = () => resolve();
     logo.onerror = () => resolve();
@@ -149,7 +149,7 @@ export const createInstagramStoryReceiptImage = async (
   context.fillStyle = "#E8D090";
   context.font = 'bold 32px "Plus Jakarta Sans"';
   context.textAlign = "center";
-  context.fillText("@annvriksh", width / 2, 440);
+  context.fillText("@annvriksh_in", width / 2, 440);
 
   // Message
   context.fillStyle = "#112C24";

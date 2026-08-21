@@ -97,7 +97,6 @@ Message: ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <DesiHero />
-
       {/* Farm & Origin Section */}
       <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
         {/* Decorative SVG Illustrations */}

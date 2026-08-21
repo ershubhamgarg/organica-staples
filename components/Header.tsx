@@ -9,8 +9,6 @@ import { supabase } from "@/utils/supabase";
 import {
   ShoppingCart,
   Menu,
-  LogOut,
-  ChevronDown,
   UserCircle,
   X,
 } from "lucide-react";
@@ -155,10 +153,11 @@ export default function Header() {
               onClick={handleHomeClick}
             >
               <Image
-                src="/logo-header.png"
+                src="/logo-annvriksh-tight.jpeg"
                 alt="ANNVRIKSH"
-                width={200}
-                height={4}
+                width={112}
+                height={112}
+                className="h-20 w-20 object-contain sm:h-24 sm:w-24 lg:h-28 lg:w-28"
                 priority
               />
             </Link>
@@ -170,7 +169,7 @@ export default function Header() {
               <Link
                 href="/"
                 onClick={handleHomeClick}
-                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
               >
                 Home
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -178,14 +177,14 @@ export default function Header() {
               <Link
                 href="/#shop"
                 onClick={(event) => handleSectionClick(event, "shop")}
-                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
               >
                 The Pantry
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
               </Link>
               <Link
                 href="/our-story"
-                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
               >
                 About us
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -194,7 +193,7 @@ export default function Header() {
               <Link
                 href="/#contact"
                 onClick={(event) => handleSectionClick(event, "contact")}
-                className="group relative text-brand-brown hover:text-brand-green transition-colors text-[10px] uppercase tracking-[0.3em] font-bold"
+                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
               >
                 Contact Us
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -251,7 +250,7 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="text-brand-brown hover:text-brand-green transition-all text-[10px] uppercase tracking-[0.3em] font-bold min-w-[48px] min-h-[48px] flex items-center justify-center"
+                className="text-brand-brown hover:text-brand-green transition-all font-serif text-[13px] uppercase tracking-[0.16em] font-semibold min-w-[48px] min-h-[48px] flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Login
@@ -335,7 +334,7 @@ export default function Header() {
           <div className="mt-12 pt-12 border-t border-brand-gold/20">
             <Link
               href={user ? "/profile" : "/login"}
-              className="text-[10px] uppercase tracking-[0.3em] font-bold text-brand-brown/60 hover:text-brand-brown"
+              className="font-serif text-[13px] uppercase tracking-[0.16em] font-semibold text-brand-brown/60 hover:text-brand-brown"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {user ? "Account" : "Login"}
