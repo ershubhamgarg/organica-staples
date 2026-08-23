@@ -4,13 +4,18 @@ import Image from "next/image";
 import {
   ArrowRight,
   BadgeIndianRupee,
+  Circle,
   FlaskConical,
+  Flower2,
   Leaf,
   Lock,
   MapPin,
   MessageCircle,
+  Plus,
   Quote,
+  ScrollText,
   ShieldCheck,
+  Sparkles,
   Sprout,
   Truck,
   Users,
@@ -415,6 +420,223 @@ Message: ${formData.message}
       <HelpMeDecide />
 
       <ReviewCarousel />
+
+      {/* Story Behind the Name & Logo */}
+      <section className="relative bg-white py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-70" />
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+        <div
+          className="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-green/5 rounded-full blur-3xl pointer-events-none"
+          style={{ animationDelay: "2s" }}
+        />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Section Header */}
+          <ScrollReveal className="text-center max-w-2xl mx-auto mb-16 lg:mb-20">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Our Philosophy
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight mb-5">
+              The story behind the{" "}
+              <span className="italic text-brand-terracotta">
+                name &amp; logo.
+              </span>
+            </h2>
+            <p className="text-sm text-brand-brown/60 font-light leading-relaxed text-balance">
+              At ANNVRIKSH, we believe that true nourishment begins with
+              nature — and that the finest things in life are often rooted in
+              simplicity, balance and tradition. Even our name and logo carry
+              this belief at their heart.
+            </p>
+          </ScrollReveal>
+
+          {/* The Name */}
+          <ScrollReveal className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-3 mb-8">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                The Name
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+
+            <div className="flex items-center justify-center gap-6 sm:gap-10 mb-10">
+              <div>
+                <p className="font-devanagari text-3xl sm:text-4xl text-brand-gold mb-1">
+                  अन्न
+                </p>
+                <p className="font-serif italic text-xl sm:text-2xl text-brand-brown">
+                  Ann
+                </p>
+                <p className="mt-1 text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-black text-brand-brown/40">
+                  Food · Nourishment
+                </p>
+              </div>
+              <Plus
+                size={18}
+                className="text-brand-gold/40 mt-2"
+                strokeWidth={1.5}
+              />
+              <div>
+                <p className="font-devanagari text-3xl sm:text-4xl text-brand-gold mb-1">
+                  वृक्ष
+                </p>
+                <p className="font-serif italic text-xl sm:text-2xl text-brand-brown">
+                  Vriksh
+                </p>
+                <p className="mt-1 text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-black text-brand-brown/40">
+                  Tree
+                </p>
+              </div>
+            </div>
+
+            <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base mb-4 text-balance">
+              ANNVRIKSH brings together two simple ideas —{" "}
+              <span className="font-semibold text-brand-brown">Ann</span>,
+              meaning food or nourishment, and{" "}
+              <span className="font-semibold text-brand-brown">Vriksh</span>,
+              meaning tree. Together, they represent our belief that good
+              food, like a tree, should be deeply rooted in nature, nurtured
+              with care and ultimately give something meaningful back to
+              life.
+            </p>
+            <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base text-balance">
+              The name reflects our vision of bringing food closer to its
+              natural roots — thoughtfully sourced, responsibly prepared and
+              made for everyday nourishment.
+            </p>
+          </ScrollReveal>
+
+          <div className="w-16 h-px bg-brand-gold/15 mx-auto my-16 lg:my-20" />
+
+          {/* The Logo */}
+          <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-center">
+            <ScrollReveal className="relative mx-auto max-w-sm lg:max-w-none w-full">
+              <div className="absolute -inset-8 bg-brand-gold/10 rounded-[3rem] blur-3xl pointer-events-none" />
+              <div className="relative aspect-[10/7] rounded-[2rem] overflow-hidden border-8 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
+                <Image
+                  src="/logo-annvriksh-tight.jpeg"
+                  alt="The ANNVRIKSH emblem — a blossoming flower of interwoven gold petals"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 90vw, 480px"
+                />
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal
+              animation="reveal-fade"
+              delay={150}
+              className="space-y-8"
+            >
+              <div>
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <span className="h-[1px] w-8 bg-brand-gold" />
+                  <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                    The Logo
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-serif text-brand-brown leading-tight tracking-tight mb-4">
+                  A blossoming flower,{" "}
+                  <span className="italic text-brand-terracotta">
+                    rooted in meaning.
+                  </span>
+                </h3>
+                <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base">
+                  Our symbol is inspired by the timeless beauty of a
+                  blossoming flower. Its flowing petals come together in
+                  harmony, representing the natural journey of food — from
+                  the earth, through mindful cultivation, to the nourishment
+                  of our homes.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
+                {[
+                  {
+                    icon: Flower2,
+                    title: "Interwoven Petals",
+                    body: "The connection between nature, farmers, traditions and people — nothing in nature exists in isolation.",
+                  },
+                  {
+                    icon: Circle,
+                    title: "Quiet, Open Centre",
+                    body: "Purity and authenticity at the heart of the symbol — the essence of food, kept untouched.",
+                  },
+                  {
+                    icon: Sparkles,
+                    title: "Golden Points",
+                    body: "The little details that matter — careful sourcing, honest processes and respect for every ingredient.",
+                  },
+                  {
+                    icon: ScrollText,
+                    title: "Golden Form",
+                    body: "The value we place on age-old wisdom, carried thoughtfully into today's homes.",
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex gap-3">
+                      <div className="w-9 h-9 shrink-0 rounded-full bg-brand-sand/50 flex items-center justify-center text-brand-gold">
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-brand-brown mb-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-brand-brown/60 font-light leading-relaxed">
+                          {item.body}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
+          </div>
+
+          <div className="w-16 h-px bg-brand-gold/15 mx-auto my-16 lg:my-20" />
+
+          {/* More Than a Logo */}
+          <ScrollReveal className="text-center max-w-xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                More Than A Logo
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <p className="text-brand-brown/60 font-light text-sm mb-7">
+              Our symbol is a reminder of what ANNVRIKSH stands for:
+            </p>
+            <div className="space-y-2 mb-10">
+              {[
+                "Rooted in nature.",
+                "Inspired by tradition.",
+                "Created with care.",
+                "Chosen for a better everyday.",
+              ].map((line) => (
+                <p
+                  key={line}
+                  className="font-serif text-xl sm:text-2xl text-brand-brown italic tracking-tight"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+            <p className="text-sm text-brand-brown/50 font-light">
+              This is the thought behind ANNVRIKSH —
+            </p>
+            <p className="mt-2 font-serif text-2xl sm:text-3xl text-brand-terracotta italic tracking-tight">
+              Pure by nature. Essential by choice.
+            </p>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* Values Section */}
       <section className="relative bg-white py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
