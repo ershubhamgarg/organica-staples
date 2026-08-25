@@ -345,62 +345,117 @@ export default function ProductPage({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Product Images */}
-            <div className="relative lg:sticky lg:top-32 lg:w-full lg:max-w-[420px] lg:mx-auto">
+            <div className="relative lg:sticky lg:top-32 lg:w-full lg:max-w-[520px] lg:mx-auto">
               <div className="absolute -inset-6 bg-brand-gold/10 rounded-[2.5rem] blur-3xl pointer-events-none" />
               <div
                 className="absolute -inset-3 rounded-[2rem] border border-dashed border-brand-gold/25 animate-spin-slow pointer-events-none"
                 style={{ animationDuration: "36s" }}
               />
 
-              <div className="relative aspect-square w-full rounded-[2rem] bg-brand-sand overflow-hidden border-4 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
-                <ProductImageCarousel
-                  product={product}
-                  imageClassName={`object-cover transition-transform duration-1000 ${!available ? "blur-[2px] opacity-60" : ""}`}
-                  sizes="(max-width: 1024px) 100vw, 420px"
-                />
+              <div className="relative">
+                <div className="relative aspect-square w-full rounded-[2rem] bg-brand-sand overflow-hidden border-4 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
+                  <ProductImageCarousel
+                    product={product}
+                    imageClassName={`object-cover transition-transform duration-1000 ${!available ? "blur-[2px] opacity-60" : ""}`}
+                    sizes="(max-width: 1024px) 100vw, 520px"
+                  />
 
-                {/* Premium Corner Badge for Discount */}
-                {available && hasDiscount && (
-                  <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
-                    <div
-                      className={`absolute top-[20px] right-[-32px] rotate-45 w-32 py-1.5 text-center text-[9px] font-black uppercase tracking-[0.25em] shadow-xl border-y border-white/20 text-white ${
-                        hasHighDiscount
-                          ? "bg-brand-terracotta"
-                          : "bg-brand-green-fresh"
-                      }`}
-                    >
-                      {hasHighDiscount
-                        ? "Exclusive"
-                        : `${discountPercent}% Off`}
+                  {/* Premium Corner Badge for Discount */}
+                  {available && hasDiscount && (
+                    <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
+                      <div
+                        className={`absolute top-[20px] right-[-32px] rotate-45 w-32 py-1.5 text-center text-[9px] font-black uppercase tracking-[0.25em] shadow-xl border-y border-white/20 text-white ${
+                          hasHighDiscount
+                            ? "bg-brand-terracotta"
+                            : "bg-brand-green-fresh"
+                        }`}
+                      >
+                        {hasHighDiscount
+                          ? "Exclusive"
+                          : `${discountPercent}% Off`}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {!available && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
-                    <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
-                      Available Soon
-                    </span>
+                  {!available && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-brand-brown/20 backdrop-blur-[1px]">
+                      <span className="bg-brand-cream/90 backdrop-blur-md text-brand-brown px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg border border-brand-gold/10">
+                        Available Soon
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Floating Trust Badge */}
+                {available && (
+                  <div className="hidden sm:flex absolute -right-4 lg:-right-6 -bottom-6 z-20 items-center gap-3 bg-white/90 backdrop-blur-md pl-4 pr-5 py-3.5 rounded-2xl shadow-xl border border-brand-gold/10 animate-float-slow">
+                    <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
+                      <ShieldCheck size={18} strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown">
+                        Purity Checked
+                      </p>
+                      <p className="text-[9px] text-brand-brown/50 font-light">
+                        Farm to Table
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Floating Trust Badge */}
-              {available && (
-                <div className="hidden sm:flex absolute -right-4 lg:-right-6 -bottom-6 z-20 items-center gap-3 bg-white/90 backdrop-blur-md pl-4 pr-5 py-3.5 rounded-2xl shadow-xl border border-brand-gold/10 animate-float-slow">
-                  <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
-                    <ShieldCheck size={18} strokeWidth={1.8} />
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown">
-                      Purity Checked
-                    </p>
-                    <p className="text-[9px] text-brand-brown/50 font-light">
-                      Farm to Table
-                    </p>
-                  </div>
-                </div>
-              )}
+              {/* Trust Features */}
+              <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 pt-6 border-t border-brand-gold/10">
+                {[
+                  {
+                    icon: ShieldCheck,
+                    title: "Quality Checked",
+                    body: "Every Batch Verified",
+                    color: "text-brand-gold bg-brand-gold/10",
+                  },
+                  {
+                    icon: Award,
+                    title: "Farm Direct",
+                    body: "Ethical Sourcing",
+                    color: "text-brand-green bg-brand-green/10",
+                  },
+                  {
+                    icon: Truck,
+                    title: "Traceable Sourcing",
+                    body: "Farm To Pantry",
+                    color: "text-brand-terracotta bg-brand-terracotta/10",
+                  },
+                  {
+                    icon: Leaf,
+                    title: "100% Organic",
+                    body: "Zero Chemicals",
+                    color: "text-brand-green bg-brand-green/10",
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex items-start gap-3">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${item.color}`}
+                      >
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
+                          {item.title}
+                        </h4>
+                        <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
+                          {item.body}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="mt-6 text-[10px] text-brand-brown/35 font-light leading-relaxed">
+                Every batch is checked with care and sourced directly from
+                trusted farm partners before it reaches your pantry.
+              </p>
             </div>
 
             {/* Right: Product Info */}
@@ -628,59 +683,6 @@ export default function ProductPage({
                   </div>
                 )}
               </div>
-
-              {/* Trust Features */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5 pt-6 border-t border-brand-gold/10">
-                {[
-                  {
-                    icon: ShieldCheck,
-                    title: "Quality Checked",
-                    body: "Every Batch Verified",
-                    color: "text-brand-gold bg-brand-gold/10",
-                  },
-                  {
-                    icon: Award,
-                    title: "Farm Direct",
-                    body: "Ethical Sourcing",
-                    color: "text-brand-green bg-brand-green/10",
-                  },
-                  {
-                    icon: Truck,
-                    title: "Traceable Sourcing",
-                    body: "Farm To Pantry",
-                    color: "text-brand-terracotta bg-brand-terracotta/10",
-                  },
-                  {
-                    icon: Leaf,
-                    title: "100% Organic",
-                    body: "Zero Chemicals",
-                    color: "text-brand-green bg-brand-green/10",
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.title} className="flex items-start gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${item.color}`}
-                      >
-                        <Icon size={16} strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                          {item.title}
-                        </h4>
-                        <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
-                          {item.body}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="mt-6 text-[10px] text-brand-brown/35 font-light leading-relaxed">
-                Every batch is checked with care and sourced directly from
-                trusted farm partners before it reaches your pantry.
-              </p>
             </div>
           </div>
         </div>
