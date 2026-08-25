@@ -192,7 +192,7 @@ export default function ProductListing() {
       <ScrollReveal
         animation="reveal-fade"
         threshold={0.05}
-        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-8 gap-y-8 sm:gap-y-12 min-h-[60vh] transition-all duration-500"
+        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 min-h-[60vh] transition-all duration-500"
       >
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
@@ -206,20 +206,16 @@ export default function ProductListing() {
           return (
             <div
               key={product.id}
-              className="group flex flex-col animate-fade-in"
+              className="group flex flex-col bg-white rounded-2xl sm:rounded-3xl border border-brand-gold/10 shadow-lg shadow-brand-brown/5 overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-brand-brown/10 hover:border-brand-gold/25 animate-fade-in"
             >
               <Link
                 href={`/product/${product.id}`}
-                className="block relative mb-3 sm:mb-6 group/image"
+                className="block relative group/image"
               >
-                {/* Decorative Organic Outline */}
-                <div className="absolute -inset-1 sm:-inset-2 border border-brand-gold/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] group-hover/image:scale-105 group-hover/image:border-brand-gold/30 transition-all duration-700 pointer-events-none" />
-                <div className="absolute -inset-0.5 sm:-inset-1.5 border border-brand-green/5 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] group-hover/image:scale-105 group-hover/image:border-brand-green/10 transition-all duration-700 pointer-events-none delay-100" />
-
-                <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand transition-all duration-700 group-hover:shadow-[0_30px_60px_-15px_rgba(60,54,42,0.2)]">
+                <div className="relative aspect-square w-full overflow-hidden bg-brand-sand">
                   <ProductImageCarousel
                     product={product}
-                    imageClassName={`object-cover transition-transform duration-1000 group-hover:scale-110 ${!available ? "blur-[2px] opacity-60" : ""}`}
+                    imageClassName={`object-cover transition-transform duration-700 group-hover:scale-105 ${!available ? "blur-[2px] opacity-60" : ""}`}
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   />
 
@@ -261,7 +257,7 @@ export default function ProductListing() {
                 </div>
               </Link>
 
-              <div className="flex flex-col flex-grow text-center px-1 sm:px-4">
+              <div className="flex flex-col flex-grow text-center px-3 sm:px-5 pt-3 sm:pt-5 pb-3 sm:pb-5">
                 <div className="flex flex-col items-center mb-1">
                   <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold/50">
                     {product.category}
@@ -341,11 +337,11 @@ export default function ProductListing() {
                   )}
                 </div>
 
-                <div className={`${available ? "mt-auto" : ""} pt-2`}>
+                <div className={`${available ? "mt-auto" : ""} pt-1`}>
                   <QuickAddButton product={product} className="w-full" />
                 </div>
 
-                <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
+                <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-brand-gold/5">
                   <div className="flex items-center gap-0.5 text-brand-gold">
                     {[...Array(5)].map((_, i) => (
                       <Star
@@ -369,21 +365,18 @@ export default function ProductListing() {
         })}
 
         {/* Coming Soon Placeholder */}
-        <div className="group flex flex-col animate-fade-in">
-          <div className="block relative mb-3 sm:mb-6">
-            <div className="absolute -inset-1 sm:-inset-2 border border-brand-gold/15 organic-border-alt pointer-events-none opacity-50" />
-            <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-brand-sand/10 flex flex-col items-center justify-center p-6 text-center group-hover:bg-brand-sand/30 transition-all duration-1000 border border-brand-gold/5 bg-jute">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-4 text-brand-gold/40 group-hover:scale-110 group-hover:text-brand-gold/60 transition-all duration-1000">
-                <Hourglass size={20} strokeWidth={1.5} />
-              </div>
-              <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold/30 mb-2">
-                Growing Soon
-              </p>
-              <h4 className="font-serif text-sm sm:text-lg text-brand-brown/30 group-hover:text-brand-brown/50 transition-colors duration-1000 leading-tight px-4">
-                More healthy products are on the way...
-              </h4>
-              <div className="mt-4 w-12 h-[1px] bg-brand-gold/10 group-hover:w-20 group-hover:bg-brand-gold/20 transition-all duration-1000" />
+        <div className="group flex flex-col bg-jute rounded-2xl sm:rounded-3xl border border-dashed border-brand-gold/15 overflow-hidden transition-all duration-1000 hover:border-brand-gold/30">
+          <div className="relative aspect-square w-full overflow-hidden bg-brand-sand/10 flex flex-col items-center justify-center p-6 text-center group-hover:bg-brand-sand/20 transition-all duration-1000">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-brand-gold/10 flex items-center justify-center mb-4 text-brand-gold/40 group-hover:scale-110 group-hover:text-brand-gold/60 transition-all duration-1000">
+              <Hourglass size={20} strokeWidth={1.5} />
             </div>
+            <p className="text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-black text-brand-gold/30 mb-2">
+              Growing Soon
+            </p>
+            <h4 className="font-serif text-sm sm:text-lg text-brand-brown/30 group-hover:text-brand-brown/50 transition-colors duration-1000 leading-tight px-4">
+              More healthy products are on the way...
+            </h4>
+            <div className="mt-4 w-12 h-[1px] bg-brand-gold/10 group-hover:w-20 group-hover:bg-brand-gold/20 transition-all duration-1000" />
           </div>
         </div>
       </ScrollReveal>
