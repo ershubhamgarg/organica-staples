@@ -663,9 +663,14 @@ export default function CheckoutPage() {
               {isLaunchOfferConfirmation && (
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
                   <Sparkles size={13} strokeWidth={1.8} />
-                  <p className="text-[7px] font-black uppercase tracking-[0.2em]">
+                  <a
+                    href="https://www.instagram.com/annvriksh_in/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[7px] font-black uppercase tracking-[0.2em] underline underline-offset-2 hover:text-brand-brown transition-colors"
+                  >
                     @annvriksh_in
-                  </p>
+                  </a>
                   <Sparkles size={13} strokeWidth={1.8} />
                 </div>
               )}
@@ -675,8 +680,16 @@ export default function CheckoutPage() {
           {isLaunchOfferConfirmation ? (
             <div className="animate-reveal-up space-y-3">
               <p className="rounded-2xl border border-brand-gold/20 bg-white px-4 py-3 text-center text-[10px] font-semibold leading-relaxed text-brand-brown/65 shadow-lg shadow-brand-brown/5">
-                Before posting, add an Instagram mention tag for @annvriksh_in on
-                your Story.
+                Before posting, add an Instagram mention tag for{" "}
+                <a
+                  href="https://www.instagram.com/annvriksh_in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-terracotta underline underline-offset-2 hover:text-brand-brown transition-colors"
+                >
+                  @annvriksh_in
+                </a>{" "}
+                on your Story.
               </p>
               <button
                 type="button"
@@ -1037,8 +1050,16 @@ export default function CheckoutPage() {
                 </h2>
                 <p className="mt-2 max-w-2xl text-xs font-light leading-relaxed text-brand-brown/60">
                   Place the order for ₹0, then upload the final order
-                  confirmation to your Instagram Story and tag @annvriksh_in. We
-                  will process the order after verification.
+                  confirmation to your Instagram Story and tag{" "}
+                  <a
+                    href="https://www.instagram.com/annvriksh_in/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-green underline underline-offset-2 hover:text-brand-brown transition-colors"
+                  >
+                    @annvriksh_in
+                  </a>
+                  . We will process the order after verification.
                 </p>
               </div>
             </div>
@@ -1472,7 +1493,16 @@ export default function CheckoutPage() {
                         <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
                           No online payment is needed. Your order remains
                           pending until you share the confirmation on Instagram
-                          Story and tag @annvriksh_in.
+                          Story and tag{" "}
+                          <a
+                            href="https://www.instagram.com/annvriksh_in/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-green underline underline-offset-2 hover:text-brand-brown transition-colors"
+                          >
+                            @annvriksh_in
+                          </a>
+                          .
                         </p>
                       </div>
                     </div>

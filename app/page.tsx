@@ -4,11 +4,22 @@ import Image from "next/image";
 import {
   ArrowRight,
   BadgeIndianRupee,
+  Circle,
+  FlaskConical,
+  Flower2,
   Leaf,
+  Lock,
   MapPin,
   MessageCircle,
+  Plus,
+  Quote,
+  ScrollText,
   ShieldCheck,
+  Sparkles,
   Sprout,
+  Truck,
+  Users,
+  Wheat,
 } from "lucide-react";
 import HelpMeDecide from "@/components/HelpMeDecide";
 import ProductListing from "@/components/ProductListing";
@@ -97,6 +108,56 @@ Message: ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <DesiHero />
+
+      {/* Trust Strip */}
+      <section className="relative -mt-6 sm:-mt-10 lg:-mt-14 z-30 px-4 sm:px-6 lg:px-8">
+        <ScrollReveal className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-brand-gold/10 rounded-3xl overflow-hidden border border-brand-gold/10 shadow-[0_30px_60px_-25px_rgba(60,54,42,0.25)]">
+            {[
+              {
+                icon: Users,
+                label: "500+ Farming Families",
+                sub: "Partnered directly",
+              },
+              {
+                icon: MapPin,
+                label: "12+ States Sourced",
+                sub: "Across Bharat's heartland",
+              },
+              {
+                icon: FlaskConical,
+                label: "Every Batch Lab-Tested",
+                sub: "Purity you can verify",
+              },
+              {
+                icon: Leaf,
+                label: "Zero Synthetic Chemicals",
+                sub: "Grown the honest way",
+              },
+            ].map((stat, idx) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.label}
+                  className="bg-white p-5 sm:p-7 flex flex-col items-center text-center gap-2 hover:bg-brand-cream/60 transition-colors duration-500"
+                  style={{ animationDelay: `${idx * 120}ms` }}
+                >
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-brand-sand/60 flex items-center justify-center text-brand-gold mb-1">
+                    <Icon size={18} strokeWidth={1.5} />
+                  </div>
+                  <p className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-brand-brown leading-tight">
+                    {stat.label}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] text-brand-brown/45 font-light tracking-wide">
+                    {stat.sub}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
+      </section>
+
       {/* Farm & Origin Section */}
       <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
         {/* Decorative SVG Illustrations */}
@@ -202,12 +263,380 @@ Message: ${formData.message}
         </div>
       </section>
 
+      {/* Farm to Table Process */}
+      <section className="relative bg-brand-cream py-12 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-60" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal className="text-center mb-14 lg:mb-20 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Our Process
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight">
+              From the khet to your{" "}
+              <span className="italic text-brand-terracotta">kitchen.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
+            <div className="hidden lg:block absolute top-[42px] left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-brand-gold/0 via-brand-gold/30 to-brand-gold/0" />
+
+            {[
+              {
+                icon: Sprout,
+                step: "01",
+                title: "Sourced Direct",
+                body: "We partner with small growers across Bharat, paying fair value straight at the farm-gate.",
+              },
+              {
+                icon: Wheat,
+                step: "02",
+                title: "Traditionally Processed",
+                body: "Sun-dried, stone-ground, and cold-pressed using time-honoured methods that protect nutrition.",
+              },
+              {
+                icon: FlaskConical,
+                step: "03",
+                title: "Lab Tested",
+                body: "Every batch is verified for purity, so what reaches you is free of adulteration or pesticides.",
+              },
+              {
+                icon: Truck,
+                step: "04",
+                title: "Delivered Fresh",
+                body: "Small-batch packed and shipped pan-India, carrying the same freshness as the harvest day.",
+              },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <ScrollReveal
+                  key={item.step}
+                  delay={idx * 150}
+                  className="relative flex flex-col items-center text-center gap-4"
+                >
+                  <div className="relative w-[84px] h-[84px] flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border border-dashed border-brand-gold/30 animate-spin-slow" />
+                    <div className="relative w-16 h-16 rounded-full bg-white shadow-lg shadow-brand-brown/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold">
+                      <Icon size={26} strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold/50">
+                    Step {item.step}
+                  </span>
+                  <h3 className="text-lg font-serif text-brand-brown tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-brand-brown/60 font-light leading-relaxed max-w-[220px]">
+                    {item.body}
+                  </p>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* Product Grid Section */}
       <ProductListing />
+
+      {/* Voices from the Villages */}
+      <section className="relative bg-brand-brown py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
+        <div
+          className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
+        />
+        <div
+          className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-green-fresh/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
+          style={{ animationDelay: "2.5s" }}
+        />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal className="text-center mb-14 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Voices From The Villages
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-cream tracking-tight leading-tight">
+              The hands behind{" "}
+              <span className="italic text-brand-gold">every harvest.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {[
+              {
+                quote:
+                  "Our soil has fed generations before us. Farming without chemicals isn't new to us — it is simply how we always worked.",
+                region: "Wheat & Millet Cluster",
+                place: "Bundelkhand, MP",
+              },
+              {
+                quote:
+                  "When a buyer comes straight to the farm-gate, we finally get paid what the harvest is truly worth.",
+                region: "Mustard Growers",
+                place: "Rajasthan",
+              },
+              {
+                quote:
+                  "Cold-pressing the old way takes longer, but the oil still tastes the way it did in my grandfather's time.",
+                region: "Oilseed Cluster",
+                place: "Uttarakhand Hills",
+              },
+            ].map((voice, idx) => (
+              <ScrollReveal
+                key={voice.place}
+                animation="reveal-fade"
+                delay={idx * 150}
+                className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 flex flex-col gap-6 hover:bg-white/10 transition-colors duration-700"
+              >
+                <Quote
+                  className="text-brand-gold/30"
+                  size={32}
+                  strokeWidth={1}
+                />
+                <p className="text-brand-cream/85 font-serif text-lg italic leading-relaxed">
+                  &ldquo;{voice.quote}&rdquo;
+                </p>
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">
+                    {voice.region}
+                  </p>
+                  <p className="text-[10px] uppercase tracking-widest text-brand-cream/50 mt-1">
+                    {voice.place}
+                  </p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <HelpMeDecide />
 
       <ReviewCarousel />
+
+      {/* Story Behind the Name & Logo */}
+      <section className="relative bg-white py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-70" />
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
+        <div
+          className="absolute -bottom-24 -left-24 w-80 h-80 bg-brand-green/5 rounded-full blur-3xl pointer-events-none"
+          style={{ animationDelay: "2s" }}
+        />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Section Header */}
+          <ScrollReveal className="text-center max-w-2xl mx-auto mb-16 lg:mb-20">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Our Philosophy
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight mb-5">
+              The story behind the{" "}
+              <span className="italic text-brand-terracotta">
+                name &amp; logo.
+              </span>
+            </h2>
+            <p className="text-sm text-brand-brown/60 font-light leading-relaxed text-balance">
+              At ANNVRIKSH, we believe that true nourishment begins with
+              nature — and that the finest things in life are often rooted in
+              simplicity, balance and tradition. Even our name and logo carry
+              this belief at their heart.
+            </p>
+          </ScrollReveal>
+
+          {/* The Name */}
+          <ScrollReveal className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-3 mb-8">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                The Name
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+
+            <div className="flex items-center justify-center gap-6 sm:gap-10 mb-10">
+              <div>
+                <p className="font-devanagari text-3xl sm:text-4xl text-brand-gold mb-1">
+                  अन्न
+                </p>
+                <p className="font-serif italic text-xl sm:text-2xl text-brand-brown">
+                  Ann
+                </p>
+                <p className="mt-1 text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-black text-brand-brown/40">
+                  Food · Nourishment
+                </p>
+              </div>
+              <Plus
+                size={18}
+                className="text-brand-gold/40 mt-2"
+                strokeWidth={1.5}
+              />
+              <div>
+                <p className="font-devanagari text-3xl sm:text-4xl text-brand-gold mb-1">
+                  वृक्ष
+                </p>
+                <p className="font-serif italic text-xl sm:text-2xl text-brand-brown">
+                  Vriksh
+                </p>
+                <p className="mt-1 text-[8px] sm:text-[9px] uppercase tracking-[0.2em] font-black text-brand-brown/40">
+                  Tree
+                </p>
+              </div>
+            </div>
+
+            <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base mb-4 text-balance">
+              ANNVRIKSH brings together two simple ideas —{" "}
+              <span className="font-semibold text-brand-brown">Ann</span>,
+              meaning food or nourishment, and{" "}
+              <span className="font-semibold text-brand-brown">Vriksh</span>,
+              meaning tree. Together, they represent our belief that good
+              food, like a tree, should be deeply rooted in nature, nurtured
+              with care and ultimately give something meaningful back to
+              life.
+            </p>
+            <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base text-balance">
+              The name reflects our vision of bringing food closer to its
+              natural roots — thoughtfully sourced, responsibly prepared and
+              made for everyday nourishment.
+            </p>
+          </ScrollReveal>
+
+          <div className="w-16 h-px bg-brand-gold/15 mx-auto my-16 lg:my-20" />
+
+          {/* The Logo */}
+          <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-center">
+            <ScrollReveal className="relative mx-auto max-w-sm lg:max-w-none w-full">
+              <div className="absolute -inset-8 bg-brand-gold/10 rounded-[3rem] blur-3xl pointer-events-none" />
+              <div className="relative aspect-[10/7] rounded-[2rem] overflow-hidden border-8 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
+                <Image
+                  src="/logo-annvriksh-tight.jpeg"
+                  alt="The ANNVRIKSH emblem — a blossoming flower of interwoven gold petals"
+                  fill
+                  className="object-cover object-top"
+                  sizes="(max-width: 1024px) 90vw, 480px"
+                />
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal
+              animation="reveal-fade"
+              delay={150}
+              className="space-y-8"
+            >
+              <div>
+                <div className="inline-flex items-center gap-3 mb-4">
+                  <span className="h-[1px] w-8 bg-brand-gold" />
+                  <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                    The Logo
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-serif text-brand-brown leading-tight tracking-tight mb-4">
+                  A blossoming flower,{" "}
+                  <span className="italic text-brand-terracotta">
+                    rooted in meaning.
+                  </span>
+                </h3>
+                <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base">
+                  Our symbol is inspired by the timeless beauty of a
+                  blossoming flower. Its flowing petals come together in
+                  harmony, representing the natural journey of food — from
+                  the earth, through mindful cultivation, to the nourishment
+                  of our homes.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-5">
+                {[
+                  {
+                    icon: Flower2,
+                    title: "Interwoven Petals",
+                    body: "The connection between nature, farmers, traditions and people — nothing in nature exists in isolation.",
+                  },
+                  {
+                    icon: Circle,
+                    title: "Quiet, Open Centre",
+                    body: "Purity and authenticity at the heart of the symbol — the essence of food, kept untouched.",
+                  },
+                  {
+                    icon: Sparkles,
+                    title: "Golden Points",
+                    body: "The little details that matter — careful sourcing, honest processes and respect for every ingredient.",
+                  },
+                  {
+                    icon: ScrollText,
+                    title: "Golden Form",
+                    body: "The value we place on age-old wisdom, carried thoughtfully into today's homes.",
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex gap-3">
+                      <div className="w-9 h-9 shrink-0 rounded-full bg-brand-sand/50 flex items-center justify-center text-brand-gold">
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-brand-brown mb-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-brand-brown/60 font-light leading-relaxed">
+                          {item.body}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
+          </div>
+
+          <div className="w-16 h-px bg-brand-gold/15 mx-auto my-16 lg:my-20" />
+
+          {/* More Than a Logo */}
+          <ScrollReveal className="text-center max-w-xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                More Than A Logo
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <p className="text-brand-brown/60 font-light text-sm mb-7">
+              Our symbol is a reminder of what ANNVRIKSH stands for:
+            </p>
+            <div className="space-y-2 mb-10">
+              {[
+                "Rooted in nature.",
+                "Inspired by tradition.",
+                "Created with care.",
+                "Chosen for a better everyday.",
+              ].map((line) => (
+                <p
+                  key={line}
+                  className="font-serif text-xl sm:text-2xl text-brand-brown italic tracking-tight"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+            <p className="text-sm text-brand-brown/50 font-light">
+              This is the thought behind ANNVRIKSH —
+            </p>
+            <p className="mt-2 font-serif text-2xl sm:text-3xl text-brand-terracotta italic tracking-tight">
+              Pure by nature. Essential by choice.
+            </p>
+          </ScrollReveal>
+        </div>
+      </section>
 
       {/* Values Section */}
       <section className="relative bg-white py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -306,6 +735,31 @@ Message: ${formData.message}
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Assurance Strip */}
+      <section className="relative bg-white py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-b border-brand-gold/10">
+        <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+          {[
+            { icon: ShieldCheck, label: "FSSAI Compliant" },
+            { icon: FlaskConical, label: "Lab Tested Purity" },
+            { icon: Sprout, label: "100% Organic" },
+            { icon: Lock, label: "Secure Payments" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 text-brand-brown/60"
+              >
+                <Icon size={18} className="text-brand-gold" strokeWidth={1.5} />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black">
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
+        </ScrollReveal>
       </section>
 
       {/* Contact Us Section */}

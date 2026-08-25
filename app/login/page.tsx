@@ -211,7 +211,7 @@ export default function LoginPage() {
                 </div>
               ))}
             </div>
-            
+
             <div className="mt-8 flex gap-2">
               {slides.map((_, idx) => (
                 <button
@@ -289,123 +289,126 @@ export default function LoginPage() {
               <span>Continue with Google</span>
             </button>
 
-          <div className="my-7 flex items-center">
-            <div className="flex-1 h-px bg-brand-gold/10" />
-            <span className="px-4 text-[9px] font-black uppercase tracking-widest text-brand-brown/20">
-              or
-            </span>
-            <div className="flex-1 h-px bg-brand-gold/10" />
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-1.5">
-              <label
-                className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
-                htmlFor="email"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setFormError(null);
-                  clearError();
-                }}
-                onBlur={() =>
-                  setTouchedFields((fields) => ({ ...fields, email: true }))
-                }
-                className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
-                placeholder="you@example.com"
-              />
-              {touchedFields.email && emailError && (
-                <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
-                  {emailError}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <label
-                className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete={isSignUp ? "new-password" : "current-password"}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setFormError(null);
-                  clearError();
-                }}
-                onBlur={() =>
-                  setTouchedFields((fields) => ({ ...fields, password: true }))
-                }
-                className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
-                placeholder="••••••••"
-              />
-              {touchedFields.password && passwordError && (
-                <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
-                  {passwordError}
-                </p>
-              )}
-            </div>
-
-            {displayError && (
-              <div className="p-4 rounded-xl bg-brand-terracotta/5 border border-brand-terracotta/10">
-                <p className="text-[10px] font-bold text-brand-terracotta text-center uppercase tracking-wider">
-                  {displayError}
-                </p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="group w-full relative inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-brand-green px-8 text-brand-cream shadow-xl shadow-brand-green/15 transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-brand-green/25 disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
-            >
-              <span className="font-black uppercase tracking-[0.2em] text-[10px]">
-                {isLoading
-                  ? "Verifying..."
-                  : isSignUp
-                    ? "Create Account"
-                    : "Sign In"}
+            <div className="my-7 flex items-center">
+              <div className="flex-1 h-px bg-brand-gold/10" />
+              <span className="px-4 text-[9px] font-black uppercase tracking-widest text-brand-brown/20">
+                or
               </span>
-              {!isLoading && (
-                <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
-              )}
-            </button>
-          </form>
+              <div className="flex-1 h-px bg-brand-gold/10" />
+            </div>
 
-          <div className="mt-9 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setFormError(null);
-                clearError();
-              }}
-              className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 hover:text-brand-brown transition-colors"
-            >
-              {isSignUp ? (
-                <>
-                  Already have an account?{" "}
-                  <span className="text-brand-gold">Sign In</span>
-                </>
-              ) : (
-                <>
-                  New to ANNVRIKSH?{" "}
-                  <span className="text-brand-gold">Create Account</span>
-                </>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1.5">
+                <label
+                  className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
+                  htmlFor="email"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setFormError(null);
+                    clearError();
+                  }}
+                  onBlur={() =>
+                    setTouchedFields((fields) => ({ ...fields, email: true }))
+                  }
+                  className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
+                  placeholder="you@example.com"
+                />
+                {touchedFields.email && emailError && (
+                  <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
+                    {emailError}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
+                  htmlFor="password"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setFormError(null);
+                    clearError();
+                  }}
+                  onBlur={() =>
+                    setTouchedFields((fields) => ({
+                      ...fields,
+                      password: true,
+                    }))
+                  }
+                  className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
+                  placeholder="••••••••"
+                />
+                {touchedFields.password && passwordError && (
+                  <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
+                    {passwordError}
+                  </p>
+                )}
+              </div>
+
+              {displayError && (
+                <div className="p-4 rounded-xl bg-brand-terracotta/5 border border-brand-terracotta/10">
+                  <p className="text-[10px] font-bold text-brand-terracotta text-center uppercase tracking-wider">
+                    {displayError}
+                  </p>
+                </div>
               )}
-            </button>
+
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="group w-full relative inline-flex min-h-[58px] items-center justify-center gap-3 rounded-full bg-brand-green px-8 text-brand-cream shadow-xl shadow-brand-green/15 transition-all duration-500 hover:bg-brand-green-light hover:translate-y-[-2px] hover:shadow-brand-green/25 disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
+              >
+                <span className="font-black uppercase tracking-[0.2em] text-[10px]">
+                  {isLoading
+                    ? "Verifying..."
+                    : isSignUp
+                      ? "Create Account"
+                      : "Sign In"}
+                </span>
+                {!isLoading && (
+                  <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
+                )}
+              </button>
+            </form>
+
+            <div className="mt-9 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setFormError(null);
+                  clearError();
+                }}
+                className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 hover:text-brand-brown transition-colors"
+              >
+                {isSignUp ? (
+                  <>
+                    Already have an account?{" "}
+                    <span className="text-brand-gold">Sign In</span>
+                  </>
+                ) : (
+                  <>
+                    New to ANNVRIKSH?{" "}
+                    <span className="text-brand-gold">Create Account</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

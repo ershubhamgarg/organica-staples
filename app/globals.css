@@ -193,6 +193,35 @@ body {
   animation: shimmer 2s infinite;
 }
 
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 18s linear infinite;
+}
+
+@keyframes growUp {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.animate-grow-up {
+  animation: growUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  transform-origin: bottom;
+}
+
+@keyframes driftSlow {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(12px) translateY(-8px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+.animate-drift-slow {
+  animation: driftSlow 12s ease-in-out infinite;
+}
+
 .order-confirmation-card {
   animation: confirmationCardIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
