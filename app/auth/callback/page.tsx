@@ -29,6 +29,7 @@ const getCallbackErrorMessage = (message: string | null) => {
 export default function AuthCallbackPage() {
   const router = useRouter();
   const fetchUser = useUserStore((state) => state.fetchUser);
+  const setJustSignedIn = useUserStore((state) => state.setJustSignedIn);
   const [message, setMessage] = useState("Finishing secure sign in...");
 
   useEffect(() => {
@@ -69,11 +70,12 @@ export default function AuthCallbackPage() {
 
       setMessage("Sign in complete. Taking you to the store...");
       await fetchUser();
+      setJustSignedIn(true);
       router.replace(next);
     };
 
     void finishSignIn();
-  }, [fetchUser, router]);
+  }, [fetchUser, router, setJustSignedIn]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-brand-cream px-4">

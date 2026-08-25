@@ -63,7 +63,9 @@ interface UserState {
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
+  justSignedIn: boolean;
   clearError: () => void;
+  setJustSignedIn: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
   signUp: (email: string, password: string) => Promise<boolean>;
@@ -78,7 +80,9 @@ export const useUserStore = create<UserState>()(
       isLoading: false,
       isInitialized: false,
       error: null,
+      justSignedIn: false,
       clearError: () => set({ error: null }),
+      setJustSignedIn: (value: boolean) => set({ justSignedIn: value }),
 
       signIn: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
@@ -88,7 +92,7 @@ export const useUserStore = create<UserState>()(
             password,
           });
           if (error) throw error;
-          set({ user: data.user, isLoading: false });
+          set({ user: data.user, isLoading: false, justSignedIn: true });
 
           if (data.user) {
             await useCartStore.getState().syncCartWithSupabase(data.user.id);
@@ -133,7 +137,7 @@ export const useUserStore = create<UserState>()(
             password,
           });
           if (error) throw error;
-          set({ user: data.user, isLoading: false });
+          set({ user: data.user, isLoading: false, justSignedIn: true });
           return Boolean(data.user);
         } catch (error) {
           set({ error: getAuthErrorMessage(error), isLoading: false });
@@ -145,7 +149,7 @@ export const useUserStore = create<UserState>()(
         set({ isLoading: true, error: null });
         try {
           await supabase.auth.signOut();
-          set({ user: null, isLoading: false });
+          set({ user: null, isLoading: false, justSignedIn: false });
           useCartStore.getState().clearCart();
           const { useAddressStore } = await import("./addressStore");
           useAddressStore.getState().clearAddresses();
