@@ -21,7 +21,6 @@ import {
   Users,
   Wheat,
 } from "lucide-react";
-import HelpMeDecide from "@/components/HelpMeDecide";
 import ProductListing from "@/components/ProductListing";
 import DesiHero from "@/components/DesiHero";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -418,8 +417,6 @@ Message: ${formData.message}
           </div>
         </div>
       </section>
-
-      <HelpMeDecide />
 
       <ReviewCarousel />
 

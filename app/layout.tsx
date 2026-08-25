@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MapPin } from "lucide-react";
 import {
   Plus_Jakarta_Sans,
   Fraunces,
@@ -60,7 +61,7 @@ export default function RootLayout({
 
         <footer className="bg-white text-brand-brown/70 py-16 relative overflow-hidden border-t border-brand-gold/10">
           <div className="absolute inset-0 bg-organic-texture opacity-[0.03] pointer-events-none" />
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 relative z-10">
             <div className="space-y-8 flex flex-col items-center md:items-start">
               <Image
                 src="/annvriksh_logo_no_bg.png"
@@ -134,9 +135,60 @@ export default function RootLayout({
                 </li>
               </ul>
             </div>
+            <div>
+              <h4 className="text-brand-gold font-serif text-lg mb-6 tracking-wide">
+                Visit Us
+              </h4>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Kirti+Nagar%2C+Sirsa%2C+Haryana+125055"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-3 text-sm font-light hover:text-brand-gold transition-colors duration-300"
+              >
+                <MapPin
+                  size={16}
+                  className="mt-0.5 shrink-0 text-brand-gold/70 group-hover:text-brand-gold transition-colors"
+                />
+                <span className="leading-relaxed">
+                  ANNVRIKSH
+                  <br />
+                  Kirti Nagar, Sirsa,
+                  <br />
+                  Haryana - 125055
+                </span>
+              </a>
+            </div>
           </div>
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 text-[10px] uppercase tracking-[0.2em] text-brand-brown/40 text-center relative z-10 font-bold">
-            &copy; {new Date().getFullYear()} ANNVRIKSH. All rights reserved.
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 mt-16 pt-8 border-t border-brand-gold/10 relative z-10">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-x-6 gap-y-3 mb-5 text-[9px] uppercase tracking-[0.18em] text-brand-brown/40 font-bold">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-brand-gold transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                href="/shipping-policy"
+                className="hover:text-brand-gold transition-colors"
+              >
+                Shipping Policy
+              </Link>
+              <Link
+                href="/returns-and-refunds"
+                className="hover:text-brand-gold transition-colors"
+              >
+                Returns &amp; Refunds
+              </Link>
+              <Link
+                href="/terms-and-conditions"
+                className="hover:text-brand-gold transition-colors"
+              >
+                Terms &amp; Conditions
+              </Link>
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-brand-brown/40 text-center font-bold">
+              &copy; {new Date().getFullYear()} ANNVRIKSH. All rights reserved.
+            </div>
           </div>
         </footer>
       </body>
