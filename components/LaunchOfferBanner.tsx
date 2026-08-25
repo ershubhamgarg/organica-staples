@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
+import { isLaunchOfferEnabled } from "@/lib/launchOffer";
 
 export default function LaunchOfferBanner() {
   const { user } = useUserStore();
@@ -56,7 +57,12 @@ export default function LaunchOfferBanner() {
     };
   }, [showOfferDetails]);
 
-  if (isDismissed || !hasRevealDelayElapsed || hasClaimed) {
+  if (
+    !isLaunchOfferEnabled() ||
+    isDismissed ||
+    !hasRevealDelayElapsed ||
+    hasClaimed
+  ) {
     return null;
   }
 

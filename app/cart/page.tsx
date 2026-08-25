@@ -31,6 +31,7 @@ import {
   LAUNCH_OFFER_CODE,
   LAUNCH_OFFER_PACK_LIMIT,
   getLaunchOfferState,
+  isLaunchOfferEnabled,
 } from "@/lib/launchOffer";
 import {
   getDiscountedPrice,
@@ -438,6 +439,7 @@ export default function CartPage() {
           </Link>
         </div>
 
+        {isLaunchOfferEnabled() && (
         <div className="mb-8 rounded-3xl border border-brand-green/15 bg-brand-green/5 p-5 shadow-xl shadow-brand-brown/5">
           {!launchOfferClaim.hasClaimed && (
             <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
@@ -483,6 +485,7 @@ export default function CartPage() {
             </div>
           )}
         </div>
+        )}
 
         {items.length === 0 ? (
           <div className="bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 text-center shadow-2xl shadow-brand-brown/5 max-w-xl mx-auto">

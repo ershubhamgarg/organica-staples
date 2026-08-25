@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   description:
     "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
   icons: {
-    icon: "/logo-annvriksh-new.jpeg",
+    icon: "/annvriksh_logo.png",
     apple: "/favicon.png",
   },
 };
@@ -63,7 +63,7 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
             <div className="space-y-8 flex flex-col items-center md:items-start">
               <Image
-                src="/ann_logo_header.png"
+                src="/annvriksh_logo_no_bg.png"
                 alt="ANNVRIKSH"
                 width={636}
                 height={212}

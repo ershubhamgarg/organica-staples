@@ -148,7 +148,7 @@ export default function Header() {
               onClick={handleHomeClick}
             >
               <Image
-                src="/ann_logo_header.png"
+                src="/annvriksh_logo_horizontal.png"
                 alt="ANNVRIKSH"
                 width={212}
                 height={212}

@@ -579,7 +579,7 @@ export default function CheckoutPage() {
             <div className="relative z-10 px-5 py-5 text-center">
               <div className="mb-3 flex items-center justify-between gap-4">
                 <Image
-                  src="/logo-annvriksh-new.jpeg"
+                  src="/annvriksh_logo.png"
                   alt="ANNVRIKSH"
                   width={80}
                   height={80}

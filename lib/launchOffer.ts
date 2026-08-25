@@ -3,6 +3,12 @@ import type { CartItem } from "@/store/cartStore";
 export const LAUNCH_OFFER_CODE = "LAUNCHSTORY";
 export const LAUNCH_OFFER_PACK_LIMIT = 20;
 
+// Set NEXT_PUBLIC_ENABLE_LAUNCH_OFFER=true in env to turn the launch story
+// offer back on. Defaults to disabled so it can be paused without a code
+// change beyond flipping this flag.
+export const isLaunchOfferEnabled = () =>
+  process.env.NEXT_PUBLIC_ENABLE_LAUNCH_OFFER === "true";
+
 export type LaunchOfferState = {
   isEligible: boolean;
   itemCount: number;
@@ -13,6 +19,17 @@ export type LaunchOfferState = {
 
 export function getLaunchOfferState(items: CartItem[]): LaunchOfferState {
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+
+  if (!isLaunchOfferEnabled()) {
+    return {
+      isEligible: false,
+      itemCount,
+      distinctItemCount: items.length,
+      invalidQuantityItems: [],
+      message: "The launch story offer isn't running right now.",
+    };
+  }
+
   const invalidQuantityItems = items.filter((item) => item.quantity !== 1);
   const hasExactlyTwoProducts = items.length === 2;
   const hasTwoTotalItems = itemCount === 2;
