@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -55,10 +55,18 @@ export default function LoginPage() {
     isInitialized,
   } = useUserStore();
   const router = useRouter();
+  const initialSessionCheckedRef = useRef(false);
 
+  // Only bounce visitors who already had a session when this page first
+  // loaded. A fresh sign-in/sign-up is handled explicitly by handleSubmit
+  // (and the OAuth callback), which take the user to "/" with a welcome
+  // modal — this guard must not fight that redirect.
   useEffect(() => {
-    if (isInitialized && user) {
-      router.push("/profile");
+    if (!isInitialized || initialSessionCheckedRef.current) return;
+    initialSessionCheckedRef.current = true;
+
+    if (user) {
+      router.push("/");
     }
   }, [isInitialized, user, router]);
 

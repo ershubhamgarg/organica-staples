@@ -3,9 +3,9 @@
 import Image from "next/image";
 import {
   ArrowRight,
+  Award,
   BadgeIndianRupee,
   Circle,
-  FlaskConical,
   Flower2,
   Leaf,
   Lock,
@@ -25,6 +25,7 @@ import HelpMeDecide from "@/components/HelpMeDecide";
 import ProductListing from "@/components/ProductListing";
 import DesiHero from "@/components/DesiHero";
 import ScrollReveal from "@/components/ScrollReveal";
+import WelcomeModal from "@/components/WelcomeModal";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
@@ -107,6 +108,7 @@ Message: ${formData.message}
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
+      <WelcomeModal />
       <DesiHero />
 
       {/* Trust Strip */}
@@ -125,9 +127,9 @@ Message: ${formData.message}
                 sub: "Across Bharat's heartland",
               },
               {
-                icon: FlaskConical,
-                label: "Every Batch Lab-Tested",
-                sub: "Purity you can verify",
+                icon: ShieldCheck,
+                label: "Every Batch Quality Checked",
+                sub: "Purity you can trust",
               },
               {
                 icon: Leaf,
@@ -298,10 +300,10 @@ Message: ${formData.message}
                 body: "Sun-dried, stone-ground, and cold-pressed using time-honoured methods that protect nutrition.",
               },
               {
-                icon: FlaskConical,
+                icon: ShieldCheck,
                 step: "03",
-                title: "Lab Tested",
-                body: "Every batch is verified for purity, so what reaches you is free of adulteration or pesticides.",
+                title: "Quality Checked",
+                body: "Every batch is checked for purity, so what reaches you is free of adulteration or pesticides.",
               },
               {
                 icon: Truck,
@@ -692,7 +694,7 @@ Message: ${formData.message}
                 {
                   icon: Sprout,
                   title: "100% Organic",
-                  body: "Certified organic goods, grown with respect for the earth and free from synthetic chemicals.",
+                  body: "Grown with respect for the earth and free from synthetic chemicals.",
                 },
                 {
                   icon: MapPin,
@@ -741,8 +743,8 @@ Message: ${formData.message}
       <section className="relative bg-white py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-b border-brand-gold/10">
         <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
           {[
-            { icon: ShieldCheck, label: "FSSAI Compliant" },
-            { icon: FlaskConical, label: "Lab Tested Purity" },
+            { icon: Truck, label: "Farm To Table" },
+            { icon: Award, label: "Quality Assured" },
             { icon: Sprout, label: "100% Organic" },
             { icon: Lock, label: "Secure Payments" },
           ].map((item) => {

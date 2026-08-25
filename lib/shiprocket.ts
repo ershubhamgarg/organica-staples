@@ -125,7 +125,7 @@ const getConfig = () => {
     email,
     password,
     pickupLocation,
-    pickupPostcode: process.env.SHIPROCKET_PICKUP_POSTCODE?.trim() ?? "",
+    pickupPostcode: process.env.SHIPROCKET_PICKUP_POSTCODE?.trim() ?? "125055",
     channelId: Number.parseInt(process.env.SHIPROCKET_CHANNEL_ID ?? "", 10),
     autoAssignAwb: process.env.SHIPROCKET_AUTO_ASSIGN_AWB === "true",
     defaultLengthCm: Number.parseFloat(
@@ -169,7 +169,9 @@ const shiprocketFetch = async <T>(
 
   if (!response.ok) {
     throw new Error(
-      body.message ?? body.error ?? `Shiprocket request failed (${response.status}).`,
+      body.message ??
+        body.error ??
+        `Shiprocket request failed (${response.status}).`,
     );
   }
 
@@ -192,7 +194,9 @@ const getToken = async () => {
   });
 
   if (!result.token) {
-    throw new Error(result.message ?? "Shiprocket did not return an auth token.");
+    throw new Error(
+      result.message ?? "Shiprocket did not return an auth token.",
+    );
   }
 
   return result.token;
@@ -212,19 +216,23 @@ export async function getShiprocketHealth() {
       trimmedEmailLength: process.env.SHIPROCKET_EMAIL?.trim().length ?? 0,
       passwordPresent: Boolean(process.env.SHIPROCKET_PASSWORD),
       passwordLength: process.env.SHIPROCKET_PASSWORD?.length ?? 0,
-      trimmedPasswordLength: process.env.SHIPROCKET_PASSWORD?.trim().length ?? 0,
+      trimmedPasswordLength:
+        process.env.SHIPROCKET_PASSWORD?.trim().length ?? 0,
       pickupLocation: maskValue(process.env.SHIPROCKET_PICKUP_LOCATION),
     };
   }
 
   try {
-    const result = await shiprocketFetch<ShiprocketAuthResponse>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({
-        email: config.email,
-        password: config.password,
-      }),
-    });
+    const result = await shiprocketFetch<ShiprocketAuthResponse>(
+      "/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email: config.email,
+          password: config.password,
+        }),
+      },
+    );
 
     return {
       configured: true,
@@ -245,7 +253,9 @@ export async function getShiprocketHealth() {
       authOk: false,
       status: null,
       message:
-        error instanceof Error ? error.message : "Shiprocket auth check failed.",
+        error instanceof Error
+          ? error.message
+          : "Shiprocket auth check failed.",
       email: maskValue(config.email),
       emailLength: process.env.SHIPROCKET_EMAIL?.length ?? 0,
       trimmedEmailLength: config.email.length,
@@ -335,7 +345,10 @@ const buildCreateOrderPayload = (order: Order) => {
 
   return {
     order_id: order.id,
-    order_date: new Date(order.created_at).toISOString().slice(0, 19).replace("T", " "),
+    order_date: new Date(order.created_at)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " "),
     pickup_location: config.pickupLocation,
     ...channelId,
     billing_customer_name: firstName,
@@ -367,7 +380,9 @@ const buildCreateOrderPayload = (order: Order) => {
 };
 
 const getTrackingUrl = (awbCode: string | null) =>
-  awbCode ? `https://www.shiprocket.in/shipment-tracking/?awb=${awbCode}` : null;
+  awbCode
+    ? `https://www.shiprocket.in/shipment-tracking/?awb=${awbCode}`
+    : null;
 
 export const isShiprocketConfigured = () => Boolean(getConfig());
 
@@ -497,9 +512,12 @@ export async function createShiprocketShipment(
           body: JSON.stringify({ shipment_id: shipmentId }),
         },
       );
-      awbCode = assigned.response?.data?.awb_code ?? assigned.awb_code ?? awbCode;
+      awbCode =
+        assigned.response?.data?.awb_code ?? assigned.awb_code ?? awbCode;
       courierName =
-        assigned.response?.data?.courier_name ?? assigned.courier_name ?? courierName;
+        assigned.response?.data?.courier_name ??
+        assigned.courier_name ??
+        courierName;
       status = awbCode ? "awb_assigned" : "created";
     }
 

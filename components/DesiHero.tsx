@@ -148,7 +148,7 @@ const DesiHero = () => {
                   <ShieldCheck size={16} strokeWidth={1.8} />
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown">
-                  Lab Tested &amp; Certified Pure
+                  100% Organic &amp; Ethically Sourced
                 </p>
               </div>
             </div>
@@ -184,10 +184,10 @@ const DesiHero = () => {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-green uppercase tracking-tighter">
-                      Certified Pure
+                      Farm Direct
                     </p>
                     <p className="text-sm text-brand-brown/60">
-                      Lab tested quality
+                      Sourced with integrity
                     </p>
                   </div>
                 </div>

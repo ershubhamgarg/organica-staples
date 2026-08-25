@@ -5,22 +5,22 @@ import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import {
+  Award,
   Check,
-  ShieldCheck,
-  Truck,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Leaf,
   Minus,
   Plus,
-  Star,
-  ChevronLeft,
-  ChevronRight,
-  MessageCircle,
-  ArrowRight,
+  ShieldCheck,
   ShoppingBag,
-  Award,
+  Sparkles,
+  Star,
+  Truck,
+  ArrowRight,
 } from "lucide-react";
-import { useEffect, useState, use, useMemo } from "react";
+import { useEffect, useState, use, useMemo, useRef } from "react";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import QuickAddButton from "@/components/QuickAddButton";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -65,6 +65,10 @@ export default function ProductPage({
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
+    useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
 
   // New Review Form States
   const [newRating, setNewRating] = useState<number | null>(null);
@@ -156,6 +160,16 @@ export default function ProductPage({
     }
   }, [user, newUserName]);
 
+  useEffect(() => {
+    setIsDescriptionExpanded(false);
+  }, [product?.id]);
+
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el) return;
+    setIsDescriptionOverflowing(el.scrollHeight > el.clientHeight + 2);
+  }, [product?.description, isDescriptionExpanded]);
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
@@ -211,13 +225,50 @@ export default function ProductPage({
   if ((!hasFetched || isLoading) && !product) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative w-24 h-24">
-            <img
-              src="/loader.gif"
-              alt="Loading..."
-              className="w-full h-full object-contain"
-            />
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+            <div className="absolute inset-0 bg-brand-gold/20 rounded-full blur-xl animate-pulse-slow" />
+            <svg
+              viewBox="0 0 200 200"
+              role="img"
+              aria-label="Loading"
+              className="relative w-full h-full animate-spin-slow"
+              style={{ animationDuration: "2.4s" }}
+            >
+              <defs>
+                <linearGradient
+                  id="loaderPetalGold"
+                  x1="0"
+                  y1="0"
+                  x2="1"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor="#E8D090" />
+                  <stop offset="55%" stopColor="#C5A028" />
+                  <stop offset="100%" stopColor="#9C7F1F" />
+                </linearGradient>
+              </defs>
+              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+                <g key={deg} transform={`rotate(${deg} 100 100)`}>
+                  <path
+                    d="M100 100 C82 74 76 44 100 18 C124 44 118 74 100 100 Z"
+                    fill="url(#loaderPetalGold)"
+                    stroke="#9C7F1F"
+                    strokeWidth="1"
+                    strokeOpacity="0.4"
+                  />
+                  <circle cx="100" cy="26" r="3.2" fill="#9C7F1F" />
+                </g>
+              ))}
+              <circle
+                cx="100"
+                cy="100"
+                r="24"
+                fill="#FDFBF7"
+                stroke="url(#loaderPetalGold)"
+                strokeWidth="3"
+              />
+            </svg>
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
             Fetching the harvest...
@@ -266,8 +317,12 @@ export default function ProductPage({
   return (
     <div className="min-h-screen bg-brand-cream">
       {/* Product Hero Section */}
-      <section className="relative pt-8 lg:pt-16 pb-16 px-4 sm:px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative pt-8 lg:pt-16 pb-16 px-4 sm:px-6 lg:px-12 overflow-hidden">
+        <div className="absolute inset-0 bg-mandala opacity-60 pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-brand-green/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
           {/* Breadcrumb - Mobile (above image) */}
           <nav className="flex lg:hidden items-center gap-2 mb-4 text-[8px] uppercase tracking-[0.2em] font-bold text-brand-brown/60 flex-wrap">
             <Link href="/" className="hover:text-brand-brown transition-colors">
@@ -290,12 +345,18 @@ export default function ProductPage({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Product Images */}
-            <div className="relative lg:sticky lg:top-32">
-              <div className="relative aspect-square w-full rounded-3xl bg-brand-sand overflow-hidden">
+            <div className="relative lg:sticky lg:top-32 lg:w-full lg:max-w-[420px] lg:mx-auto">
+              <div className="absolute -inset-6 bg-brand-gold/10 rounded-[2.5rem] blur-3xl pointer-events-none" />
+              <div
+                className="absolute -inset-3 rounded-[2rem] border border-dashed border-brand-gold/25 animate-spin-slow pointer-events-none"
+                style={{ animationDuration: "36s" }}
+              />
+
+              <div className="relative aspect-square w-full rounded-[2rem] bg-brand-sand overflow-hidden border-4 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
                 <ProductImageCarousel
                   product={product}
                   imageClassName={`object-cover transition-transform duration-1000 ${!available ? "blur-[2px] opacity-60" : ""}`}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  sizes="(max-width: 1024px) 100vw, 420px"
                 />
 
                 {/* Premium Corner Badge for Discount */}
@@ -324,8 +385,22 @@ export default function ProductPage({
                 )}
               </div>
 
-              {/* Decorative Ring */}
-              <div className="absolute -inset-4 z-[-1] border border-brand-gold/10 rounded-[30%_70%_70%_30%/30%_30%_70%_70%] animate-float-slow" />
+              {/* Floating Trust Badge */}
+              {available && (
+                <div className="hidden sm:flex absolute -right-4 lg:-right-6 -bottom-6 z-20 items-center gap-3 bg-white/90 backdrop-blur-md pl-4 pr-5 py-3.5 rounded-2xl shadow-xl border border-brand-gold/10 animate-float-slow">
+                  <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
+                    <ShieldCheck size={18} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown">
+                      Purity Checked
+                    </p>
+                    <p className="text-[9px] text-brand-brown/50 font-light">
+                      Farm to Table
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right: Product Info */}
@@ -384,7 +459,7 @@ export default function ProductPage({
                   </button>
                 </div>
 
-                <h1 className="text-4xl lg:text-5xl font-serif text-brand-brown mb-1 tracking-tight leading-[0.95]">
+                <h1 className="text-3xl md:text-4xl lg:text-[2.5rem] font-serif text-brand-brown mb-1 tracking-tight leading-[1.05]">
                   {product.name}
                 </h1>
 
@@ -456,9 +531,23 @@ export default function ProductPage({
                     )}
                 </div>
 
-                <div className="text-base text-brand-brown/80 font-light leading-relaxed max-w-xl text-balance whitespace-pre-wrap">
+                <div
+                  ref={descriptionRef}
+                  className={`text-base text-brand-brown/80 font-light leading-relaxed max-w-xl text-balance whitespace-pre-wrap ${
+                    isDescriptionExpanded ? "" : "line-clamp-4"
+                  }`}
+                >
                   {product.description}
                 </div>
+                {(isDescriptionOverflowing || isDescriptionExpanded) && (
+                  <button
+                    type="button"
+                    onClick={() => setIsDescriptionExpanded((v) => !v)}
+                    className="mt-2 text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-colors"
+                  >
+                    {isDescriptionExpanded ? "See Less" : "See More"}
+                  </button>
+                )}
 
                 {/* Compact Benefits List */}
                 {product.benefits && product.benefits.length > 0 && (
@@ -541,43 +630,91 @@ export default function ProductPage({
               </div>
 
               {/* Trust Features */}
-              <div className="grid grid-cols-2 gap-6 pt-6 border-t border-brand-gold/10">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
-                    <ShieldCheck size={16} />
-                  </div>
-                  <div>
-                    <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                      Certified Pure
-                    </h4>
-                    <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
-                      100% Lab Tested
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green shrink-0">
-                    <Award size={16} />
-                  </div>
-                  <div>
-                    <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                      Farm Direct
-                    </h4>
-                    <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
-                      Ethical Sourcing
-                    </p>
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-5 pt-6 border-t border-brand-gold/10">
+                {[
+                  {
+                    icon: ShieldCheck,
+                    title: "Quality Checked",
+                    body: "Every Batch Verified",
+                    color: "text-brand-gold bg-brand-gold/10",
+                  },
+                  {
+                    icon: Award,
+                    title: "Farm Direct",
+                    body: "Ethical Sourcing",
+                    color: "text-brand-green bg-brand-green/10",
+                  },
+                  {
+                    icon: Truck,
+                    title: "Traceable Sourcing",
+                    body: "Farm To Pantry",
+                    color: "text-brand-terracotta bg-brand-terracotta/10",
+                  },
+                  {
+                    icon: Leaf,
+                    title: "100% Organic",
+                    body: "Zero Chemicals",
+                    color: "text-brand-green bg-brand-green/10",
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex items-start gap-3">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${item.color}`}
+                      >
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
+                          {item.title}
+                        </h4>
+                        <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
+                          {item.body}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+              <p className="mt-6 text-[10px] text-brand-brown/35 font-light leading-relaxed">
+                Every batch is checked with care and sourced directly from
+                trusted farm partners before it reaches your pantry.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Assurance Strip */}
+      <section className="relative bg-white py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-y border-brand-gold/10">
+        <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+          {[
+            { icon: Award, label: "Farm Direct" },
+            { icon: Sparkles, label: "Quality Assured" },
+            { icon: Leaf, label: "100% Organic" },
+            { icon: Truck, label: "Pan-India Delivery" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 text-brand-brown/60"
+              >
+                <Icon size={18} className="text-brand-gold" strokeWidth={1.5} />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-black">
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
+        </ScrollReveal>
+      </section>
+
       {/* Customer Reviews */}
       <section
         id="reviews"
-        className="bg-brand-cream border-y border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
+        className="bg-brand-cream border-b border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
       >
         <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-8">
