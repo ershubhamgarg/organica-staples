@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
@@ -48,41 +49,14 @@ export default function WelcomeModal() {
         <div className="relative text-center space-y-6">
           <div className="relative mx-auto w-20 h-20">
             <div className="absolute inset-0 bg-brand-gold/15 rounded-full blur-xl" />
-            <svg viewBox="0 0 200 200" className="relative w-full h-full">
-              <defs>
-                <linearGradient
-                  id="welcomePetalGold"
-                  x1="0"
-                  y1="0"
-                  x2="1"
-                  y2="1"
-                >
-                  <stop offset="0%" stopColor="#E8D090" />
-                  <stop offset="55%" stopColor="#C5A028" />
-                  <stop offset="100%" stopColor="#9C7F1F" />
-                </linearGradient>
-              </defs>
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                <g key={deg} transform={`rotate(${deg} 100 100)`}>
-                  <path
-                    d="M100 100 C82 74 76 44 100 18 C124 44 118 74 100 100 Z"
-                    fill="url(#welcomePetalGold)"
-                    stroke="#9C7F1F"
-                    strokeWidth="1"
-                    strokeOpacity="0.4"
-                  />
-                  <circle cx="100" cy="26" r="3.2" fill="#9C7F1F" />
-                </g>
-              ))}
-              <circle
-                cx="100"
-                cy="100"
-                r="24"
-                fill="#FDFBF7"
-                stroke="url(#welcomePetalGold)"
-                strokeWidth="3"
-              />
-            </svg>
+            <Image
+              src="/annvriksh_logo_mark.png"
+              alt="ANNVRIKSH"
+              fill
+              className="relative object-contain"
+              sizes="80px"
+              priority
+            />
           </div>
 
           <div className="space-y-2">

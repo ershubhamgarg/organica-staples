@@ -3,6 +3,7 @@
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
+import Image from "next/image";
 import Link from "next/link";
 import {
   Award,
@@ -228,47 +229,15 @@ export default function ProductPage({
         <div className="flex flex-col items-center gap-6">
           <div className="relative w-20 h-20 sm:w-24 sm:h-24">
             <div className="absolute inset-0 bg-brand-gold/20 rounded-full blur-xl animate-pulse-slow" />
-            <svg
-              viewBox="0 0 200 200"
-              role="img"
-              aria-label="Loading"
-              className="relative w-full h-full animate-spin-slow"
+            <Image
+              src="/annvriksh_logo_mark.png"
+              alt="Loading"
+              fill
+              className="relative object-contain animate-spin-slow"
               style={{ animationDuration: "2.4s" }}
-            >
-              <defs>
-                <linearGradient
-                  id="loaderPetalGold"
-                  x1="0"
-                  y1="0"
-                  x2="1"
-                  y2="1"
-                >
-                  <stop offset="0%" stopColor="#E8D090" />
-                  <stop offset="55%" stopColor="#C5A028" />
-                  <stop offset="100%" stopColor="#9C7F1F" />
-                </linearGradient>
-              </defs>
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                <g key={deg} transform={`rotate(${deg} 100 100)`}>
-                  <path
-                    d="M100 100 C82 74 76 44 100 18 C124 44 118 74 100 100 Z"
-                    fill="url(#loaderPetalGold)"
-                    stroke="#9C7F1F"
-                    strokeWidth="1"
-                    strokeOpacity="0.4"
-                  />
-                  <circle cx="100" cy="26" r="3.2" fill="#9C7F1F" />
-                </g>
-              ))}
-              <circle
-                cx="100"
-                cy="100"
-                r="24"
-                fill="#FDFBF7"
-                stroke="url(#loaderPetalGold)"
-                strokeWidth="3"
-              />
-            </svg>
+              sizes="96px"
+              priority
+            />
           </div>
           <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
             Fetching the harvest...
@@ -768,8 +737,9 @@ export default function ProductPage({
                   </p>
                 </div>
               ) : (
+                <div className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5">
                 <div
-                  className={`space-y-4 md:space-y-6 ${reviews.length >= 3 ? "max-h-[600px] overflow-y-auto pr-2 custom-scrollbar" : ""}`}
+                  className={`space-y-4 md:space-y-6 ${reviews.length >= 3 ? "max-h-[600px] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar" : ""}`}
                 >
                   {paginatedReviews.map((review) => {
                     const isOwnReview = user && review.user_id === user.id;
@@ -834,33 +804,34 @@ export default function ProductPage({
                       </div>
                     );
                   })}
+                </div>
 
-                  {totalPages > 1 && (
-                    <div className="flex items-center gap-3 pl-0 md:pl-12 pt-4 md:pt-6">
-                      <button
-                        onClick={() =>
-                          setCurrentPage(Math.max(1, currentPage - 1))
-                        }
-                        disabled={currentPage === 1}
-                        className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
-                      >
-                        <ChevronLeft size={14} />
-                      </button>
-                      <span className="text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
-                        {currentPage} <span className="mx-2">/</span>{" "}
-                        {totalPages}
-                      </span>
-                      <button
-                        onClick={() =>
-                          setCurrentPage(Math.min(totalPages, currentPage + 1))
-                        }
-                        disabled={currentPage === totalPages}
-                        className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
-                      >
-                        <ChevronRight size={14} />
-                      </button>
-                    </div>
-                  )}
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-3 pl-0 md:pl-12 pt-4 md:pt-6 mt-4 md:mt-6 border-t border-brand-gold/10">
+                    <button
+                      onClick={() =>
+                        setCurrentPage(Math.max(1, currentPage - 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                    <span className="text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
+                      {currentPage} <span className="mx-2">/</span>{" "}
+                      {totalPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage(Math.min(totalPages, currentPage + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
                 </div>
               )}
             </div>
