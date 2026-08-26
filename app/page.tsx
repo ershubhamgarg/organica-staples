@@ -12,7 +12,6 @@ import {
   MapPin,
   MessageCircle,
   Plus,
-  Quote,
   ScrollText,
   ShieldCheck,
   Sparkles,
@@ -24,6 +23,7 @@ import {
 import ProductListing from "@/components/ProductListing";
 import DesiHero from "@/components/DesiHero";
 import ScrollReveal from "@/components/ScrollReveal";
+import SpiceWheelImage from "@/components/SpiceWheelImage";
 import WelcomeModal from "@/components/WelcomeModal";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
@@ -343,8 +343,8 @@ Message: ${formData.message}
       {/* Product Grid Section */}
       <ProductListing />
 
-      {/* Voices from the Villages */}
-      <section className="relative bg-brand-brown py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Spices */}
+      <section className="relative bg-brand-brown py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
         <div
           className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
@@ -355,65 +355,79 @@ Message: ${formData.message}
         />
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <ScrollReveal className="text-center mb-14 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <span className="h-[1px] w-8 bg-brand-gold" />
-              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
-                Voices From The Villages
-              </span>
-              <span className="h-[1px] w-8 bg-brand-gold" />
-            </div>
-            <h2 className="text-2xl md:text-4xl font-serif text-brand-cream tracking-tight leading-tight">
-              The hands behind{" "}
-              <span className="italic text-brand-gold">every harvest.</span>
-            </h2>
-          </ScrollReveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+            {/* Left: Rotating Spice Wheel */}
+            <SpiceWheelImage />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            {[
-              {
-                quote:
-                  "Our soil has fed generations before us. Farming without chemicals isn't new to us — it is simply how we always worked.",
-                region: "Wheat & Millet Cluster",
-                place: "Bundelkhand, MP",
-              },
-              {
-                quote:
-                  "When a buyer comes straight to the farm-gate, we finally get paid what the harvest is truly worth.",
-                region: "Mustard Growers",
-                place: "Rajasthan",
-              },
-              {
-                quote:
-                  "Cold-pressing the old way takes longer, but the oil still tastes the way it did in my grandfather's time.",
-                region: "Oilseed Cluster",
-                place: "Uttarakhand Hills",
-              },
-            ].map((voice, idx) => (
-              <ScrollReveal
-                key={voice.place}
-                animation="reveal-fade"
-                delay={idx * 150}
-                className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 flex flex-col gap-6 hover:bg-white/10 transition-colors duration-700"
-              >
-                <Quote
-                  className="text-brand-gold/30"
-                  size={32}
-                  strokeWidth={1}
-                />
-                <p className="text-brand-cream/85 font-serif text-lg italic leading-relaxed">
-                  &ldquo;{voice.quote}&rdquo;
-                </p>
-                <div className="pt-4 border-t border-white/10">
-                  <p className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">
-                    {voice.region}
-                  </p>
-                  <p className="text-[10px] uppercase tracking-widest text-brand-cream/50 mt-1">
-                    {voice.place}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
+            {/* Right: Content */}
+            <ScrollReveal animation="reveal-fade" delay={150}>
+              <div className="inline-flex items-center gap-3 mb-5">
+                <span className="h-[1px] w-8 bg-brand-gold" />
+                <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                  The Spice Story
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-4xl font-serif text-brand-cream tracking-tight leading-[1.15] mb-6">
+                Flavour, rooted in{" "}
+                <span className="italic text-brand-gold">purity.</span>
+              </h2>
+              <p className="text-brand-cream/70 font-light leading-relaxed text-sm sm:text-base mb-4">
+                Spices are more than seasoning — for generations, Indian
+                kitchens have turned to turmeric, chilli, and coriander not
+                just for flavour, but for the quiet wellness they carry in
+                every pinch. Warming, digestive, and rich in natural
+                compounds, spices are one of the oldest forms of everyday
+                care.
+              </p>
+              <p className="text-brand-cream/70 font-light leading-relaxed text-sm sm:text-base mb-10">
+                But that benefit only holds if the spice itself is honest.
+                Ours are stone-ground and sun-dried in small batches, with
+                nothing added and nothing taken away — so what reaches your
+                masala dabba is exactly what left the farm.
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-7">
+                {[
+                  {
+                    icon: Sparkles,
+                    title: "Rich in Antioxidants",
+                    body: "Turmeric's curcumin, chilli's capsaicin — compounds diluted or lost when spices are cut, aged, or over-processed.",
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: "Free From Adulteration",
+                    body: "No artificial colour, no added starch or filler, no irradiation — just the spice, exactly as harvested.",
+                  },
+                  {
+                    icon: Leaf,
+                    title: "Grown Without Chemicals",
+                    body: "No synthetic pesticides or fumigants at any stage, so nothing but the spice itself reaches your food.",
+                  },
+                  {
+                    icon: Wheat,
+                    title: "Stone-Ground, Slow-Dried",
+                    body: "Traditional processing keeps the volatile oils intact — the difference between fragrant and flat.",
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex gap-3">
+                      <div className="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-brand-gold">
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-brand-cream mb-1">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-brand-cream/60 font-light leading-relaxed">
+                          {item.body}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
