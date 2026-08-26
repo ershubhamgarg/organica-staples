@@ -259,7 +259,7 @@ export default function ProductListing() {
 
               <div className="flex flex-col flex-grow text-center px-3 sm:px-5 pt-3 sm:pt-5 pb-3 sm:pb-5">
                 <div className="flex flex-col items-center mb-1">
-                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold/50">
+                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold">
                     {product.category}
                   </span>
                 </div>
@@ -280,7 +280,7 @@ export default function ProductListing() {
                 </Link>
 
                 <div
-                  className={`flex flex-col items-center gap-1 ${available ? "mb-4 sm:mb-6" : "mb-2"}`}
+                  className={`flex flex-col items-center gap-1 ${available ? "mb-3 sm:mb-4" : "mb-2"}`}
                 >
                   <p className="text-[8px] sm:text-[10px] text-brand-gold italic font-medium tracking-wide">
                     {product.weight}
@@ -324,10 +324,10 @@ export default function ProductListing() {
                       {product.stock_quantity !== undefined &&
                         product.stock_quantity !== null && (
                           <span
-                            className={`text-[6px] sm:text-[7px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
+                            className={`text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
                               lowStock
                                 ? "text-brand-terracotta"
-                                : "text-brand-green/60"
+                                : "text-brand-green"
                             }`}
                           >
                             {lowStock ? "Selling Out Soon" : "In Stock"}
@@ -337,7 +337,7 @@ export default function ProductListing() {
                   )}
                 </div>
 
-                <div className={`${available ? "mt-auto" : ""} pt-1`}>
+                <div className="pt-1">
                   <QuickAddButton product={product} className="w-full" />
                 </div>
 
@@ -355,7 +355,7 @@ export default function ProductListing() {
                       />
                     ))}
                   </div>
-                  <span className="text-[7px] sm:text-[8px] text-brand-brown/30 uppercase tracking-[0.2em] font-black">
+                  <span className="text-[7px] sm:text-[8px] text-brand-brown/55 uppercase tracking-[0.2em] font-black">
                     {product.review_count || 0} Reviews
                   </span>
                 </div>
