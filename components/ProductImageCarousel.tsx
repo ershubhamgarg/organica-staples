@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { Product } from "@/lib/data";
@@ -11,9 +19,14 @@ interface ProductImageCarouselProps {
   sizes: string;
   priority?: boolean;
   imageClassName?: string;
+  onSelectedIndexChange?: (index: number) => void;
 }
 
-function getProductImages(product: Product): string[] {
+export interface ProductImageCarouselHandle {
+  scrollTo: (index: number) => void;
+}
+
+export function getProductImages(product: Product): string[] {
   const imageSet = new Set<string>();
   const productImages =
     typeof product.images === "string"
@@ -52,12 +65,16 @@ function parseImageList(images: string): string[] {
   return [];
 }
 
-export default function ProductImageCarousel({
-  product,
-  sizes,
-  priority = false,
-  imageClassName = "object-cover",
-}: ProductImageCarouselProps) {
+function ProductImageCarousel(
+  {
+    product,
+    sizes,
+    priority = false,
+    imageClassName = "object-cover",
+    onSelectedIndexChange,
+  }: ProductImageCarouselProps,
+  ref: React.Ref<ProductImageCarouselHandle>,
+) {
   const images = useMemo(() => getProductImages(product), [product]);
   const imageCount = images.length;
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -80,13 +97,17 @@ export default function ProductImageCarousel({
     [emblaApi],
   );
 
+  useImperativeHandle(ref, () => ({ scrollTo }), [scrollTo]);
+
   useEffect(() => {
     if (!emblaApi) {
       return;
     }
 
     const handleSelect = () => {
-      setSelectedIndex(emblaApi.selectedScrollSnap());
+      const index = emblaApi.selectedScrollSnap();
+      setSelectedIndex(index);
+      onSelectedIndexChange?.(index);
     };
 
     handleSelect();
@@ -97,7 +118,7 @@ export default function ProductImageCarousel({
       emblaApi.off("select", handleSelect);
       emblaApi.off("reInit", handleSelect);
     };
-  }, [emblaApi]);
+  }, [emblaApi, onSelectedIndexChange]);
 
   if (imageCount <= 1) {
     return (
@@ -157,3 +178,5 @@ export default function ProductImageCarousel({
     </div>
   );
 }
+
+export default forwardRef(ProductImageCarousel);

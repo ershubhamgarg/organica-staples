@@ -22,7 +22,11 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useEffect, useState, use, useMemo, useRef } from "react";
-import ProductImageCarousel from "@/components/ProductImageCarousel";
+import ProductImageCarousel, {
+  getProductImages,
+  type ProductImageCarouselHandle,
+} from "@/components/ProductImageCarousel";
+import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
 import ScrollReveal from "@/components/ScrollReveal";
 import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
@@ -70,6 +74,12 @@ export default function ProductPage({
   const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
     useState(false);
   const descriptionRef = useRef<HTMLDivElement>(null);
+  const carouselRef = useRef<ProductImageCarouselHandle>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const productImages = useMemo(
+    () => (product ? getProductImages(product) : []),
+    [product],
+  );
 
   // New Review Form States
   const [newRating, setNewRating] = useState<number | null>(null);
@@ -163,6 +173,7 @@ export default function ProductPage({
 
   useEffect(() => {
     setIsDescriptionExpanded(false);
+    setActiveImageIndex(0);
   }, [product?.id]);
 
   useEffect(() => {
@@ -324,9 +335,11 @@ export default function ProductPage({
               <div className="relative">
                 <div className="relative aspect-square w-full rounded-[2rem] bg-brand-sand overflow-hidden border-4 border-white shadow-[0_40px_80px_-20px_rgba(60,54,42,0.25)]">
                   <ProductImageCarousel
+                    ref={carouselRef}
                     product={product}
                     imageClassName={`object-cover transition-transform duration-1000 ${!available ? "blur-[2px] opacity-60" : ""}`}
                     sizes="(max-width: 1024px) 100vw, 520px"
+                    onSelectedIndexChange={setActiveImageIndex}
                   />
 
                   {/* Premium Corner Badge for Discount */}
@@ -373,58 +386,36 @@ export default function ProductPage({
                 )}
               </div>
 
-              {/* Trust Features */}
-              <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 pt-6 border-t border-brand-gold/10">
-                {[
-                  {
-                    icon: ShieldCheck,
-                    title: "Quality Checked",
-                    body: "Every Batch Verified",
-                    color: "text-brand-gold bg-brand-gold/10",
-                  },
-                  {
-                    icon: Award,
-                    title: "Farm Direct",
-                    body: "Ethical Sourcing",
-                    color: "text-brand-green bg-brand-green/10",
-                  },
-                  {
-                    icon: Truck,
-                    title: "Traceable Sourcing",
-                    body: "Farm To Pantry",
-                    color: "text-brand-terracotta bg-brand-terracotta/10",
-                  },
-                  {
-                    icon: Leaf,
-                    title: "100% Organic",
-                    body: "Zero Chemicals",
-                    color: "text-brand-green bg-brand-green/10",
-                  },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.title} className="flex items-start gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${item.color}`}
+              {/* Image Thumbnails */}
+              {productImages.length > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-3 pt-6 border-t border-brand-gold/10">
+                  {productImages.map((image, index) => {
+                    const isActive = activeImageIndex === index;
+                    return (
+                      <button
+                        key={`${image}-${index}`}
+                        type="button"
+                        onClick={() => carouselRef.current?.scrollTo(index)}
+                        aria-label={`Show product image ${index + 1}`}
+                        aria-current={isActive}
+                        className={`relative w-16 h-16 sm:w-[72px] sm:h-[72px] shrink-0 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                          isActive
+                            ? "border-brand-gold shadow-lg shadow-brand-gold/20 scale-105"
+                            : "border-brand-gold/10 opacity-60 hover:opacity-100 hover:border-brand-gold/30"
+                        }`}
                       >
-                        <Icon size={16} strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <h4 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                          {item.title}
-                        </h4>
-                        <p className="text-[10px] text-brand-brown/40 font-light mt-0.5">
-                          {item.body}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="mt-6 text-[10px] text-brand-brown/35 font-light leading-relaxed">
-                Every batch is checked with care and sourced directly from
-                trusted farm partners before it reaches your pantry.
-              </p>
+                        <ImageWithFallback
+                          src={image}
+                          alt={`${product.name} thumbnail ${index + 1}`}
+                          fill
+                          className="object-cover"
+                          sizes="72px"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Right: Product Info */}

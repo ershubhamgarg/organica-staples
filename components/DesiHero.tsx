@@ -10,7 +10,7 @@ import LaunchCarousel from "./LaunchCarousel";
 import { useEffect } from "react";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=1200";
+  "https://images.unsplash.com/photo-1781773338964-bc0e969d2973?auto=format&fit=crop&q=80&w=1000";
 
 const trustBadges = [
   { icon: Sprout, label: "100% Organic" },
@@ -53,7 +53,7 @@ const DesiHero = () => {
   }
 
   return (
-    <section className="relative min-h-[64vh] sm:min-h-[70vh] lg:min-h-[86vh] w-full flex items-center overflow-hidden bg-brand-cream pt-2 sm:pt-4 lg:pt-0">
+    <section className="relative min-h-[64vh] sm:min-h-[70vh] lg:min-h-[88vh] w-full flex items-center overflow-hidden bg-brand-cream pt-2 sm:pt-4 lg:pt-0">
       {/* Ambient Background Layers */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-10%,rgba(197,160,40,0.12),transparent),radial-gradient(ellipse_60%_50%_at_105%_100%,rgba(17,44,36,0.08),transparent)]" />
@@ -67,7 +67,7 @@ const DesiHero = () => {
       </div>
 
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 sm:pb-16 lg:pt-8 lg:pb-8">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-8 items-center">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="max-w-xl text-left">
             <div className="inline-flex items-center gap-2 mb-6 rounded-full border border-brand-gold/25 bg-white/70 backdrop-blur-sm px-4 py-2 shadow-sm shadow-brand-brown/5">
               <Leaf size={12} className="text-brand-green" strokeWidth={2} />
@@ -133,16 +133,16 @@ const DesiHero = () => {
 
           {/* Mobile / Tablet Image Banner */}
           <div className="relative lg:hidden -mx-4 sm:mx-0">
-            <div className="relative aspect-[16/11] sm:aspect-[16/9] sm:rounded-[2rem] overflow-hidden shadow-xl">
+            <div className="relative aspect-[4/5] sm:aspect-[16/10] sm:rounded-[2rem] overflow-hidden shadow-xl">
               <Image
                 src={HERO_IMAGE}
-                alt="Organic Indian Staples & Spices"
+                alt="Hands preparing organic Indian spices"
                 fill
                 className="object-cover"
                 sizes="100vw"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/30 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/40 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-white/85 backdrop-blur-md pl-3 pr-4 py-2.5 rounded-full shadow-lg">
                 <div className="w-8 h-8 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold shrink-0">
                   <ShieldCheck size={16} strokeWidth={1.8} />
@@ -154,33 +154,35 @@ const DesiHero = () => {
             </div>
           </div>
 
+          {/* Desktop Image Composition */}
           <div className="relative hidden lg:block">
-            <div className="relative aspect-square max-w-lg mx-auto">
+            <div className="relative aspect-[4/5] max-w-md mx-auto">
               {/* Ambient glow behind the frame */}
-              <div className="absolute -inset-10 bg-brand-gold/10 rounded-full blur-[80px]" />
+              <div className="absolute -inset-16 bg-brand-gold/15 rounded-full blur-[110px] pointer-events-none" />
 
-              {/* Main Product Image with Organic Mask */}
-              <div className="absolute inset-0 z-20 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] overflow-hidden border-8 border-white shadow-2xl shadow-brand-brown/20">
-                <Image
-                  src={HERO_IMAGE}
-                  alt="Organic Indian Staples & Spices"
-                  fill
-                  className="object-cover scale-110"
-                  sizes="(max-width: 1024px) 0px, 512px"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/15 via-transparent to-transparent" />
+              {/* Tilted layered composition: colour panel + gold outline + photo */}
+              <div className="absolute inset-0 rotate-[-2deg]">
+                <div className="absolute -inset-3 translate-x-5 translate-y-5 rounded-[2.5rem] bg-brand-green" />
+                <div className="absolute -inset-3 -translate-x-3 -translate-y-3 rounded-[2.5rem] border-2 border-brand-gold/40" />
+
+                <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden border-[6px] border-white shadow-2xl shadow-brand-brown/25">
+                  <Image
+                    src={HERO_IMAGE}
+                    alt="Hands preparing organic Indian spices"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 0px, 480px"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/25 via-transparent to-transparent" />
+                </div>
               </div>
 
-              {/* Decorative Rings */}
-              <div className="absolute -inset-4 z-10 rounded-full border border-dashed border-brand-gold/30 animate-spin-slow" />
-              <div className="absolute -inset-8 z-0 border border-brand-green/10 rounded-[50%_50%_30%_70%/50%_50%_70%_30%] animate-float" />
-
               {/* Floating Highlight Card */}
-              <div className="absolute -right-8 bottom-20 z-30 bg-white/85 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-brand-cream animate-float-slow">
+              <div className="absolute -bottom-6 -right-4 lg:-right-8 z-30 bg-white p-5 rounded-2xl shadow-xl border border-brand-cream animate-float-slow">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold">
-                    <ShieldCheck size={24} strokeWidth={1.8} />
+                  <div className="w-11 h-11 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold shrink-0">
+                    <ShieldCheck size={22} strokeWidth={1.8} />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-brand-green uppercase tracking-tighter">
@@ -190,19 +192,6 @@ const DesiHero = () => {
                       Sourced with integrity
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Secondary Floating Chip */}
-              <div
-                className="absolute -left-6 top-10 z-30 bg-white/85 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl border border-brand-cream animate-float"
-                style={{ animationDelay: "1.5s" }}
-              >
-                <div className="flex items-center gap-2.5 text-brand-brown">
-                  <Sprout size={16} className="text-brand-green" strokeWidth={1.8} />
-                  <p className="text-[10px] font-black uppercase tracking-widest">
-                    Direct From The Farm
-                  </p>
                 </div>
               </div>
             </div>

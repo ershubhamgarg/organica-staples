@@ -17,7 +17,6 @@ import {
   Sparkles,
   Sprout,
   Truck,
-  Users,
   Wheat,
 } from "lucide-react";
 import ProductListing from "@/components/ProductListing";
@@ -109,55 +108,6 @@ Message: ${formData.message}
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <WelcomeModal />
       <DesiHero />
-
-      {/* Trust Strip */}
-      <section className="relative -mt-6 sm:-mt-10 lg:-mt-14 z-30 px-4 sm:px-6 lg:px-8">
-        <ScrollReveal className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-brand-gold/10 rounded-3xl overflow-hidden border border-brand-gold/10 shadow-[0_30px_60px_-25px_rgba(60,54,42,0.25)]">
-            {[
-              {
-                icon: Users,
-                label: "500+ Farming Families",
-                sub: "Partnered directly",
-              },
-              {
-                icon: MapPin,
-                label: "12+ States Sourced",
-                sub: "Across Bharat's heartland",
-              },
-              {
-                icon: ShieldCheck,
-                label: "Every Batch Quality Checked",
-                sub: "Purity you can trust",
-              },
-              {
-                icon: Leaf,
-                label: "Zero Synthetic Chemicals",
-                sub: "Grown the honest way",
-              },
-            ].map((stat, idx) => {
-              const Icon = stat.icon;
-              return (
-                <div
-                  key={stat.label}
-                  className="bg-white p-5 sm:p-7 flex flex-col items-center text-center gap-2 hover:bg-brand-cream/60 transition-colors duration-500"
-                  style={{ animationDelay: `${idx * 120}ms` }}
-                >
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-brand-sand/60 flex items-center justify-center text-brand-gold mb-1">
-                    <Icon size={18} strokeWidth={1.5} />
-                  </div>
-                  <p className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-brand-brown leading-tight">
-                    {stat.label}
-                  </p>
-                  <p className="text-[9px] sm:text-[10px] text-brand-brown/45 font-light tracking-wide">
-                    {stat.sub}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </ScrollReveal>
-      </section>
 
       {/* Farm & Origin Section */}
       <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
