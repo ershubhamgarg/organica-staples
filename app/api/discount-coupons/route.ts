@@ -20,7 +20,8 @@ const getSupabaseServerClient = () => {
   });
 };
 
-const couponColumns = "code, percent, label, is_public, min_order_value";
+const couponColumns =
+  "code, percent, label, is_public, min_order_value, valid_upto";
 
 export async function GET() {
   const supabase = getSupabaseServerClient();
@@ -37,6 +38,7 @@ export async function GET() {
     .select(couponColumns)
     .eq("is_active", true)
     .eq("is_public", true)
+    .or(`valid_upto.is.null,valid_upto.gte.${new Date().toISOString()}`)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -97,6 +99,14 @@ export async function POST(request: Request) {
   }
 
   const coupon = mapDiscountCoupon(data);
+
+  if (coupon.validUpto && new Date(coupon.validUpto).getTime() < Date.now()) {
+    return NextResponse.json(
+      { error: "This coupon has expired." },
+      { status: 404 },
+    );
+  }
+
   const minOrderValue = coupon.minOrderValue;
   const shortfall =
     minOrderValue !== null ? Math.max(minOrderValue - subtotal, 0) : 0;

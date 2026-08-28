@@ -4,6 +4,7 @@ export type DiscountCode = {
   label: string;
   isPublic: boolean;
   minOrderValue: number | null;
+  validUpto: string | null;
 };
 
 export type DiscountResult = {
@@ -25,6 +26,7 @@ export function mapDiscountCoupon(row: {
   label?: string | null;
   is_public?: boolean | null;
   min_order_value?: number | string | null;
+  valid_upto?: string | null;
 }): DiscountCode {
   return {
     code: normalizeDiscountCode(row.code),
@@ -35,6 +37,7 @@ export function mapDiscountCoupon(row: {
       row.min_order_value === null || row.min_order_value === undefined
         ? null
         : Number(row.min_order_value),
+    validUpto: row.valid_upto ?? null,
   };
 }
 
