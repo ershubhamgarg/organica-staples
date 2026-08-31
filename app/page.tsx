@@ -109,190 +109,6 @@ Message: ${formData.message}
       <WelcomeModal />
       <DesiHero />
 
-      {/* Farm & Origin Section */}
-      <section className="relative py-8 lg:py-12 bg-white overflow-hidden border-y border-brand-gold/10">
-        {/* Decorative SVG Illustrations */}
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-20 bg-jute">
-          {/* Wheat Stalk - Top Left */}
-          <div className="absolute top-6 left-[3%] animate-float-slow">
-            <svg
-              width="100"
-              height="200"
-              viewBox="0 0 100 200"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M50 200V50M50 50C50 50 20 40 10 20M50 70C50 70 80 60 90 40M50 90C50 90 20 80 10 60M50 110C50 110 80 100 90 80M50 130C50 130 20 120 10 100"
-                stroke="#C29F64"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
-        </div>
-
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-brand-sand/10 skew-x-[-15deg] translate-x-1/4 pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-            {/* Left: Illustration & Image */}
-            <ScrollReveal className="relative w-full lg:w-5/12">
-              <div className="relative aspect-[4/4.5] rounded-[2rem] overflow-hidden shadow-2xl">
-                <Image
-                  src="/organic-farming-bharat.jpeg"
-                  alt="Organic Farming in Bharat"
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-brand-brown/10 mix-blend-multiply" />
-              </div>
-
-              {/* Floating Farmer Badge */}
-              <div className="absolute right-4 sm:-right-4 -bottom-6 bg-brand-cream p-6 rounded-2xl shadow-xl border border-brand-gold/10 max-w-[200px] animate-float">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green">
-                    <Sprout size={20} />
-                  </div>
-                  <h4 className="text-base font-serif text-brand-brown leading-tight">
-                    Farmer <span className="italic">Owned.</span>
-                  </h4>
-                </div>
-                <p className="text-[10px] text-brand-brown/60 font-light leading-relaxed">
-                  Supporting over 500+ marginal farming families across North
-                  India.
-                </p>
-              </div>
-            </ScrollReveal>
-
-            {/* Right: Story Content */}
-            <ScrollReveal
-              animation="reveal-fade"
-              delay={200}
-              className="w-full lg:w-7/12 relative"
-            >
-              <div className="inline-flex items-center gap-4 mb-4">
-                <span className="h-[1px] w-8 bg-brand-terracotta" />
-                <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-terracotta">
-                  Direct From Local Khets
-                </span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-serif text-brand-brown leading-[1.1] tracking-tight mb-6">
-                Harvested by hands that <br />
-                <span className="italic text-brand-gold">revere the soil.</span>
-              </h2>
-              <div className="space-y-5">
-                <p className="text-brand-brown/70 font-light leading-relaxed text-base">
-                  At ANNVRIKSH, we trace every grain back to the soil it grew
-                  in. By partnering directly with small-scale Indian farmers, we
-                  bypass the industrial complex to bring you the true bounty of
-                  Bharat.
-                </p>
-
-                <div className="grid grid-cols-2 gap-6 pt-4">
-                  <div className="space-y-1">
-                    <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                      Direct Sourcing
-                    </h5>
-                    <p className="text-[11px] text-brand-brown/70 font-light">
-                      Fair value for the grower, unmatched purity for your
-                      family.
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                      Village Clusters
-                    </h5>
-                    <p className="text-[11px] text-brand-brown/70 font-light">
-                      Small-batch processing to retain original nutrition.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* Farm to Table Process */}
-      <section className="relative bg-brand-cream py-12 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
-        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-60" />
-        <div className="max-w-7xl mx-auto relative z-10">
-          <ScrollReveal className="text-center mb-14 lg:mb-20 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <span className="h-[1px] w-8 bg-brand-gold" />
-              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
-                Our Process
-              </span>
-              <span className="h-[1px] w-8 bg-brand-gold" />
-            </div>
-            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight">
-              From the khet to your{" "}
-              <span className="italic text-brand-terracotta">kitchen.</span>
-            </h2>
-          </ScrollReveal>
-
-          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
-            <div className="hidden lg:block absolute top-[42px] left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-brand-gold/0 via-brand-gold/30 to-brand-gold/0" />
-
-            {[
-              {
-                icon: Sprout,
-                step: "01",
-                title: "Sourced Direct",
-                body: "We partner with small growers across Bharat, paying fair value straight at the farm-gate.",
-              },
-              {
-                icon: Wheat,
-                step: "02",
-                title: "Traditionally Processed",
-                body: "Sun-dried, stone-ground, and cold-pressed using time-honoured methods that protect nutrition.",
-              },
-              {
-                icon: ShieldCheck,
-                step: "03",
-                title: "Quality Checked",
-                body: "Every batch is checked for purity, so what reaches you is free of adulteration or pesticides.",
-              },
-              {
-                icon: Truck,
-                step: "04",
-                title: "Delivered Fresh",
-                body: "Small-batch packed and shipped pan-India, carrying the same freshness as the harvest day.",
-              },
-            ].map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <ScrollReveal
-                  key={item.step}
-                  delay={idx * 150}
-                  className="relative flex flex-col items-center text-center gap-4"
-                >
-                  <div className="relative w-[84px] h-[84px] flex items-center justify-center">
-                    <div className="absolute inset-0 rounded-full border border-dashed border-brand-gold/30 animate-spin-slow" />
-                    <div className="relative w-16 h-16 rounded-full bg-white shadow-lg shadow-brand-brown/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold">
-                      <Icon size={26} strokeWidth={1.5} />
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold/50">
-                    Step {item.step}
-                  </span>
-                  <h3 className="text-lg font-serif text-brand-brown tracking-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-brand-brown/60 font-light leading-relaxed max-w-[220px]">
-                    {item.body}
-                  </p>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Product Grid Section */}
-      <ProductListing />
-
       {/* Spices */}
       <section className="relative bg-brand-brown py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
@@ -378,6 +194,87 @@ Message: ${formData.message}
           </div>
         </div>
       </section>
+
+      {/* Farm & Origin Section */}
+
+      {/* Farm to Table Process */}
+      <section className="relative bg-brand-cream py-12 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+        <div className="absolute inset-0 bg-mandala pointer-events-none opacity-60" />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <ScrollReveal className="text-center mb-14 lg:mb-20 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="h-[1px] w-8 bg-brand-gold" />
+              <span className="text-[9px] uppercase tracking-[0.4em] font-black text-brand-gold">
+                Our Process
+              </span>
+              <span className="h-[1px] w-8 bg-brand-gold" />
+            </div>
+            <h2 className="text-2xl md:text-4xl font-serif text-brand-brown tracking-tight leading-tight">
+              From the khet to your{" "}
+              <span className="italic text-brand-terracotta">kitchen.</span>
+            </h2>
+          </ScrollReveal>
+
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-14 gap-x-8">
+            <div className="hidden lg:block absolute top-[42px] left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-brand-gold/0 via-brand-gold/30 to-brand-gold/0" />
+
+            {[
+              {
+                icon: Sprout,
+                step: "01",
+                title: "Sourced Direct",
+                body: "We partner with small growers across Bharat, paying fair value straight at the farm-gate.",
+              },
+              {
+                icon: Wheat,
+                step: "02",
+                title: "Traditionally Processed",
+                body: "Sun-dried, stone-ground, and cold-pressed using time-honoured methods that protect nutrition.",
+              },
+              {
+                icon: ShieldCheck,
+                step: "03",
+                title: "Quality Checked",
+                body: "Every batch is checked for purity, so what reaches you is free of adulteration or pesticides.",
+              },
+              {
+                icon: Truck,
+                step: "04",
+                title: "Delivered Fresh",
+                body: "Small-batch packed and shipped pan-India, carrying the same freshness as the harvest day.",
+              },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <ScrollReveal
+                  key={item.step}
+                  delay={idx * 150}
+                  className="relative flex flex-col items-center text-center gap-4"
+                >
+                  <div className="relative w-[84px] h-[84px] flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border border-dashed border-brand-gold/30 animate-spin-slow" />
+                    <div className="relative w-16 h-16 rounded-full bg-white shadow-lg shadow-brand-brown/5 border border-brand-gold/10 flex items-center justify-center text-brand-gold">
+                      <Icon size={26} strokeWidth={1.5} />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-gold/50">
+                    Step {item.step}
+                  </span>
+                  <h3 className="text-lg font-serif text-brand-brown tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-brand-brown/60 font-light leading-relaxed max-w-[220px]">
+                    {item.body}
+                  </p>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Grid Section */}
+      <ProductListing />
 
       <ReviewCarousel />
 
