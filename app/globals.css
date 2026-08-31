@@ -237,6 +237,15 @@ body {
   animation: driftSlow 12s ease-in-out infinite;
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
 .order-confirmation-card {
   animation: confirmationCardIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }

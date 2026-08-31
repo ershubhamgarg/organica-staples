@@ -22,6 +22,7 @@ import {
 import ProductListing from "@/components/ProductListing";
 import DesiHero from "@/components/DesiHero";
 import ScrollReveal from "@/components/ScrollReveal";
+import SpiceTicker from "@/components/SpiceTicker";
 import SpiceWheelImage from "@/components/SpiceWheelImage";
 import WelcomeModal from "@/components/WelcomeModal";
 import { useCartStore } from "@/store/cartStore";
@@ -194,6 +195,8 @@ Message: ${formData.message}
           </div>
         </div>
       </section>
+
+      <SpiceTicker />
 
       {/* Farm & Origin Section */}
 
