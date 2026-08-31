@@ -29,17 +29,95 @@ const devanagari = Noto_Sans_Devanagari({
   weight: ["400", "500", "700"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://annvriksh.com";
+const SITE_TITLE = "ANNVRIKSH | Premium Organic Indian Staples & Spices";
+const SITE_DESCRIPTION =
+  "ANNVRIKSH brings you 100% organic, chemical-free Indian staples and spices — cold-pressed oils, atta, and more — ethically sourced direct from farms and delivered fresh to your door.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "https://annvriksh.com",
-  ),
-  title: "ANNVRIKSH | Premium Organic Goods",
-  description:
-    "Discover our curated selection of premium organic staples, directly sourced for your wellbeing.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: "%s | ANNVRIKSH",
+  },
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "Annvriksh",
+    "organic food",
+    "organic staples",
+    "organic spices India",
+    "organic atta online",
+    "cold pressed oil online",
+    "buy organic food online India",
+    "chemical free spices",
+    "pure organic groceries",
+  ],
+  authors: [{ name: "ANNVRIKSH" }],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: SITE_URL,
+    siteName: "ANNVRIKSH",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "ANNVRIKSH — Pure by nature. Essential by choice.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/og-image.jpg"],
+  },
   icons: {
     icon: "/annvriksh_logo.png",
     apple: "/favicon.png",
   },
+};
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "ANNVRIKSH",
+  alternateName: "Annvriksh Organic Staples",
+  url: SITE_URL,
+  logo: `${SITE_URL}/annvriksh_logo.png`,
+  slogan: "Pure by nature. Essential by choice.",
+  description: SITE_DESCRIPTION,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Kirti Nagar",
+    addressLocality: "Sirsa",
+    addressRegion: "Haryana",
+    postalCode: "125055",
+    addressCountry: "IN",
+  },
+  sameAs: ["https://www.instagram.com/annvriksh_in/"],
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ANNVRIKSH",
+  url: SITE_URL,
 };
 
 export default function RootLayout({
@@ -49,6 +127,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+      </head>
       <body
         className={`${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
       >

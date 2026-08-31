@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | ANNVRIKSH",
+  title: "Privacy Policy",
   description:
     "How ANNVRIKSH collects, uses, and protects your personal information.",
 };

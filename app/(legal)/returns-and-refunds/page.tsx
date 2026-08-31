@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
 
 export const metadata: Metadata = {
-  title: "Returns & Refund Policy | ANNVRIKSH",
+  title: "Returns & Refund Policy",
   description:
     "Our policy for damaged, defective, or incorrect orders, cancellations, and refunds.",
 };

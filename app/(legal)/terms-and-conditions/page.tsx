@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | ANNVRIKSH",
+  title: "Terms & Conditions",
   description:
     "The terms and conditions governing your use of annvriksh.com and purchases made through it.",
 };

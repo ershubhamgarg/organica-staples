@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Leaf, Sprout, Wheat, Heart } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Our Story",
+  description:
+    "The story behind ANNVRIKSH — why we exist, how we source our organic Indian staples and spices, and the meaning behind our name and logo.",
+};
 
 export default function OurStory() {
   return (

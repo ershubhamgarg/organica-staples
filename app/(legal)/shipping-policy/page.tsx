@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
 
 export const metadata: Metadata = {
-  title: "Shipping Policy | ANNVRIKSH",
+  title: "Shipping Policy",
   description:
     "Order processing times, delivery timelines, shipping charges, and tracking information for ANNVRIKSH orders.",
 };
