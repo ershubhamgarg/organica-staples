@@ -140,7 +140,7 @@ Message: ${formData.message}
             <ScrollReveal className="relative w-full lg:w-5/12">
               <div className="relative aspect-[4/4.5] rounded-[2rem] overflow-hidden shadow-2xl">
                 <Image
-                  src="https://images.unsplash.com/photo-1627314129626-c5cf387f351b?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  src="/organic-farming-bharat.jpeg"
                   alt="Organic Farming in Bharat"
                   fill
                   className="object-cover"
@@ -296,9 +296,7 @@ Message: ${formData.message}
       {/* Spices */}
       <section className="relative bg-brand-brown py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
-        <div
-          className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
-        />
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
         <div
           className="absolute -bottom-24 -right-24 w-80 h-80 bg-brand-green-fresh/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none"
           style={{ animationDelay: "2.5s" }}
@@ -323,17 +321,16 @@ Message: ${formData.message}
               </h2>
               <p className="text-brand-cream/70 font-light leading-relaxed text-sm sm:text-base mb-4">
                 Spices are more than seasoning — for generations, Indian
-                kitchens have turned to turmeric, chilli, and coriander not
-                just for flavour, but for the quiet wellness they carry in
-                every pinch. Warming, digestive, and rich in natural
-                compounds, spices are one of the oldest forms of everyday
-                care.
+                kitchens have turned to turmeric, chilli, and coriander not just
+                for flavour, but for the quiet wellness they carry in every
+                pinch. Warming, digestive, and rich in natural compounds, spices
+                are one of the oldest forms of everyday care.
               </p>
               <p className="text-brand-cream/70 font-light leading-relaxed text-sm sm:text-base mb-10">
-                But that benefit only holds if the spice itself is honest.
-                Ours are stone-ground and sun-dried in small batches, with
-                nothing added and nothing taken away — so what reaches your
-                masala dabba is exactly what left the farm.
+                But that benefit only holds if the spice itself is honest. Ours
+                are stone-ground and sun-dried in small batches, with nothing
+                added and nothing taken away — so what reaches your masala dabba
+                is exactly what left the farm.
               </p>
 
               <div className="grid sm:grid-cols-2 gap-x-6 gap-y-7">
@@ -410,8 +407,8 @@ Message: ${formData.message}
               </span>
             </h2>
             <p className="text-sm text-brand-brown/60 font-light leading-relaxed text-balance">
-              At ANNVRIKSH, we believe that true nourishment begins with
-              nature — and that the finest things in life are often rooted in
+              At ANNVRIKSH, we believe that true nourishment begins with nature
+              — and that the finest things in life are often rooted in
               simplicity, balance and tradition. Even our name and logo carry
               this belief at their heart.
             </p>
@@ -462,10 +459,9 @@ Message: ${formData.message}
               <span className="font-semibold text-brand-brown">Ann</span>,
               meaning food or nourishment, and{" "}
               <span className="font-semibold text-brand-brown">Vriksh</span>,
-              meaning tree. Together, they represent our belief that good
-              food, like a tree, should be deeply rooted in nature, nurtured
-              with care and ultimately give something meaningful back to
-              life.
+              meaning tree. Together, they represent our belief that good food,
+              like a tree, should be deeply rooted in nature, nurtured with care
+              and ultimately give something meaningful back to life.
             </p>
             <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base text-balance">
               The name reflects our vision of bringing food closer to its
@@ -510,11 +506,10 @@ Message: ${formData.message}
                   </span>
                 </h3>
                 <p className="text-brand-brown/70 font-light leading-relaxed text-sm sm:text-base">
-                  Our symbol is inspired by the timeless beauty of a
-                  blossoming flower. Its flowing petals come together in
-                  harmony, representing the natural journey of food — from
-                  the earth, through mindful cultivation, to the nourishment
-                  of our homes.
+                  Our symbol is inspired by the timeless beauty of a blossoming
+                  flower. Its flowing petals come together in harmony,
+                  representing the natural journey of food — from the earth,
+                  through mindful cultivation, to the nourishment of our homes.
                 </p>
               </div>
 
