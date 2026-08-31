@@ -291,6 +291,11 @@ export default function ProfilePage() {
                         className="w-full bg-transparent border-b border-brand-gold/20 py-3 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2"
                         placeholder="+91"
                       />
+                      <p className="text-[10px] text-brand-brown/45 mt-1.5 leading-snug">
+                        We&apos;ll send live order updates on WhatsApp to this
+                        number — please make sure it&apos;s your WhatsApp
+                        number.
+                      </p>
                     </div>
                   </div>
                   <div className="mb-8 space-y-2">

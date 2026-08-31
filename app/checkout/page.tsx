@@ -1188,6 +1188,7 @@ export default function CheckoutPage() {
                           <input
                             type="tel"
                             autoComplete="tel"
+                            required
                             value={newAddress.phone}
                             onChange={(e) =>
                               setNewAddress({
@@ -1198,9 +1199,15 @@ export default function CheckoutPage() {
                             className={`w-full bg-transparent border-b ${addressErrors.phone ? "border-red-500" : "border-brand-gold/20"} py-2 text-sm focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/10 font-light px-2`}
                             placeholder="+91"
                           />
-                          {addressErrors.phone && (
+                          {addressErrors.phone ? (
                             <p className="text-xs text-red-500 mt-1">
                               {addressErrors.phone}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] text-brand-brown/45 mt-1.5 leading-snug">
+                              We&apos;ll send live order updates on WhatsApp to
+                              this number — please make sure it&apos;s your
+                              WhatsApp number.
                             </p>
                           )}
                         </div>

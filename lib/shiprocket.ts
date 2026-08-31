@@ -498,7 +498,17 @@ export async function createShiprocketShipment(
         body: JSON.stringify(buildCreateOrderPayload(order)),
       },
     );
-    const shipmentId = created.shipment_id ? String(created.shipment_id) : null;
+
+    // Shiprocket returns HTTP 200 with a validation-style `message` (e.g. a
+    // wrong pickup location) instead of an HTTP error when it rejects the
+    // order, so a missing shipment_id has to be treated as a failure here.
+    if (!created.shipment_id) {
+      throw new Error(
+        created.message ?? "Shiprocket did not return a shipment id.",
+      );
+    }
+
+    const shipmentId = String(created.shipment_id);
     let awbCode = created.awb_code ?? null;
     let courierName = created.courier_name ?? null;
     let status: ShiprocketShipmentResult["status"] = "created";
