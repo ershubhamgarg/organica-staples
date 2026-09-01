@@ -159,14 +159,21 @@ const recomputeOrderPricing = async (
     }
   }
 
-  const subtotalAmount = Number(
+  // `actualSubtotal` is the raw, pre-discount sum — this is what
+  // `orders.subtotal_amount` has always meant (the client always sent the
+  // raw total under this name), and what the order-history UI displays as
+  // "Items Subtotal" alongside separate discount line items. `netSubtotal`
+  // (after both product and coupon discounts) is only used to compute the
+  // final payable total — it must never be stored as subtotal_amount, or the
+  // UI ends up subtracting the coupon discount a second time visually.
+  const netSubtotal = Number(
     (discountedSubtotal - couponDiscountAmount).toFixed(2),
   );
 
   return {
     storedItems,
     actualSubtotal,
-    subtotalAmount,
+    netSubtotal,
     productDiscountAmount,
     couponDiscountAmount,
     discountPercent,
@@ -331,7 +338,12 @@ export async function POST(request: Request) {
   // order snapshot and Shiprocket; `rpcItems` is the minimal id/quantity/price
   // shape place_order_with_inventory actually reads.
   let storedItems: CartItem[] = items;
-  let subtotalAmount = pricingDetails?.subtotalAmount ?? 0;
+  // Raw, pre-discount subtotal — this is what gets stored as
+  // orders.subtotal_amount and shown as "Items Subtotal" in order history.
+  let storedSubtotalAmount = pricingDetails?.subtotalAmount ?? 0;
+  // Subtotal after product + coupon discounts — used only to compute the
+  // final payable total, never stored directly.
+  let netSubtotalForTotal = storedSubtotalAmount;
   let discountCode = pricingDetails?.discountCode ?? null;
   let discountPercent = pricingDetails?.discountPercent ?? 0;
   let productDiscountAmount = pricingDetails?.productDiscountAmount ?? 0;
@@ -346,7 +358,8 @@ export async function POST(request: Request) {
         pricingDetails?.discountCode ?? null,
       );
       storedItems = recomputed.storedItems;
-      subtotalAmount = recomputed.subtotalAmount;
+      storedSubtotalAmount = recomputed.actualSubtotal;
+      netSubtotalForTotal = recomputed.netSubtotal;
       discountCode = recomputed.discountCode;
       discountPercent = recomputed.discountPercent;
       productDiscountAmount = recomputed.productDiscountAmount;
@@ -386,9 +399,12 @@ export async function POST(request: Request) {
     }
 
     computedTotal = Number(
-      (subtotalAmount + shippingAmount + convenienceFeeAmount + codAmount).toFixed(
-        2,
-      ),
+      (
+        netSubtotalForTotal +
+        shippingAmount +
+        convenienceFeeAmount +
+        codAmount
+      ).toFixed(2),
     );
 
     if (paymentMethod === "razorpay") {
@@ -424,7 +440,7 @@ export async function POST(request: Request) {
     delivery_address: deliveryAddressForOrder,
     payment_method: paymentMethod,
     payment_details: paymentDetails ?? null,
-    subtotal_amount: subtotalAmount,
+    subtotal_amount: storedSubtotalAmount,
     discount_code: discountCode,
     discount_percent: discountPercent,
     product_discount_amount: productDiscountAmount,
