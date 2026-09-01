@@ -10,7 +10,7 @@ type CreateRazorpayOrderPayload = {
 };
 
 const getRazorpayCredentials = () => {
-  const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Razorpay test keys are not configured. Add NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.",
+          "Razorpay keys are not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.",
       },
       { status: 500 },
     );
