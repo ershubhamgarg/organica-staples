@@ -1,6 +1,7 @@
 import type { Address } from "@/store/addressStore";
 import type { CartItem } from "@/store/cartStore";
 import type { Order } from "@/store/orderStore";
+import { isLocalDeliveryPincode } from "@/lib/shipping";
 
 const SHIPROCKET_API_BASE = "https://apiv2.shiprocket.in/v1/external";
 
@@ -96,7 +97,12 @@ export type ShiprocketShipmentResult = {
   awbCode: string | null;
   courierName: string | null;
   trackingUrl: string | null;
-  status: "created" | "awb_assigned" | "failed" | "not_configured";
+  status:
+    | "created"
+    | "awb_assigned"
+    | "failed"
+    | "not_configured"
+    | "local_delivery";
   error: string | null;
 };
 
@@ -397,6 +403,20 @@ export async function estimateShiprocketRate({
   isCod: boolean;
   declaredValue: number;
 }): Promise<ShiprocketRateEstimate> {
+  if (isLocalDeliveryPincode(deliveryPostcode)) {
+    return {
+      available: true,
+      shippingAmount: 0,
+      courierName: "Local Delivery",
+      courierCompanyId: null,
+      expectedDeliveryDate: null,
+      codCharges: 0,
+      freightCharge: 0,
+      chargeableWeightKg: 0,
+      error: null,
+    };
+  }
+
   const config = getConfig();
 
   if (!config || !config.pickupPostcode) {
@@ -474,6 +494,20 @@ export async function estimateShiprocketRate({
 export async function createShiprocketShipment(
   order: Order,
 ): Promise<ShiprocketShipmentResult> {
+  const deliveryAddress = order.delivery_address as Address;
+
+  if (isLocalDeliveryPincode(deliveryAddress?.zipCode)) {
+    return {
+      orderId: null,
+      shipmentId: null,
+      awbCode: null,
+      courierName: "Local Delivery",
+      trackingUrl: null,
+      status: "local_delivery",
+      error: null,
+    };
+  }
+
   const config = getConfig();
 
   if (!config) {

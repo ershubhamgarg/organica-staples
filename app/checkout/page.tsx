@@ -33,7 +33,7 @@ import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
-import { STANDARD_SHIPPING_RATE } from "@/lib/shipping";
+import { STANDARD_SHIPPING_RATE, isLocalDeliveryPincode } from "@/lib/shipping";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
@@ -350,6 +350,8 @@ export default function CheckoutPage() {
   );
   const [isShippingRateLoading, setIsShippingRateLoading] = useState(false);
 
+  const isLocalDelivery = isLocalDeliveryPincode(selectedAddress?.zipCode);
+
   // Real-time shipping logic with capping
   const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
   const shippingCap = STANDARD_SHIPPING_RATE;
@@ -410,6 +412,25 @@ export default function CheckoutPage() {
       setShippingRateError(
         selectedAddress ? "Select a valid 6-digit delivery pincode." : null,
       );
+      setIsShippingRateLoading(false);
+      return;
+    }
+
+    // Local pincode: free, in-house delivery — skip Shiprocket entirely,
+    // don't even make the network call.
+    if (isLocalDeliveryPincode(deliveryPostcode)) {
+      setDynamicShipping({
+        available: true,
+        shippingAmount: 0,
+        courierName: "Local Delivery",
+        courierCompanyId: null,
+        expectedDeliveryDate: null,
+        codCharges: 0,
+        freightCharge: 0,
+        chargeableWeightKg: 0,
+        error: null,
+      });
+      setShippingRateError(null);
       setIsShippingRateLoading(false);
       return;
     }
@@ -1911,6 +1932,11 @@ export default function CheckoutPage() {
                           {shipping > 0 ? `₹${shipping.toFixed(2)}` : "Free"}
                         </span>
                       </div>
+                      {isLocalDelivery && (
+                        <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
+                          Local Delivery — Sirsa
+                        </p>
+                      )}
                       {/* {dynamicShipping?.courierName && (
                           <p className="text-[8px] font-bold uppercase tracking-widest text-brand-green-fresh">
                             {dynamicShipping.courierName}

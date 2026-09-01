@@ -46,6 +46,7 @@ const normalizeEmail = (email: string) => email.trim().toLowerCase();
 const getShippingStatusForOrder = (status: string) => {
   if (status === "awb_assigned") return "processing";
   if (status === "created") return "processing";
+  if (status === "local_delivery") return "processing";
   return "pending";
 };
 

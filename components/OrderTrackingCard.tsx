@@ -112,6 +112,10 @@ const getStatusCopy = (
     return "Tracking will appear after the team books this parcel.";
   }
 
+  if (tracking.shippingStatus === "local_delivery") {
+    return "Local delivery — no courier needed, we'll hand it to you directly.";
+  }
+
   if (tracking.shippingStatus === "sync_failed" || order.shipping_error) {
     return "Shipment booking needs a team check. Your order is safely placed.";
   }
@@ -142,7 +146,10 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
     [tracking.currentStatus, tracking.shippingStatus],
   );
   const latestActivities = tracking.activities.slice(0, 3);
-  const canRefresh = enableShiprocket; // Only allow refresh in production mode
+  // Only allow refresh in production mode, and only when there's actually a
+  // Shiprocket-tracked shipment — local-delivery orders never get one.
+  const canRefresh =
+    enableShiprocket && tracking.shippingStatus !== "local_delivery";
 
   const refreshTracking = async () => {
     if (!canRefresh) return;
