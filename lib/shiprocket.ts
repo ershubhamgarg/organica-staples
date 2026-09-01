@@ -407,7 +407,7 @@ export async function estimateShiprocketRate({
     return {
       available: true,
       shippingAmount: 0,
-      courierName: "Local Delivery",
+      courierName: null,
       courierCompanyId: null,
       expectedDeliveryDate: null,
       codCharges: 0,
@@ -501,7 +501,7 @@ export async function createShiprocketShipment(
       orderId: null,
       shipmentId: null,
       awbCode: null,
-      courierName: "Local Delivery",
+      courierName: null,
       trackingUrl: null,
       status: "local_delivery",
       error: null,

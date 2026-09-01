@@ -105,7 +105,7 @@ const getStatusCopy = (
   enableShiprocket: boolean,
 ) => {
   if (!enableShiprocket) {
-    return "Shipping services are currently disabled in development mode.";
+    return "Courier booking is paused for now. Your order is safely placed and the team will book it shortly.";
   }
 
   if (tracking.shippingStatus === "not_configured") {
@@ -140,16 +140,17 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
 
   const enableShiprocket =
     process.env.NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT === "true";
+  const isLocalDelivery = tracking.shippingStatus === "local_delivery";
+  // AWB/courier/progress info only makes sense for an actual Shiprocket
+  // shipment — a local delivery never gets one, so none of that applies.
+  const showCourierDetails = enableShiprocket && !isLocalDelivery;
 
   const activeStep = useMemo(
     () => getStepIndex(tracking.shippingStatus ?? tracking.currentStatus),
     [tracking.currentStatus, tracking.shippingStatus],
   );
   const latestActivities = tracking.activities.slice(0, 3);
-  // Only allow refresh in production mode, and only when there's actually a
-  // Shiprocket-tracked shipment — local-delivery orders never get one.
-  const canRefresh =
-    enableShiprocket && tracking.shippingStatus !== "local_delivery";
+  const canRefresh = showCourierDetails;
 
   const refreshTracking = async () => {
     if (!canRefresh) return;
@@ -197,7 +198,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         <div className="mb-4 flex items-center gap-2 rounded-xl bg-brand-gold/10 px-3 py-2 text-brand-gold">
           <AlertCircle size={14} />
           <p className="text-[9px] font-black uppercase tracking-widest">
-            Shipping Disabled (Dev Mode)
+            Courier Booking Paused
           </p>
         </div>
       )}
@@ -257,7 +258,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         )}
       </div>
 
-      {enableShiprocket && (
+      {showCourierDetails && (
         <div className="mb-6 grid grid-cols-2 gap-3">
           <div>
             <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/35">
@@ -288,7 +289,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         </div>
       )}
 
-      {enableShiprocket && (
+      {showCourierDetails && (
         <div className="mb-6 grid grid-cols-4 gap-2">
           {steps.map((step, index) => {
             const isDone = index <= activeStep;
@@ -312,7 +313,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         </div>
       )}
 
-      {enableShiprocket && latestActivities.length > 0 && (
+      {showCourierDetails && latestActivities.length > 0 && (
         <div className="mb-6 space-y-3 border-t border-brand-gold/10 pt-5">
           {latestActivities.map((activity, index) => (
             <div key={`${activity.status}-${index}`} className="flex gap-3">

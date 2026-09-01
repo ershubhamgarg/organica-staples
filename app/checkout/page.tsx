@@ -422,7 +422,7 @@ export default function CheckoutPage() {
       setDynamicShipping({
         available: true,
         shippingAmount: 0,
-        courierName: "Local Delivery",
+        courierName: null,
         courierCompanyId: null,
         expectedDeliveryDate: null,
         codCharges: 0,
