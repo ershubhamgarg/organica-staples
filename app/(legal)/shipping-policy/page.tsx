@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
+import { STANDARD_SHIPPING_RATE } from "@/lib/shipping";
 
 export const metadata: Metadata = {
   title: "Shipping Policy",
@@ -67,8 +68,8 @@ export default function ShippingPolicyPage() {
             <li>Orders of ₹1,000 and above ship free.</li>
             <li>
               Orders below ₹1,000 are charged a flat shipping fee starting
-              at ₹99, calculated at checkout based on your delivery pincode
-              and order weight.
+              at ₹{STANDARD_SHIPPING_RATE}, calculated at checkout based on
+              your delivery pincode and order weight.
             </li>
             <li>
               Cash on Delivery (COD) orders may attract a small additional

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Star, ChevronDown, Hourglass } from "lucide-react";
+import { Star, ChevronDown, Hourglass, Search, X } from "lucide-react";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -32,6 +32,7 @@ export default function ProductListing() {
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const visibleProducts = useMemo(() => {
     return products.filter((p) => p.isVisible !== false);
@@ -61,6 +62,15 @@ export default function ProductListing() {
 
     if (selectedCategory !== "All") {
       result = result.filter((p) => p.category === selectedCategory);
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      result = result.filter((p) =>
+        [p.name, p.name2, p.category, p.origin]
+          .filter(Boolean)
+          .some((field) => field!.toLowerCase().includes(query)),
+      );
     }
 
     // Custom sorting logic:
@@ -111,7 +121,7 @@ export default function ProductListing() {
     });
 
     return result;
-  }, [selectedCategory, sortOrder, visibleProducts]);
+  }, [selectedCategory, sortOrder, searchQuery, visibleProducts]);
 
   return (
     <section
@@ -135,6 +145,33 @@ export default function ProductListing() {
         </h2>
         <div className="mt-6 flex justify-center">
           <div className="w-16 h-1 bg-brand-gold/20 rounded-full" />
+        </div>
+      </div>
+
+      <div className="mb-8 lg:mb-10 flex justify-center">
+        <div className="relative w-full max-w-md">
+          <Search
+            size={15}
+            strokeWidth={2}
+            className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-brand-gold"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search the pantry — turmeric, dal, besan..."
+            className="w-full rounded-full border border-brand-gold/20 bg-white py-3.5 pl-12 pr-11 text-xs text-brand-brown placeholder:text-brand-brown/35 shadow-sm transition-all focus:border-brand-gold focus:outline-none"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-brown/30 transition-colors hover:text-brand-brown"
+            >
+              <X size={15} strokeWidth={2} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -189,11 +226,31 @@ export default function ProductListing() {
       </div>
 
       {/* Grid */}
-      <ScrollReveal
-        animation="reveal-fade"
-        threshold={0.05}
-        className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 min-h-[60vh] transition-all duration-500"
-      >
+      {filteredProducts.length === 0 && searchQuery ? (
+        <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold">
+            <Search size={22} strokeWidth={1.5} />
+          </div>
+          <p className="font-serif text-lg text-brand-brown">
+            No products found for &ldquo;{searchQuery}&rdquo;
+          </p>
+          <p className="mt-1.5 text-xs font-light text-brand-brown/50">
+            Try a different name, or browse by category instead.
+          </p>
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="mt-6 rounded-full border border-brand-gold/20 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-brand-brown transition-colors hover:border-brand-gold/40"
+          >
+            Clear Search
+          </button>
+        </div>
+      ) : (
+        <ScrollReveal
+          animation="reveal-fade"
+          threshold={0.05}
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 min-h-[60vh] transition-all duration-500"
+        >
         {filteredProducts.map((product) => {
           const hasDiscount = hasProductDiscount(product);
           const hasHighDiscount = hasHighProductDiscount(product);
@@ -259,8 +316,26 @@ export default function ProductListing() {
 
               <div className="flex flex-col flex-grow text-center px-3 sm:px-5 pt-3 sm:pt-5 pb-3 sm:pb-5">
                 <div className="flex flex-col items-center mb-1">
-                  <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold">
+                  <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold">
                     {product.category}
+                    {product.origin && (
+                      <details className="group/info relative inline-block">
+                        <summary
+                          className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border border-brand-gold/40 text-[8px] font-black text-brand-gold cursor-pointer list-none normal-case tracking-normal [&::-webkit-details-marker]:hidden"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          i
+                        </summary>
+                        <div className="absolute left-1/2 top-full z-20 mt-2 w-36 -translate-x-1/2 rounded-xl border border-brand-gold/15 bg-white p-2.5 text-center shadow-xl shadow-brand-brown/10">
+                          <p className="text-[7px] font-black uppercase tracking-wider text-brand-brown/40">
+                            Sourced From
+                          </p>
+                          <p className="mt-0.5 font-serif text-[11px] normal-case tracking-normal text-brand-brown">
+                            {product.origin}
+                          </p>
+                        </div>
+                      </details>
+                    )}
                   </span>
                 </div>
                 <Link
@@ -379,7 +454,8 @@ export default function ProductListing() {
             <div className="mt-4 w-12 h-[1px] bg-brand-gold/10 group-hover:w-20 group-hover:bg-brand-gold/20 transition-all duration-1000" />
           </div>
         </div>
-      </ScrollReveal>
+        </ScrollReveal>
+      )}
     </section>
   );
 }

@@ -139,6 +139,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
+        suppressHydrationWarning
       >
         <Header />
 

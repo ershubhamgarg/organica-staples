@@ -1007,7 +1007,7 @@ export default function CartPage() {
             <div className="mb-6 flex items-start justify-between gap-6">
               <div>
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-gold">
-                  Public Coupons
+                  Just For You
                 </p>
                 <h2 className="mt-2 text-2xl font-serif tracking-tight text-brand-brown">
                   Available <span className="italic">Offers</span>

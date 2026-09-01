@@ -77,7 +77,13 @@ export default function WelcomeModal() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href="/#shop"
-              onClick={handleClose}
+              onClick={() => {
+                // Defer closing until after the browser has dispatched this
+                // click's default navigation — since the modal is rendered
+                // via createPortal, closing synchronously here can unmount
+                // this very <a> mid-click and cancel the navigation.
+                window.setTimeout(handleClose, 0);
+              }}
               className="group w-full sm:w-auto relative inline-flex items-center justify-center gap-3 px-8 py-4 bg-brand-brown text-brand-cream rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-xl hover:translate-y-[-2px]"
             >
               <span className="relative z-10 flex items-center gap-3">

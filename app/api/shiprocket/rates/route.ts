@@ -44,13 +44,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ estimate });
   } catch (error) {
+    // Never relay the raw Shiprocket/provider error text to the customer —
+    // it can contain internal details (credential/account-lockout messages)
+    // that are confusing or alarming on a storefront. Log the real cause
+    // server-side and return a generic, safe fallback message instead.
+    console.error("Shiprocket rate estimation failed:", error);
+
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unable to calculate Shiprocket shipping.",
-      },
+      { error: "Unable to calculate live shipping right now." },
       { status: 502 },
     );
   }

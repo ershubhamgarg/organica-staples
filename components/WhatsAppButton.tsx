@@ -20,14 +20,16 @@ export default function WhatsAppButton() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  // On cart and checkout pages, lift the button slightly higher to avoid overlapping the new floating checkout bars
+  // Cart and checkout already have a prominent sticky CTA bar at the same
+  // screen edge — keep this button off those pages entirely rather than
+  // trying to tune an offset that overlaps on shorter viewports.
   const isCartOrCheckout = pathname === "/cart" || pathname === "/checkout";
   const hasFloatingCart = mounted && totalItems > 0 && !isCartOrCheckout;
-  const bottomOffset = isCartOrCheckout
-    ? "bottom-[108px]"
-    : hasFloatingCart
-      ? "bottom-[104px]"
-      : "bottom-6";
+  const bottomOffset = hasFloatingCart ? "bottom-[104px]" : "bottom-6";
+
+  if (isCartOrCheckout) {
+    return null;
+  }
 
   return (
     <div

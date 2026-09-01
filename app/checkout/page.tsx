@@ -33,6 +33,7 @@ import type { DiscountCode } from "@/lib/discountCodes";
 import { calculateDiscount } from "@/lib/discountCodes";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
+import { STANDARD_SHIPPING_RATE } from "@/lib/shipping";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
@@ -275,7 +276,7 @@ export default function CheckoutPage() {
     : subtotalAfterDiscount >= 1000
       ? 0
       : subtotalAfterDiscount >= 500
-        ? 99
+        ? STANDARD_SHIPPING_RATE
         : subtotalAfterDiscount > 0
           ? 149
           : 0;
@@ -351,7 +352,7 @@ export default function CheckoutPage() {
 
   // Real-time shipping logic with capping
   const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
-  const shippingCap = 99;
+  const shippingCap = STANDARD_SHIPPING_RATE;
   const isCapped =
     !launchOffer.isEligible &&
     subtotalAfterDiscount < 1000 &&
@@ -454,12 +455,11 @@ export default function CheckoutPage() {
           return;
         }
 
+        // A live-rate lookup failure is a backend hiccup, not something the
+        // customer needs to see or act on — the standard shipping estimate
+        // below already covers it silently.
         setDynamicShipping(null);
-        setShippingRateError(
-          error instanceof Error
-            ? error.message
-            : "Unable to calculate live shipping right now.",
-        );
+        setShippingRateError(null);
       } finally {
         setIsShippingRateLoading(false);
       }
