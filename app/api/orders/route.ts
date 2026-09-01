@@ -1,10 +1,18 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { CartItem } from "@/store/cartStore";
 import type { Address } from "@/store/addressStore";
+import type { Product } from "@/lib/data";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
 import type { Order } from "@/store/orderStore";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
+import { getDiscountedPrice } from "@/lib/pricing";
+import {
+  calculateDiscount,
+  mapDiscountCoupon,
+  normalizeDiscountCode,
+} from "@/lib/discountCodes";
 import { createShiprocketShipment } from "@/lib/shiprocket";
 
 type OrderPayload = {
@@ -39,6 +47,194 @@ const getShippingStatusForOrder = (status: string) => {
   if (status === "awb_assigned") return "processing";
   if (status === "created") return "processing";
   return "pending";
+};
+
+// Bounded, sanity-checked (rather than exactly recomputed) fee ceiling. Real
+// shipping/COD/convenience amounts depend on live courier rates fetched
+// during checkout; the actual paid amount is still independently confirmed
+// against Razorpay below, so this just blocks obviously fabricated values.
+const MAX_TRUSTED_FEES_TOTAL = 400;
+
+const signaturesMatch = (expected: string, received: string) => {
+  try {
+    const expectedBuffer = Buffer.from(expected, "hex");
+    const receivedBuffer = Buffer.from(received, "hex");
+
+    return (
+      expectedBuffer.length === receivedBuffer.length &&
+      timingSafeEqual(expectedBuffer, receivedBuffer)
+    );
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Recompute the order's authoritative product pricing server-side from the
+ * live `products` table, ignoring the client-submitted item prices/discount
+ * fields entirely. This is the fix for client-side price tampering: the
+ * client can request any items/quantities, but what they cost is decided
+ * here, not by whatever `price`/`pricingDetails` the request body claims.
+ */
+const recomputeOrderPricing = async (
+  supabaseAdmin: NonNullable<ReturnType<typeof getSupabaseAdmin>>,
+  items: CartItem[],
+  requestedDiscountCode: string | null,
+) => {
+  const productIds = items.map((item) => item.id);
+  const { data: products, error } = await supabaseAdmin
+    .from("products")
+    .select("*")
+    .in("id", productIds);
+
+  if (error) {
+    throw new Error(`Unable to verify product pricing: ${error.message}`);
+  }
+
+  const productById = new Map(
+    (products ?? []).map((p) => [String((p as Product).id), p as Product]),
+  );
+
+  let actualSubtotal = 0;
+  let discountedSubtotal = 0;
+  const storedItems: CartItem[] = items.map((item) => {
+    const product = productById.get(String(item.id));
+
+    if (!product) {
+      throw new Error(
+        `Product ${item.id} in your cart is no longer available.`,
+      );
+    }
+
+    const quantity = Number(item.quantity);
+
+    if (!Number.isFinite(quantity) || quantity <= 0) {
+      throw new Error(`Invalid quantity for product ${item.id}.`);
+    }
+
+    const unitPrice = getDiscountedPrice(product);
+    actualSubtotal += product.price * quantity;
+    discountedSubtotal += unitPrice * quantity;
+
+    // Keep the full item (name/weight/image/etc.) — only price and quantity
+    // are corrected. The stored order snapshot and Shiprocket's weight
+    // calculation both depend on the other fields being intact.
+    return { ...item, quantity, price: unitPrice };
+  });
+
+  actualSubtotal = Number(actualSubtotal.toFixed(2));
+  discountedSubtotal = Number(discountedSubtotal.toFixed(2));
+  const productDiscountAmount = Number(
+    (actualSubtotal - discountedSubtotal).toFixed(2),
+  );
+
+  let couponDiscountAmount = 0;
+  let discountPercent = 0;
+  let discountCode: string | null = null;
+
+  if (requestedDiscountCode) {
+    const normalizedCode = normalizeDiscountCode(requestedDiscountCode);
+    const { data: couponRow } = await supabaseAdmin
+      .from("discount_coupons")
+      .select("code, percent, label, is_public, min_order_value, valid_upto")
+      .eq("code", normalizedCode)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (couponRow) {
+      const coupon = mapDiscountCoupon(couponRow);
+      const isExpired =
+        coupon.validUpto !== null &&
+        new Date(coupon.validUpto).getTime() < Date.now();
+
+      if (!isExpired) {
+        const result = calculateDiscount(discountedSubtotal, coupon);
+        if (result.isEligible) {
+          couponDiscountAmount = result.amount;
+          discountPercent = result.percent;
+          discountCode = coupon.code;
+        }
+      }
+    }
+  }
+
+  const subtotalAmount = Number(
+    (discountedSubtotal - couponDiscountAmount).toFixed(2),
+  );
+
+  return {
+    storedItems,
+    actualSubtotal,
+    subtotalAmount,
+    productDiscountAmount,
+    couponDiscountAmount,
+    discountPercent,
+    discountCode,
+  };
+};
+
+const verifyRazorpayPayment = async ({
+  paymentDetails,
+  expectedAmount,
+}: {
+  paymentDetails: PaymentDetails;
+  expectedAmount: number;
+}) => {
+  const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!keyId || !keySecret) {
+    throw new Error("Razorpay is not configured on the server.");
+  }
+
+  const { provider_order_id, provider_payment_id, provider_signature } =
+    paymentDetails;
+
+  if (!provider_order_id || !provider_payment_id || !provider_signature) {
+    throw new Error("Payment verification details are incomplete.");
+  }
+
+  const expectedSignature = createHmac("sha256", keySecret)
+    .update(`${provider_order_id}|${provider_payment_id}`)
+    .digest("hex");
+
+  if (!signaturesMatch(expectedSignature, provider_signature)) {
+    throw new Error("Payment signature verification failed.");
+  }
+
+  const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
+  const response = await fetch(
+    `https://api.razorpay.com/v1/payments/${provider_payment_id}`,
+    { headers: { Authorization: `Basic ${auth}` } },
+  );
+
+  if (!response.ok) {
+    throw new Error("Unable to confirm payment with Razorpay.");
+  }
+
+  const payment = (await response.json()) as {
+    status?: string;
+    order_id?: string;
+    amount?: number;
+  };
+
+  if (payment.status !== "captured") {
+    throw new Error("This payment has not been captured by Razorpay.");
+  }
+
+  if (payment.order_id !== provider_order_id) {
+    throw new Error("Payment does not match the expected order.");
+  }
+
+  const expectedAmountInPaise = Math.round(expectedAmount * 100);
+  const amountTolerancePaise = 100; // 1 rupee, to absorb rounding only.
+
+  if (
+    typeof payment.amount !== "number" ||
+    Math.abs(payment.amount - expectedAmountInPaise) > amountTolerancePaise
+  ) {
+    throw new Error("Paid amount does not match the order total.");
+  }
 };
 
 export async function POST(request: Request) {
@@ -128,26 +324,117 @@ export async function POST(request: Request) {
     ? normalizeEmail(user?.email ?? "")
     : null;
 
+  // Defaults for the launch-offer path, which keeps its existing (already
+  // gated behind sign-in + eligibility + manual verification) behaviour.
+  // `storedItems` keeps every field (name/weight/image/etc.) for the stored
+  // order snapshot and Shiprocket; `rpcItems` is the minimal id/quantity/price
+  // shape place_order_with_inventory actually reads.
+  let storedItems: CartItem[] = items;
+  let subtotalAmount = pricingDetails?.subtotalAmount ?? 0;
+  let discountCode = pricingDetails?.discountCode ?? null;
+  let discountPercent = pricingDetails?.discountPercent ?? 0;
+  let productDiscountAmount = pricingDetails?.productDiscountAmount ?? 0;
+  let couponDiscountAmount = pricingDetails?.couponDiscountAmount ?? 0;
+  let computedTotal = totalAmount;
+
+  if (!isLaunchOfferOrder) {
+    try {
+      const recomputed = await recomputeOrderPricing(
+        supabaseAdmin,
+        items,
+        pricingDetails?.discountCode ?? null,
+      );
+      storedItems = recomputed.storedItems;
+      subtotalAmount = recomputed.subtotalAmount;
+      discountCode = recomputed.discountCode;
+      discountPercent = recomputed.discountPercent;
+      productDiscountAmount = recomputed.productDiscountAmount;
+      couponDiscountAmount = recomputed.couponDiscountAmount;
+    } catch (pricingError) {
+      return NextResponse.json(
+        {
+          error:
+            pricingError instanceof Error
+              ? pricingError.message
+              : "Unable to verify order pricing.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const shippingAmount = Number(pricingDetails?.shippingAmount ?? 0);
+    const convenienceFeeAmount = Number(
+      pricingDetails?.convenienceFeeAmount ?? 0,
+    );
+    const codAmount = Number(pricingDetails?.codAmount ?? 0);
+    const feesTotal = shippingAmount + convenienceFeeAmount + codAmount;
+    const feesAreValid =
+      Number.isFinite(shippingAmount) &&
+      shippingAmount >= 0 &&
+      Number.isFinite(convenienceFeeAmount) &&
+      convenienceFeeAmount >= 0 &&
+      Number.isFinite(codAmount) &&
+      codAmount >= 0 &&
+      feesTotal <= MAX_TRUSTED_FEES_TOTAL;
+
+    if (!feesAreValid) {
+      return NextResponse.json(
+        { error: "Order totals could not be verified." },
+        { status: 400 },
+      );
+    }
+
+    computedTotal = Number(
+      (subtotalAmount + shippingAmount + convenienceFeeAmount + codAmount).toFixed(
+        2,
+      ),
+    );
+
+    if (paymentMethod === "razorpay") {
+      if (!paymentDetails) {
+        return NextResponse.json(
+          { error: "Payment verification details are required." },
+          { status: 400 },
+        );
+      }
+
+      try {
+        await verifyRazorpayPayment({
+          paymentDetails,
+          expectedAmount: computedTotal,
+        });
+      } catch (verifyError) {
+        return NextResponse.json(
+          {
+            error:
+              verifyError instanceof Error
+                ? verifyError.message
+                : "Payment verification failed.",
+          },
+          { status: 402 },
+        );
+      }
+    }
+  }
+
   const orderData = {
     user_id: orderUserId,
-    items,
+    items: storedItems,
     delivery_address: deliveryAddressForOrder,
     payment_method: paymentMethod,
     payment_details: paymentDetails ?? null,
-    subtotal_amount: pricingDetails?.subtotalAmount ?? 0,
-    discount_code: pricingDetails?.discountCode ?? null,
-    discount_percent: pricingDetails?.discountPercent ?? null,
-    product_discount_amount: pricingDetails?.productDiscountAmount ?? 0,
-    coupon_discount_amount: pricingDetails?.couponDiscountAmount ?? 0,
-    discount_amount:
-      (pricingDetails?.productDiscountAmount ?? 0) +
-      (pricingDetails?.couponDiscountAmount ?? 0),
+    subtotal_amount: subtotalAmount,
+    discount_code: discountCode,
+    discount_percent: discountPercent,
+    product_discount_amount: productDiscountAmount,
+    coupon_discount_amount: couponDiscountAmount,
+    discount_amount: productDiscountAmount + couponDiscountAmount,
     shipping_amount: pricingDetails?.shippingAmount ?? 0,
     extra_shipping_amount: pricingDetails?.extraShippingAmount ?? 0,
     convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? 0,
     cod_amount: pricingDetails?.codAmount ?? 0,
     freight_charge: pricingDetails?.freightCharge ?? 0,
-    total_amount: totalAmount,
+    total_amount: isLaunchOfferOrder ? totalAmount : computedTotal,
     status:
       paymentMethod === "instagram_story_verification"
         ? "verification_pending"
@@ -158,7 +445,7 @@ export async function POST(request: Request) {
     "place_order_with_inventory",
     {
       p_order_data: orderData,
-      p_items: items.map((item) => ({
+      p_items: storedItems.map((item) => ({
         id: item.id,
         quantity: item.quantity,
         price: item.price,

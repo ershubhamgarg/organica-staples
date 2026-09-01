@@ -920,7 +920,6 @@ export default function CheckoutPage() {
           email: deliveryAddress.email || user?.email || "",
           contact: deliveryAddress.phone,
         },
-        method: "upi",
         notes: {
           address: `${deliveryAddress.address}, ${deliveryAddress.city}`,
         },
@@ -931,17 +930,36 @@ export default function CheckoutPage() {
           display: {
             blocks: {
               upi: {
-                name: "UPI",
+                name: "Pay via UPI",
                 instruments: [
                   {
                     method: "upi",
                   },
                 ],
               },
+              cards: {
+                name: "Cards",
+                instruments: [
+                  {
+                    method: "card",
+                  },
+                ],
+              },
+              other: {
+                name: "Other Payment Methods",
+                instruments: [
+                  {
+                    method: "netbanking",
+                  },
+                  {
+                    method: "wallet",
+                  },
+                ],
+              },
             },
-            sequence: ["block.upi"],
+            sequence: ["block.upi", "block.cards", "block.other"],
             preferences: {
-              show_default_blocks: true,
+              show_default_blocks: false,
             },
           },
         },
@@ -1543,7 +1561,7 @@ export default function CheckoutPage() {
                           Razorpay Checkout
                         </p>
                         <p className="text-[10px] font-light opacity-70 mt-1">
-                          Test mode cards, UPI, wallets, and netbanking
+                          Pay securely via UPI, cards, netbanking &amp; wallets
                         </p>
                       </div>
                       {selectedPayment === "razorpay" && (
