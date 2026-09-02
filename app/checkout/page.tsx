@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/userStore";
 import { Address, useAddressStore } from "@/store/addressStore";
 import type { PaymentDetails } from "@/store/orderStore";
 import { useOrderStore } from "@/store/orderStore";
+import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -775,8 +776,17 @@ export default function CheckoutPage() {
     paymentMethod: string,
     paymentDetails?: PaymentDetails,
   ) => {
+    // `user` from the store can be stale right after a Google OAuth login
+    // (it's populated by an async fetch elsewhere) — re-check directly with
+    // Supabase right before submitting so a signed-in order never goes out
+    // as a guest order just because the store hadn't caught up yet.
+    const {
+      data: { user: freshUser },
+    } = await supabase.auth.getUser();
+    const resolvedUserId = freshUser?.id ?? user?.id ?? null;
+
     const result = await placeOrder(
-      user?.id || null,
+      resolvedUserId,
       items,
       deliveryAddress,
       paymentMethod,
@@ -812,7 +822,7 @@ export default function CheckoutPage() {
         total: finalTotal,
       });
       setOrderPlaced(true);
-      clearCart(user?.id);
+      clearCart(resolvedUserId ?? undefined);
     }
   };
 

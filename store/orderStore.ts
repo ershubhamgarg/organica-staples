@@ -164,6 +164,15 @@ export const useOrderStore = create<OrderState>()(
           const {
             data: { session },
           } = await supabase.auth.getSession();
+          // `userId` is whatever the caller had in hand at click time, which
+          // can be stale — e.g. right after a Google OAuth redirect, the
+          // Zustand user store can still be mid-refresh. `session` here is
+          // resolved fresh, right before this request, so when it exists it
+          // is the authoritative source for both the Bearer token below and
+          // the userId in the body — they must never be allowed to diverge,
+          // or the server ends up creating an order with no user_id for a
+          // user who actually is signed in.
+          const resolvedUserId = session?.user?.id ?? userId;
           const response = await fetch("/api/orders", {
             method: "POST",
             headers: {
@@ -173,7 +182,7 @@ export const useOrderStore = create<OrderState>()(
                 : {}),
             },
             body: JSON.stringify({
-              userId,
+              userId: resolvedUserId,
               items,
               deliveryAddress,
               paymentMethod,
