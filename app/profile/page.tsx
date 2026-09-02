@@ -20,6 +20,7 @@ import {
   ShoppingBag,
   Share2,
   Sparkles,
+  FileDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
@@ -27,6 +28,7 @@ import OrderTrackingCard from "@/components/OrderTrackingCard";
 import { getProductThumbnail } from "@/lib/data";
 import { LAUNCH_OFFER_CODE } from "@/lib/launchOffer";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
+import { supabase } from "@/utils/supabase";
 
 const getOrderAmount = (value: number | null | undefined) =>
   typeof value === "number" && Number.isFinite(value) ? value : 0;
@@ -46,6 +48,31 @@ const getOrderBreakdown = (order: Order) => {
 const isLaunchOfferOrder = (order: Order) =>
   order.payment_method === "instagram_story_verification" ||
   order.discount_code === LAUNCH_OFFER_CODE;
+
+const downloadOrderInvoice = async (orderId: string) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.access_token) return;
+
+  const response = await fetch(`/api/orders/${orderId}/invoice`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+
+  if (!response.ok) {
+    alert("Unable to generate the invoice right now. Please try again.");
+    return;
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `invoice-${orderId.slice(0, 8)}.pdf`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 export default function ProfilePage() {
   const { user, signOut, isInitialized } = useUserStore();
@@ -484,6 +511,16 @@ export default function ProfilePage() {
                             <p className="text-xl font-medium text-brand-brown tracking-tighter">
                               ₹{order.total_amount.toFixed(2)}
                             </p>
+                            {!isLaunchOffer && (
+                              <button
+                                type="button"
+                                onClick={() => downloadOrderInvoice(order.id)}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-brand-gold/20 px-3.5 py-1.5 text-[8px] font-black uppercase tracking-widest text-brand-brown/70 transition-colors hover:border-brand-gold/40 hover:text-brand-brown"
+                              >
+                                <FileDown size={12} strokeWidth={1.8} />
+                                Invoice
+                              </button>
+                            )}
                           </div>
                         </div>
 

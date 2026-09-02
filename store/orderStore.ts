@@ -48,6 +48,8 @@ export interface Order {
   shipping_error?: string | null;
   shipped_at?: string | null;
   delivered_at?: string | null;
+  invoice_number?: string | null;
+  invoice_generated_at?: string | null;
   created_at: string;
 }
 
