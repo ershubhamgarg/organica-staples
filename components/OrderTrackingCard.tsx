@@ -10,6 +10,7 @@ import {
   PackageCheck,
   RefreshCw,
   Truck,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -120,6 +121,10 @@ const getStatusCopy = (
     return "Shipment booking needs a team check. Your order is safely placed.";
   }
 
+  if (tracking.shippingStatus === "cancelled") {
+    return "This shipment was cancelled. Reach out to us if you weren't expecting this.";
+  }
+
   if (!tracking.awbCode) {
     return "Your pantry parcel is being packed with care.";
   }
@@ -141,9 +146,13 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
   const enableShiprocket =
     process.env.NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT === "true";
   const isLocalDelivery = tracking.shippingStatus === "local_delivery";
+  const isCancelled = tracking.shippingStatus === "cancelled";
   // AWB/courier/progress info only makes sense for an actual Shiprocket
   // shipment — a local delivery never gets one, so none of that applies.
   const showCourierDetails = enableShiprocket && !isLocalDelivery;
+  // The 4-step progress bar has no "cancelled" state, so showing it would
+  // misleadingly imply the shipment is still moving forward.
+  const showProgressSteps = showCourierDetails && !isCancelled;
 
   const activeStep = useMemo(
     () => getStepIndex(tracking.shippingStatus ?? tracking.currentStatus),
@@ -204,8 +213,16 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
       )}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
-            {tracking.shippingStatus === "delivered" ? (
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-full ${
+              isCancelled
+                ? "bg-brand-terracotta/10 text-brand-terracotta"
+                : "bg-brand-green/10 text-brand-green"
+            }`}
+          >
+            {isCancelled ? (
+              <XCircle size={17} strokeWidth={1.8} />
+            ) : tracking.shippingStatus === "delivered" ? (
               <PackageCheck size={17} strokeWidth={1.8} />
             ) : (
               <Truck size={17} strokeWidth={1.8} />
@@ -241,6 +258,8 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
           <div className="mt-1">
             {tracking.shippingStatus === "sync_failed" ? (
               <AlertCircle size={15} className="text-brand-terracotta" />
+            ) : isCancelled ? (
+              <XCircle size={15} className="text-brand-terracotta" />
             ) : tracking.shippingStatus === "delivered" ? (
               <CheckCircle2 size={15} className="text-brand-green-fresh" />
             ) : (
@@ -289,7 +308,7 @@ export default function OrderTrackingCard({ order }: { order: Order }) {
         </div>
       )}
 
-      {showCourierDetails && (
+      {showProgressSteps && (
         <div className="mb-6 grid grid-cols-4 gap-2">
           {steps.map((step, index) => {
             const isDone = index <= activeStep;

@@ -106,6 +106,21 @@ export type ShiprocketShipmentResult = {
   error: string | null;
 };
 
+// Shared status mapping used by both the customer-triggered polling route
+// and the Shiprocket webhook, so a given Shiprocket status string always
+// resolves to the same shipping_status here regardless of which path caught it.
+export function normalizeTrackingStatus(status: string | null | undefined) {
+  const value = status?.toLowerCase() ?? "";
+
+  if (value.includes("deliver")) return "delivered";
+  if (value.includes("out for delivery")) return "out_for_delivery";
+  if (value.includes("transit") || value.includes("shipped")) return "in_transit";
+  if (value.includes("cancel")) return "cancelled";
+  if (value.includes("pick") || value.includes("manifest")) return "awb_assigned";
+
+  return "awb_assigned";
+}
+
 export type ShiprocketRateEstimate = {
   available: boolean;
   shippingAmount: number;
@@ -604,7 +619,22 @@ export async function getShiprocketTracking(
   const trackingData = result.tracking_data;
   const shipment = trackingData?.shipment_track?.[0];
 
+  // A cancelled AWB isn't reported as a normal status — Shiprocket returns
+  // it as `tracking_data.error` (e.g. "Ohh! This AWB has been cancelled.")
+  // with an otherwise-empty shipment_track row. That's a real status, not a
+  // failure, so it must not be thrown away — only genuine errors should be.
   if (trackingData?.error) {
+    if (trackingData.error.toLowerCase().includes("cancel")) {
+      return {
+        awbCode: shipment?.awb_code || awbCode,
+        courierName: shipment?.courier_name || null,
+        currentStatus: "CANCELLED",
+        deliveredAt: null,
+        expectedDeliveryDate: null,
+        trackingUrl: trackingData?.track_url || getTrackingUrl(awbCode),
+        activities: [],
+      };
+    }
     throw new Error(trackingData.error);
   }
 

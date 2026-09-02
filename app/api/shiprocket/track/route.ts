@@ -1,4 +1,4 @@
-import { getShiprocketTracking } from "@/lib/shiprocket";
+import { getShiprocketTracking, normalizeTrackingStatus } from "@/lib/shiprocket";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -16,18 +16,6 @@ const getSupabaseAdmin = () => {
       autoRefreshToken: false,
     },
   });
-};
-
-const normalizeTrackingStatus = (status: string | null) => {
-  const value = status?.toLowerCase() ?? "";
-
-  if (value.includes("deliver")) return "delivered";
-  if (value.includes("out for delivery")) return "out_for_delivery";
-  if (value.includes("transit") || value.includes("shipped")) return "in_transit";
-  if (value.includes("cancel")) return "cancelled";
-  if (value.includes("pick") || value.includes("manifest")) return "awb_assigned";
-
-  return "awb_assigned";
 };
 
 export async function GET(request: Request) {
