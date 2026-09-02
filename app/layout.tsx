@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { FileCheck2, MapPin } from "lucide-react";
 import {
   Plus_Jakarta_Sans,
   Fraunces,
@@ -275,6 +275,44 @@ export default function RootLayout({
                 Terms &amp; Conditions
               </Link>
             </div>
+
+            <div className="flex justify-center mb-8">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 rounded-2xl border border-brand-gold/15 bg-white/60 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-6 w-12 shrink-0">
+                    <Image
+                      src="/fssai_logo.png"
+                      alt="FSSAI"
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[7px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                      FSSAI Lic. No.
+                    </p>
+                    <p className="text-[11px] font-black tracking-wide text-brand-brown">
+                      20826019001149
+                    </p>
+                  </div>
+                </div>
+                <span className="hidden sm:block h-8 w-px bg-brand-gold/15" />
+                <div className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold">
+                    <FileCheck2 size={13} strokeWidth={1.8} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[7px] font-bold uppercase tracking-[0.2em] text-brand-brown/40">
+                      GSTIN
+                    </p>
+                    <p className="text-[11px] font-black tracking-wide text-brand-brown">
+                      06AYVPK4873C1Z2
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="text-[10px] uppercase tracking-[0.2em] text-brand-brown/40 text-center font-bold">
               &copy; {new Date().getFullYear()} ANNVRIKSH. All rights reserved.
             </div>
