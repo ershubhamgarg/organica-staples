@@ -25,6 +25,7 @@ import {
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import OrderTrackingCard from "@/components/OrderTrackingCard";
+import RefundStatusCard from "@/components/RefundStatusCard";
 import { getProductThumbnail } from "@/lib/data";
 import { LAUNCH_OFFER_CODE } from "@/lib/launchOffer";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
@@ -724,6 +725,12 @@ export default function ProfilePage() {
                                     </div>
                                   </div>
                                 </div>
+                              )}
+
+                            {order.status === "cancelled" &&
+                              order.payment_method === "razorpay" &&
+                              order.payment_details && (
+                                <RefundStatusCard order={order} />
                               )}
 
                             {isLaunchOffer && (
