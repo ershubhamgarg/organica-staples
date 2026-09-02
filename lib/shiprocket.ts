@@ -400,7 +400,7 @@ const buildCreateOrderPayload = (order: Order) => {
   };
 };
 
-const getTrackingUrl = (awbCode: string | null) =>
+export const getTrackingUrl = (awbCode: string | null) =>
   awbCode
     ? `https://www.shiprocket.in/shipment-tracking/?awb=${awbCode}`
     : null;

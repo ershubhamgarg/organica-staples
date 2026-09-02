@@ -1,4 +1,4 @@
-import { normalizeTrackingStatus } from "@/lib/shiprocket";
+import { getTrackingUrl, normalizeTrackingStatus } from "@/lib/shiprocket";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -20,6 +20,7 @@ const getSupabaseAdmin = () => {
 
 type OrderMatchRow = {
   id: string;
+  shiprocket_awb_code: string | null;
   shiprocket_courier_name: string | null;
   shiprocket_tracking_url: string | null;
   shipping_status: string | null;
@@ -27,7 +28,7 @@ type OrderMatchRow = {
 };
 
 const ORDER_MATCH_COLUMNS =
-  "id, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, delivered_at";
+  "id, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, delivered_at";
 
 // Shiprocket's webhook payload shape isn't consistently documented across
 // their webhook types, so every field below is read defensively under
@@ -90,6 +91,14 @@ export async function POST(request: Request) {
     "status",
     "order_status",
   ]);
+  // A courier reassignment on Shiprocket's side often means a new AWB and
+  // courier name for the same shipment — captured here so the DB (and the
+  // customer's tracking card) reflect it instead of staying on the old one.
+  const courierName = readString(payload, [
+    "courier_name",
+    "courier_company_name",
+    "courier",
+  ]);
 
   if (!awbCode && !shiprocketOrderId && !channelOrderId) {
     return NextResponse.json(
@@ -137,9 +146,20 @@ export async function POST(request: Request) {
         ? "cancelled"
         : "shipped";
 
+  // A changed AWB (courier reassignment) also invalidates the previously
+  // stored tracking URL, which is derived from the AWB — regenerate it
+  // whenever the AWB actually changed rather than carrying the stale one.
+  const nextAwbCode = awbCode ?? order.shiprocket_awb_code;
+  const awbChanged = Boolean(awbCode) && awbCode !== order.shiprocket_awb_code;
+
   await supabaseAdmin
     .from("orders")
     .update({
+      shiprocket_awb_code: nextAwbCode,
+      shiprocket_courier_name: courierName ?? order.shiprocket_courier_name,
+      shiprocket_tracking_url: awbChanged
+        ? getTrackingUrl(nextAwbCode)
+        : order.shiprocket_tracking_url,
       shipping_status: shippingStatus,
       shipping_error: null,
       delivered_at:
