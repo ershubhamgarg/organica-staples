@@ -10,8 +10,7 @@ import LaunchCarousel from "./LaunchCarousel";
 import RakshaBandhanHero from "./RakshaBandhanHero";
 import { useEffect } from "react";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1781773338964-bc0e969d2973?auto=format&fit=crop&q=80&w=1000";
+const HERO_IMAGE = "/organic-farming-bharat.jpeg";
 
 const trustBadges = [
   { icon: Sprout, label: "100% Organic" },
