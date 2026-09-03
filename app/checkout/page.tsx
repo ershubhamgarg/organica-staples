@@ -652,8 +652,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2 text-left">
-                {placedOrderDetails.items.slice(0, 3).map((item, index) => (
+              <div className="mt-4 max-h-[280px] space-y-2 overflow-y-auto text-left">
+                {placedOrderDetails.items.map((item, index) => (
                   <div
                     key={item.id}
                     className="confirmation-line flex items-center justify-between gap-3 rounded-2xl border border-brand-gold/10 bg-white/75 px-3 py-2.5"
@@ -672,15 +672,16 @@ export default function CheckoutPage() {
                     </p>
                   </div>
                 ))}
-                {placedOrderDetails.items.length > 3 && (
-                  <div className="rounded-2xl border border-brand-gold/10 bg-brand-cream/45 px-3 py-2 text-center">
-                    <p className="text-[8px] font-black uppercase tracking-[0.18em] text-brand-brown/45">
-                      +{placedOrderDetails.items.length - 3} more items in this
-                      order
-                    </p>
-                  </div>
-                )}
               </div>
+
+              {user && !isLaunchOfferConfirmation && (
+                <Link
+                  href="/profile"
+                  className="mt-4 inline-flex min-h-[38px] w-full items-center justify-center gap-2 rounded-full border border-brand-gold/20 px-4 text-[8px] font-black uppercase tracking-[0.18em] text-brand-brown/70 transition-colors hover:border-brand-gold/40 hover:text-brand-brown"
+                >
+                  View Full Order Details
+                </Link>
+              )}
 
               {isLaunchOfferConfirmation && (
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
