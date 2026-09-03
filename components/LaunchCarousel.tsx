@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import Link from "next/link";
+import ImageWithFallback from "./ImageWithFallback";
 import {
   ArrowRight,
   ArrowLeft,
@@ -148,7 +148,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                     <div className="absolute -inset-4 bg-gradient-to-br from-brand-gold/15 via-white/50 to-brand-green/15 rounded-[40%_60%_70%_30%/40%_50%_60%_50%] animate-float-slow group-hover:scale-105 transition-all duration-1000 border border-white/50" />
 
                     <div className="relative h-full w-full rounded-[2rem] overflow-hidden shadow-xl border-2 border-white ring-1 ring-brand-gold/5">
-                      <Image
+                      <ImageWithFallback
                         src={imageUrl}
                         alt={product.name}
                         fill

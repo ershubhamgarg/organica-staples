@@ -4,7 +4,6 @@ import { ArrowRight, Leaf, Mail, ShieldCheck, Sprout, Truck } from "lucide-react
 import Image from "next/image";
 import Link from "next/link";
 
-import { isProductAvailable } from "@/lib/data";
 import { isRakshaBandhanOfferLive } from "@/lib/rakshaBandhanOffer";
 import { useProductStore } from "@/store/productStore";
 import LaunchCarousel from "./LaunchCarousel";
@@ -29,26 +28,11 @@ const DesiHero = () => {
     }
   }, [products.length, fetchProducts]);
 
-  const featuredProducts = [...products]
-    .filter(
-      (p) =>
-        p.isVisible !== false &&
-        (p.isLaunchingSoon ||
-          p.launch_status === "launching_soon" ||
-          !isProductAvailable(p)),
-    )
-    .sort((a, b) => {
-      const launchingSoonA =
-        a.isLaunchingSoon || a.launch_status === "launching_soon";
-      const launchingSoonB =
-        b.isLaunchingSoon || b.launch_status === "launching_soon";
-
-      if (launchingSoonA !== launchingSoonB) {
-        return launchingSoonA ? -1 : 1;
-      }
-
-      return 0;
-    });
+  const featuredProducts = products.filter(
+    (p) =>
+      p.isVisible !== false &&
+      (p.isLaunchingSoon || p.launch_status === "launching_soon"),
+  );
 
   if (featuredProducts.length > 0) {
     return <LaunchCarousel products={featuredProducts} />;
