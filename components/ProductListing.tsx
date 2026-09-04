@@ -416,24 +416,26 @@ export default function ProductListing() {
                   <QuickAddButton product={product} className="w-full" />
                 </div>
 
-                <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-brand-gold/5">
-                  <div className="flex items-center gap-0.5 text-brand-gold">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={8}
-                        className={
-                          i < Math.round(product.rating || 0)
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-brand-gold/20"
-                        }
-                      />
-                    ))}
+                {available && (
+                  <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-brand-gold/5">
+                    <div className="flex items-center gap-0.5 text-brand-gold">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={8}
+                          className={
+                            i < Math.round(product.rating || 0)
+                              ? "fill-brand-gold text-brand-gold"
+                              : "text-brand-gold/20"
+                          }
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[7px] sm:text-[8px] text-brand-brown/55 uppercase tracking-[0.2em] font-black">
+                      {product.review_count || 0} Reviews
+                    </span>
                   </div>
-                  <span className="text-[7px] sm:text-[8px] text-brand-brown/55 uppercase tracking-[0.2em] font-black">
-                    {product.review_count || 0} Reviews
-                  </span>
-                </div>
+                )}
               </div>
             </div>
           );

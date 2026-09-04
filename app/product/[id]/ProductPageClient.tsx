@@ -443,31 +443,33 @@ export default function ProductPageClient({ id }: { id: string }) {
                     {product.category}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-0.5 text-brand-gold">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={14}
-                        className={
-                          i < Math.round(averageRating)
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-brand-gold/20"
-                        }
-                      />
-                    ))}
+                {available && (
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-0.5 text-brand-gold">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={14}
+                          className={
+                            i < Math.round(averageRating)
+                              ? "fill-brand-gold text-brand-gold"
+                              : "text-brand-gold/20"
+                          }
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => {
+                        document
+                          .getElementById("reviews")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/50 pb-0.5 text-left active:scale-95"
+                    >
+                      {reviewCount} Customer Reviews
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      document
-                        .getElementById("reviews")
-                        ?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/50 pb-0.5 text-left active:scale-95"
-                  >
-                    {reviewCount} Customer Reviews
-                  </button>
-                </div>
+                )}
 
                 <h1 className="text-3xl md:text-4xl lg:text-[2.5rem] font-serif text-brand-brown mb-1 tracking-tight leading-[1.05]">
                   {product.name}
@@ -669,6 +671,7 @@ export default function ProductPageClient({ id }: { id: string }) {
       </section>
 
       {/* Customer Reviews */}
+      {available && (
       <section
         id="reviews"
         className="bg-brand-cream border-b border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
@@ -914,6 +917,7 @@ export default function ProductPageClient({ id }: { id: string }) {
           </div>
         </div>
       </section>
+      )}
 
       {/* Related Products */}
       {recommendedProducts.length > 0 && (
