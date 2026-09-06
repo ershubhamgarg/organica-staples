@@ -50,6 +50,7 @@ export interface Order {
   delivered_at?: string | null;
   invoice_number?: string | null;
   invoice_generated_at?: string | null;
+  invoice_pdf_path?: string | null;
   razorpay_refund_id?: string | null;
   refund_status?:
     | "not_initiated"

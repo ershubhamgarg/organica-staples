@@ -1,13 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
 import type { Order } from "@/store/orderStore";
-import {
-  InvoiceDocument,
-  formatInvoiceNumber,
-  getFinancialYear,
-  type InvoiceItemInput,
-} from "@/lib/invoice";
+import { ensureInvoiceGenerated } from "@/lib/invoiceGeneration";
 
 const getSupabaseAdmin = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -76,72 +70,23 @@ export async function GET(
     );
   }
 
-  // Assign a stable, sequential invoice number the first time it's
-  // requested — every later download reuses the same number.
-  let invoiceNumber = order.invoice_number ?? null;
+  // Reuses the invoice generated at order-confirmation time (stored in
+  // Supabase Storage) when it exists — this only actually renders a PDF for
+  // orders placed before that existed, or if that first attempt failed.
+  const result = await ensureInvoiceGenerated(supabaseAdmin, order);
 
-  if (!invoiceNumber) {
-    const financialYear = getFinancialYear(new Date(order.created_at));
-    const { data: sequence, error: sequenceError } = await supabaseAdmin.rpc(
-      "get_next_invoice_number",
-      { p_financial_year: financialYear },
+  if (!result) {
+    return NextResponse.json(
+      { error: "Unable to generate the invoice for this order." },
+      { status: 500 },
     );
-
-    if (sequenceError) {
-      return NextResponse.json(
-        { error: `Unable to assign an invoice number: ${sequenceError.message}` },
-        { status: 500 },
-      );
-    }
-
-    invoiceNumber = formatInvoiceNumber(financialYear, sequence as number);
-    const generatedAt = new Date().toISOString();
-
-    const { error: updateError } = await supabaseAdmin
-      .from("orders")
-      .update({
-        invoice_number: invoiceNumber,
-        invoice_generated_at: generatedAt,
-      })
-      .eq("id", order.id);
-
-    if (updateError) {
-      return NextResponse.json(
-        { error: `Unable to save the invoice number: ${updateError.message}` },
-        { status: 500 },
-      );
-    }
-
-    order.invoice_generated_at = generatedAt;
   }
 
-  const productIds = order.items.map((item) => item.id);
-  const { data: products } = await supabaseAdmin
-    .from("products")
-    .select("id, hsn_code")
-    .in("id", productIds);
-
-  const hsnByProductId = new Map(
-    (products ?? []).map((p) => [String(p.id), p.hsn_code as string | null]),
-  );
-
-  const invoiceItems: InvoiceItemInput[] = order.items.map((item) => ({
-    name: item.name,
-    weight: item.weight,
-    quantity: item.quantity,
-    price: item.price,
-    hsnCode: hsnByProductId.get(String(item.id)) ?? null,
-  }));
-
-  const pdfBuffer = await renderToBuffer(
-    InvoiceDocument({ order, invoiceNumber, items: invoiceItems }),
-  );
-
-  return new NextResponse(new Uint8Array(pdfBuffer), {
+  return new NextResponse(new Uint8Array(result.pdfBuffer), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${invoiceNumber.replace(/\//g, "-")}.pdf"`,
+      "Content-Disposition": `inline; filename="${result.invoiceNumber.replace(/\//g, "-")}.pdf"`,
     },
   });
 }

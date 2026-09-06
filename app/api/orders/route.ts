@@ -14,6 +14,7 @@ import {
   normalizeDiscountCode,
 } from "@/lib/discountCodes";
 import { createShiprocketShipment } from "@/lib/shiprocket";
+import { ensureInvoiceGenerated } from "@/lib/invoiceGeneration";
 
 type OrderPayload = {
   userId: string | null;
@@ -488,6 +489,17 @@ export async function POST(request: Request) {
   }
 
   const order = data as Order;
+
+  // Generate the GST invoice PDF once, right when the order is confirmed,
+  // and store it in Supabase Storage — every later download (profile page,
+  // invoice route) reuses this instead of re-rendering the PDF each time.
+  // Failure here never blocks order placement; the invoice route falls
+  // back to generating on-demand if this didn't run or didn't finish.
+  const invoiceResult = await ensureInvoiceGenerated(supabaseAdmin, order);
+  if (invoiceResult) {
+    order.invoice_number = invoiceResult.invoiceNumber;
+    order.invoice_pdf_path = invoiceResult.storagePath;
+  }
 
   // Toggle for Shiprocket Shipment Creation
   // Set NEXT_PUBLIC_ENABLE_SHIPROCKET_SHIPMENT=true in env to enable live shipment creation
