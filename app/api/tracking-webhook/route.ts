@@ -143,7 +143,11 @@ export async function POST(request: Request) {
   }
 
   if (!order) {
-    return NextResponse.json({ error: "No matching order found." }, { status: 404 });
+    // A non-2xx here reads to Shiprocket as "this webhook is broken" (their
+    // own webhook test sends a fake AWB specifically to verify the endpoint
+    // responds, which will never match a real order) — acknowledge receipt
+    // with 200 either way and let "no match" just be informational.
+    return NextResponse.json({ ok: true, matched: false });
   }
 
   const shippingStatus = normalizeTrackingStatus(statusText);
