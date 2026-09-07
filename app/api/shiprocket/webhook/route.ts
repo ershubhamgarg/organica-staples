@@ -180,3 +180,32 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ ok: true });
 }
+
+// Some webhook registration flows probe the URL with a plain GET/HEAD before
+// accepting it, treating any non-2xx response as "unreachable" — this route
+// only ever needed POST for real events, so that probe got a 405. Respond
+// successfully here too (still secret-gated) so registration doesn't fail
+// on that reachability check alone.
+export async function GET(request: Request) {
+  const expectedSecret = process.env.SHIPROCKET_WEBHOOK_SECRET;
+  if (!expectedSecret) {
+    return NextResponse.json(
+      { error: "SHIPROCKET_WEBHOOK_SECRET is not configured on the server." },
+      { status: 500 },
+    );
+  }
+
+  const { searchParams } = new URL(request.url);
+  const providedSecret =
+    searchParams.get("secret") ??
+    request.headers.get("x-api-key") ??
+    request.headers.get("x-webhook-secret");
+
+  if (!isSecretValid(providedSecret, expectedSecret)) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+export const HEAD = GET;
