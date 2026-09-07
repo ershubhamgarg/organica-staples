@@ -66,16 +66,20 @@ dashboard (most importantly cancellations), register a webhook so Shiprocket
 pushes updates instead:
 
 1. Generate a random secret and set it as `SHIPROCKET_WEBHOOK_SECRET` above.
-2. In Shiprocket: **Settings → API → Shipment Webhook Settings**, set the
-   callback URL to:
-   `https://<your-domain>/api/shiprocket/webhook?secret=<SHIPROCKET_WEBHOOK_SECRET>`
-   (the secret is passed as a query parameter because Shiprocket's webhook
-   config doesn't reliably support a custom header across all webhook
-   types — this avoids depending on that).
-3. Trigger a test event from Shiprocket's dashboard (or cancel/update a real
-   test order) and check the server logs — the route logs every payload it
-   receives (`[shiprocket webhook] payload: ...`) so you can confirm the
-   field names Shiprocket actually sends match what the route expects
+2. In Shiprocket: **Settings → API → Webhooks**, fill in:
+   - **URL**: `https://<your-domain>/api/tracking-webhook`
+   - **Auth Token Type**: `x-api-key`
+   - **Token**: the same `SHIPROCKET_WEBHOOK_SECRET` value
+
+   The webhook route deliberately does **not** live under `/api/shiprocket/*`
+   — Shiprocket's own webhook form rejects any URL containing "shiprocket",
+   "kartrocket", "sr", or "kr" ("Address is not allowed", with no further
+   detail), so keep it elsewhere if you ever move it.
+3. Toggle **Webhook Connection** to enabled, click **Save**, then **Test
+   Webhook**. Trigger a real status change (or cancel a test order) and
+   check the server logs — the route logs the parsed fields it received
+   (`[shiprocket webhook] { awbCode, shiprocketOrderId, ... }`) so you can
+   confirm Shiprocket's actual payload matches what the route expects
    (`awb`/`awb_code`, `order_id`, `channel_order_id`, `current_status`).
    Shiprocket doesn't publish one fixed webhook schema across all account
    types, so this check is worth doing once after setup.
