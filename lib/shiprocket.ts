@@ -243,12 +243,7 @@ export async function getShiprocketHealth() {
       status: null,
       message: "Shiprocket credentials are not configured.",
       email: maskValue(process.env.SHIPROCKET_EMAIL),
-      emailLength: process.env.SHIPROCKET_EMAIL?.length ?? 0,
-      trimmedEmailLength: process.env.SHIPROCKET_EMAIL?.trim().length ?? 0,
       passwordPresent: Boolean(process.env.SHIPROCKET_PASSWORD),
-      passwordLength: process.env.SHIPROCKET_PASSWORD?.length ?? 0,
-      trimmedPasswordLength:
-        process.env.SHIPROCKET_PASSWORD?.trim().length ?? 0,
       pickupLocation: maskValue(process.env.SHIPROCKET_PICKUP_LOCATION),
     };
   }
@@ -271,11 +266,7 @@ export async function getShiprocketHealth() {
       status: 200,
       message: result.token ? null : (result.message ?? "No token returned."),
       email: maskValue(config.email),
-      emailLength: process.env.SHIPROCKET_EMAIL?.length ?? 0,
-      trimmedEmailLength: config.email.length,
       passwordPresent: true,
-      passwordLength: process.env.SHIPROCKET_PASSWORD?.length ?? 0,
-      trimmedPasswordLength: config.password.length,
       pickupLocation: maskValue(config.pickupLocation),
     };
   } catch (error) {
@@ -288,11 +279,7 @@ export async function getShiprocketHealth() {
           ? error.message
           : "Shiprocket auth check failed.",
       email: maskValue(config.email),
-      emailLength: process.env.SHIPROCKET_EMAIL?.length ?? 0,
-      trimmedEmailLength: config.email.length,
       passwordPresent: true,
-      passwordLength: process.env.SHIPROCKET_PASSWORD?.length ?? 0,
-      trimmedPasswordLength: config.password.length,
       pickupLocation: maskValue(config.pickupLocation),
     };
   }

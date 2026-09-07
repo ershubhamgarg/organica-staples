@@ -68,7 +68,12 @@ interface UserState {
   setJustSignedIn: (value: boolean) => void;
   signIn: (email: string, password: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<boolean>;
-  signUp: (email: string, password: string) => Promise<boolean>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+    phone: string,
+  ) => Promise<boolean>;
   signOut: () => Promise<void>;
   fetchUser: () => Promise<void>;
 }
@@ -129,12 +134,23 @@ export const useUserStore = create<UserState>()(
         }
       },
 
-      signUp: async (email: string, password: string) => {
+      signUp: async (
+        email: string,
+        password: string,
+        fullName: string,
+        phone: string,
+      ) => {
         set({ isLoading: true, error: null });
         try {
           const { data, error } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+              data: {
+                full_name: fullName,
+                phone,
+              },
+            },
           });
           if (error) throw error;
           set({ user: data.user, isLoading: false, justSignedIn: true });

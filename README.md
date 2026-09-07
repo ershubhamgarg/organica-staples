@@ -54,6 +54,9 @@ SHIPROCKET_DEFAULT_HEIGHT_CM=8
 SHIPROCKET_DEFAULT_WEIGHT_KG=0.5
 # Shared secret for the inbound Shiprocket webhook (see below).
 SHIPROCKET_WEBHOOK_SECRET=...
+# Gates GET /api/shiprocket/health (?secret=... or x-api-key header) — this
+# diagnostic endpoint has no other auth, so it's unreachable without this set.
+DIAGNOSTICS_SECRET=...
 ```
 
 Order tracking on the site is otherwise only refreshed when a signed-in

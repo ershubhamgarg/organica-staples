@@ -37,11 +37,17 @@ const slides = [
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [touchedFields, setTouchedFields] = useState({
+    fullName: false,
+    phone: false,
     email: false,
     password: false,
+    confirmPassword: false,
   });
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -89,8 +95,20 @@ export default function LoginPage() {
     }
   }, []);
 
+  const normalizePhone = (value: string) => value.replace(/\D/g, "").slice(-10);
+  const isValidPhone = (value: string) =>
+    /^[6-9]\d{9}$/.test(normalizePhone(value));
+
   const validateForm = () => {
     const trimmedEmail = email.trim();
+
+    if (isSignUp && !fullName.trim()) {
+      return "Please enter your full name.";
+    }
+
+    if (isSignUp && !isValidPhone(phone)) {
+      return "Please enter a valid 10-digit mobile number.";
+    }
 
     if (!trimmedEmail && !password) {
       return "Please enter your email address and password.";
@@ -112,6 +130,10 @@ export default function LoginPage() {
       return "Please use a password with at least 6 characters.";
     }
 
+    if (isSignUp && password !== confirmPassword) {
+      return "Passwords do not match.";
+    }
+
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       return "You appear to be offline. Please check your connection and try again.";
     }
@@ -124,7 +146,13 @@ export default function LoginPage() {
 
     clearError();
     setFormError(null);
-    setTouchedFields({ email: true, password: true });
+    setTouchedFields({
+      fullName: true,
+      phone: true,
+      email: true,
+      password: true,
+      confirmPassword: true,
+    });
 
     const validationError = validateForm();
 
@@ -134,7 +162,12 @@ export default function LoginPage() {
     }
 
     const didAuthenticate = isSignUp
-      ? await signUp(email.trim(), password)
+      ? await signUp(
+          email.trim(),
+          password,
+          fullName.trim(),
+          normalizePhone(phone),
+        )
       : await signIn(email.trim(), password);
 
     if (didAuthenticate) {
@@ -168,7 +201,29 @@ export default function LoginPage() {
     : isSignUp && password.length < 6
       ? "Use at least 6 characters."
       : null;
-  const canSubmit = !emailError && !passwordError && !isLoading;
+  const fullNameError =
+    isSignUp && !fullName.trim() ? "Full name is required." : null;
+  const phoneError = isSignUp
+    ? !phone
+      ? "Mobile number is required."
+      : !isValidPhone(phone)
+        ? "Enter a valid 10-digit mobile number."
+        : null
+    : null;
+  const confirmPasswordError = isSignUp
+    ? !confirmPassword
+      ? "Please confirm your password."
+      : confirmPassword !== password
+        ? "Passwords do not match."
+        : null
+    : null;
+  const canSubmit =
+    !emailError &&
+    !passwordError &&
+    !fullNameError &&
+    !phoneError &&
+    !confirmPasswordError &&
+    !isLoading;
 
   return (
     <main className="relative flex min-h-[calc(100vh-104px)] items-center justify-center overflow-hidden bg-[#fbfaf7] px-4 py-10 sm:px-6 lg:px-10">
@@ -306,6 +361,74 @@ export default function LoginPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {isSignUp && (
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
+                    htmlFor="fullName"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      setFormError(null);
+                      clearError();
+                    }}
+                    onBlur={() =>
+                      setTouchedFields((fields) => ({
+                        ...fields,
+                        fullName: true,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
+                    placeholder="Enter your name"
+                  />
+                  {touchedFields.fullName && fullNameError && (
+                    <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
+                      {fullNameError}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {isSignUp && (
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
+                    htmlFor="phone"
+                  >
+                    Mobile Number
+                  </label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      setFormError(null);
+                      clearError();
+                    }}
+                    onBlur={() =>
+                      setTouchedFields((fields) => ({ ...fields, phone: true }))
+                    }
+                    className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
+                    placeholder="Enter mobile number"
+                  />
+                  {touchedFields.phone && phoneError && (
+                    <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
+                      {phoneError}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <label
                   className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
@@ -368,6 +491,41 @@ export default function LoginPage() {
                   </p>
                 )}
               </div>
+
+              {isSignUp && (
+                <div className="space-y-1.5">
+                  <label
+                    className="block text-[9px] font-black uppercase tracking-widest text-brand-brown/40 ml-1"
+                    htmlFor="confirmPassword"
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setFormError(null);
+                      clearError();
+                    }}
+                    onBlur={() =>
+                      setTouchedFields((fields) => ({
+                        ...fields,
+                        confirmPassword: true,
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-brand-gold/15 bg-white px-5 py-4 text-sm text-brand-brown shadow-inner shadow-brand-brown/[0.025] placeholder:text-brand-brown/30 focus:border-brand-gold/50 focus:bg-white focus:ring-4 focus:ring-brand-gold/10 transition-all outline-none"
+                    placeholder="••••••••"
+                  />
+                  {touchedFields.confirmPassword && confirmPasswordError && (
+                    <p className="mt-1 text-[9px] font-bold text-brand-terracotta ml-1">
+                      {confirmPasswordError}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {displayError && (
                 <div className="p-4 rounded-xl bg-brand-terracotta/5 border border-brand-terracotta/10">

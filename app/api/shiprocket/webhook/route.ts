@@ -1,6 +1,15 @@
+import { timingSafeEqual } from "node:crypto";
 import { getTrackingUrl, normalizeTrackingStatus } from "@/lib/shiprocket";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+
+const isSecretValid = (provided: string | null, expected: string) => {
+  const providedBuffer = Buffer.from(provided ?? "");
+  const expectedBuffer = Buffer.from(expected);
+
+  if (providedBuffer.length !== expectedBuffer.length) return false;
+  return timingSafeEqual(providedBuffer, expectedBuffer);
+};
 
 const getSupabaseAdmin = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -66,7 +75,7 @@ export async function POST(request: Request) {
     request.headers.get("x-api-key") ??
     request.headers.get("x-webhook-secret");
 
-  if (providedSecret !== expectedSecret) {
+  if (!isSecretValid(providedSecret, expectedSecret)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -76,11 +85,6 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
-
-  // Logged so real payload field names can be confirmed against Shiprocket's
-  // actual webhook delivery the first time it fires — their schema isn't
-  // fully published, so this is the fallback way to verify field names.
-  console.log("[shiprocket webhook] payload:", JSON.stringify(payload));
 
   const awbCode = readString(payload, ["awb", "awb_code"]);
   const shiprocketOrderId = readString(payload, ["order_id", "sr_order_id"]);
@@ -106,6 +110,10 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  // Only the parsed, non-PII fields are logged — the raw payload can carry
+  // consignee name/address/phone depending on the event type.
+  console.log("[shiprocket webhook]", { awbCode, shiprocketOrderId, channelOrderId, statusText, courierName });
 
   let order: OrderMatchRow | null = null;
 
