@@ -161,6 +161,16 @@ const getConfig = () => {
     defaultWeightKg: Number.parseFloat(
       process.env.SHIPROCKET_DEFAULT_WEIGHT_KG ?? "0.5",
     ),
+    // Used to estimate a box height that scales with order weight — see
+    // getPackageDimensionsCm. Density is grams of packed order per cm³
+    // (pouches + box + cushioning, not the raw product density); tune this
+    // once real packed-box measurements are available.
+    packingDensityGPerCm3: Number.parseFloat(
+      process.env.SHIPROCKET_PACKING_DENSITY_G_PER_CM3 ?? "0.35",
+    ),
+    maxHeightCm: Number.parseFloat(
+      process.env.SHIPROCKET_MAX_HEIGHT_CM ?? "45",
+    ),
   };
 };
 
@@ -331,6 +341,39 @@ const getPackageWeightKg = (items: CartItem[], fallbackWeightKg: number) => {
   return Math.max(Number(total.toFixed(2)), fallbackWeightKg);
 };
 
+/**
+ * The base footprint (length × breadth) stays fixed — orders are assumed to
+ * be packed in pouches stacked in the same box style — while height scales
+ * with order weight, so a heavier/bulkier order is reported to Shiprocket
+ * as an actually bigger box instead of always the same small default. This
+ * makes volumetric weight (L×B×H / 5000) track real order size instead of
+ * staying constant regardless of what's in the cart.
+ */
+const getPackageDimensionsCm = (
+  weightKg: number,
+  config: {
+    defaultLengthCm: number;
+    defaultBreadthCm: number;
+    defaultHeightCm: number;
+    packingDensityGPerCm3: number;
+    maxHeightCm: number;
+  },
+) => {
+  const { defaultLengthCm: length, defaultBreadthCm: breadth } = config;
+  const footprintCm2 = length * breadth;
+  const estimatedVolumeCm3 =
+    (weightKg * 1000) / config.packingDensityGPerCm3;
+  const estimatedHeightCm =
+    footprintCm2 > 0 ? estimatedVolumeCm3 / footprintCm2 : config.defaultHeightCm;
+
+  const height = Math.min(
+    Math.max(estimatedHeightCm, config.defaultHeightCm),
+    config.maxHeightCm,
+  );
+
+  return { length, breadth, height: Number(height.toFixed(1)) };
+};
+
 const getRecommendedCourier = (
   couriers: ShiprocketCourierCompany[],
   recommendedCourierId: number | undefined,
@@ -363,6 +406,8 @@ const buildCreateOrderPayload = (order: Order) => {
   const channelId = Number.isFinite(config.channelId)
     ? { channel_id: config.channelId }
     : {};
+  const weight = getPackageWeightKg(order.items, config.defaultWeightKg);
+  const dimensions = getPackageDimensionsCm(weight, config);
 
   return {
     order_id: order.id,
@@ -392,10 +437,10 @@ const buildCreateOrderPayload = (order: Order) => {
     })),
     payment_method: getPaymentMethod(order.payment_method),
     sub_total: toNumber(order.total_amount),
-    length: config.defaultLengthCm,
-    breadth: config.defaultBreadthCm,
-    height: config.defaultHeightCm,
-    weight: getPackageWeightKg(order.items, config.defaultWeightKg),
+    length: dimensions.length,
+    breadth: dimensions.breadth,
+    height: dimensions.height,
+    weight,
     cod_amount: getCodAmount(order),
   };
 };
@@ -450,14 +495,15 @@ export async function estimateShiprocketRate({
 
   const token = await getToken();
   const weight = getPackageWeightKg(items, config.defaultWeightKg);
+  const dimensions = getPackageDimensionsCm(weight, config);
   const params = new URLSearchParams({
     pickup_postcode: config.pickupPostcode,
     delivery_postcode: deliveryPostcode,
     cod: isCod ? "1" : "0",
     weight: String(weight),
-    length: String(config.defaultLengthCm),
-    breadth: String(config.defaultBreadthCm),
-    height: String(config.defaultHeightCm),
+    length: String(dimensions.length),
+    breadth: String(dimensions.breadth),
+    height: String(dimensions.height),
     declared_value: String(Math.max(Math.round(declaredValue), 1)),
     is_return: "0",
   });
