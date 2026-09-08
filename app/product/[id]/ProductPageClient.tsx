@@ -40,8 +40,11 @@ import {
   getDiscountedPrice,
   getDiscountPercent,
   getUnitPriceInfo,
+  getVariantDiscountedPrice,
+  getVariantDiscountPercent,
   hasHighProductDiscount,
   hasProductDiscount,
+  hasVariantDiscount,
 } from "@/lib/pricing";
 
 const REVIEWS_PER_PAGE = 3;
@@ -290,14 +293,15 @@ export default function ProductPageClient({ id }: { id: string }) {
   const selectedVariant = variants
     ? (variants.find((v) => v.id === selectedVariantId) ?? variants[0])
     : null;
-  // A selected variant's price is final — the base product's scalar
-  // discount% is not additionally stacked on top of it.
+  // A selected variant's price (and its own discount, if any) is final —
+  // the base product's scalar discount% is not additionally stacked on
+  // top of it.
   const displayProduct: Product = selectedVariant
     ? {
         ...product,
         price: selectedVariant.price,
         weight: selectedVariant.weight,
-        discount: null,
+        discount: selectedVariant.discountPercent ?? null,
         stock_quantity: selectedVariant.stockQuantity,
       }
     : product;
@@ -631,23 +635,64 @@ export default function ProductPageClient({ id }: { id: string }) {
                   <div className="flex flex-col gap-5">
                     {variants && (
                       <div className="flex flex-wrap gap-2">
-                        {variants.map((v) => (
-                          <button
-                            key={v.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedVariantId(v.id);
-                              setQuantity(1);
-                            }}
-                            className={`px-4 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider border-2 transition-all ${
-                              selectedVariant?.id === v.id
-                                ? "bg-brand-brown text-brand-cream border-brand-brown"
-                                : "border-brand-gold/25 text-brand-brown/70 hover:border-brand-gold/50"
-                            }`}
-                          >
-                            {v.label}
-                          </button>
-                        ))}
+                        {variants.map((v) => {
+                          const variantDiscounted = hasVariantDiscount(v);
+                          const variantPrice = getVariantDiscountedPrice(v);
+                          const variantPercent = getVariantDiscountPercent(v);
+                          const isSelected = selectedVariant?.id === v.id;
+                          return (
+                            <button
+                              key={v.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedVariantId(v.id);
+                                setQuantity(1);
+                              }}
+                              className={`relative flex flex-col items-start px-4 py-2.5 rounded-2xl border-2 transition-all ${
+                                isSelected
+                                  ? "bg-brand-brown text-brand-cream border-brand-brown"
+                                  : "border-brand-gold/25 text-brand-brown/70 hover:border-brand-gold/50"
+                              }`}
+                            >
+                              {variantDiscounted && (
+                                <span
+                                  className={`absolute -top-2 -right-2 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-white shadow-md ${
+                                    variantPercent >= 50
+                                      ? "bg-brand-terracotta"
+                                      : "bg-brand-green-fresh"
+                                  }`}
+                                >
+                                  -{variantPercent}%
+                                </span>
+                              )}
+                              <span className="text-[11px] font-bold uppercase tracking-wider">
+                                {v.label}
+                              </span>
+                              <span className="flex items-baseline gap-1.5 mt-0.5">
+                                {variantDiscounted && (
+                                  <span
+                                    className={`text-[10px] line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/35"}`}
+                                  >
+                                    ₹{v.price.toFixed(0)}
+                                  </span>
+                                )}
+                                <span
+                                  className={`text-[11px] font-semibold ${
+                                    variantDiscounted
+                                      ? isSelected
+                                        ? "text-brand-cream"
+                                        : "text-brand-green-fresh"
+                                      : isSelected
+                                        ? "text-brand-cream/80"
+                                        : "text-brand-brown/50"
+                                  }`}
+                                >
+                                  ₹{variantPrice.toFixed(0)}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                     <div className="flex flex-col sm:flex-row items-center gap-8">

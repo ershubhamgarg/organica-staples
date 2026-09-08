@@ -4,6 +4,8 @@ export interface ProductVariant {
   label: string;
   weight: string;
   price: number;
+  /** 0-100. Final for this variant — not stacked with the base product's own `discount`. */
+  discountPercent?: number | null;
   stockQuantity?: number | null;
   lowStockThreshold?: number | null;
   isActive?: boolean;

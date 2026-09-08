@@ -21,11 +21,15 @@ export default function QuickAddButton({
   const { user } = useUserStore();
 
   const variantId = selectedVariant?.id;
+  // A selected variant's price (and its own discount, if any) is final —
+  // the base product's scalar discount% is not additionally stacked on
+  // top of it (matches ProductListing.tsx / ProductPageClient.tsx).
   const effective: Product = selectedVariant
     ? {
         ...product,
         price: selectedVariant.price,
         weight: selectedVariant.weight,
+        discount: selectedVariant.discountPercent ?? null,
         stock_quantity: selectedVariant.stockQuantity,
       }
     : product;

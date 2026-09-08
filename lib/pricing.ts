@@ -1,4 +1,4 @@
-import { Product } from "@/lib/data";
+import { Product, ProductVariant } from "@/lib/data";
 
 export function getDiscountPercent(product: Product): number {
   const discount = Number(product.discount || 0);
@@ -26,6 +26,39 @@ export function hasProductDiscount(product: Product): boolean {
 
 export function hasHighProductDiscount(product: Product): boolean {
   return getDiscountPercent(product) >= 50;
+}
+
+// A variant's own discount is final — it is never stacked with the base
+// product's scalar `discount` (see the "variant price is final" note
+// everywhere a variant overrides the display/cart product below).
+export function getVariantDiscountPercent(
+  variant: Pick<ProductVariant, "discountPercent">,
+): number {
+  const discount = Number(variant.discountPercent || 0);
+
+  if (!Number.isFinite(discount) || discount <= 0) {
+    return 0;
+  }
+
+  return Math.min(discount, 100);
+}
+
+export function getVariantDiscountedPrice(
+  variant: Pick<ProductVariant, "price" | "discountPercent">,
+): number {
+  const discount = getVariantDiscountPercent(variant);
+
+  if (!discount) {
+    return variant.price;
+  }
+
+  return Number((variant.price * (1 - discount / 100)).toFixed(2));
+}
+
+export function hasVariantDiscount(
+  variant: Pick<ProductVariant, "discountPercent">,
+): boolean {
+  return getVariantDiscountPercent(variant) > 0;
 }
 
 export function getUnitPriceInfo(product: Product): string | null {

@@ -37,8 +37,10 @@ import {
 import {
   getDiscountedPrice,
   getDiscountPercent,
+  getVariantDiscountedPrice,
   hasHighProductDiscount,
   hasProductDiscount,
+  hasVariantDiscount,
 } from "@/lib/pricing";
 import {
   getProductThumbnail,
@@ -155,7 +157,14 @@ export default function CartPage() {
 
   const handleVariantChange = (
     item: CartItem,
-    variant: { id: string; label: string; price: number; weight: string; stockQuantity?: number | null },
+    variant: {
+      id: string;
+      label: string;
+      price: number;
+      weight: string;
+      discountPercent?: number | null;
+      stockQuantity?: number | null;
+    },
   ) => {
     if (variant.id === item.variantId) return;
     removeFromCart(item.id, user?.id, item.variantId);
@@ -164,6 +173,10 @@ export default function CartPage() {
         ...item,
         price: variant.price,
         weight: variant.weight,
+        // A selected variant's price (and its own discount, if any) is
+        // final — the base product's scalar discount% is not additionally
+        // stacked on top of it.
+        discount: variant.discountPercent ?? null,
         stock_quantity: variant.stockQuantity,
       },
       item.quantity,
@@ -610,22 +623,52 @@ export default function CartPage() {
                                     className="flex flex-wrap gap-1"
                                     onClick={(e) => e.preventDefault()}
                                   >
-                                    {fullProduct.variants.map((v) => (
-                                      <button
-                                        key={v.id}
-                                        type="button"
-                                        onClick={() =>
-                                          handleVariantChange(item, v)
-                                        }
-                                        className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border transition-all ${
-                                          (item.variantId ?? null) === v.id
-                                            ? "bg-brand-brown text-brand-cream border-brand-brown"
-                                            : "border-brand-gold/20 text-brand-brown/50 hover:border-brand-gold/40"
-                                        }`}
-                                      >
-                                        {v.label}
-                                      </button>
-                                    ))}
+                                    {fullProduct.variants.map((v) => {
+                                      const variantDiscounted =
+                                        hasVariantDiscount(v);
+                                      const variantPrice =
+                                        getVariantDiscountedPrice(v);
+                                      const isSelected =
+                                        (item.variantId ?? null) === v.id;
+                                      return (
+                                        <button
+                                          key={v.id}
+                                          type="button"
+                                          onClick={() =>
+                                            handleVariantChange(item, v)
+                                          }
+                                          className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all ${
+                                            isSelected
+                                              ? "bg-brand-brown text-brand-cream border-brand-brown"
+                                              : "border-brand-gold/20 text-brand-brown/50 hover:border-brand-gold/40"
+                                          }`}
+                                        >
+                                          <span className="text-[8px] font-bold uppercase tracking-wider">
+                                            {v.label}
+                                          </span>
+                                          {variantDiscounted && (
+                                            <span
+                                              className={`text-[7px] line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/30"}`}
+                                            >
+                                              ₹{v.price.toFixed(0)}
+                                            </span>
+                                          )}
+                                          <span
+                                            className={`text-[7px] font-semibold ${
+                                              variantDiscounted
+                                                ? isSelected
+                                                  ? "text-brand-cream"
+                                                  : "text-brand-green-fresh"
+                                                : isSelected
+                                                  ? "text-brand-cream/80"
+                                                  : "text-brand-brown/40"
+                                            }`}
+                                          >
+                                            ₹{variantPrice.toFixed(0)}
+                                          </span>
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 );
                               }

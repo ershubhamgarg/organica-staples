@@ -13,8 +13,11 @@ import {
   getDiscountedPrice,
   getDiscountPercent,
   getUnitPriceInfo,
+  getVariantDiscountedPrice,
+  getVariantDiscountPercent,
   hasHighProductDiscount,
   hasProductDiscount,
+  hasVariantDiscount,
 } from "@/lib/pricing";
 
 type ProductsResponse = {
@@ -265,14 +268,15 @@ export default function ProductListing() {
             ? (variants.find((v) => v.id === selectedVariantIds[product.id]) ??
               variants[0])
             : null;
-          // A selected variant's price is final — the base product's scalar
-          // discount% is not additionally stacked on top of it.
+          // A selected variant's price (and its own discount, if any) is
+          // final — the base product's scalar discount% is not additionally
+          // stacked on top of it.
           const displayProduct: Product = selectedVariant
             ? {
                 ...product,
                 price: selectedVariant.price,
                 weight: selectedVariant.weight,
-                discount: null,
+                discount: selectedVariant.discountPercent ?? null,
                 stock_quantity: selectedVariant.stockQuantity,
               }
             : product;
@@ -440,25 +444,66 @@ export default function ProductListing() {
                 <div className="pt-1">
                   {variants && (
                     <div className="flex flex-wrap justify-center gap-1.5 mb-2">
-                      {variants.map((v) => (
-                        <button
-                          key={v.id}
-                          type="button"
-                          onClick={() =>
-                            setSelectedVariantIds((prev) => ({
-                              ...prev,
-                              [product.id]: v.id,
-                            }))
-                          }
-                          className={`px-2.5 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider border transition-all ${
-                            selectedVariant?.id === v.id
-                              ? "bg-brand-brown text-brand-cream border-brand-brown"
-                              : "border-brand-gold/20 text-brand-brown/60 hover:border-brand-gold/40"
-                          }`}
-                        >
-                          {v.label}
-                        </button>
-                      ))}
+                      {variants.map((v) => {
+                        const variantDiscounted = hasVariantDiscount(v);
+                        const variantPrice = getVariantDiscountedPrice(v);
+                        const variantPercent = getVariantDiscountPercent(v);
+                        const isSelected = selectedVariant?.id === v.id;
+                        return (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() =>
+                              setSelectedVariantIds((prev) => ({
+                                ...prev,
+                                [product.id]: v.id,
+                              }))
+                            }
+                            className={`relative flex flex-col items-center px-2.5 py-1 rounded-xl border transition-all ${
+                              isSelected
+                                ? "bg-brand-brown text-brand-cream border-brand-brown"
+                                : "border-brand-gold/20 text-brand-brown/60 hover:border-brand-gold/40"
+                            }`}
+                          >
+                            {variantDiscounted && (
+                              <span
+                                className={`absolute -top-1.5 -right-1.5 rounded-full px-1 py-px text-[6px] font-black uppercase tracking-wide text-white shadow-sm ${
+                                  variantPercent >= 50
+                                    ? "bg-brand-terracotta"
+                                    : "bg-brand-green-fresh"
+                                }`}
+                              >
+                                -{variantPercent}%
+                              </span>
+                            )}
+                            <span className="text-[8px] font-bold uppercase tracking-wider">
+                              {v.label}
+                            </span>
+                            <span className="flex items-center gap-1 text-[7px] font-semibold">
+                              {variantDiscounted && (
+                                <span
+                                  className={`line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/35"}`}
+                                >
+                                  ₹{v.price.toFixed(0)}
+                                </span>
+                              )}
+                              <span
+                                className={
+                                  variantDiscounted
+                                    ? isSelected
+                                      ? "text-brand-cream"
+                                      : "text-brand-green-fresh"
+                                    : isSelected
+                                      ? "text-brand-cream/80"
+                                      : "text-brand-brown/45"
+                                }
+                              >
+                                ₹{variantPrice.toFixed(0)}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                   <QuickAddButton

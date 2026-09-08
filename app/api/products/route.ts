@@ -13,6 +13,7 @@ type ProductVariantRow = {
   label: string;
   weight: string;
   price: number;
+  discount_percent?: number | null;
   sort_order?: number | null;
   is_active?: boolean | null;
   product_variant_inventory?: ProductInventoryRow | ProductInventoryRow[] | null;
@@ -63,6 +64,7 @@ const mapVariant = (row: ProductVariantRow): ProductVariant => {
     label: row.label,
     weight: row.weight,
     price: row.price,
+    discountPercent: row.discount_percent ?? null,
     stockQuantity: inventory?.available_quantity ?? null,
     lowStockThreshold: inventory?.low_stock_threshold ?? null,
     isActive: row.is_active ?? true,
@@ -158,7 +160,7 @@ export async function GET(request: Request) {
   let query = supabase
     .from("products")
     .select(
-      "*, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, sort_order, is_active, product_variant_inventory(available_quantity, low_stock_threshold))",
+      "*, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, discount_percent, sort_order, is_active, product_variant_inventory(available_quantity, low_stock_threshold))",
     );
 
   if (productId) {

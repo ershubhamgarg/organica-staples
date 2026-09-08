@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import type { OrderPricingDetails, PaymentDetails } from "@/store/orderStore";
 import type { Order } from "@/store/orderStore";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
-import { getDiscountedPrice } from "@/lib/pricing";
+import { getDiscountedPrice, getVariantDiscountedPrice } from "@/lib/pricing";
 import {
   calculateDiscount,
   mapDiscountCoupon,
@@ -106,7 +106,7 @@ const recomputeOrderPricing = async (
   const { data: variants, error: variantsError } = variantIds.length
     ? await supabaseAdmin
         .from("product_variants")
-        .select("id, product_id, price, weight, is_active")
+        .select("id, product_id, price, weight, discount_percent, is_active")
         .in("id", variantIds)
     : { data: [], error: null };
 
@@ -134,6 +134,7 @@ const recomputeOrderPricing = async (
     }
 
     let unitPrice: number;
+    let rawUnitPrice: number;
     let weight = product.weight;
 
     if (item.variantId) {
@@ -149,15 +150,21 @@ const recomputeOrderPricing = async (
         );
       }
 
-      // A variant's price is final — no separate product-level discount is
-      // stacked on top of it (see lib/pricing.ts's discount-stacking note).
-      unitPrice = Number(variant.price);
+      // A variant's own discount is final — no separate product-level
+      // discount is stacked on top of it (see lib/pricing.ts's
+      // discount-stacking note).
+      rawUnitPrice = Number(variant.price);
+      unitPrice = getVariantDiscountedPrice({
+        price: rawUnitPrice,
+        discountPercent: variant.discount_percent,
+      });
       weight = variant.weight;
     } else {
+      rawUnitPrice = product.price;
       unitPrice = getDiscountedPrice(product);
     }
 
-    actualSubtotal += (item.variantId ? unitPrice : product.price) * quantity;
+    actualSubtotal += rawUnitPrice * quantity;
     discountedSubtotal += unitPrice * quantity;
 
     // Keep the full item (name/weight/image/etc.) — only price, quantity,
