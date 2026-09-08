@@ -1,4 +1,4 @@
-import type { Product } from "@/lib/data";
+import type { Product, ProductVariant } from "@/lib/data";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
@@ -7,8 +7,20 @@ type ProductInventoryRow = {
   low_stock_threshold?: number | null;
 };
 
+type ProductVariantRow = {
+  id: number | string;
+  product_id: number | string;
+  label: string;
+  weight: string;
+  price: number;
+  sort_order?: number | null;
+  is_active?: boolean | null;
+  product_variant_inventory?: ProductInventoryRow | ProductInventoryRow[] | null;
+};
+
 type ProductRow = Product & {
   product_inventory?: ProductInventoryRow | ProductInventoryRow[] | null;
+  product_variants?: ProductVariantRow[] | null;
   launch_status?: string | null;
   launch_date?: string | null;
   launch_badge_text?: string | null;
@@ -32,20 +44,49 @@ const getSupabaseServerClient = () => {
   });
 };
 
-const getInventory = (row: ProductRow) => {
-  if (Array.isArray(row.product_inventory)) {
-    return row.product_inventory[0] ?? null;
+const getInventory = (
+  inventory: ProductInventoryRow | ProductInventoryRow[] | null | undefined,
+) => {
+  if (Array.isArray(inventory)) {
+    return inventory[0] ?? null;
   }
 
-  return row.product_inventory ?? null;
+  return inventory ?? null;
+};
+
+const mapVariant = (row: ProductVariantRow): ProductVariant => {
+  const inventory = getInventory(row.product_variant_inventory);
+
+  return {
+    id: String(row.id),
+    productId: String(row.product_id),
+    label: row.label,
+    weight: row.weight,
+    price: row.price,
+    stockQuantity: inventory?.available_quantity ?? null,
+    lowStockThreshold: inventory?.low_stock_threshold ?? null,
+    isActive: row.is_active ?? true,
+  };
+};
+
+const mapVariants = (row: ProductRow): ProductVariant[] | undefined => {
+  const active = (row.product_variants ?? [])
+    .filter((v) => v.is_active !== false)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    .map(mapVariant);
+
+  return active.length > 0 ? active : undefined;
 };
 
 const mapProduct = (row: ProductRow): Product => {
-  const inventory = getInventory(row);
+  const inventory = getInventory(row.product_inventory);
   const stockQuantity = inventory?.available_quantity;
   const lowStockThreshold = inventory?.low_stock_threshold;
+  const variants = mapVariants(row);
   const product = Object.fromEntries(
-    Object.entries(row).filter(([key]) => key !== "product_inventory"),
+    Object.entries(row).filter(
+      ([key]) => key !== "product_inventory" && key !== "product_variants",
+    ),
   ) as Product;
 
   if (product.name === "Cold Pressed Mustard Oil") {
@@ -92,6 +133,7 @@ const mapProduct = (row: ProductRow): Product => {
         : product.low_stock_threshold,
     available:
       typeof stockQuantity === "number" ? stockQuantity > 0 : product.available,
+    variants,
     // Map new launch status columns to frontend properties
     justLaunched: row.launch_status === "just_launched",
     isLaunchingSoon: row.launch_status === "launching_soon",
@@ -115,7 +157,9 @@ export async function GET(request: Request) {
 
   let query = supabase
     .from("products")
-    .select("*, product_inventory(available_quantity, low_stock_threshold)");
+    .select(
+      "*, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, sort_order, is_active, product_variant_inventory(available_quantity, low_stock_threshold))",
+    );
 
   if (productId) {
     query = query.eq("id", productId);

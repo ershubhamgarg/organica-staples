@@ -120,7 +120,7 @@ export default function FloatingCart() {
 
                 {previewItems.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.variantId ?? "base"}`}
                     className="relative h-11 w-11 overflow-hidden rounded-full border-2 border-brand-cream bg-brand-sand shadow-lg"
                     style={{
                       marginLeft: index === 0 ? 12 : -16,

@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type { CartItem } from "@/store/cartStore";
 
+type OrderItemForValidation = Pick<CartItem, "id" | "quantity"> & {
+  variant_id?: string | null;
+};
+
 type CreateRazorpayOrderPayload = {
   amount: number;
   receipt?: string;
   notes?: Record<string, string>;
-  items?: Pick<CartItem, "id" | "quantity">[];
+  items?: OrderItemForValidation[];
 };
 
 const getRazorpayCredentials = () => {
@@ -37,7 +41,7 @@ const getSupabaseAdmin = () => {
 };
 
 const validateInventory = async (
-  items: Pick<CartItem, "id" | "quantity">[] | undefined,
+  items: OrderItemForValidation[] | undefined,
 ) => {
   if (!items?.length) {
     return null;
@@ -49,25 +53,52 @@ const validateInventory = async (
     return "Inventory validation requires SUPABASE_SERVICE_ROLE_KEY on the server.";
   }
 
-  const productIds = items.map((item) => item.id);
-  const { data, error } = await supabaseAdmin
-    .from("product_inventory")
-    .select("product_id, available_quantity")
-    .in("product_id", productIds);
+  // Advisory only — the real, atomic guard is place_order_with_inventory's
+  // row lock. This just fails fast with a friendlier message beforehand.
+  const plainItems = items.filter((item) => !item.variant_id);
+  const variantItems = items.filter((item) => item.variant_id);
 
-  if (error) {
-    return error.message;
+  const productIds = plainItems.map((item) => item.id);
+  const { data: productInventory, error: productError } = productIds.length
+    ? await supabaseAdmin
+        .from("product_inventory")
+        .select("product_id, available_quantity")
+        .in("product_id", productIds)
+    : { data: [], error: null };
+
+  if (productError) {
+    return productError.message;
+  }
+
+  const variantIds = variantItems.map((item) => String(item.variant_id));
+  const { data: variantInventory, error: variantError } = variantIds.length
+    ? await supabaseAdmin
+        .from("product_variant_inventory")
+        .select("variant_id, available_quantity")
+        .in("variant_id", variantIds)
+    : { data: [], error: null };
+
+  if (variantError) {
+    return variantError.message;
   }
 
   const inventoryByProduct = new Map(
-    (data ?? []).map((row) => [
+    (productInventory ?? []).map((row) => [
       String(row.product_id),
+      Number(row.available_quantity),
+    ]),
+  );
+  const inventoryByVariant = new Map(
+    (variantInventory ?? []).map((row) => [
+      String(row.variant_id),
       Number(row.available_quantity),
     ]),
   );
 
   for (const item of items) {
-    const availableQuantity = inventoryByProduct.get(String(item.id));
+    const availableQuantity = item.variant_id
+      ? inventoryByVariant.get(String(item.variant_id))
+      : inventoryByProduct.get(String(item.id));
 
     if (availableQuantity === undefined) {
       return "Inventory is not configured for one or more products in your cart.";

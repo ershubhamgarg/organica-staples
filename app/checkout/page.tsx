@@ -655,7 +655,7 @@ export default function CheckoutPage() {
               <div className="mt-4 max-h-[280px] space-y-2 overflow-y-auto text-left">
                 {placedOrderDetails.items.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.variantId ?? "base"}`}
                     className="confirmation-line flex items-center justify-between gap-3 rounded-2xl border border-brand-gold/10 bg-white/75 px-3 py-2.5"
                     style={{ animationDelay: `${200 + index * 90}ms` }}
                   >
@@ -664,7 +664,7 @@ export default function CheckoutPage() {
                         {item.name}
                       </p>
                       <p className="mt-0.5 text-[7px] font-black uppercase tracking-[0.16em] text-brand-brown/35">
-                        Qty {item.quantity} / {item.weight}
+                        Qty {item.quantity} / {item.variantLabel ?? item.weight}
                       </p>
                     </div>
                     <p className="shrink-0 text-[8px] font-black uppercase tracking-[0.14em] text-brand-green">
@@ -910,6 +910,7 @@ export default function CheckoutPage() {
           items: items.map((item) => ({
             id: item.id,
             quantity: item.quantity,
+            variant_id: item.variantId ?? null,
           })),
           receipt: `annvriksh_${Date.now().toString(36)}`,
           notes: {
@@ -1829,7 +1830,7 @@ export default function CheckoutPage() {
                   const available = isProductAvailable(item);
                   return (
                     <Link
-                      key={item.id}
+                      key={`${item.id}-${item.variantId ?? "base"}`}
                       href={`/product/${item.id}`}
                       className="flex gap-4 items-center group hover:bg-brand-brown/[0.02] -m-2 p-2 rounded-2xl transition-all"
                     >

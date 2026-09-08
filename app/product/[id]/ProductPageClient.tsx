@@ -29,7 +29,12 @@ import ProductImageCarousel, {
 import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
 import ScrollReveal from "@/components/ScrollReveal";
-import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
+import {
+  hasVariants,
+  isProductAvailable,
+  isProductLowStock,
+  Product,
+} from "@/lib/data";
 import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
@@ -63,6 +68,9 @@ export default function ProductPageClient({ id }: { id: string }) {
   const { addToCart } = useCartStore();
   const { user } = useUserStore();
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariantId, setSelectedVariantId] = useState<
+    string | undefined
+  >(undefined);
   const [added, setAdded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -169,6 +177,10 @@ export default function ProductPageClient({ id }: { id: string }) {
   useEffect(() => {
     setIsDescriptionExpanded(false);
     setActiveImageIndex(0);
+    setSelectedVariantId(product?.variants?.[0]?.id);
+    // Only reset when navigating to a genuinely different product, not on
+    // every incidental re-fetch/update of the same product's data.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
 
   useEffect(() => {
@@ -274,17 +286,39 @@ export default function ProductPageClient({ id }: { id: string }) {
     );
   }
 
-  const hasDiscount = hasProductDiscount(product);
-  const hasHighDiscount = hasHighProductDiscount(product);
-  const discountPercent = getDiscountPercent(product);
-  const discountedPrice = getDiscountedPrice(product);
-  const available = isProductAvailable(product);
-  const lowStock = isProductLowStock(product);
-  const unitPrice = product ? getUnitPriceInfo(product) : null;
+  const variants = hasVariants(product) ? product.variants : null;
+  const selectedVariant = variants
+    ? (variants.find((v) => v.id === selectedVariantId) ?? variants[0])
+    : null;
+  // A selected variant's price is final — the base product's scalar
+  // discount% is not additionally stacked on top of it.
+  const displayProduct: Product = selectedVariant
+    ? {
+        ...product,
+        price: selectedVariant.price,
+        weight: selectedVariant.weight,
+        discount: null,
+        stock_quantity: selectedVariant.stockQuantity,
+      }
+    : product;
+
+  const hasDiscount = hasProductDiscount(displayProduct);
+  const hasHighDiscount = hasHighProductDiscount(displayProduct);
+  const discountPercent = getDiscountPercent(displayProduct);
+  const discountedPrice = getDiscountedPrice(displayProduct);
+  const available = isProductAvailable(displayProduct);
+  const lowStock = isProductLowStock(displayProduct);
+  const unitPrice = getUnitPriceInfo(displayProduct);
 
   const handleAddToCart = () => {
     if (!available) return;
-    addToCart(product, quantity, user?.id);
+    addToCart(
+      displayProduct,
+      quantity,
+      user?.id,
+      selectedVariant?.id,
+      selectedVariant?.label,
+    );
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
@@ -482,7 +516,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                 )}
 
                 <p className="text-[12px] text-brand-gold uppercase tracking-[0.3em] font-black mb-3">
-                  {product.weight}
+                  {displayProduct.weight}
                 </p>
 
                 <div className="flex items-center gap-6 mb-4">
@@ -500,18 +534,18 @@ export default function ProductPageClient({ id }: { id: string }) {
                           )}
                         </div>
                         <span className="text-lg text-brand-brown/50 line-through font-light">
-                          ₹{product.price.toFixed(2)}
+                          ₹{displayProduct.price.toFixed(2)}
                         </span>
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-1">
-                        You Save ₹{(product.price - discountedPrice).toFixed(2)}{" "}
+                        You Save ₹{(displayProduct.price - discountedPrice).toFixed(2)}{" "}
                         ({discountPercent}% Off)
                       </p>
                     </div>
                   ) : available ? (
                     <div className="flex items-baseline gap-3">
                       <span className="text-2xl lg:text-3xl font-medium text-brand-brown">
-                        ₹{product.price.toFixed(2)}
+                        ₹{displayProduct.price.toFixed(2)}
                       </span>
                       {unitPrice && (
                         <span className="text-sm text-brand-brown/50 font-light">
@@ -522,8 +556,8 @@ export default function ProductPageClient({ id }: { id: string }) {
                   ) : null}
 
                   {available &&
-                    product.stock_quantity !== undefined &&
-                    product.stock_quantity !== null && (
+                    displayProduct.stock_quantity !== undefined &&
+                    displayProduct.stock_quantity !== null && (
                       <div className="flex items-center gap-2 px-3 py-1 bg-brand-green/10 rounded-full">
                         <div
                           className={`w-1.5 h-1.5 rounded-full animate-pulse ${
@@ -594,7 +628,29 @@ export default function ProductPageClient({ id }: { id: string }) {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-col sm:flex-row items-center gap-8">
+                  <div className="flex flex-col gap-5">
+                    {variants && (
+                      <div className="flex flex-wrap gap-2">
+                        {variants.map((v) => (
+                          <button
+                            key={v.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedVariantId(v.id);
+                              setQuantity(1);
+                            }}
+                            className={`px-4 py-2.5 rounded-2xl text-[11px] font-bold uppercase tracking-wider border-2 transition-all ${
+                              selectedVariant?.id === v.id
+                                ? "bg-brand-brown text-brand-cream border-brand-brown"
+                                : "border-brand-gold/25 text-brand-brown/70 hover:border-brand-gold/50"
+                            }`}
+                          >
+                            {v.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-col sm:flex-row items-center gap-8">
                     <div className="flex items-center border border-brand-brown rounded-full px-6 py-3 lg:py-4 bg-white shadow-inner w-full sm:w-auto justify-between sm:justify-start">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -608,14 +664,14 @@ export default function ProductPageClient({ id }: { id: string }) {
                       <button
                         onClick={() =>
                           setQuantity(
-                            typeof product.stock_quantity === "number"
-                              ? Math.min(product.stock_quantity, quantity + 1)
+                            typeof displayProduct.stock_quantity === "number"
+                              ? Math.min(displayProduct.stock_quantity, quantity + 1)
                               : quantity + 1,
                           )
                         }
                         disabled={
-                          typeof product.stock_quantity === "number" &&
-                          quantity >= product.stock_quantity
+                          typeof displayProduct.stock_quantity === "number" &&
+                          quantity >= displayProduct.stock_quantity
                         }
                         className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-25"
                       >
@@ -637,6 +693,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                       </span>
                       <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                     </button>
+                  </div>
                   </div>
                 )}
               </div>

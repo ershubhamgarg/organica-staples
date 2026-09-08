@@ -8,7 +8,7 @@ import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useProductStore } from "@/store/productStore";
 
-import { isProductAvailable, isProductLowStock, Product } from "@/lib/data";
+import { hasVariants, isProductAvailable, isProductLowStock, Product } from "@/lib/data";
 import {
   getDiscountedPrice,
   getDiscountPercent,
@@ -21,8 +21,16 @@ type ProductsResponse = {
   products?: Product[];
 };
 
+const sortablePrice = (product: Product) =>
+  hasVariants(product)
+    ? Math.min(...product.variants.map((v) => v.price))
+    : getDiscountedPrice(product);
+
 export default function ProductListing() {
   const { products, fetchProducts } = useProductStore();
+  const [selectedVariantIds, setSelectedVariantIds] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     if (products.length === 0) {
@@ -112,9 +120,9 @@ export default function ProductListing() {
 
       // Within the same group, apply user-selected sort order
       if (sortOrder === "price-asc") {
-        return getDiscountedPrice(a) - getDiscountedPrice(b);
+        return sortablePrice(a) - sortablePrice(b);
       } else if (sortOrder === "price-desc") {
-        return getDiscountedPrice(b) - getDiscountedPrice(a);
+        return sortablePrice(b) - sortablePrice(a);
       }
 
       return 0;
@@ -252,13 +260,30 @@ export default function ProductListing() {
           className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 min-h-[60vh] transition-all duration-500"
         >
         {filteredProducts.map((product) => {
-          const hasDiscount = hasProductDiscount(product);
-          const hasHighDiscount = hasHighProductDiscount(product);
-          const discountPercent = getDiscountPercent(product);
-          const discountedPrice = getDiscountedPrice(product);
-          const available = isProductAvailable(product);
-          const lowStock = isProductLowStock(product);
-          const unitPrice = getUnitPriceInfo(product);
+          const variants = hasVariants(product) ? product.variants : null;
+          const selectedVariant = variants
+            ? (variants.find((v) => v.id === selectedVariantIds[product.id]) ??
+              variants[0])
+            : null;
+          // A selected variant's price is final — the base product's scalar
+          // discount% is not additionally stacked on top of it.
+          const displayProduct: Product = selectedVariant
+            ? {
+                ...product,
+                price: selectedVariant.price,
+                weight: selectedVariant.weight,
+                discount: null,
+                stock_quantity: selectedVariant.stockQuantity,
+              }
+            : product;
+
+          const hasDiscount = hasProductDiscount(displayProduct);
+          const hasHighDiscount = hasHighProductDiscount(displayProduct);
+          const discountPercent = getDiscountPercent(displayProduct);
+          const discountedPrice = getDiscountedPrice(displayProduct);
+          const available = isProductAvailable(displayProduct);
+          const lowStock = isProductLowStock(displayProduct);
+          const unitPrice = getUnitPriceInfo(displayProduct);
 
           return (
             <div
@@ -358,7 +383,7 @@ export default function ProductListing() {
                   className={`flex flex-col items-center gap-1 ${available ? "mb-3 sm:mb-4" : "mb-2"}`}
                 >
                   <p className="text-[8px] sm:text-[10px] text-brand-gold italic font-medium tracking-wide">
-                    {product.weight}
+                    {displayProduct.weight}
                   </p>
 
                   {available && (
@@ -367,7 +392,7 @@ export default function ProductListing() {
                         <div className="flex flex-col items-center">
                           <div className="flex items-center gap-3">
                             <span className="text-xs sm:text-sm text-brand-brown/40 line-through font-light">
-                              ₹{product.price.toFixed(2)}
+                              ₹{displayProduct.price.toFixed(2)}
                             </span>
                             <div className="flex items-baseline gap-1 sm:gap-1.5">
                               <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
@@ -381,13 +406,13 @@ export default function ProductListing() {
                             </div>
                           </div>
                           <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
-                            Save ₹{(product.price - discountedPrice).toFixed(2)}
+                            Save ₹{(displayProduct.price - discountedPrice).toFixed(2)}
                           </p>
                         </div>
                       ) : (
                         <div className="flex items-baseline gap-1 sm:gap-1.5">
                           <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
-                            ₹{product.price.toFixed(2)}
+                            ₹{displayProduct.price.toFixed(2)}
                           </span>
                           {unitPrice && (
                             <span className="text-[8px] sm:text-[10px] text-brand-brown/50 font-light">
@@ -396,8 +421,8 @@ export default function ProductListing() {
                           )}
                         </div>
                       )}
-                      {product.stock_quantity !== undefined &&
-                        product.stock_quantity !== null && (
+                      {displayProduct.stock_quantity !== undefined &&
+                        displayProduct.stock_quantity !== null && (
                           <span
                             className={`text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
                               lowStock
@@ -413,7 +438,34 @@ export default function ProductListing() {
                 </div>
 
                 <div className="pt-1">
-                  <QuickAddButton product={product} className="w-full" />
+                  {variants && (
+                    <div className="flex flex-wrap justify-center gap-1.5 mb-2">
+                      {variants.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          onClick={() =>
+                            setSelectedVariantIds((prev) => ({
+                              ...prev,
+                              [product.id]: v.id,
+                            }))
+                          }
+                          className={`px-2.5 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider border transition-all ${
+                            selectedVariant?.id === v.id
+                              ? "bg-brand-brown text-brand-cream border-brand-brown"
+                              : "border-brand-gold/20 text-brand-brown/60 hover:border-brand-gold/40"
+                          }`}
+                        >
+                          {v.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <QuickAddButton
+                    product={product}
+                    selectedVariant={selectedVariant}
+                    className="w-full"
+                  />
                 </div>
 
                 {available && (

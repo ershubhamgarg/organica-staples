@@ -97,6 +97,25 @@ const recomputeOrderPricing = async (
     (products ?? []).map((p) => [String((p as Product).id), p as Product]),
   );
 
+  // Any item claiming a variant has its price/weight resolved from
+  // product_variants instead of the base product — this is the server-side
+  // trust boundary for variants, mirroring the base-product path below.
+  const variantIds = items
+    .map((item) => item.variantId)
+    .filter((id): id is string => Boolean(id));
+  const { data: variants, error: variantsError } = variantIds.length
+    ? await supabaseAdmin
+        .from("product_variants")
+        .select("id, product_id, price, weight, is_active")
+        .in("id", variantIds)
+    : { data: [], error: null };
+
+  if (variantsError) {
+    throw new Error(`Unable to verify variant pricing: ${variantsError.message}`);
+  }
+
+  const variantById = new Map((variants ?? []).map((v) => [String(v.id), v]));
+
   let actualSubtotal = 0;
   let discountedSubtotal = 0;
   const storedItems: CartItem[] = items.map((item) => {
@@ -114,14 +133,37 @@ const recomputeOrderPricing = async (
       throw new Error(`Invalid quantity for product ${item.id}.`);
     }
 
-    const unitPrice = getDiscountedPrice(product);
-    actualSubtotal += product.price * quantity;
+    let unitPrice: number;
+    let weight = product.weight;
+
+    if (item.variantId) {
+      const variant = variantById.get(String(item.variantId));
+
+      if (
+        !variant ||
+        String(variant.product_id) !== String(item.id) ||
+        variant.is_active === false
+      ) {
+        throw new Error(
+          `The selected size for ${product.name} is no longer available.`,
+        );
+      }
+
+      // A variant's price is final — no separate product-level discount is
+      // stacked on top of it (see lib/pricing.ts's discount-stacking note).
+      unitPrice = Number(variant.price);
+      weight = variant.weight;
+    } else {
+      unitPrice = getDiscountedPrice(product);
+    }
+
+    actualSubtotal += (item.variantId ? unitPrice : product.price) * quantity;
     discountedSubtotal += unitPrice * quantity;
 
-    // Keep the full item (name/weight/image/etc.) — only price and quantity
-    // are corrected. The stored order snapshot and Shiprocket's weight
-    // calculation both depend on the other fields being intact.
-    return { ...item, quantity, price: unitPrice };
+    // Keep the full item (name/weight/image/etc.) — only price, quantity,
+    // and weight are corrected. The stored order snapshot and Shiprocket's
+    // weight calculation both depend on the other fields being intact.
+    return { ...item, quantity, price: unitPrice, weight };
   });
 
   actualSubtotal = Number(actualSubtotal.toFixed(2));
@@ -467,6 +509,7 @@ export async function POST(request: Request) {
         id: item.id,
         quantity: item.quantity,
         price: item.price,
+        variant_id: item.variantId ?? null,
       })),
       p_launch_offer_email: launchOfferEmail,
     },

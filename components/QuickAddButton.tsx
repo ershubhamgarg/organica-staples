@@ -2,46 +2,61 @@
 
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { isProductAvailable, Product } from "@/lib/data";
+import { isProductAvailable, Product, ProductVariant } from "@/lib/data";
 import { Clock, Plus, Minus, ShoppingBag } from "lucide-react";
 
 interface QuickAddButtonProps {
   product: Product;
+  /** Omitted = today's plain single-price behavior. */
+  selectedVariant?: ProductVariant | null;
   className?: string;
 }
 
 export default function QuickAddButton({
   product,
+  selectedVariant,
   className,
 }: QuickAddButtonProps) {
   const { items, addToCart, updateQuantity } = useCartStore();
   const { user } = useUserStore();
 
-  const cartItem = items.find((item) => item.id === product.id);
+  const variantId = selectedVariant?.id;
+  const effective: Product = selectedVariant
+    ? {
+        ...product,
+        price: selectedVariant.price,
+        weight: selectedVariant.weight,
+        stock_quantity: selectedVariant.stockQuantity,
+      }
+    : product;
+
+  const cartItem = items.find(
+    (item) => item.id === product.id && (item.variantId ?? null) === (variantId ?? null),
+  );
   const quantity = cartItem?.quantity || 0;
-  const available = isProductAvailable(product);
+  const available = isProductAvailable(effective);
   const hasReachedStockLimit =
-    typeof product.stock_quantity === "number" &&
-    quantity >= product.stock_quantity;
+    typeof effective.stock_quantity === "number" &&
+    quantity >= effective.stock_quantity;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!available) return;
-    addToCart(product, 1, user?.id);
+    addToCart(effective, 1, user?.id, variantId, selectedVariant?.label);
   };
 
   const handleIncrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (hasReachedStockLimit) return;
-    updateQuantity(product.id, quantity + 1, user?.id);
+    updateQuantity(product.id, quantity + 1, user?.id, variantId);
   };
 
   const handleDecrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    updateQuantity(product.id, quantity - 1, user?.id);
+    updateQuantity(product.id, quantity - 1, user?.id, variantId);
   };
 
   if (!available) {

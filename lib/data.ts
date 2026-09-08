@@ -1,3 +1,14 @@
+export interface ProductVariant {
+  id: string;
+  productId: string;
+  label: string;
+  weight: string;
+  price: number;
+  stockQuantity?: number | null;
+  lowStockThreshold?: number | null;
+  isActive?: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -22,6 +33,14 @@ export interface Product {
   launchDate?: string | null;
   launch_status?: "available" | "just_launched" | "launching_soon" | null;
   launch_badge_text?: string | null;
+  /** Absent/empty = a plain single-price product (today's behavior, unchanged). */
+  variants?: ProductVariant[];
+}
+
+export function hasVariants(
+  product: Pick<Product, "variants">,
+): product is Pick<Product, "variants"> & { variants: ProductVariant[] } {
+  return Array.isArray(product.variants) && product.variants.length > 0;
 }
 
 export function getProductThumbnail(product: Product): string {

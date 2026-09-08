@@ -1,6 +1,7 @@
 "use client";
 
-import { useCartStore } from "@/store/cartStore";
+import { useCartStore, type CartItem } from "@/store/cartStore";
+import { useProductStore } from "@/store/productStore";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
 import {
@@ -41,6 +42,7 @@ import {
 } from "@/lib/pricing";
 import {
   getProductThumbnail,
+  hasVariants,
   isProductAvailable,
   isProductLowStock,
 } from "@/lib/data";
@@ -48,9 +50,12 @@ import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
+  const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
+  const catalogProducts = useProductStore((state) => state.products);
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
   const appliedDiscountCode = useCartStore(
     (state) => state.appliedDiscountCode,
   );
@@ -71,6 +76,7 @@ export default function CartPage() {
   const [itemToDelete, setItemToDelete] = useState<{
     id: string;
     name: string;
+    variantId?: string;
   } | null>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [discountMessage, setDiscountMessage] = useState<string | null>(null);
@@ -138,6 +144,34 @@ export default function CartPage() {
     0,
   );
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+
+  // Needed to know each cart line's full set of size options, so a variant
+  // switcher can be shown here (not just at add-to-cart time).
+  useEffect(() => {
+    if (catalogProducts.length === 0) {
+      void fetchProducts();
+    }
+  }, [catalogProducts.length, fetchProducts]);
+
+  const handleVariantChange = (
+    item: CartItem,
+    variant: { id: string; label: string; price: number; weight: string; stockQuantity?: number | null },
+  ) => {
+    if (variant.id === item.variantId) return;
+    removeFromCart(item.id, user?.id, item.variantId);
+    addToCart(
+      {
+        ...item,
+        price: variant.price,
+        weight: variant.weight,
+        stock_quantity: variant.stockQuantity,
+      },
+      item.quantity,
+      user?.id,
+      variant.id,
+      variant.label,
+    );
+  };
 
   // Sync summary to store for checkout page
   useEffect(() => {
@@ -419,7 +453,11 @@ export default function CartPage() {
                     </button>
                     <button
                       onClick={() => {
-                        removeFromCart(itemToDelete.id, user?.id);
+                        removeFromCart(
+                          itemToDelete.id,
+                          user?.id,
+                          itemToDelete.variantId,
+                        );
                         setItemToDelete(null);
                       }}
                       className="flex-1 py-4 rounded-full bg-brand-terracotta text-[10px] uppercase tracking-[0.25em] font-black text-white hover:bg-brand-terracotta/90 transition-colors shadow-xl shadow-brand-terracotta/20"
@@ -524,7 +562,7 @@ export default function CartPage() {
 
                 return (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.variantId ?? "base"}`}
                     className="group bg-white rounded-2xl border border-brand-gold/10 p-4 md:p-6 flex gap-4 md:gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
                   >
                     <Link
@@ -558,9 +596,45 @@ export default function CartPage() {
                             </p>
                           )}
                           <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                            <p className="text-[9px] text-brand-brown/40 font-bold uppercase tracking-widest">
-                              {item.weight}
-                            </p>
+                            {(() => {
+                              const fullProduct = catalogProducts.find(
+                                (p) => p.id === item.id,
+                              );
+                              if (
+                                fullProduct &&
+                                hasVariants(fullProduct) &&
+                                fullProduct.variants.length > 1
+                              ) {
+                                return (
+                                  <div
+                                    className="flex flex-wrap gap-1"
+                                    onClick={(e) => e.preventDefault()}
+                                  >
+                                    {fullProduct.variants.map((v) => (
+                                      <button
+                                        key={v.id}
+                                        type="button"
+                                        onClick={() =>
+                                          handleVariantChange(item, v)
+                                        }
+                                        className={`px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border transition-all ${
+                                          (item.variantId ?? null) === v.id
+                                            ? "bg-brand-brown text-brand-cream border-brand-brown"
+                                            : "border-brand-gold/20 text-brand-brown/50 hover:border-brand-gold/40"
+                                        }`}
+                                      >
+                                        {v.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                );
+                              }
+                              return (
+                                <p className="text-[9px] text-brand-brown/40 font-bold uppercase tracking-widest">
+                                  {item.variantLabel ?? item.weight}
+                                </p>
+                              );
+                            })()}
                             {available && itemHasDiscount && (
                               <span
                                 className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 text-white ${
@@ -587,9 +661,10 @@ export default function CartPage() {
                               setItemToDelete({
                                 id: item.id,
                                 name: item.name,
+                                variantId: item.variantId,
                               });
                             } else {
-                              removeFromCart(item.id, user?.id);
+                              removeFromCart(item.id, user?.id, item.variantId);
                             }
                           }}
                           className="text-brand-brown/20 hover:text-brand-terracotta transition-all p-2 hover:scale-110 shrink-0"
@@ -606,12 +681,14 @@ export default function CartPage() {
                                 setItemToDelete({
                                   id: item.id,
                                   name: item.name,
+                                  variantId: item.variantId,
                                 });
                               } else {
                                 updateQuantity(
                                   item.id,
                                   item.quantity - 1,
                                   user?.id,
+                                  item.variantId,
                                 );
                               }
                             }}
@@ -629,6 +706,7 @@ export default function CartPage() {
                                 item.id,
                                 item.quantity + 1,
                                 user?.id,
+                                item.variantId,
                               )
                             }
                             disabled={hasReachedStockLimit}

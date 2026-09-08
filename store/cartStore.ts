@@ -10,7 +10,17 @@ import { supabase } from "@/utils/supabase";
 
 export interface CartItem extends Product {
   quantity: number;
+  /** Undefined = a plain single-price line (today's behavior). */
+  variantId?: string;
+  variantLabel?: string;
 }
+
+/** Two lines are "the same" only if both id and variant match — `?? null`
+ * on both sides means "no variant" always equals "no variant" regardless of
+ * whether it arrives as `undefined` or `null` (carts round-trip through
+ * Supabase JSONB). */
+const sameLine = (item: CartItem, id: string, variantId?: string) =>
+  item.id === id && (item.variantId ?? null) === (variantId ?? null);
 
 export interface OrderSummary {
   actualSubtotal: number;
@@ -32,12 +42,19 @@ interface CartState {
   appliedDiscountCode: string | null;
   appliedDiscountCoupon: DiscountCode | null;
   orderSummary: OrderSummary | null;
-  addToCart: (product: Product, quantity?: number, userId?: string) => void;
-  removeFromCart: (productId: string, userId?: string) => void;
+  addToCart: (
+    product: Product,
+    quantity?: number,
+    userId?: string,
+    variantId?: string,
+    variantLabel?: string,
+  ) => void;
+  removeFromCart: (productId: string, userId?: string, variantId?: string) => void;
   updateQuantity: (
     productId: string,
     quantity: number,
     userId?: string,
+    variantId?: string,
   ) => void;
   clearCart: (userId?: string) => void;
   applyDiscountCode: (coupon: DiscountCode, userId?: string) => void;
@@ -90,18 +107,24 @@ export const useCartStore = create<CartState>()(
       appliedDiscountCoupon: null,
       orderSummary: null,
 
-      addToCart: (product: Product, quantity: number = 1, userId?: string) => {
+      addToCart: (
+        product: Product,
+        quantity: number = 1,
+        userId?: string,
+        variantId?: string,
+        variantLabel?: string,
+      ) => {
         set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.id === product.id,
+          const existingItem = state.items.find((item) =>
+            sameLine(item, product.id, variantId),
           );
           const newItems = existingItem
             ? state.items.map((item) =>
-                item.id === product.id
-                  ? { ...product, quantity: item.quantity + quantity }
+                sameLine(item, product.id, variantId)
+                  ? { ...item, quantity: item.quantity + quantity }
                   : item,
               )
-            : [...state.items, { ...product, quantity }];
+            : [...state.items, { ...product, quantity, variantId, variantLabel }];
 
           if (userId) {
             syncCartToSupabase(newItems, userId, state.appliedDiscountCoupon);
@@ -111,9 +134,11 @@ export const useCartStore = create<CartState>()(
         });
       },
 
-      removeFromCart: (productId: string, userId?: string) => {
+      removeFromCart: (productId: string, userId?: string, variantId?: string) => {
         set((state) => {
-          const newItems = state.items.filter((item) => item.id !== productId);
+          const newItems = state.items.filter(
+            (item) => !sameLine(item, productId, variantId),
+          );
 
           if (userId) {
             syncCartToSupabase(newItems, userId, state.appliedDiscountCoupon);
@@ -127,15 +152,16 @@ export const useCartStore = create<CartState>()(
         productId: string,
         quantity: number,
         userId?: string,
+        variantId?: string,
       ) => {
         if (quantity <= 0) {
-          get().removeFromCart(productId, userId);
+          get().removeFromCart(productId, userId, variantId);
           return;
         }
 
         set((state) => {
           const newItems = state.items.map((item) =>
-            item.id === productId ? { ...item, quantity } : item,
+            sameLine(item, productId, variantId) ? { ...item, quantity } : item,
           );
 
           if (userId) {
