@@ -168,9 +168,17 @@ const recomputeOrderPricing = async (
     discountedSubtotal += unitPrice * quantity;
 
     // Keep the full item (name/weight/image/etc.) — only price, quantity,
-    // and weight are corrected. The stored order snapshot and Shiprocket's
-    // weight calculation both depend on the other fields being intact.
-    return { ...item, quantity, price: unitPrice, weight };
+    // weight, and hsn_code are corrected/attached. The stored order snapshot
+    // and Shiprocket's weight/HSN reporting both depend on the other fields
+    // being intact. HSN is a product-level GST classification — the same
+    // code applies regardless of which variant was ordered.
+    return {
+      ...item,
+      quantity,
+      price: unitPrice,
+      weight,
+      hsn_code: product.hsn_code ?? null,
+    };
   });
 
   actualSubtotal = Number(actualSubtotal.toFixed(2));

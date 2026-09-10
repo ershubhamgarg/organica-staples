@@ -421,6 +421,7 @@ const buildCreateOrderPayload = (order: Order) => {
       selling_price: item.price,
       discount: 0,
       tax: 0,
+      hsn: item.hsn_code || "",
     })),
     payment_method: getPaymentMethod(order.payment_method),
     sub_total: toNumber(order.total_amount),

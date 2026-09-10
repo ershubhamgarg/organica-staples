@@ -35,6 +35,8 @@ export interface Product {
   launchDate?: string | null;
   launch_status?: "available" | "just_launched" | "launching_soon" | null;
   launch_badge_text?: string | null;
+  /** GST tariff classification — same across all of a product's variants. */
+  hsn_code?: string | null;
   /** Absent/empty = a plain single-price product (today's behavior, unchanged). */
   variants?: ProductVariant[];
 }
