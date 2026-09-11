@@ -112,8 +112,14 @@ export type ShiprocketShipmentResult = {
 export function normalizeTrackingStatus(status: string | null | undefined) {
   const value = status?.toLowerCase() ?? "";
 
-  if (value.includes("deliver")) return "delivered";
+  // "out for delivery" contains "deliver" as a substring — it must be
+  // checked before the generic "deliver" branch below, or Shiprocket's
+  // real "Out for Delivery" status (confirmed live, e.g. courier activity
+  // code "OFD") gets misread as a completed "delivered" the moment a
+  // courier picks up the package for the final leg, before it's actually
+  // reached the customer.
   if (value.includes("out for delivery")) return "out_for_delivery";
+  if (value.includes("deliver")) return "delivered";
   if (value.includes("transit") || value.includes("shipped")) return "in_transit";
   if (value.includes("cancel")) return "cancelled";
   if (value.includes("pick") || value.includes("manifest")) return "awb_assigned";
