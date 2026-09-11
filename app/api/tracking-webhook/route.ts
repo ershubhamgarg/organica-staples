@@ -29,6 +29,7 @@ const getSupabaseAdmin = () => {
 
 type OrderMatchRow = {
   id: string;
+  status: string;
   shiprocket_awb_code: string | null;
   shiprocket_courier_name: string | null;
   shiprocket_tracking_url: string | null;
@@ -37,7 +38,7 @@ type OrderMatchRow = {
 };
 
 const ORDER_MATCH_COLUMNS =
-  "id, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, delivered_at";
+  "id, status, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, delivered_at";
 
 // Shiprocket's webhook payload shape isn't consistently documented across
 // their webhook types, so every field below is read defensively under
@@ -151,11 +152,21 @@ export async function POST(request: Request) {
   }
 
   const shippingStatus = normalizeTrackingStatus(statusText);
+  // A cancelled shipment is not the same thing as a cancelled order — the
+  // courier/AWB was voided (RTO, a failed pickup, a manual cancel on
+  // Shiprocket's own dashboard), but the order itself still needs to be
+  // fulfilled, typically by assigning a new AWB. Only a deliberate
+  // admin-initiated cancellation (via the CMS's Cancel Order flow) should
+  // ever set the order itself to "cancelled" — this path sends it back to
+  // "processing" instead, unless the order was already cancelled or
+  // delivered, in which case that terminal state is left alone.
   const orderStatus =
     shippingStatus === "delivered"
       ? "delivered"
       : shippingStatus === "cancelled"
-        ? "cancelled"
+        ? order.status === "cancelled" || order.status === "delivered"
+          ? order.status
+          : "processing"
         : "shipped";
 
   // A changed AWB (courier reassignment) also invalidates the previously

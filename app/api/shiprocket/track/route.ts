@@ -60,7 +60,7 @@ export async function GET(request: Request) {
   const { data: order, error } = await supabaseAdmin
     .from("orders")
     .select(
-      "id, user_id, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, shipping_error, delivered_at",
+      "id, user_id, status, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, shipping_error, delivered_at",
     )
     .eq("id", orderId)
     .single();
@@ -96,11 +96,18 @@ export async function GET(request: Request) {
   try {
     const tracking = await getShiprocketTracking(order.shiprocket_awb_code);
     const shippingStatus = normalizeTrackingStatus(tracking.currentStatus);
+    // A cancelled shipment (RTO, failed pickup, a manual cancel on
+    // Shiprocket's own dashboard) is not the same as a cancelled order — the
+    // order still needs fulfilling, typically via a new AWB — so this sends
+    // it back to "processing" rather than "cancelled", unless the order is
+    // already in one of those terminal states.
     const orderStatus =
       shippingStatus === "delivered"
         ? "delivered"
         : shippingStatus === "cancelled"
-          ? "cancelled"
+          ? order.status === "cancelled" || order.status === "delivered"
+            ? order.status
+            : "processing"
           : "shipped";
 
     await supabaseAdmin
