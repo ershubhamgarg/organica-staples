@@ -20,6 +20,8 @@ interface ProductImageCarouselProps {
   priority?: boolean;
   imageClassName?: string;
   onSelectedIndexChange?: (index: number) => void;
+  /** Defaults to true (existing behavior). Set false to require manual/swipe navigation only. */
+  autoplay?: boolean;
 }
 
 export interface ProductImageCarouselHandle {
@@ -72,6 +74,7 @@ function ProductImageCarousel(
     priority = false,
     imageClassName = "object-cover",
     onSelectedIndexChange,
+    autoplay: autoplayEnabled = true,
   }: ProductImageCarouselProps,
   ref: React.Ref<ProductImageCarouselHandle>,
 ) {
@@ -87,7 +90,7 @@ function ProductImageCarousel(
   );
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { align: "start", loop: imageCount > 1 },
-    [autoplay.current],
+    autoplayEnabled ? [autoplay.current] : [],
   );
 
   const scrollTo = useCallback(
