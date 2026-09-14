@@ -115,16 +115,33 @@ export const useCartStore = create<CartState>()(
         variantLabel?: string,
       ) => {
         set((state) => {
+          // A barter/collab coupon is only valid at 1 unit per line, so while
+          // one is applied every quantity is hard-capped here — the single
+          // chokepoint every add path (listing, PDP, cart) goes through.
+          const capToOne = state.appliedDiscountCoupon?.isFreeOrder === true;
           const existingItem = state.items.find((item) =>
             sameLine(item, product.id, variantId),
           );
           const newItems = existingItem
             ? state.items.map((item) =>
                 sameLine(item, product.id, variantId)
-                  ? { ...item, quantity: item.quantity + quantity }
+                  ? {
+                      ...item,
+                      quantity: capToOne
+                        ? 1
+                        : item.quantity + quantity,
+                    }
                   : item,
               )
-            : [...state.items, { ...product, quantity, variantId, variantLabel }];
+            : [
+                ...state.items,
+                {
+                  ...product,
+                  quantity: capToOne ? 1 : quantity,
+                  variantId,
+                  variantLabel,
+                },
+              ];
 
           if (userId) {
             syncCartToSupabase(newItems, userId, state.appliedDiscountCoupon);
@@ -160,8 +177,12 @@ export const useCartStore = create<CartState>()(
         }
 
         set((state) => {
+          const cappedQuantity =
+            state.appliedDiscountCoupon?.isFreeOrder === true ? 1 : quantity;
           const newItems = state.items.map((item) =>
-            sameLine(item, productId, variantId) ? { ...item, quantity } : item,
+            sameLine(item, productId, variantId)
+              ? { ...item, quantity: cappedQuantity }
+              : item,
           );
 
           if (userId) {

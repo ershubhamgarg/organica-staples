@@ -68,12 +68,23 @@ export default function ProductPageClient({ id }: { id: string }) {
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [hasFetched, setHasFetched] = useState(false);
-  const { addToCart } = useCartStore();
+  const { addToCart, appliedDiscountCoupon } = useCartStore();
+  // A barter/collab coupon is valid only at 1 unit per product, so while one
+  // is applied the quantity stepper is pinned to 1.
+  const quantityLockedToOne = appliedDiscountCoupon?.isFreeOrder === true;
   const { user } = useUserStore();
   const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState<
     string | undefined
   >(undefined);
+
+  // If the coupon gets applied while a higher quantity is already picked,
+  // snap the stepper back to 1 so it matches what will actually be added.
+  useEffect(() => {
+    if (quantityLockedToOne) {
+      setQuantity(1);
+    }
+  }, [quantityLockedToOne]);
   const [added, setAdded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -715,8 +726,14 @@ export default function ProductPageClient({ id }: { id: string }) {
                           )
                         }
                         disabled={
-                          typeof displayProduct.stock_quantity === "number" &&
-                          quantity >= displayProduct.stock_quantity
+                          quantityLockedToOne ||
+                          (typeof displayProduct.stock_quantity === "number" &&
+                            quantity >= displayProduct.stock_quantity)
+                        }
+                        title={
+                          quantityLockedToOne
+                            ? `${appliedDiscountCoupon?.code} allows only 1 of each product.`
+                            : undefined
                         }
                         className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-25"
                       >

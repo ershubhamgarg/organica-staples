@@ -9,7 +9,7 @@ import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -24,6 +24,7 @@ import {
   Lock,
   Banknote,
   Share2,
+  Gift,
   X,
   Camera,
   Sparkles,
@@ -31,7 +32,10 @@ import {
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
-import { calculateDiscount } from "@/lib/discountCodes";
+import {
+  calculateDiscount,
+  getFreeOrderCartState,
+} from "@/lib/discountCodes";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { STANDARD_SHIPPING_RATE, isLocalDeliveryPincode } from "@/lib/shipping";
@@ -245,6 +249,25 @@ export default function CheckoutPage() {
           message: launchOfferClaim.hasClaimed ? "" : "Checking status...",
         }
       : rawLaunchOffer;
+
+  // A barter/collab coupon (100% off + waived fees) — resolved from the
+  // applied coupon's own `isFreeOrder` flag, not a specific hardcoded code,
+  // so any future coupon can opt into the same zero-payment flow. Coupons
+  // with this flag are configured with no minimum order value, so shortfall
+  // eligibility isn't a real-world concern here.
+  const hasFreeOrderCoupon =
+    !launchOffer.isEligible && appliedDiscountCoupon?.isFreeOrder === true;
+  // Free-order coupons also require every cart line to be a single unit.
+  const freeOrderCart = getFreeOrderCartState(items);
+  const isFreeOrderCoupon = hasFreeOrderCoupon && freeOrderCart.isEligible;
+  // Applied, but the cart breaks the 1-per-product rule — surfaced as a
+  // blocking notice rather than silently charging them full price.
+  const freeOrderCartBlocked = hasFreeOrderCoupon && !freeOrderCart.isEligible;
+  // Both flows skip payment collection entirely; kept as one flag so the
+  // handful of fee/shipping/total computations below don't need to know
+  // which specific offer triggered it.
+  const isFreeCheckoutFlow = launchOffer.isEligible || isFreeOrderCoupon;
+
   const usableOrderSummary =
     orderSummary?.couponDiscount.code === LAUNCH_OFFER_CODE &&
     !launchOffer.isEligible
@@ -281,7 +304,7 @@ export default function CheckoutPage() {
         : subtotalAfterDiscount > 0
           ? 149
           : 0;
-  const convenienceFee = launchOffer.isEligible
+  const convenienceFee = isFreeCheckoutFlow
     ? 0
     : (usableOrderSummary?.convenienceFee ?? (actualSubtotal <= 300 ? 5 : 10));
 
@@ -343,7 +366,7 @@ export default function CheckoutPage() {
   const [dynamicShipping, setDynamicShipping] =
     useState<ShippingRateEstimate | null>(null);
   const currentCodFee =
-    selectedPayment === "cod" && !launchOffer.isEligible
+    selectedPayment === "cod" && !isFreeCheckoutFlow
       ? (dynamicShipping?.codCharges ?? 0)
       : 0;
   const [shippingRateError, setShippingRateError] = useState<string | null>(
@@ -361,7 +384,7 @@ export default function CheckoutPage() {
     subtotalAfterDiscount < 1000 &&
     rawShippingAmount > shippingCap;
 
-  const shipping = launchOffer.isEligible
+  const shipping = isFreeCheckoutFlow
     ? 0
     : subtotalAfterDiscount >= 1000
       ? 0
@@ -377,7 +400,7 @@ export default function CheckoutPage() {
         ? Number((rawShippingAmount - shippingCap).toFixed(2))
         : 0;
 
-  const finalTotal = launchOffer.isEligible
+  const finalTotal = isFreeCheckoutFlow
     ? 0
     : subtotalAfterDiscount + shipping + convenienceFee + currentCodFee;
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -498,11 +521,20 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [orderPlaced]);
 
-  useEffect(() => {
-    if (launchOffer.isEligible || !appliedDiscountCode || appliedDiscountCoupon)
-      return;
+  // Re-validate the applied coupon against the server on arrival from the
+  // cart — a persisted coupon can have gone stale in the meantime (used up,
+  // expired, deactivated), and for free-order coupons the cart itself has to
+  // still satisfy the 1-per-product rule. Runs once per mount; the ref stops
+  // the re-apply below from retriggering it.
+  const hasRevalidatedCoupon = useRef(false);
 
-    const fetchAppliedCoupon = async () => {
+  useEffect(() => {
+    if (launchOffer.isEligible || !appliedDiscountCode) return;
+    if (hasRevalidatedCoupon.current) return;
+
+    hasRevalidatedCoupon.current = true;
+
+    const revalidateAppliedCoupon = async () => {
       try {
         const response = await fetch("/api/discount-coupons", {
           method: "POST",
@@ -513,28 +545,39 @@ export default function CheckoutPage() {
           }),
         });
         const result = (await response.json()) as
-          | { coupon: DiscountCode }
+          | { coupon: DiscountCode; isEligible: boolean; shortfall: number }
           | { error?: string };
 
         if (!response.ok || !("coupon" in result)) {
-          throw new Error("Coupon is no longer available.");
+          throw new Error(
+            ("error" in result && result.error) ||
+              "This coupon is no longer available.",
+          );
+        }
+
+        if (result.coupon.requiresLogin && !user) {
+          throw new Error("Please sign in to use this coupon.");
         }
 
         applyDiscountCode(result.coupon, user?.id);
-      } catch {
+      } catch (error) {
         removeDiscountCode(user?.id);
+        setPaymentError(
+          error instanceof Error
+            ? `${error.message} It has been removed from your order.`
+            : "This coupon is no longer available. It has been removed from your order.",
+        );
       }
     };
 
-    fetchAppliedCoupon();
+    revalidateAppliedCoupon();
   }, [
     appliedDiscountCode,
-    appliedDiscountCoupon,
     applyDiscountCode,
     removeDiscountCode,
     totalPrice,
     launchOffer.isEligible,
-    user?.id,
+    user,
   ]);
 
   const createInstagramStoryImage = async (
@@ -882,6 +925,33 @@ export default function CheckoutPage() {
         getOrderErrorMessage(
           error,
           "We could not place your COD order. Please try again.",
+        ),
+      );
+    }
+  };
+
+  const handleFreeOrderClaim = async () => {
+    if (!selectedAddressId || !isFreeOrderCoupon) return;
+
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    const deliveryAddress = checkoutAddresses.find(
+      (a) => a.id === selectedAddressId,
+    );
+    if (!deliveryAddress) return;
+
+    try {
+      setPaymentError(null);
+      await completeOrder(deliveryAddress, "barter_collab", undefined);
+    } catch (error) {
+      console.error("Free order placement error:", error);
+      setPaymentError(
+        getOrderErrorMessage(
+          error,
+          "We could not place your order. Please try again.",
         ),
       );
     }
@@ -1527,9 +1597,17 @@ export default function CheckoutPage() {
                   2
                 </div>
                 <h2 className="text-xl font-serif text-brand-brown tracking-tight">
-                  {launchOffer.isEligible ? "Story" : "Payment"}{" "}
+                  {launchOffer.isEligible
+                    ? "Story"
+                    : hasFreeOrderCoupon
+                      ? "Collab"
+                      : "Payment"}{" "}
                   <span className="italic">
-                    {launchOffer.isEligible ? "Verification" : "Method"}
+                    {launchOffer.isEligible
+                      ? "Verification"
+                      : hasFreeOrderCoupon
+                        ? "Order"
+                        : "Method"}
                   </span>
                 </h2>
               </div>
@@ -1561,6 +1639,58 @@ export default function CheckoutPage() {
                             @annvriksh_in
                           </a>
                           .
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : hasFreeOrderCoupon ? (
+                  <div
+                    className={`w-full rounded-2xl border p-5 text-left shadow-xl ${
+                      freeOrderCartBlocked
+                        ? "border-brand-terracotta/40 bg-brand-terracotta/10"
+                        : "border-brand-terracotta/15 bg-brand-terracotta/5"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-brand-terracotta">
+                        {freeOrderCartBlocked ? (
+                          <AlertTriangle size={22} strokeWidth={1.5} />
+                        ) : (
+                          <Gift size={22} strokeWidth={1.5} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-terracotta mb-1">
+                          Barter Collaboration
+                        </h4>
+                        <p className="text-lg font-serif tracking-tight text-brand-brown">
+                          {freeOrderCartBlocked
+                            ? "One Quantity Per Product"
+                            : "No Payment Required"}
+                        </p>
+                        <p className="mt-1 text-[10px] font-light leading-relaxed text-brand-brown/60">
+                          {freeOrderCartBlocked ? (
+                            <>
+                              {freeOrderCart.message}{" "}
+                              <Link
+                                href="/cart"
+                                className="text-brand-terracotta underline underline-offset-2 hover:text-brand-brown transition-colors"
+                              >
+                                Edit cart
+                              </Link>
+                              .
+                            </>
+                          ) : (
+                            <>
+                              This order is covered under code{" "}
+                              <span className="font-semibold text-brand-brown">
+                                {appliedDiscountCoupon?.code}
+                              </span>{" "}
+                              — no payment is collected, shipping is on us.
+                              {!user &&
+                                " Sign in to place the order under your account."}
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -1676,6 +1806,10 @@ export default function CheckoutPage() {
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-green bg-brand-green/8 px-2.5 py-0.5 rounded-full border border-brand-green/20 w-fit mt-0.5">
                           <span>Story Verification</span>
                         </span>
+                      ) : isFreeOrderCoupon ? (
+                        <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-terracotta bg-brand-terracotta/8 px-2.5 py-0.5 rounded-full border border-brand-terracotta/20 w-fit mt-0.5">
+                          <span>Collab · Free Order</span>
+                        </span>
                       ) : selectedPayment ? (
                         <span className="inline-flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-brand-gold bg-brand-gold/8 px-2.5 py-0.5 rounded-full border border-brand-gold/20 w-fit mt-0.5">
                           <span>
@@ -1696,15 +1830,18 @@ export default function CheckoutPage() {
                       onClick={
                         launchOffer.isEligible
                           ? handleLaunchOfferOrder
-                          : selectedPayment === "razorpay"
-                            ? handleRazorpayPayment
-                            : handleCODPayment
+                          : isFreeOrderCoupon
+                            ? handleFreeOrderClaim
+                            : selectedPayment === "razorpay"
+                              ? handleRazorpayPayment
+                              : handleCODPayment
                       }
                       disabled={
                         isPlacingOrder ||
                         isStartingPayment ||
                         isShippingRateLoading ||
-                        (!launchOffer.isEligible && !selectedPayment)
+                        freeOrderCartBlocked ||
+                        (!isFreeCheckoutFlow && !selectedPayment)
                       }
                       className="flex-1 max-w-[180px] group relative flex items-center justify-center gap-2 py-3 px-4 bg-brand-green text-brand-cream rounded-full text-[9px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
                     >
@@ -1715,6 +1852,11 @@ export default function CheckoutPage() {
                           <div className="w-3.5 h-3.5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin flex-shrink-0" />
                         ) : launchOffer.isEligible ? (
                           <Share2
+                            size={12}
+                            className="text-brand-gold flex-shrink-0"
+                          />
+                        ) : isFreeOrderCoupon ? (
+                          <Gift
                             size={12}
                             className="text-brand-gold flex-shrink-0"
                           />
@@ -1734,13 +1876,19 @@ export default function CheckoutPage() {
                           isStartingPayment ||
                           isShippingRateLoading
                             ? "Verifying..."
-                            : launchOffer.isEligible
-                              ? user
-                                ? "Place Order"
-                                : "Sign In"
-                              : selectedPayment === "razorpay"
-                                ? "Pay Securely"
-                                : "Place Order"}
+                            : freeOrderCartBlocked
+                              ? "Set Qty To 1"
+                              : launchOffer.isEligible
+                                ? user
+                                  ? "Place Order"
+                                  : "Sign In"
+                                : isFreeOrderCoupon
+                                  ? user
+                                    ? "Confirm Free Order"
+                                    : "Sign In"
+                                  : selectedPayment === "razorpay"
+                                    ? "Pay Securely"
+                                    : "Place Order"}
                         </span>
                         <ArrowRight
                           size={12}
@@ -1761,21 +1909,26 @@ export default function CheckoutPage() {
                     onClick={
                       launchOffer.isEligible
                         ? handleLaunchOfferOrder
-                        : selectedPayment === "razorpay"
-                          ? handleRazorpayPayment
-                          : handleCODPayment
+                        : isFreeOrderCoupon
+                          ? handleFreeOrderClaim
+                          : selectedPayment === "razorpay"
+                            ? handleRazorpayPayment
+                            : handleCODPayment
                     }
                     disabled={
                       isPlacingOrder ||
                       isStartingPayment ||
                       isShippingRateLoading ||
-                      (!launchOffer.isEligible && !selectedPayment)
+                      freeOrderCartBlocked ||
+                      (!isFreeCheckoutFlow && !selectedPayment)
                     }
                     className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-3 lg:py-4 rounded-xl lg:rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
                   >
                     <span className="relative z-10 flex items-center gap-4">
                       {launchOffer.isEligible ? (
                         <Share2 size={18} className="text-brand-green-fresh" />
+                      ) : isFreeOrderCoupon ? (
+                        <Gift size={18} className="text-brand-green-fresh" />
                       ) : selectedPayment === "razorpay" ? (
                         <Lock size={18} className="text-brand-green-fresh" />
                       ) : (
@@ -1788,13 +1941,19 @@ export default function CheckoutPage() {
                       isStartingPayment ||
                       isShippingRateLoading
                         ? "Verifying Securely..."
-                        : launchOffer.isEligible
-                          ? user
-                            ? "Place Launch Offer Order"
-                            : "Sign In To Claim Offer"
-                          : selectedPayment === "razorpay"
-                            ? `Pay ₹${finalTotal.toFixed(2)}`
-                            : `Confirm Order ₹${finalTotal.toFixed(2)}`}
+                        : freeOrderCartBlocked
+                          ? "Set Every Quantity To 1"
+                          : launchOffer.isEligible
+                            ? user
+                              ? "Place Launch Offer Order"
+                              : "Sign In To Claim Offer"
+                            : isFreeOrderCoupon
+                              ? user
+                                ? "Confirm Free Collab Order"
+                                : "Sign In To Place Order"
+                              : selectedPayment === "razorpay"
+                                ? `Pay ₹${finalTotal.toFixed(2)}`
+                                : `Confirm Order ₹${finalTotal.toFixed(2)}`}
                       <ArrowRight
                         size={20}
                         className="group-hover:translate-x-2 transition-transform"
@@ -1804,9 +1963,13 @@ export default function CheckoutPage() {
                       <ShieldCheck size={10} />
                       {launchOffer.isEligible
                         ? "Pending Instagram Story Verification"
-                        : selectedPayment === "razorpay"
-                          ? "Powered by Razorpay"
-                          : "Verified Cash on Delivery Order"}
+                        : freeOrderCartBlocked
+                          ? "1 Quantity Per Product For Collab Orders"
+                          : isFreeOrderCoupon
+                            ? "Barter Collaboration · No Payment Due"
+                            : selectedPayment === "razorpay"
+                              ? "Powered by Razorpay"
+                              : "Verified Cash on Delivery Order"}
                     </span>
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
                     <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
@@ -1859,7 +2022,7 @@ export default function CheckoutPage() {
                       <p className="text-[11px] font-bold text-brand-brown shrink-0">
                         {!available
                           ? "Coming Soon"
-                          : launchOffer.isEligible
+                          : isFreeCheckoutFlow
                             ? "₹0.00"
                             : `₹${(getDiscountedPrice(item) * item.quantity).toFixed(2)}`}
                       </p>
@@ -1995,7 +2158,7 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
-                    {isShippingRateLoading && !launchOffer.isEligible && (
+                    {isShippingRateLoading && !isFreeCheckoutFlow && (
                       <div className="flex justify-between text-xs">
                         <span className="text-brand-brown/60 font-light">
                           Checking live shipping
@@ -2003,7 +2166,7 @@ export default function CheckoutPage() {
                         <span className="h-3.5 w-3.5 rounded-full border-2 border-brand-gold border-t-transparent animate-spin" />
                       </div>
                     )}
-                    {shippingRateError && !launchOffer.isEligible && (
+                    {shippingRateError && !isFreeCheckoutFlow && (
                       <p className="rounded-2xl border border-brand-gold/10 bg-brand-cream/60 px-3 py-2 text-[9px] font-semibold leading-relaxed text-brand-brown/50">
                         {shippingRateError} Using standard shipping estimate for
                         now.

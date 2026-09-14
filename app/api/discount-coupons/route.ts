@@ -21,7 +21,7 @@ const getSupabaseServerClient = () => {
 };
 
 const couponColumns =
-  "code, percent, label, is_public, min_order_value, valid_upto";
+  "code, percent, label, is_public, min_order_value, valid_upto, is_free_order, requires_login, max_redemptions, redemption_count";
 
 export async function GET() {
   const supabase = getSupabaseServerClient();
@@ -103,6 +103,19 @@ export async function POST(request: Request) {
   if (coupon.validUpto && new Date(coupon.validUpto).getTime() < Date.now()) {
     return NextResponse.json(
       { error: "This coupon has expired." },
+      { status: 404 },
+    );
+  }
+
+  // Advisory only — the authoritative, race-free gate is the atomic
+  // lock-check-increment inside place_order_with_inventory. This just fails
+  // fast with a friendlier message before the customer gets to checkout.
+  if (
+    coupon.maxRedemptions !== null &&
+    coupon.redemptionCount >= coupon.maxRedemptions
+  ) {
+    return NextResponse.json(
+      { error: "This coupon has reached its usage limit." },
       { status: 404 },
     );
   }

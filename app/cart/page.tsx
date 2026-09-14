@@ -27,7 +27,10 @@ import {
 } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
-import { calculateDiscount } from "@/lib/discountCodes";
+import {
+  calculateDiscount,
+  getFreeOrderCartState,
+} from "@/lib/discountCodes";
 import {
   LAUNCH_OFFER_CODE,
   LAUNCH_OFFER_PACK_LIMIT,
@@ -133,12 +136,22 @@ export default function CartPage() {
   const subtotalAfterDiscount = launchOffer.isEligible
     ? 0
     : cartDiscount.subtotalAfterDiscount;
+
+  // Barter/collab coupon: only valid while every line is a single unit, and
+  // it waives the convenience fee along with shipping.
+  const hasFreeOrderCoupon =
+    !launchOffer.isEligible && appliedDiscountCoupon?.isFreeOrder === true;
+  const freeOrderCart = getFreeOrderCartState(items);
+  const freeOrderCartBlocked = hasFreeOrderCoupon && !freeOrderCart.isEligible;
+  const isFreeOrderCoupon = hasFreeOrderCoupon && freeOrderCart.isEligible;
+
   const shipping = 0;
-  const convenienceFee = launchOffer.isEligible
-    ? 0
-    : actualSubtotal <= 300
-      ? 5
-      : 10;
+  const convenienceFee =
+    launchOffer.isEligible || isFreeOrderCoupon
+      ? 0
+      : actualSubtotal <= 300
+        ? 5
+        : 10;
   const totalPayable = subtotalAfterDiscount;
   const freeShippingThreshold = 1000;
   const freeShippingShortfall = Math.max(
@@ -269,6 +282,22 @@ export default function CartPage() {
           `Add ₹${result.shortfall.toFixed(2)} more to use ${result.coupon.code}.`,
         );
         return;
+      }
+
+      if (result.coupon.requiresLogin && !user) {
+        setDiscountError(
+          `Please sign in to use ${result.coupon.code}.`,
+        );
+        return;
+      }
+
+      if (result.coupon.isFreeOrder) {
+        const cartState = getFreeOrderCartState(items);
+
+        if (!cartState.isEligible) {
+          setDiscountError(cartState.message);
+          return;
+        }
       }
 
       applyDiscountCode(result.coupon, user?.id);
@@ -752,7 +781,12 @@ export default function CartPage() {
                                 item.variantId,
                               )
                             }
-                            disabled={hasReachedStockLimit}
+                            disabled={hasReachedStockLimit || hasFreeOrderCoupon}
+                            title={
+                              hasFreeOrderCoupon
+                                ? `${appliedDiscountCoupon?.code} allows only 1 of each product. Remove the coupon to order more.`
+                                : undefined
+                            }
                             className="w-8 h-8 flex items-center justify-center text-brand-brown hover:text-brand-green transition-all rounded-full hover:bg-brand-cream disabled:cursor-not-allowed disabled:opacity-25"
                             aria-label="Increase quantity"
                           >
@@ -976,6 +1010,12 @@ export default function CartPage() {
                       }`}
                     >
                       {discountError || discountMessage}
+                    </p>
+                  )}
+
+                  {freeOrderCartBlocked && (
+                    <p className="mt-3 rounded-xl border border-brand-terracotta/20 bg-brand-terracotta/5 px-3 py-2 text-[9px] font-bold uppercase leading-relaxed tracking-widest text-brand-terracotta">
+                      {freeOrderCart.message}
                     </p>
                   )}
                 </div>

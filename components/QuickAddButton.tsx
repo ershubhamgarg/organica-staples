@@ -17,8 +17,12 @@ export default function QuickAddButton({
   selectedVariant,
   className,
 }: QuickAddButtonProps) {
-  const { items, addToCart, updateQuantity } = useCartStore();
+  const { items, addToCart, updateQuantity, appliedDiscountCoupon } =
+    useCartStore();
   const { user } = useUserStore();
+  // A barter/collab coupon is valid only at 1 unit per product, so while one
+  // is applied the quantity stepper can't go past 1.
+  const quantityLockedToOne = appliedDiscountCoupon?.isFreeOrder === true;
 
   const variantId = selectedVariant?.id;
   // A selected variant's price (and its own discount, if any) is final —
@@ -53,7 +57,7 @@ export default function QuickAddButton({
   const handleIncrease = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (hasReachedStockLimit) return;
+    if (hasReachedStockLimit || quantityLockedToOne) return;
     updateQuantity(product.id, quantity + 1, user?.id, variantId);
   };
 
@@ -97,12 +101,19 @@ export default function QuickAddButton({
         </span>
         <button
           onClick={handleIncrease}
-          disabled={hasReachedStockLimit}
+          disabled={hasReachedStockLimit || quantityLockedToOne}
+          title={
+            quantityLockedToOne
+              ? `${appliedDiscountCoupon?.code} allows only 1 of each product.`
+              : undefined
+          }
           className="text-brand-brown hover:text-brand-green transition-all p-1 hover:scale-110 disabled:cursor-not-allowed disabled:opacity-25"
           aria-label={
-            hasReachedStockLimit
-              ? `${product.name} stock limit reached`
-              : "Increase quantity"
+            quantityLockedToOne
+              ? `Only 1 unit allowed while ${appliedDiscountCoupon?.code} is applied`
+              : hasReachedStockLimit
+                ? `${product.name} stock limit reached`
+                : "Increase quantity"
           }
         >
           <Plus size={14} strokeWidth={3} />

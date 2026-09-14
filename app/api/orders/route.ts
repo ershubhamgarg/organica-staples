@@ -10,6 +10,7 @@ import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice, getVariantDiscountedPrice } from "@/lib/pricing";
 import {
   calculateDiscount,
+  getFreeOrderCartState,
   mapDiscountCoupon,
   normalizeDiscountCode,
 } from "@/lib/discountCodes";
@@ -190,12 +191,17 @@ const recomputeOrderPricing = async (
   let couponDiscountAmount = 0;
   let discountPercent = 0;
   let discountCode: string | null = null;
+  let isFreeOrderCoupon = false;
+  let couponRequiresLogin = false;
+  let couponRedemptionsExhausted = false;
 
   if (requestedDiscountCode) {
     const normalizedCode = normalizeDiscountCode(requestedDiscountCode);
     const { data: couponRow } = await supabaseAdmin
       .from("discount_coupons")
-      .select("code, percent, label, is_public, min_order_value, valid_upto")
+      .select(
+        "code, percent, label, is_public, min_order_value, valid_upto, is_free_order, requires_login, max_redemptions, redemption_count",
+      )
       .eq("code", normalizedCode)
       .eq("is_active", true)
       .maybeSingle();
@@ -205,14 +211,21 @@ const recomputeOrderPricing = async (
       const isExpired =
         coupon.validUpto !== null &&
         new Date(coupon.validUpto).getTime() < Date.now();
+      const isExhausted =
+        coupon.maxRedemptions !== null &&
+        coupon.redemptionCount >= coupon.maxRedemptions;
 
-      if (!isExpired) {
+      if (!isExpired && !isExhausted) {
         const result = calculateDiscount(discountedSubtotal, coupon);
         if (result.isEligible) {
           couponDiscountAmount = result.amount;
           discountPercent = result.percent;
           discountCode = coupon.code;
+          isFreeOrderCoupon = coupon.isFreeOrder;
+          couponRequiresLogin = coupon.requiresLogin;
         }
+      } else if (isExhausted) {
+        couponRedemptionsExhausted = true;
       }
     }
   }
@@ -236,6 +249,9 @@ const recomputeOrderPricing = async (
     couponDiscountAmount,
     discountPercent,
     discountCode,
+    isFreeOrderCoupon,
+    couponRequiresLogin,
+    couponRedemptionsExhausted,
   };
 };
 
@@ -407,8 +423,13 @@ export async function POST(request: Request) {
   let productDiscountAmount = pricingDetails?.productDiscountAmount ?? 0;
   let couponDiscountAmount = pricingDetails?.couponDiscountAmount ?? 0;
   let computedTotal = totalAmount;
+  let finalShippingAmount = pricingDetails?.shippingAmount ?? 0;
+  let finalConvenienceFeeAmount = pricingDetails?.convenienceFeeAmount ?? 0;
+  let finalCodAmount = pricingDetails?.codAmount ?? 0;
 
   if (!isLaunchOfferOrder) {
+    let isFreeOrderCoupon = false;
+
     try {
       const recomputed = await recomputeOrderPricing(
         supabaseAdmin,
@@ -422,6 +443,32 @@ export async function POST(request: Request) {
       discountPercent = recomputed.discountPercent;
       productDiscountAmount = recomputed.productDiscountAmount;
       couponDiscountAmount = recomputed.couponDiscountAmount;
+      isFreeOrderCoupon = recomputed.isFreeOrderCoupon;
+
+      if (recomputed.couponRedemptionsExhausted) {
+        return NextResponse.json(
+          { error: "This coupon has reached its usage limit." },
+          { status: 400 },
+        );
+      }
+
+      if (isFreeOrderCoupon && recomputed.couponRequiresLogin && !user) {
+        return NextResponse.json(
+          { error: "Please sign in to use this coupon." },
+          { status: 401 },
+        );
+      }
+
+      if (isFreeOrderCoupon) {
+        const cartState = getFreeOrderCartState(items);
+
+        if (!cartState.isEligible) {
+          return NextResponse.json(
+            { error: cartState.message },
+            { status: 400 },
+          );
+        }
+      }
     } catch (pricingError) {
       return NextResponse.json(
         {
@@ -434,11 +481,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const shippingAmount = Number(pricingDetails?.shippingAmount ?? 0);
-    const convenienceFeeAmount = Number(
-      pricingDetails?.convenienceFeeAmount ?? 0,
-    );
-    const codAmount = Number(pricingDetails?.codAmount ?? 0);
+    // A free-order (barter/collab) coupon waives shipping/convenience/COD
+    // fees entirely, regardless of what the client submitted — this is
+    // resolved from the coupon row itself, not trusted from the request.
+    const shippingAmount = isFreeOrderCoupon
+      ? 0
+      : Number(pricingDetails?.shippingAmount ?? 0);
+    const convenienceFeeAmount = isFreeOrderCoupon
+      ? 0
+      : Number(pricingDetails?.convenienceFeeAmount ?? 0);
+    const codAmount = isFreeOrderCoupon
+      ? 0
+      : Number(pricingDetails?.codAmount ?? 0);
     const feesTotal = shippingAmount + convenienceFeeAmount + codAmount;
     const feesAreValid =
       Number.isFinite(shippingAmount) &&
@@ -455,6 +509,10 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
+    finalShippingAmount = shippingAmount;
+    finalConvenienceFeeAmount = convenienceFeeAmount;
+    finalCodAmount = codAmount;
 
     computedTotal = Number(
       (
@@ -504,10 +562,10 @@ export async function POST(request: Request) {
     product_discount_amount: productDiscountAmount,
     coupon_discount_amount: couponDiscountAmount,
     discount_amount: productDiscountAmount + couponDiscountAmount,
-    shipping_amount: pricingDetails?.shippingAmount ?? 0,
+    shipping_amount: finalShippingAmount,
     extra_shipping_amount: pricingDetails?.extraShippingAmount ?? 0,
-    convenience_fee_amount: pricingDetails?.convenienceFeeAmount ?? 0,
-    cod_amount: pricingDetails?.codAmount ?? 0,
+    convenience_fee_amount: finalConvenienceFeeAmount,
+    cod_amount: finalCodAmount,
     freight_charge: pricingDetails?.freightCharge ?? 0,
     total_amount: isLaunchOfferOrder ? totalAmount : computedTotal,
     status:
