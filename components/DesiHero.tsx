@@ -5,7 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { isRakshaBandhanOfferLive } from "@/lib/rakshaBandhanOffer";
+import { isGaneshChaturthiOfferLive } from "@/lib/ganeshChaturthiOffer";
 import { useProductStore } from "@/store/productStore";
+import GaneshChaturthiHero from "./GaneshChaturthiHero";
 import LaunchCarousel from "./LaunchCarousel";
 import RakshaBandhanHero from "./RakshaBandhanHero";
 import { useEffect } from "react";
@@ -35,6 +37,10 @@ const DesiHero = () => {
 
   if (featuredProducts.length > 0) {
     return <LaunchCarousel products={featuredProducts} />;
+  }
+
+  if (isGaneshChaturthiOfferLive()) {
+    return <GaneshChaturthiHero />;
   }
 
   if (isRakshaBandhanOfferLive()) {
