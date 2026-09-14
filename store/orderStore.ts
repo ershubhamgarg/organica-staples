@@ -23,9 +23,6 @@ export interface Order {
   extra_shipping_amount?: number | null;
   convenience_fee_amount?: number | null;
   cod_amount?: number | null;
-  wholesale_total_amount?: number | null;
-  cost_to_company?: number | null;
-  profit_loss?: number | null;
   total_amount: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   shiprocket_order_id?: string | null;
@@ -91,6 +88,14 @@ export type OrderPricingDetails = {
   freightCharge?: number;
 };
 
+// Everything the customer-facing order history needs, and nothing more.
+// Keep in sync with the Order type above — notably it must never grow
+// wholesale_total_amount, cost_to_company or profit_loss. Written as one
+// string literal because Supabase infers the row type from it; building it
+// by joining an array widens it to `string` and breaks that inference.
+const CUSTOMER_ORDER_COLUMNS =
+  "id, user_id, items, delivery_address, payment_method, payment_details, subtotal_amount, discount_code, discount_percent, product_discount_amount, coupon_discount_amount, discount_amount, shipping_amount, extra_shipping_amount, convenience_fee_amount, cod_amount, total_amount, status, shiprocket_order_id, shiprocket_shipment_id, shiprocket_awb_code, shiprocket_courier_name, shiprocket_tracking_url, shipping_status, shipping_error, shipped_at, delivered_at, invoice_number, invoice_generated_at, invoice_pdf_path, razorpay_refund_id, refund_status, refund_amount, refunded_at, created_at";
+
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "Something went wrong";
 
@@ -129,9 +134,14 @@ export const useOrderStore = create<OrderState>()(
       fetchOrders: async (userId: string) => {
         set({ isLoading: true, error: null });
         try {
+          // Explicit column list rather than `*`: orders also carry the
+          // internal commercials (wholesale_total_amount, cost_to_company,
+          // profit_loss) that drive the CMS's profit reporting. RLS lets a
+          // customer read their own order rows, so `*` handed them our
+          // margin on their own order.
           const { data, error } = await supabase
             .from("orders")
-            .select("*")
+            .select(CUSTOMER_ORDER_COLUMNS)
             .eq("user_id", userId)
             .order("created_at", { ascending: false });
 

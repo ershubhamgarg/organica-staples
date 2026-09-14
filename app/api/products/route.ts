@@ -45,6 +45,23 @@ const getSupabaseServerClient = () => {
   });
 };
 
+// Explicit allowlist rather than `*`: the products table also carries
+// internal commercials — wholesale_price, margin_percentage, packet_cost,
+// sticker_cost — that feed the CMS's cost-to-company and profit/loss
+// reporting. Those must never reach the storefront, where anyone can read
+// the response in devtools. Add new public columns here deliberately.
+// Written as string literals (not joined arrays/templates) because Supabase
+// infers the row type from the select string; anything that widens it to
+// `string` loses that inference.
+// Real products columns only — the camelCase launch fields
+// (isLaunchingSoon/justLaunched/launchDate) are derived in mapProduct from
+// launch_status/launch_date, not stored.
+const PUBLIC_PRODUCT_COLUMNS =
+  "id, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, launch_status, launch_date, launch_badge_text";
+
+const PRODUCT_SELECT =
+  "id, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, launch_status, launch_date, launch_badge_text, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, discount_percent, sort_order, is_active, product_variant_inventory(available_quantity, low_stock_threshold))";
+
 const getInventory = (
   inventory: ProductInventoryRow | ProductInventoryRow[] | null | undefined,
 ) => {
@@ -157,11 +174,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("id");
 
-  let query = supabase
-    .from("products")
-    .select(
-      "*, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, discount_percent, sort_order, is_active, product_variant_inventory(available_quantity, low_stock_threshold))",
-    );
+  let query = supabase.from("products").select(PRODUCT_SELECT);
 
   if (productId) {
     query = query.eq("id", productId);
@@ -175,7 +188,9 @@ export async function GET(request: Request) {
       error.code === "PGRST204" ||
       error.code === "42P01"
     ) {
-      let fallbackQuery = supabase.from("products").select("*");
+      let fallbackQuery = supabase
+        .from("products")
+        .select(PUBLIC_PRODUCT_COLUMNS);
 
       if (productId) {
         fallbackQuery = fallbackQuery.eq("id", productId);
@@ -190,7 +205,11 @@ export async function GET(request: Request) {
         );
       }
 
-      const fallbackProducts = (fallbackData ?? []) as Product[];
+      // `as unknown as` because Product declares a required `image` field
+      // that has no corresponding products column (callers read `images`
+      // and fall back to it) — the previous `select("*")` only type-checked
+      // here because its row shape was untyped.
+      const fallbackProducts = (fallbackData ?? []) as unknown as Product[];
       return NextResponse.json({
         products: fallbackProducts,
         product: productId ? (fallbackProducts[0] ?? null) : null,
@@ -203,7 +222,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const products = ((data ?? []) as ProductRow[]).map(mapProduct);
+  const products = ((data ?? []) as unknown as ProductRow[]).map(mapProduct);
 
   return NextResponse.json({
     products,

@@ -45,6 +45,34 @@ const getSupabaseAdmin = () => {
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
+/**
+ * Strip the internal commercials before an order goes back over the wire.
+ * place_order_with_inventory computes these for the CMS's profit/loss
+ * reporting; the customer's browser has no business seeing what the order
+ * cost us or earned us.
+ */
+// The raw row from place_order_with_inventory carries these; the Order type
+// the storefront uses deliberately no longer declares them.
+type OrderRowWithCosts = Order & {
+  wholesale_total_amount?: number | null;
+  cost_to_company?: number | null;
+  profit_loss?: number | null;
+};
+
+const toCustomerOrder = (order: OrderRowWithCosts): Order => {
+  const {
+    wholesale_total_amount: _wholesaleTotal,
+    cost_to_company: _costToCompany,
+    profit_loss: _profitLoss,
+    ...customerFacing
+  } = order;
+  void _wholesaleTotal;
+  void _costToCompany;
+  void _profitLoss;
+
+  return customerFacing;
+};
+
 const getShippingStatusForOrder = (status: string) => {
   if (status === "awb_assigned") return "processing";
   if (status === "created") return "processing";
@@ -85,9 +113,13 @@ const recomputeOrderPricing = async (
   requestedDiscountCode: string | null,
 ) => {
   const productIds = items.map((item) => item.id);
+  // Only the fields pricing actually needs. Deliberately excludes the cost
+  // columns (wholesale_price/margin_percentage/packet_cost/sticker_cost) —
+  // the order RPC reads those itself, straight from the table, so they never
+  // need to pass through application code that also builds a response.
   const { data: products, error } = await supabaseAdmin
     .from("products")
-    .select("*")
+    .select("id, name, price, discount, weight, hsn_code")
     .in("id", productIds);
 
   if (error) {
@@ -633,7 +665,7 @@ export async function POST(request: Request) {
     console.log(
       "Shiprocket shipment creation is disabled in development. Order saved to DB only.",
     );
-    return NextResponse.json({ order });
+    return NextResponse.json({ order: toCustomerOrder(order) });
   }
 
   const shipment = await createShiprocketShipment(order);
@@ -661,12 +693,14 @@ export async function POST(request: Request) {
       shippingUpdateError,
     );
     return NextResponse.json({
-      order: {
+      order: toCustomerOrder({
         ...order,
         ...shippingUpdate,
-      },
+      } as unknown as OrderRowWithCosts),
     });
   }
 
-  return NextResponse.json({ order: updatedOrder });
+  return NextResponse.json({
+    order: toCustomerOrder(updatedOrder as unknown as OrderRowWithCosts),
+  });
 }

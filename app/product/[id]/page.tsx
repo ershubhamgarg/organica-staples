@@ -25,9 +25,14 @@ async function getProductForMetadata(id: string): Promise<Product | null> {
   const supabase = getSupabaseServerClient();
   if (!supabase) return null;
 
+  // Only what the metadata/OG tags need — never `*`, which would pull the
+  // internal cost columns (wholesale_price, margin_percentage, packet_cost,
+  // sticker_cost) into a page-level fetch.
   const { data } = await supabase
     .from("products")
-    .select("*")
+    .select(
+      "id, name, name2, description, category, price, weight, origin, images, isVisible",
+    )
     .eq("id", id)
     .maybeSingle();
 
