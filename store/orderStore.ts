@@ -173,6 +173,18 @@ export const useOrderStore = create<OrderState>()(
           // the userId in the body — they must never be allowed to diverge,
           // or the server ends up creating an order with no user_id for a
           // user who actually is signed in.
+          //
+          // The reverse divergence is why this throws: the user store is
+          // persisted to localStorage, so a caller can still hold a user id
+          // after the Supabase session has expired or been cleared. Sending
+          // that id with no Bearer token used to surface server-side as the
+          // baffling "Authenticated user does not match this order."
+          if (!session && userId) {
+            throw new Error(
+              "Your session has expired. Please sign in again to place this order.",
+            );
+          }
+
           const resolvedUserId = session?.user?.id ?? userId;
           const response = await fetch("/api/orders", {
             method: "POST",

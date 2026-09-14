@@ -384,8 +384,15 @@ export async function POST(request: Request) {
   }
 
   if (userId && user?.id !== userId) {
+    // Almost always a stale sign-in rather than an attack: the client sent a
+    // user id with no matching (or an expired) token. Phrase it as something
+    // the customer can act on instead of an internal-sounding mismatch.
     return NextResponse.json(
-      { error: "Authenticated user does not match this order." },
+      {
+        error: user
+          ? "This order does not belong to the signed-in account. Please refresh and try again."
+          : "Your session has expired. Please sign in again to place this order.",
+      },
       { status: 403 },
     );
   }

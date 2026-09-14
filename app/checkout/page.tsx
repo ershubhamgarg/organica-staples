@@ -933,7 +933,14 @@ export default function CheckoutPage() {
   const handleFreeOrderClaim = async () => {
     if (!selectedAddressId || !isFreeOrderCoupon) return;
 
-    if (!user) {
+    // The user store is persisted, so it can still hold a user after the
+    // Supabase session has expired. A collab coupon requires a real signed-in
+    // account, so check the live session rather than the cached user.
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
       router.push("/login");
       return;
     }
