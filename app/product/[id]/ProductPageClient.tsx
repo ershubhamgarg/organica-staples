@@ -633,54 +633,71 @@ export default function ProductPageClient({ id }: { id: string }) {
 
               {/* Cart Actions */}
               <div className="p-6 bg-brand-cream rounded-3xl border border-brand-gold/10 shadow-xl shadow-brand-brown/5 mb-8">
+                {/* Size picker sits above the availability branch on purpose:
+                    when the selected size is sold out, this is the only
+                    control that can switch to one that isn't, so hiding it
+                    would strand the customer on "Available Soon". */}
+                {variants && variants.length > 1 && (
+                  <div className="mb-5">
+                    <label
+                      htmlFor="product-size"
+                      className="mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-brand-brown/40"
+                    >
+                      Choose Size
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="product-size"
+                        value={selectedVariant?.id ?? ""}
+                        onChange={(event) => {
+                          setSelectedVariantId(event.target.value);
+                          // Stock differs per size, so start over at 1.
+                          setQuantity(1);
+                        }}
+                        className="w-full cursor-pointer appearance-none rounded-2xl border-2 border-brand-gold/25 bg-white py-3.5 pl-4 pr-10 text-sm font-bold text-brand-brown transition-colors hover:border-brand-gold/50 focus:border-brand-gold focus:outline-none"
+                      >
+                        {variants.map((v) => {
+                          const variantAvailable = isProductAvailable({
+                            available: product.available,
+                            stock_quantity: v.stockQuantity,
+                          });
+
+                          return (
+                            <option key={v.id} value={v.id}>
+                              {v.label} · ₹
+                              {getVariantDiscountedPrice(v).toFixed(0)}
+                              {hasVariantDiscount(v)
+                                ? ` (${getVariantDiscountPercent(v)}% off)`
+                                : ""}
+                              {variantAvailable ? "" : " — sold out"}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-brand-gold"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {!available ? (
                   <div className="flex flex-col items-center text-center p-2">
                     <Clock className="text-brand-gold mb-3" size={28} />
                     <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown">
-                      Available Soon
+                      {variants && variants.length > 1
+                        ? "This Size Is Sold Out"
+                        : "Available Soon"}
                     </p>
                     <p className="text-xs text-brand-brown/40 font-light mt-1">
-                      Sign up for availability alerts
+                      {variants && variants.length > 1
+                        ? "Pick another size above, or sign up for alerts"
+                        : "Sign up for availability alerts"}
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-5">
-                    {variants && variants.length > 1 && (
-                      <div>
-                        <label
-                          htmlFor="product-size"
-                          className="mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-brand-brown/40"
-                        >
-                          Choose Size
-                        </label>
-                        <div className="relative">
-                          <select
-                            id="product-size"
-                            value={selectedVariant?.id ?? ""}
-                            onChange={(event) => {
-                              setSelectedVariantId(event.target.value);
-                              // Stock differs per size, so start over at 1.
-                              setQuantity(1);
-                            }}
-                            className="w-full cursor-pointer appearance-none rounded-2xl border-2 border-brand-gold/25 bg-white py-3.5 pl-4 pr-10 text-sm font-bold text-brand-brown transition-colors hover:border-brand-gold/50 focus:border-brand-gold focus:outline-none"
-                          >
-                            {variants.map((v) => (
-                              <option key={v.id} value={v.id}>
-                                {v.label} · ₹
-                                {getVariantDiscountedPrice(v).toFixed(0)}
-                                {hasVariantDiscount(v)
-                                  ? ` (${getVariantDiscountPercent(v)}% off)`
-                                  : ""}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown
-                            size={16}
-                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-brand-gold"
-                          />
-                        </div>
-                      </div>
-                    )}
                     <div className="flex flex-col sm:flex-row items-center gap-8">
                     <div className="flex items-center border border-brand-brown rounded-full px-6 py-3 lg:py-4 bg-white shadow-inner w-full sm:w-auto justify-between sm:justify-start">
                       <button
