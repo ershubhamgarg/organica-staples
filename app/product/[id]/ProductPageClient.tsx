@@ -8,6 +8,7 @@ import Link from "next/link";
 import {
   Award,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -644,66 +645,40 @@ export default function ProductPageClient({ id }: { id: string }) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-5">
-                    {variants && (
-                      <div className="flex flex-wrap gap-2">
-                        {variants.map((v) => {
-                          const variantDiscounted = hasVariantDiscount(v);
-                          const variantPrice = getVariantDiscountedPrice(v);
-                          const variantPercent = getVariantDiscountPercent(v);
-                          const isSelected = selectedVariant?.id === v.id;
-                          return (
-                            <button
-                              key={v.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedVariantId(v.id);
-                                setQuantity(1);
-                              }}
-                              className={`relative flex flex-col items-start px-4 py-2.5 rounded-2xl border-2 transition-all ${
-                                isSelected
-                                  ? "bg-brand-brown text-brand-cream border-brand-brown"
-                                  : "border-brand-gold/25 text-brand-brown/70 hover:border-brand-gold/50"
-                              }`}
-                            >
-                              {variantDiscounted && (
-                                <span
-                                  className={`absolute -top-2 -right-2 rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wide text-white shadow-md ${
-                                    variantPercent >= 50
-                                      ? "bg-brand-terracotta"
-                                      : "bg-brand-green-fresh"
-                                  }`}
-                                >
-                                  -{variantPercent}%
-                                </span>
-                              )}
-                              <span className="text-[11px] font-bold uppercase tracking-wider">
-                                {v.label}
-                              </span>
-                              <span className="flex items-baseline gap-1.5 mt-0.5">
-                                {variantDiscounted && (
-                                  <span
-                                    className={`text-[10px] line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/35"}`}
-                                  >
-                                    ₹{v.price.toFixed(0)}
-                                  </span>
-                                )}
-                                <span
-                                  className={`text-[11px] font-semibold ${
-                                    variantDiscounted
-                                      ? isSelected
-                                        ? "text-brand-cream"
-                                        : "text-brand-green-fresh"
-                                      : isSelected
-                                        ? "text-brand-cream/80"
-                                        : "text-brand-brown/50"
-                                  }`}
-                                >
-                                  ₹{variantPrice.toFixed(0)}
-                                </span>
-                              </span>
-                            </button>
-                          );
-                        })}
+                    {variants && variants.length > 1 && (
+                      <div>
+                        <label
+                          htmlFor="product-size"
+                          className="mb-2 block text-[9px] font-black uppercase tracking-[0.25em] text-brand-brown/40"
+                        >
+                          Choose Size
+                        </label>
+                        <div className="relative">
+                          <select
+                            id="product-size"
+                            value={selectedVariant?.id ?? ""}
+                            onChange={(event) => {
+                              setSelectedVariantId(event.target.value);
+                              // Stock differs per size, so start over at 1.
+                              setQuantity(1);
+                            }}
+                            className="w-full cursor-pointer appearance-none rounded-2xl border-2 border-brand-gold/25 bg-white py-3.5 pl-4 pr-10 text-sm font-bold text-brand-brown transition-colors hover:border-brand-gold/50 focus:border-brand-gold focus:outline-none"
+                          >
+                            {variants.map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {v.label} · ₹
+                                {getVariantDiscountedPrice(v).toFixed(0)}
+                                {hasVariantDiscount(v)
+                                  ? ` (${getVariantDiscountPercent(v)}% off)`
+                                  : ""}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={16}
+                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-brand-gold"
+                          />
+                        </div>
                       </div>
                     )}
                     <div className="flex flex-col sm:flex-row items-center gap-8">
