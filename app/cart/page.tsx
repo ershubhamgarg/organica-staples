@@ -14,6 +14,7 @@ import {
   BadgePercent,
   Truck,
   ArrowRight,
+  ChevronDown,
   X,
   Sparkles,
   AlertCircle,
@@ -41,6 +42,7 @@ import {
   getDiscountedPrice,
   getDiscountPercent,
   getVariantDiscountedPrice,
+  getVariantDiscountPercent,
   hasHighProductDiscount,
   hasProductDiscount,
   hasVariantDiscount,
@@ -601,6 +603,18 @@ export default function CartPage() {
                 const hasReachedStockLimit =
                   typeof item.stock_quantity === "number" &&
                   item.quantity >= item.stock_quantity;
+                // Only worth a size picker when there's more than one size to
+                // pick. The cart line itself only stores the chosen variant,
+                // so the full option list comes from the catalogue.
+                const fullProduct = catalogProducts.find(
+                  (p) => p.id === item.id,
+                );
+                const variantOptions =
+                  fullProduct &&
+                  hasVariants(fullProduct) &&
+                  fullProduct.variants.length > 1
+                    ? fullProduct.variants
+                    : null;
 
                 return (
                   <div
@@ -638,75 +652,13 @@ export default function CartPage() {
                             </p>
                           )}
                           <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                            {(() => {
-                              const fullProduct = catalogProducts.find(
-                                (p) => p.id === item.id,
-                              );
-                              if (
-                                fullProduct &&
-                                hasVariants(fullProduct) &&
-                                fullProduct.variants.length > 1
-                              ) {
-                                return (
-                                  <div
-                                    className="flex flex-wrap gap-1"
-                                    onClick={(e) => e.preventDefault()}
-                                  >
-                                    {fullProduct.variants.map((v) => {
-                                      const variantDiscounted =
-                                        hasVariantDiscount(v);
-                                      const variantPrice =
-                                        getVariantDiscountedPrice(v);
-                                      const isSelected =
-                                        (item.variantId ?? null) === v.id;
-                                      return (
-                                        <button
-                                          key={v.id}
-                                          type="button"
-                                          onClick={() =>
-                                            handleVariantChange(item, v)
-                                          }
-                                          className={`flex items-center gap-1 px-2 py-0.5 rounded-full border transition-all ${
-                                            isSelected
-                                              ? "bg-brand-brown text-brand-cream border-brand-brown"
-                                              : "border-brand-gold/20 text-brand-brown/50 hover:border-brand-gold/40"
-                                          }`}
-                                        >
-                                          <span className="text-[8px] font-bold uppercase tracking-wider">
-                                            {v.label}
-                                          </span>
-                                          {variantDiscounted && (
-                                            <span
-                                              className={`text-[7px] line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/30"}`}
-                                            >
-                                              ₹{v.price.toFixed(0)}
-                                            </span>
-                                          )}
-                                          <span
-                                            className={`text-[7px] font-semibold ${
-                                              variantDiscounted
-                                                ? isSelected
-                                                  ? "text-brand-cream"
-                                                  : "text-brand-green-fresh"
-                                                : isSelected
-                                                  ? "text-brand-cream/80"
-                                                  : "text-brand-brown/40"
-                                            }`}
-                                          >
-                                            ₹{variantPrice.toFixed(0)}
-                                          </span>
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                );
-                              }
-                              return (
-                                <p className="text-[9px] text-brand-brown/40 font-bold uppercase tracking-widest">
-                                  {item.variantLabel ?? item.weight}
-                                </p>
-                              );
-                            })()}
+                            {/* With multiple sizes the picker below carries the
+                                label, so don't repeat it here. */}
+                            {!variantOptions && (
+                              <p className="text-[9px] text-brand-brown/40 font-bold uppercase tracking-widest">
+                                {item.variantLabel ?? item.weight}
+                              </p>
+                            )}
                             {available && itemHasDiscount && (
                               <span
                                 className={`px-2 py-0.5 text-[7px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 text-white ${
@@ -744,6 +696,41 @@ export default function CartPage() {
                           <Trash2 size={18} strokeWidth={1.5} />
                         </button>
                       </div>
+
+                      {/* Size picker — deliberately outside the product link
+                          above, since a select nested in an anchor navigates
+                          away on click in some browsers. */}
+                      {variantOptions && (
+                        <div className="relative mt-3 w-full max-w-[220px]">
+                          <select
+                            value={item.variantId ?? ""}
+                            onChange={(event) => {
+                              const next = variantOptions.find(
+                                (v) => v.id === event.target.value,
+                              );
+                              if (next) {
+                                handleVariantChange(item, next);
+                              }
+                            }}
+                            aria-label={`Change size for ${item.name}`}
+                            className="w-full cursor-pointer appearance-none rounded-full border border-brand-gold/25 bg-white py-2 pl-3.5 pr-8 text-[11px] font-bold text-brand-brown transition-colors hover:border-brand-gold/50 focus:border-brand-gold focus:outline-none"
+                          >
+                            {variantOptions.map((v) => (
+                              <option key={v.id} value={v.id}>
+                                {v.label} · ₹
+                                {getVariantDiscountedPrice(v).toFixed(0)}
+                                {hasVariantDiscount(v)
+                                  ? ` (${getVariantDiscountPercent(v)}% off)`
+                                  : ""}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={12}
+                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brand-gold"
+                          />
+                        </div>
+                      )}
 
                       <div className="flex flex-row items-center justify-between mt-4 pt-4 border-t border-brand-gold/10 gap-4">
                         <div className="flex items-center border border-brand-brown rounded-full bg-brand-cream/50 p-0.5 scale-90 sm:scale-100 origin-left">

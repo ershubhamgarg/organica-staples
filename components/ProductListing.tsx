@@ -385,128 +385,92 @@ export default function ProductListing() {
                 </Link>
 
                 <div
-                  className={`flex flex-col items-center gap-1 ${available ? "mb-3 sm:mb-4" : "mb-2"}`}
+                  className={`flex flex-col items-center gap-2 ${available ? "mb-3 sm:mb-4" : "mb-2"}`}
                 >
-                  <p className="text-[8px] sm:text-[10px] text-brand-gold italic font-medium tracking-wide">
-                    {displayProduct.weight}
-                  </p>
+                  {/* Size: a dropdown when there's a real choice to make,
+                      otherwise just the weight. The option labels carry each
+                      size's own price and discount, so the price block below
+                      never has to repeat per-variant detail. */}
+                  {variants && variants.length > 1 ? (
+                    <div className="relative w-full">
+                      <select
+                        value={selectedVariant?.id ?? ""}
+                        onChange={(event) =>
+                          setSelectedVariantIds((prev) => ({
+                            ...prev,
+                            [product.id]: event.target.value,
+                          }))
+                        }
+                        aria-label={`Choose size for ${product.name}`}
+                        className="w-full cursor-pointer appearance-none rounded-full border border-brand-gold/25 bg-white py-2 pl-3 pr-8 text-center text-[10px] sm:text-xs font-bold text-brand-brown transition-colors hover:border-brand-gold/50 focus:border-brand-gold focus:outline-none"
+                      >
+                        {variants.map((v) => (
+                          <option key={v.id} value={v.id}>
+                            {v.label} · ₹{getVariantDiscountedPrice(v).toFixed(0)}
+                            {hasVariantDiscount(v)
+                              ? ` (${getVariantDiscountPercent(v)}% off)`
+                              : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={12}
+                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-brand-gold"
+                      />
+                    </div>
+                  ) : (
+                    <p className="text-[9px] sm:text-[11px] font-medium italic tracking-wide text-brand-gold">
+                      {displayProduct.weight}
+                    </p>
+                  )}
 
                   {available && (
-                    <div className="flex flex-col items-center">
-                      {hasDiscount ? (
-                        <div className="flex flex-col items-center">
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs sm:text-sm text-brand-brown/40 line-through font-light">
+                    <>
+                      {/* One price line: what you pay, what it was, how much off */}
+                      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                        <span className="text-lg sm:text-2xl font-semibold tracking-tight text-brand-brown">
+                          ₹
+                          {(hasDiscount
+                            ? discountedPrice
+                            : displayProduct.price
+                          ).toFixed(2)}
+                        </span>
+                        {hasDiscount && (
+                          <>
+                            <span className="text-xs sm:text-sm font-light text-brand-brown/40 line-through">
                               ₹{displayProduct.price.toFixed(2)}
                             </span>
-                            <div className="flex items-baseline gap-1 sm:gap-1.5">
-                              <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
-                                ₹{discountedPrice.toFixed(2)}
-                              </span>
-                              {unitPrice && (
-                                <span className="text-[8px] sm:text-[10px] text-brand-brown/50 font-light">
-                                  ({unitPrice})
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-[9px] font-black uppercase tracking-widest text-brand-green-fresh mt-1">
-                            Save ₹{(displayProduct.price - discountedPrice).toFixed(2)}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex items-baseline gap-1 sm:gap-1.5">
-                          <span className="text-base sm:text-2xl font-medium text-brand-brown tracking-tighter">
-                            ₹{displayProduct.price.toFixed(2)}
-                          </span>
-                          {unitPrice && (
-                            <span className="text-[8px] sm:text-[10px] text-brand-brown/50 font-light">
-                              ({unitPrice})
+                            <span
+                              className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white ${
+                                hasHighDiscount
+                                  ? "bg-brand-terracotta"
+                                  : "bg-brand-green-fresh"
+                              }`}
+                            >
+                              {discountPercent}% off
                             </span>
-                          )}
-                        </div>
-                      )}
-                      {displayProduct.stock_quantity !== undefined &&
-                        displayProduct.stock_quantity !== null && (
-                          <span
-                            className={`text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-black mt-0.5 sm:mt-1 ${
-                              lowStock
-                                ? "text-brand-terracotta"
-                                : "text-brand-green"
-                            }`}
-                          >
-                            {lowStock ? "Selling Out Soon" : "In Stock"}
-                          </span>
+                          </>
                         )}
-                    </div>
+                      </div>
+
+                      {unitPrice && (
+                        <p className="text-[9px] sm:text-[10px] font-light text-brand-brown/45">
+                          {unitPrice}
+                        </p>
+                      )}
+
+                      {/* Only the actionable stock state — an "In Stock" note
+                          on every card was noise competing with the price. */}
+                      {lowStock && (
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-[0.15em] text-brand-terracotta">
+                          Selling out soon
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
 
                 <div className="pt-1">
-                  {variants && (
-                    <div className="flex flex-wrap justify-center gap-1.5 mb-2">
-                      {variants.map((v) => {
-                        const variantDiscounted = hasVariantDiscount(v);
-                        const variantPrice = getVariantDiscountedPrice(v);
-                        const variantPercent = getVariantDiscountPercent(v);
-                        const isSelected = selectedVariant?.id === v.id;
-                        return (
-                          <button
-                            key={v.id}
-                            type="button"
-                            onClick={() =>
-                              setSelectedVariantIds((prev) => ({
-                                ...prev,
-                                [product.id]: v.id,
-                              }))
-                            }
-                            className={`relative flex flex-col items-center px-2.5 py-1 rounded-xl border transition-all ${
-                              isSelected
-                                ? "bg-brand-brown text-brand-cream border-brand-brown"
-                                : "border-brand-gold/20 text-brand-brown/60 hover:border-brand-gold/40"
-                            }`}
-                          >
-                            {variantDiscounted && (
-                              <span
-                                className={`absolute -top-1.5 -right-1.5 rounded-full px-1 py-px text-[6px] font-black uppercase tracking-wide text-white shadow-sm ${
-                                  variantPercent >= 50
-                                    ? "bg-brand-terracotta"
-                                    : "bg-brand-green-fresh"
-                                }`}
-                              >
-                                -{variantPercent}%
-                              </span>
-                            )}
-                            <span className="text-[8px] font-bold uppercase tracking-wider">
-                              {v.label}
-                            </span>
-                            <span className="flex items-center gap-1 text-[7px] font-semibold">
-                              {variantDiscounted && (
-                                <span
-                                  className={`line-through ${isSelected ? "text-brand-cream/50" : "text-brand-brown/35"}`}
-                                >
-                                  ₹{v.price.toFixed(0)}
-                                </span>
-                              )}
-                              <span
-                                className={
-                                  variantDiscounted
-                                    ? isSelected
-                                      ? "text-brand-cream"
-                                      : "text-brand-green-fresh"
-                                    : isSelected
-                                      ? "text-brand-cream/80"
-                                      : "text-brand-brown/45"
-                                }
-                              >
-                                ₹{variantPrice.toFixed(0)}
-                              </span>
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
                   <QuickAddButton
                     product={product}
                     selectedVariant={selectedVariant}
