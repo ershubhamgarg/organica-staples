@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowRight, Leaf, Mail, ShieldCheck, Sprout, Truck } from "lucide-react";
+import {
+  ArrowRight,
+  Leaf,
+  Mail,
+  ShieldCheck,
+  Sprout,
+  Truck,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -39,9 +46,9 @@ const DesiHero = () => {
     return <LaunchCarousel products={featuredProducts} />;
   }
 
-  if (isGaneshChaturthiOfferLive()) {
-    return <GaneshChaturthiHero />;
-  }
+  // if (isGaneshChaturthiOfferLive()) {
+  //   return <GaneshChaturthiHero />;
+  // }
 
   if (isRakshaBandhanOfferLive()) {
     return <RakshaBandhanHero />;
@@ -116,7 +123,11 @@ const DesiHero = () => {
                     key={badge.label}
                     className="flex items-center gap-2 text-brand-brown/45"
                   >
-                    <Icon size={14} strokeWidth={1.5} className="text-brand-gold" />
+                    <Icon
+                      size={14}
+                      strokeWidth={1.5}
+                      className="text-brand-gold"
+                    />
                     <span className="text-[9px] uppercase tracking-[0.2em] font-black">
                       {badge.label}
                     </span>
