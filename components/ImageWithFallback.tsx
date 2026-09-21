@@ -17,13 +17,23 @@ export default function ImageWithFallback({
   fill,
   ...props
 }: ImageWithFallbackProps) {
-  // Remember *which* src failed rather than a bare boolean. A plain flag
-  // stays true forever, so an image that 404'd once (e.g. it was still being
-  // uploaded) kept showing "Image unavailable" even after the file existed
-  // or the product's image was changed; this recovers as soon as the src is
-  // different from the one that failed.
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const error = failedSrc === src;
+  // Three stages per src: 0 = through Next's optimizer, 1 = the original
+  // file directly, 2 = give up and show the placeholder.
+  //
+  // Stage 1 exists because the optimizer can fail while the file is fine —
+  // in production Vercel answers 402 OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED
+  // once the account's image-optimization quota is used, which breaks every
+  // uncached image even though the Supabase URL itself loads. Falling back to
+  // the raw URL keeps images showing (larger, but visible) until that clears.
+  //
+  // State is keyed by src rather than a bare flag, so an image that failed
+  // once (e.g. it was still uploading) recovers as soon as the src changes.
+  const [attempt, setAttempt] = useState<{ src: string; stage: number }>({
+    src,
+    stage: 0,
+  });
+  const stage = attempt.src === src ? attempt.stage : 0;
+  const error = stage >= 2;
   const fallbackClassName = `${fill ? "absolute inset-0 h-full w-full" : ""} ${className || ""}`;
 
   if (error || !src) {
@@ -39,12 +49,13 @@ export default function ImageWithFallback({
 
   return (
     <Image
+      {...props}
       src={src}
       alt={alt}
       fill={fill}
       className={className}
-      onError={() => setFailedSrc(src)}
-      {...props}
+      unoptimized={stage === 1 || props.unoptimized}
+      onError={() => setAttempt({ src, stage: stage + 1 })}
     />
   );
 }
