@@ -247,7 +247,7 @@ export default function ProfilePage() {
             {/* Saved Addresses */}
             <div
               id="addresses"
-              className="scroll-mt-32 lg:scroll-mt-40 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
+              className="scroll-mt-40 lg:scroll-mt-48 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
             >
               <div className="flex justify-between items-center mb-10">
                 <div className="flex items-center gap-4">
@@ -460,7 +460,7 @@ export default function ProfilePage() {
             {/* Order History */}
             <div
               id="orders"
-              className="scroll-mt-32 lg:scroll-mt-40 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
+              className="scroll-mt-40 lg:scroll-mt-48 bg-white rounded-3xl border border-brand-gold/10 p-10 md:p-12 shadow-2xl shadow-brand-brown/5"
             >
               <div className="flex items-center gap-4 mb-10">
                 <Package size={24} className="text-brand-gold" />

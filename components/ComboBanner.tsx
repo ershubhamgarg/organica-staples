@@ -39,7 +39,7 @@ export default function ComboBanner() {
             {settings.title}
           </h3>
           <p className="mt-1.5 max-w-md text-xs font-light leading-relaxed text-brand-cream/70">
-            Pick any {settings.minItems} smaller packs and try the range
+            Pick any {settings.minItems} different smaller packs and try the range
             without committing to full sizes.
             {lowestPrice !== null && (
               <span className="text-brand-cream/90">

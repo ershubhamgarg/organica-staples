@@ -701,7 +701,7 @@ export default function CartPage() {
                       <p className="mt-0.5 text-[11px] font-light leading-relaxed text-brand-brown/55">
                         {comboCartBlocked
                           ? comboCart.message
-                          : `${comboCart.count} items, ordered together`}
+                          : `${comboCart.count} different items, ordered together`}
                       </p>
                     </div>
                     <Link

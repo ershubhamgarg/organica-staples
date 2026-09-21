@@ -8,6 +8,7 @@ import {
 } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import FloatingCart from "@/components/FloatingCart";
@@ -141,6 +142,7 @@ export default function RootLayout({
         className={`${sans.variable} ${serif.variable} ${devanagari.variable} antialiased bg-brand-cream text-stone-900 flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
+        <AnnouncementBar />
         <Header />
 
         <main className="flex-grow">{children}</main>

@@ -721,7 +721,8 @@ export default function ProductPageClient({ id }: { id: string }) {
                       We offer this in a {comboSizeText} pack as part of a
                       Build-Your-Own Combo, so you can try it without
                       committing to a full size. Pick it along with{" "}
-                      {comboMinItems - 1} more and it&apos;s yours.
+                      {comboMinItems - 1} other different{" "}
+                      {comboMinItems - 1 === 1 ? "item" : "items"} and it&apos;s yours.
                     </p>
                     <Link
                       href="/combo"
@@ -819,7 +820,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                       <span className="font-bold text-brand-brown">
                         Build-Your-Own Combo
                       </span>{" "}
-                      of {comboMinItems} items.
+                      of {comboMinItems} different items.
                     </span>
                     <ArrowRight
                       size={14}

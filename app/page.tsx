@@ -551,7 +551,7 @@ Message: ${formData.message}
           <ScrollReveal className="lg:pt-2">
             <div
               id="contact"
-              className="scroll-mt-24 lg:scroll-mt-32 inline-flex items-center gap-4 mb-4"
+              className="scroll-mt-32 lg:scroll-mt-40 inline-flex items-center gap-4 mb-4"
             >
               <MessageCircle size={20} className="text-brand-gold" />
               <span className="text-[10px] uppercase tracking-[0.4em] font-black text-brand-gold">

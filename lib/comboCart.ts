@@ -27,9 +27,8 @@ export type ComboCartState<T extends CartLine = CartLine> = {
   /** Cart lines that belong to a combo. */
   comboLines: T[];
   /**
-   * Total packs in the combo, counting quantity — the builder lets a
-   * customer take two of the same spice, and those are two of the items the
-   * minimum asks for.
+   * Distinct SKUs in the combo. Quantity is deliberately ignored: two of the
+   * same spice is still one item toward the minimum.
    */
   count: number;
   minItems: number;
@@ -91,10 +90,7 @@ export function getComboCartState<T extends CartLine>(
 
   if (comboLines.length === 0) return empty;
 
-  const count = comboLines.reduce(
-    (total, line) => total + (line.quantity ?? 1),
-    0,
-  );
+  const count = comboLines.length;
   const shortfall = Math.max(minItems - count, 0);
 
   return {
@@ -107,6 +103,6 @@ export function getComboCartState<T extends CartLine>(
     message:
       shortfall === 0
         ? ""
-        : `Your combo needs at least ${minItems} items — add ${shortfall} more to check out.`,
+        : `Your combo needs at least ${minItems} different items — add ${shortfall} more to check out.`,
   };
 }

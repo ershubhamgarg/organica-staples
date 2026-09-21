@@ -121,14 +121,18 @@ export default function ComboPage() {
       ),
     [selectedUnits],
   );
-  /** Packs chosen, counting quantity — this is what the minimum measures. */
-  const packCount = useMemo(
-    () => selectedUnits.reduce((sum, { quantity }) => sum + quantity, 0),
-    [selectedUnits],
-  );
+  /**
+   * Distinct SKUs chosen — this is what the minimum measures. Quantity only
+   * changes the price: two of the same spice is still one item, not two.
+   */
+  const packCount = selectedUnits.length;
 
   const remaining = Math.max(minItems - packCount, 0);
   const isComplete = remaining === 0 && packCount > 0;
+  // The floating cart shows whenever the cart has something in it. On
+  // mobile it is a full-width panel at the bottom, so the bar sits above it;
+  // on desktop it lives bottom-right and the bar's content stays left of it.
+  const hasFloatingCart = cartItems.length > 0;
 
   const setQuantity = (key: string, quantity: number) => {
     setAddError(null);
@@ -244,7 +248,11 @@ export default function ComboPage() {
   const notEnoughStock = items.length < minItems;
 
   return (
-    <div className="min-h-screen bg-brand-cream pb-40">
+    <div
+      className={`min-h-screen bg-brand-cream ${
+        hasFloatingCart ? "pb-64 lg:pb-40" : "pb-40"
+      }`}
+    >
       {/* Header */}
       <section className="relative overflow-hidden px-4 pb-10 pt-10 sm:px-6 lg:px-8">
         <div className="pointer-events-none absolute inset-0 bg-mandala opacity-60" />
@@ -262,7 +270,7 @@ export default function ComboPage() {
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm font-light leading-relaxed text-brand-brown/60">
             {settings.subtitle ??
-              `Try our staples in smaller packs. Pick any ${minItems} or more and we'll box them together — same honest prices, a much smaller first step.`}
+              `Try our staples in smaller packs. Pick any ${minItems} or more different items and we'll box them together — same honest prices, a much smaller first step.`}
           </p>
         </div>
       </section>
@@ -377,25 +385,31 @@ export default function ComboPage() {
 
           <p className="mt-8 flex items-center justify-center gap-2 text-center text-[10px] font-light text-brand-brown/40">
             <Leaf size={11} className="text-brand-gold" />
-            Each item is added to your cart individually, so you can adjust
-            anything before checkout.
+            Your combo is added to the cart as one set, and you can edit it
+            there before checkout.
           </p>
         </section>
       )}
 
       {/* Sticky summary */}
       {!notEnoughStock && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-brand-gold/20 bg-brand-cream/95 px-4 py-4 shadow-[0_-12px_40px_-18px_rgba(60,54,42,0.35)] backdrop-blur-md sm:px-6">
+        <div
+          className={`fixed left-0 right-0 z-40 border-t border-brand-gold/20 bg-brand-cream/95 px-4 py-4 shadow-[0_-12px_40px_-18px_rgba(60,54,42,0.35)] backdrop-blur-md sm:px-6 ${
+            hasFloatingCart ? "bottom-[104px] lg:bottom-0" : "bottom-0"
+          }`}
+        >
           {addError && (
             <p className="mx-auto mb-3 max-w-5xl text-[11px] font-medium text-red-700">
               {addError}
             </p>
           )}
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+          <div className="mx-auto flex max-w-5xl items-center gap-5 sm:gap-8">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-brown/45">
-                  {packCount} of {minItems} chosen
+                  {packCount} of {minItems}
+                  <span className="hidden sm:inline"> different items</span>
+                  <span className="sm:hidden"> chosen</span>
                 </span>
                 {isComplete && (
                   <span className="rounded-full bg-brand-green-fresh px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white">

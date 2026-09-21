@@ -20,10 +20,11 @@ export default function WhatsAppButton() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  // Cart and checkout already have a prominent sticky CTA bar at the same
-  // screen edge — keep this button off those pages entirely rather than
-  // trying to tune an offset that overlaps on shorter viewports.
-  const isCartOrCheckout = pathname === "/cart" || pathname === "/checkout";
+  // Cart, checkout and the combo builder each have a prominent sticky CTA bar
+  // at the same screen edge — keep this button off those pages entirely
+  // rather than trying to tune an offset that overlaps on shorter viewports.
+  const isCartOrCheckout =
+    pathname === "/cart" || pathname === "/checkout" || pathname === "/combo";
   const hasFloatingCart = mounted && totalItems > 0 && !isCartOrCheckout;
   const bottomOffset = hasFloatingCart ? "bottom-[104px]" : "bottom-6";
 

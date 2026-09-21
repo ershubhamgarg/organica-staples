@@ -10,6 +10,10 @@ export const STANDARD_SHIPPING_RATE =
     ? parsedRate
     : DEFAULT_STANDARD_SHIPPING_RATE;
 
+// Subtotal (after discounts) from which standard shipping is waived. Shown in
+// the site-wide announcement bar; checkout applies the same rule.
+export const FREE_SHIPPING_THRESHOLD = 1000;
+
 const DEFAULT_LOCAL_DELIVERY_PINCODE = "125055";
 
 // Pincode treated as an in-house local delivery: free, and never routed
