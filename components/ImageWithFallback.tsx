@@ -17,7 +17,13 @@ export default function ImageWithFallback({
   fill,
   ...props
 }: ImageWithFallbackProps) {
-  const [error, setError] = useState(false);
+  // Remember *which* src failed rather than a bare boolean. A plain flag
+  // stays true forever, so an image that 404'd once (e.g. it was still being
+  // uploaded) kept showing "Image unavailable" even after the file existed
+  // or the product's image was changed; this recovers as soon as the src is
+  // different from the one that failed.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const error = failedSrc === src;
   const fallbackClassName = `${fill ? "absolute inset-0 h-full w-full" : ""} ${className || ""}`;
 
   if (error || !src) {
@@ -37,7 +43,7 @@ export default function ImageWithFallback({
       alt={alt}
       fill={fill}
       className={className}
-      onError={() => setError(true)}
+      onError={() => setFailedSrc(src)}
       {...props}
     />
   );
