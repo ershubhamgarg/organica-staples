@@ -2063,7 +2063,7 @@ export default function CheckoutPage() {
                   return (
                     <Link
                       key={`${item.id}-${item.variantId ?? "base"}`}
-                      href={`/product/${item.id}`}
+                      href={`/product/${item.slug ?? item.id}`}
                       className="flex gap-4 items-center group hover:bg-brand-brown/[0.02] -m-2 p-2 rounded-2xl transition-all"
                     >
                       <div className="w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0 relative">

@@ -325,7 +325,7 @@ export default function ProductListing() {
               className="group flex flex-col bg-white rounded-2xl sm:rounded-3xl border border-brand-gold/10 shadow-lg shadow-brand-brown/5 overflow-hidden transition-all duration-500 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-brand-brown/10 hover:border-brand-gold/25 animate-fade-in"
             >
               <Link
-                href={`/product/${product.id}`}
+                href={`/product/${product.slug ?? product.id}`}
                 className="block relative group/image"
               >
                 <div className="relative aspect-square w-full overflow-hidden bg-brand-sand">
@@ -399,7 +399,7 @@ export default function ProductListing() {
                   </span>
                 </div>
                 <Link
-                  href={`/product/${product.id}`}
+                  href={`/product/${product.slug ?? product.id}`}
                   className="mb-1 sm:mb-2 block"
                 >
                   <div className="flex flex-col items-center justify-center min-h-[2.5em] sm:min-h-[3.5em]">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { permanentRedirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
 import {
@@ -25,19 +26,21 @@ const getSupabaseServerClient = () => {
   });
 };
 
-async function getProductForMetadata(id: string): Promise<Product | null> {
+async function getProductForMetadata(idOrSlug: string): Promise<Product | null> {
   const supabase = getSupabaseServerClient();
   if (!supabase) return null;
 
   // Only what the metadata/OG tags need — never `*`, which would pull the
   // internal cost columns (wholesale_price, margin_percentage, packet_cost,
   // sticker_cost) into a page-level fetch.
+  // The URL segment is either a slug (canonical) or a legacy numeric id.
+  const isNumericId = /^\d+$/.test(idOrSlug);
   const { data } = await supabase
     .from("products")
     .select(
-      "id, name, name2, description, category, price, weight, origin, images, isVisible",
+      "id, slug, name, name2, description, category, price, weight, origin, images, isVisible",
     )
-    .eq("id", id)
+    .eq(isNumericId ? "id" : "slug", idOrSlug)
     .maybeSingle();
 
   return (data as Product | null) ?? null;
@@ -73,7 +76,7 @@ export async function generateMetadata({
     160,
   );
   const image = getProductThumbnail(product);
-  const url = `${BASE_URL}/product/${product.id}`;
+  const url = `${BASE_URL}/product/${product.slug ?? product.id}`;
 
   return {
     title,
@@ -105,6 +108,12 @@ export default async function ProductPage({
   const { id } = await params;
   const product = await getProductForMetadata(id);
 
+  // Old /product/<id> links (bookmarks, shared links, search results) keep
+  // working but consolidate onto the canonical slug URL.
+  if (product?.slug && /^\d+$/.test(id)) {
+    permanentRedirect(`/product/${product.slug}`);
+  }
+
   const jsonLd = product
     ? {
         "@context": "https://schema.org",
@@ -128,7 +137,7 @@ export default async function ProductPage({
           : {}),
         offers: {
           "@type": "Offer",
-          url: `${BASE_URL}/product/${product.id}`,
+          url: `${BASE_URL}/product/${product.slug ?? product.id}`,
           priceCurrency: "INR",
           price: product.price,
           availability: isProductAvailable(product)
@@ -146,7 +155,7 @@ export default async function ProductPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ProductPageClient id={id} />
+      <ProductPageClient id={product?.id ?? id} />
     </>
   );
 }

@@ -259,7 +259,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
 
                         <div className="flex items-center gap-5">
                           <Link
-                            href={`/product/${product.id}`}
+                            href={`/product/${product.slug ?? product.id}`}
                             className="inline-flex items-center gap-3 px-8 py-4 bg-brand-brown text-brand-cream rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-brand-green transition-all duration-500 hover:translate-y-[-2px] group active:scale-95"
                           >
                             {isJustLaunched ? "Shop Collection" : "Shop Now"}

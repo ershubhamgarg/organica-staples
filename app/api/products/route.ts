@@ -58,10 +58,10 @@ const getSupabaseServerClient = () => {
 // (isLaunchingSoon/justLaunched/launchDate) are derived in mapProduct from
 // launch_status/launch_date, not stored.
 const PUBLIC_PRODUCT_COLUMNS =
-  "id, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, is_combo_eligible, launch_status, launch_date, launch_badge_text";
+  "id, slug, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, is_combo_eligible, launch_status, launch_date, launch_badge_text";
 
 const PRODUCT_SELECT =
-  "id, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, is_combo_eligible, launch_status, launch_date, launch_badge_text, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, discount_percent, sort_order, is_active, is_combo_eligible, product_variant_inventory(available_quantity, low_stock_threshold))";
+  "id, slug, name, name2, description, category, price, discount, weight, origin, images, benefits, hsn_code, rating, review_count, available, isVisible, is_combo_eligible, launch_status, launch_date, launch_badge_text, product_inventory(available_quantity, low_stock_threshold), product_variants(id, product_id, label, weight, price, discount_percent, sort_order, is_active, is_combo_eligible, product_variant_inventory(available_quantity, low_stock_threshold))";
 
 const getInventory = (
   inventory: ProductInventoryRow | ProductInventoryRow[] | null | undefined,

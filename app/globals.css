@@ -96,22 +96,24 @@ body {
 }
 
 /* Announcement bar ticker. The track holds two identical halves, so sliding
-   it by exactly half its width loops with no visible jump. */
-@keyframes marquee {
+   it by exactly half its width loops with no visible jump. Deliberately not
+   named "marquee": SpiceTicker owns .animate-marquee further down this file,
+   and a shared name meant that later rule silently overrode this duration. */
+@keyframes announcement-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
-.animate-marquee {
-  animation: marquee 40s linear infinite;
+.animate-announcement {
+  animation: announcement-scroll 90s linear infinite;
 }
 
-.marquee-pause:hover .animate-marquee {
+.marquee-pause:hover .animate-announcement {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-announcement {
     animation: none;
   }
 }

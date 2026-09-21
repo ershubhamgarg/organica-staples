@@ -536,7 +536,7 @@ export default function ProfilePage() {
                               {order.items.map((item, idx) => (
                                 <Link
                                   key={idx}
-                                  href={`/product/${item.id}`}
+                                  href={`/product/${item.slug ?? item.id}`}
                                   className="flex items-center gap-4 group/item hover:bg-brand-brown/[0.02] p-2 -m-2 rounded-2xl transition-all"
                                 >
                                   <div className="relative shrink-0 w-16 aspect-square rounded-xl bg-brand-sand overflow-hidden shadow-sm group-hover/item:shadow-md transition-shadow">

@@ -800,7 +800,7 @@ export default function CartPage() {
                     className="group bg-white rounded-2xl border border-brand-gold/10 p-4 md:p-6 flex gap-4 md:gap-6 items-center shadow-xl shadow-brand-brown/5 transition-all hover:shadow-2xl hover:translate-y-[-2px]"
                   >
                     <Link
-                      href={`/product/${item.id}`}
+                      href={`/product/${item.slug ?? item.id}`}
                       className="relative w-20 md:w-24 aspect-square rounded-xl bg-brand-sand overflow-hidden shrink-0"
                     >
                       <ImageWithFallback
@@ -815,7 +815,7 @@ export default function CartPage() {
                     <div className="flex-grow flex flex-col justify-between w-full min-w-0">
                       <div className="flex justify-between items-start gap-4">
                         <Link
-                          href={`/product/${item.id}`}
+                          href={`/product/${item.slug ?? item.id}`}
                           className="flex-1 min-w-0 group/link"
                         >
                           <span className="text-[8px] text-brand-gold mb-1 block uppercase tracking-[0.2em] font-black">

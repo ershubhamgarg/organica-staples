@@ -47,7 +47,7 @@ export default function AnnouncementBar() {
       aria-label="Announcements"
       className="marquee-pause sticky top-0 z-60 h-8 overflow-hidden bg-brand-green text-brand-cream"
     >
-      <div className="animate-marquee flex h-full w-max items-center text-[10px] font-black uppercase tracking-[0.2em]">
+      <div className="animate-announcement flex h-full w-max items-center text-[10px] font-black uppercase tracking-[0.2em]">
         <Half />
         <Half hidden />
       </div>
