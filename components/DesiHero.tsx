@@ -162,7 +162,7 @@ const DesiHero = () => {
 
           {/* Desktop Image Composition */}
           <div className="relative hidden lg:block">
-            <div className="relative aspect-[4/5] max-w-md mx-auto">
+            <div className="relative aspect-[4/5] max-w-[22rem] mx-auto">
               {/* Ambient glow behind the frame */}
               <div className="absolute -inset-16 bg-brand-gold/15 rounded-full blur-[110px] pointer-events-none" />
 
@@ -177,7 +177,7 @@ const DesiHero = () => {
                     alt="Hands preparing organic Indian spices"
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1024px) 0px, 480px"
+                    sizes="(max-width: 1024px) 0px, 360px"
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/25 via-transparent to-transparent" />
