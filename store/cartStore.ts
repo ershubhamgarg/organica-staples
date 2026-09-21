@@ -50,6 +50,25 @@ interface CartState {
     variantLabel?: string,
   ) => void;
   removeFromCart: (productId: string, userId?: string, variantId?: string) => void;
+  /**
+   * Swap the cart's combo lines for a new set in one shot.
+   *
+   * A combo is atomic — the builder replaces it wholesale and the cart
+   * deletes it wholesale — and doing that through repeated addToCart /
+   * removeFromCart calls would fire one un-debounced Supabase upsert per
+   * line, racing them against each other. This applies the whole change in a
+   * single `set` with exactly one sync.
+   */
+  replaceComboItems: (
+    removeKeys: { id: string; variantId?: string }[],
+    additions: {
+      product: Product;
+      quantity: number;
+      variantId?: string;
+      variantLabel?: string;
+    }[],
+    userId?: string,
+  ) => void;
   updateQuantity: (
     productId: string,
     quantity: number,
@@ -156,6 +175,37 @@ export const useCartStore = create<CartState>()(
           const newItems = state.items.filter(
             (item) => !sameLine(item, productId, variantId),
           );
+
+          if (userId) {
+            syncCartToSupabase(newItems, userId, state.appliedDiscountCoupon);
+          }
+
+          return { items: newItems };
+        });
+      },
+
+      replaceComboItems: (removeKeys, additions, userId) => {
+        set((state) => {
+          // Same 1-per-line cap addToCart applies while a barter/collab
+          // coupon is active.
+          const capToOne = state.appliedDiscountCoupon?.isFreeOrder === true;
+
+          const kept = state.items.filter(
+            (item) =>
+              !removeKeys.some((key) =>
+                sameLine(item, key.id, key.variantId),
+              ),
+          );
+
+          const newItems = [
+            ...kept,
+            ...additions.map((line) => ({
+              ...line.product,
+              quantity: capToOne ? 1 : Math.max(1, line.quantity),
+              variantId: line.variantId,
+              variantLabel: line.variantLabel,
+            })),
+          ];
 
           if (userId) {
             syncCartToSupabase(newItems, userId, state.appliedDiscountCoupon);

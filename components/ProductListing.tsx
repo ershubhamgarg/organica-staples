@@ -3,12 +3,21 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Star, ChevronDown, Hourglass, Search, X } from "lucide-react";
+import ComboBanner from "@/components/ComboBanner";
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
 import { useProductStore } from "@/store/productStore";
 
-import { hasVariants, isProductAvailable, isProductLowStock, Product } from "@/lib/data";
+import {
+  getPurchasableVariants,
+  hasVariants,
+  isComboOnlyProduct,
+  isProductAvailable,
+  isProductLowStock,
+  Product,
+} from "@/lib/data";
+import { isComboLive, useCombo } from "@/lib/useCombo";
 import {
   getDiscountedPrice,
   getDiscountPercent,
@@ -44,10 +53,29 @@ export default function ProductListing() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const { data: comboData } = useCombo();
+  const comboLive = isComboLive(comboData);
 
   const visibleProducts = useMemo(() => {
-    return products.filter((p) => p.isVisible !== false);
-  }, [products]);
+    const base = products.filter((p) => p.isVisible !== false);
+
+    // Only withhold combo-only items once the builder is actually live —
+    // with combos switched off (or too few eligible items to complete one)
+    // hiding them here would leave them unsellable through any route.
+    if (!comboLive) return base;
+
+    // Combo-only sizes are stripped at the single source the whole listing
+    // derives from — the variant dropdown, sort price, stock state, badges
+    // and QuickAddButton all read `product.variants` downstream, so removing
+    // them once keeps every one of those consistent. A product left with
+    // nothing individually buyable drops out of the pantry entirely and is
+    // reachable only from its product page.
+    return base
+      .filter((p) => !isComboOnlyProduct(p))
+      .map((p) =>
+        hasVariants(p) ? { ...p, variants: getPurchasableVariants(p) } : p,
+      );
+  }, [products, comboLive]);
 
   const categories = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -158,6 +186,8 @@ export default function ProductListing() {
           <div className="w-16 h-1 bg-brand-gold/20 rounded-full" />
         </div>
       </div>
+
+      <ComboBanner />
 
       <div className="mb-8 lg:mb-10 flex justify-center">
         <div className="relative w-full max-w-md">

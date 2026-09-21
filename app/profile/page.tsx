@@ -71,8 +71,13 @@ const downloadOrderInvoice = async (orderId: string) => {
   const link = document.createElement("a");
   link.href = url;
   link.download = `invoice-${orderId.slice(0, 8)}.pdf`;
+  // Attached to the DOM (Firefox ignores clicks on detached anchors) and
+  // revoked later — revoking synchronously can cancel the download before
+  // the browser has started reading the blob.
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 };
 
 export default function ProfilePage() {

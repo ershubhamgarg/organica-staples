@@ -9,6 +9,8 @@ export interface ProductVariant {
   stockQuantity?: number | null;
   lowStockThreshold?: number | null;
   isActive?: boolean;
+  /** Sold only inside a build-your-own combo, never as a standalone pack. */
+  isComboEligible?: boolean;
 }
 
 export interface Product {
@@ -30,6 +32,12 @@ export interface Product {
   stock_quantity?: number | null;
   low_stock_threshold?: number | null;
   isVisible?: boolean | null;
+  /**
+   * Sold only inside a build-your-own combo. Only meaningful for a product
+   * with no variants — when a product has variants, this is decided per
+   * variant via `ProductVariant.isComboEligible`.
+   */
+  is_combo_eligible?: boolean | null;
   justLaunched?: boolean | null;
   isLaunchingSoon?: boolean | null;
   launchDate?: string | null;
@@ -45,6 +53,42 @@ export function hasVariants(
   product: Pick<Product, "variants">,
 ): product is Pick<Product, "variants"> & { variants: ProductVariant[] } {
   return Array.isArray(product.variants) && product.variants.length > 0;
+}
+
+/**
+ * Combo-only sizes are merchandised as sampler sizes: they exist so someone
+ * can try the range cheaply via /combo, not so they can be bought one at a
+ * time. The three helpers below are the single definition of that rule —
+ * the listing, the product page and the cart all defer to them.
+ *
+ * This is a merchandising rule, not a security boundary: the combo builder
+ * deliberately emits ordinary cart lines, so a combo-only size in the cart is
+ * indistinguishable from any other line by the time it reaches the server.
+ */
+export function getComboOnlyVariants(
+  product: Pick<Product, "variants">,
+): ProductVariant[] {
+  return (product.variants ?? []).filter((v) => v.isComboEligible === true);
+}
+
+/** The sizes a customer can buy on their own, combo-only ones removed. */
+export function getPurchasableVariants(
+  product: Pick<Product, "variants">,
+): ProductVariant[] {
+  return (product.variants ?? []).filter((v) => v.isComboEligible !== true);
+}
+
+/**
+ * True when there is nothing left to buy outside a combo — either a
+ * single-size product flagged combo-only, or one whose every variant is.
+ */
+export function isComboOnlyProduct(
+  product: Pick<Product, "variants" | "is_combo_eligible">,
+): boolean {
+  if (hasVariants(product)) {
+    return getPurchasableVariants(product).length === 0;
+  }
+  return product.is_combo_eligible === true;
 }
 
 export function getProductThumbnail(product: Product): string {

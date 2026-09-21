@@ -31,11 +31,14 @@ import ImageWithFallback from "@/components/ImageWithFallback";
 import QuickAddButton from "@/components/QuickAddButton";
 import ScrollReveal from "@/components/ScrollReveal";
 import {
-  hasVariants,
+  getComboOnlyVariants,
+  getPurchasableVariants,
+  isComboOnlyProduct,
   isProductAvailable,
   isProductLowStock,
   Product,
 } from "@/lib/data";
+import { isComboLive, useCombo } from "@/lib/useCombo";
 import { supabase } from "@/utils/supabase";
 import {
   getDiscountedPrice,
@@ -74,6 +77,8 @@ export default function ProductPageClient({ id }: { id: string }) {
   // is applied the quantity stepper is pinned to 1.
   const quantityLockedToOne = appliedDiscountCoupon?.isFreeOrder === true;
   const { user } = useUserStore();
+  const { data: comboData } = useCombo();
+  const comboLive = isComboLive(comboData);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariantId, setSelectedVariantId] = useState<
     string | undefined
@@ -148,10 +153,12 @@ export default function ProductPageClient({ id }: { id: string }) {
         (p) =>
           p.id !== product.id &&
           p.category === product.category &&
-          p.isVisible !== false,
+          p.isVisible !== false &&
+          // Don't recommend something that can't be bought on its own.
+          !(comboLive && isComboOnlyProduct(p)),
       )
       .slice(0, 4);
-  }, [product, products]);
+  }, [product, products, comboLive]);
 
   const paginatedReviews = useMemo(() => {
     const start = (currentPage - 1) * REVIEWS_PER_PAGE;
@@ -192,7 +199,12 @@ export default function ProductPageClient({ id }: { id: string }) {
   useEffect(() => {
     setIsDescriptionExpanded(false);
     setActiveImageIndex(0);
-    setSelectedVariantId(product?.variants?.[0]?.id);
+    // Default to the first size a customer can actually buy — a combo-only
+    // size is not in the dropdown, so selecting it would leave it blank.
+    const firstSelectable = product
+      ? (getPurchasableVariants(product)[0] ?? product.variants?.[0])
+      : undefined;
+    setSelectedVariantId(firstSelectable?.id);
     // Only reset when navigating to a genuinely different product, not on
     // every incidental re-fetch/update of the same product's data.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,7 +313,22 @@ export default function ProductPageClient({ id }: { id: string }) {
     );
   }
 
-  const variants = hasVariants(product) ? product.variants : null;
+  // Combo-only sizes never appear in the size dropdown — they are sold
+  // through /combo alone. They are still surfaced further down as the reason
+  // to build one, so `comboOnlyVariants` is kept rather than discarded.
+  // All of this collapses back to normal selling when the builder is not
+  // live, so nothing is ever withheld with no way left to buy it.
+  const comboOnlyVariants = comboLive ? getComboOnlyVariants(product) : [];
+  const purchasable = comboLive
+    ? getPurchasableVariants(product)
+    : (product.variants ?? []);
+  const variants = purchasable.length > 0 ? purchasable : null;
+  const isComboOnly = comboLive && isComboOnlyProduct(product);
+  const comboMinItems = comboData?.settings.minItems ?? 4;
+  const comboSizeText =
+    comboOnlyVariants.length > 0
+      ? comboOnlyVariants.map((v) => v.label).join(" or ")
+      : product.weight;
   const selectedVariant = variants
     ? (variants.find((v) => v.id === selectedVariantId) ?? variants[0])
     : null;
@@ -682,7 +709,29 @@ export default function ProductPageClient({ id }: { id: string }) {
                   </div>
                 )}
 
-                {!available ? (
+                {isComboOnly ? (
+                  <div className="rounded-2xl border border-brand-gold/25 bg-white p-6 text-center">
+                    <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold">
+                      <Sparkles size={18} strokeWidth={1.5} />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-brown">
+                      Part Of A Combo
+                    </p>
+                    <p className="mx-auto mt-2 max-w-xs text-xs font-light leading-relaxed text-brand-brown/55">
+                      We offer this in a {comboSizeText} pack as part of a
+                      Build-Your-Own Combo, so you can try it without
+                      committing to a full size. Pick it along with{" "}
+                      {comboMinItems - 1} more and it&apos;s yours.
+                    </p>
+                    <Link
+                      href="/combo"
+                      className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-brand-green px-7 py-3.5 text-[10px] font-black uppercase tracking-widest text-brand-cream transition-transform duration-300 hover:-translate-y-0.5"
+                    >
+                      Build Your Combo
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                ) : !available ? (
                   <div className="flex flex-col items-center text-center p-2">
                     <Clock className="text-brand-gold mb-3" size={28} />
                     <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown">
@@ -749,6 +798,34 @@ export default function ProductPageClient({ id }: { id: string }) {
                     </button>
                   </div>
                   </div>
+                )}
+
+                {/* Buyable in its own right, but also offered in a smaller
+                    combo-only size — point that out rather than leaving the
+                    size silently missing from the dropdown. */}
+                {!isComboOnly && comboOnlyVariants.length > 0 && (
+                  <Link
+                    href="/combo"
+                    className="group mt-5 flex items-center gap-3 rounded-2xl border border-brand-gold/25 bg-brand-gold/[0.06] px-5 py-4 transition-colors hover:border-brand-gold/50"
+                  >
+                    <Sparkles
+                      size={16}
+                      strokeWidth={1.5}
+                      className="shrink-0 text-brand-gold"
+                    />
+                    <span className="text-xs font-light leading-relaxed text-brand-brown/65">
+                      Want to try it first? A {comboSizeText} pack is available
+                      in a{" "}
+                      <span className="font-bold text-brand-brown">
+                        Build-Your-Own Combo
+                      </span>{" "}
+                      of {comboMinItems} items.
+                    </span>
+                    <ArrowRight
+                      size={14}
+                      className="ml-auto shrink-0 text-brand-gold transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </Link>
                 )}
               </div>
             </div>

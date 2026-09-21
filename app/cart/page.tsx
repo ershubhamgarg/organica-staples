@@ -53,15 +53,20 @@ import {
   isProductAvailable,
   isProductLowStock,
 } from "@/lib/data";
+import { getComboCartState } from "@/lib/comboCart";
+import { isComboLive, useCombo } from "@/lib/useCombo";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const replaceComboItems = useCartStore((state) => state.replaceComboItems);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const getTotalPrice = useCartStore((state) => state.getTotalPrice);
   const catalogProducts = useProductStore((state) => state.products);
+  const { data: comboData } = useCombo();
+  const comboLive = isComboLive(comboData);
   const fetchProducts = useProductStore((state) => state.fetchProducts);
   const appliedDiscountCode = useCartStore(
     (state) => state.appliedDiscountCode,
@@ -85,6 +90,7 @@ export default function CartPage() {
     name: string;
     variantId?: string;
   } | null>(null);
+  const [showComboDelete, setShowComboDelete] = useState(false);
   const [discountError, setDiscountError] = useState<string | null>(null);
   const [discountMessage, setDiscountMessage] = useState<string | null>(null);
   const [publicCoupons, setPublicCoupons] = useState<DiscountCode[]>([]);
@@ -161,6 +167,35 @@ export default function CartPage() {
     0,
   );
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+
+  // A combo is all-or-nothing: its items can't be bought individually, so a
+  // part-built combo must not reach checkout.
+  const comboCart = useMemo(
+    () =>
+      getComboCartState(
+        items,
+        catalogProducts,
+        comboData?.settings.minItems ?? 4,
+        comboLive,
+      ),
+    [items, catalogProducts, comboData?.settings.minItems, comboLive],
+  );
+  const comboCartBlocked = comboCart.isActive && !comboCart.isValid;
+
+  // The combo renders as one card, so the list below it holds only the
+  // lines that are not part of it.
+  const standaloneItems = useMemo(
+    () => items.filter((item) => !comboCart.comboLines.includes(item)),
+    [items, comboCart.comboLines],
+  );
+  const comboTotal = comboCart.comboLines.reduce(
+    (sum, line) => sum + getDiscountedPrice(line) * line.quantity,
+    0,
+  );
+  // The "remove your last item?" prompt is about emptying the basket, and a
+  // combo card counts as an entry in it.
+  const isOnlyBasketEntry = standaloneItems.length === 1 && !comboCart.isActive;
+  const checkoutBlocked = hasUnavailableItems || comboCartBlocked;
 
   // Needed to know each cart line's full set of size options, so a variant
   // switcher can be shown here (not just at add-to-cart time).
@@ -484,8 +519,8 @@ export default function CartPage() {
                   </p>
 
                   <p className="text-sm text-brand-brown/60 font-light mb-8 leading-relaxed">
-                    Removing this will leave your basket empty. Are you sure you
-                    want to remove your last item?
+                    Removing this will leave your basket empty. Are you sure
+                    you want to remove your last item?
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-4">
@@ -507,6 +542,50 @@ export default function CartPage() {
                       className="flex-1 py-4 rounded-full bg-brand-terracotta text-[10px] uppercase tracking-[0.25em] font-black text-white hover:bg-brand-terracotta/90 transition-colors shadow-xl shadow-brand-terracotta/20"
                     >
                       Remove Item
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Whole-combo delete confirmation */}
+          {showComboDelete && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-brand-brown/40 backdrop-blur-md animate-reveal-fade">
+              <div className="bg-white rounded-[2.5rem] border border-brand-gold/20 p-8 md:p-12 shadow-2xl shadow-brand-brown/40 max-w-md w-full relative overflow-hidden animate-reveal-up">
+                <div className="relative z-10 text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-brand-terracotta/10 flex items-center justify-center text-brand-terracotta mx-auto mb-6">
+                    <AlertCircle size={32} />
+                  </div>
+                  <h3 className="text-2xl font-serif text-brand-brown mb-2">
+                    Remove your combo?
+                  </h3>
+                  <p className="text-sm text-brand-brown/60 font-light mb-8 leading-relaxed">
+                    This removes all {comboCart.count} items in the combo from
+                    your basket. A combo is ordered as a whole, so you can&apos;t
+                    keep just some of them.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={() => setShowComboDelete(false)}
+                      className="flex-1 py-4 rounded-full border border-brand-gold/20 text-[10px] uppercase tracking-[0.25em] font-black text-brand-brown hover:bg-brand-cream transition-colors"
+                    >
+                      Keep Combo
+                    </button>
+                    <button
+                      onClick={() => {
+                        replaceComboItems(
+                          comboCart.comboLines.map((line) => ({
+                            id: line.id,
+                            variantId: line.variantId,
+                          })),
+                          [],
+                          user?.id,
+                        );
+                        setShowComboDelete(false);
+                      }}
+                      className="flex-1 py-4 rounded-full bg-brand-terracotta text-[10px] uppercase tracking-[0.25em] font-black text-white hover:bg-brand-terracotta/90 transition-colors shadow-xl shadow-brand-terracotta/20"
+                    >
+                      Remove Combo
                     </button>
                   </div>
                 </div>
@@ -591,7 +670,97 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1.8fr_1fr] gap-8 items-start">
             <div className="space-y-4">
-              {items.map((item) => {
+              {comboCart.isActive && (
+                <div
+                  className={`overflow-hidden rounded-2xl border bg-white shadow-xl shadow-brand-brown/5 ${
+                    comboCartBlocked
+                      ? "border-brand-terracotta/30"
+                      : "border-brand-gold/25"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-3 px-5 py-4 md:px-6 ${
+                      comboCartBlocked
+                        ? "bg-brand-terracotta/5"
+                        : "bg-brand-gold/6"
+                    }`}
+                  >
+                    <Sparkles
+                      size={16}
+                      strokeWidth={1.5}
+                      className={`shrink-0 ${
+                        comboCartBlocked
+                          ? "text-brand-terracotta"
+                          : "text-brand-gold"
+                      }`}
+                    />
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown">
+                        Your Combo
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-light leading-relaxed text-brand-brown/55">
+                        {comboCartBlocked
+                          ? comboCart.message
+                          : `${comboCart.count} items, ordered together`}
+                      </p>
+                    </div>
+                    <Link
+                      href="/combo"
+                      className="ml-auto shrink-0 rounded-full border border-brand-gold/30 px-4 py-2 text-[9px] font-black uppercase tracking-widest text-brand-brown transition-colors hover:bg-brand-cream"
+                    >
+                      {comboCartBlocked ? "Add More" : "Edit"}
+                    </Link>
+                    <button
+                      onClick={() => setShowComboDelete(true)}
+                      aria-label="Remove combo"
+                      className="shrink-0 p-2 text-brand-brown/25 transition-all hover:scale-110 hover:text-brand-terracotta"
+                    >
+                      <Trash2 size={18} strokeWidth={1.5} />
+                    </button>
+                  </div>
+
+                  <ul className="divide-y divide-brand-gold/10">
+                    {comboCart.comboLines.map((line) => (
+                      <li
+                        key={`${line.id}-${line.variantId ?? "base"}`}
+                        className="flex items-center gap-4 px-5 py-3 md:px-6"
+                      >
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-brand-sand">
+                          <ImageWithFallback
+                            src={getProductThumbnail(line)}
+                            alt={line.name}
+                            fill
+                            className="object-cover"
+                            sizes="48px"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-serif text-sm text-brand-brown">
+                            {line.name}
+                          </p>
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-brand-brown/40">
+                            {line.variantLabel ?? line.weight}
+                            {line.quantity > 1 && ` · × ${line.quantity}`}
+                          </p>
+                        </div>
+                        <span className="text-sm font-medium text-brand-brown">
+                          ₹{(getDiscountedPrice(line) * line.quantity).toFixed(2)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex items-baseline justify-between border-t border-brand-gold/10 bg-brand-cream/50 px-5 py-3 md:px-6">
+                    <span className="text-[9px] font-black uppercase tracking-widest text-brand-brown/50">
+                      Combo total
+                    </span>
+                    <span className="text-base font-medium text-brand-brown">
+                      ₹{comboTotal.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {standaloneItems.map((item) => {
                 const itemHasDiscount = hasProductDiscount(item);
                 const itemHasHighDiscount = hasHighProductDiscount(item);
                 const discountPercent = getDiscountPercent(item);
@@ -609,12 +778,21 @@ export default function CartPage() {
                 const fullProduct = catalogProducts.find(
                   (p) => p.id === item.id,
                 );
+                // Combo-only sizes are dropped from the switcher so a normal
+                // line can't be converted into one — except the line's own
+                // size, which must stay or the <select> would have no
+                // matching option for a line that came from a combo.
+                const switchableVariants =
+                  fullProduct && hasVariants(fullProduct)
+                    ? fullProduct.variants.filter(
+                        (v) =>
+                          !comboLive ||
+                          v.isComboEligible !== true ||
+                          v.id === item.variantId,
+                      )
+                    : [];
                 const variantOptions =
-                  fullProduct &&
-                  hasVariants(fullProduct) &&
-                  fullProduct.variants.length > 1
-                    ? fullProduct.variants
-                    : null;
+                  switchableVariants.length > 1 ? switchableVariants : null;
 
                 return (
                   <div
@@ -681,7 +859,7 @@ export default function CartPage() {
                         </Link>
                         <button
                           onClick={() => {
-                            if (items.length === 1) {
+                            if (isOnlyBasketEntry) {
                               setItemToDelete({
                                 id: item.id,
                                 name: item.name,
@@ -736,7 +914,7 @@ export default function CartPage() {
                         <div className="flex items-center border border-brand-brown rounded-full bg-brand-cream/50 p-0.5 scale-90 sm:scale-100 origin-left">
                           <button
                             onClick={() => {
-                              if (item.quantity === 1 && items.length === 1) {
+                              if (item.quantity === 1 && isOnlyBasketEntry) {
                                 setItemToDelete({
                                   id: item.id,
                                   name: item.name,
@@ -1024,6 +1202,25 @@ export default function CartPage() {
                   </div>
                 )}
 
+                {comboCartBlocked && (
+                  <div className="mb-6 rounded-xl border border-brand-terracotta/20 bg-brand-terracotta/5 p-4">
+                    <p className="mb-1 text-[8px] font-black uppercase tracking-widest text-brand-terracotta">
+                      Your combo isn&apos;t complete
+                    </p>
+                    <p className="text-[11px] font-light leading-relaxed text-brand-brown/60">
+                      {comboCart.message} These sampler sizes are only sold as
+                      part of a combo.
+                    </p>
+                    <Link
+                      href="/combo"
+                      className="mt-3 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-brand-green hover:underline"
+                    >
+                      Add {comboCart.shortfall} more
+                      <ArrowRight size={12} />
+                    </Link>
+                  </div>
+                )}
+
                 {/* Mobile Floating Checkout Bar - Redesigned to be "Wow" and Premium */}
                 <div className="lg:hidden fixed bottom-6 left-4 right-4 bg-brand-cream/95 backdrop-blur-xl border border-brand-gold/25 shadow-[0_20px_50px_rgba(60,54,42,0.22)] z-40 rounded-[2.2rem] p-1 safe-bottom animate-fade-in overflow-hidden">
                   {/* Subtle Jute/Paper texture background overlay */}
@@ -1074,9 +1271,9 @@ export default function CartPage() {
 
                     {/* Right Column: Checkout Action Button */}
                     <Link
-                      href={hasUnavailableItems ? "#" : "/checkout"}
+                      href={checkoutBlocked ? "#" : "/checkout"}
                       className={`flex-1 max-w-[215px] group relative flex items-center justify-center gap-2 py-4 px-4 bg-brand-green text-brand-cream rounded-full text-[10px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 ${
-                        hasUnavailableItems
+                        checkoutBlocked
                           ? "opacity-40 cursor-not-allowed grayscale"
                           : ""
                       }`}
@@ -1103,9 +1300,9 @@ export default function CartPage() {
                 {/* Desktop Static Checkout Bar */}
                 <div className="hidden lg:block lg:static lg:p-0 lg:border-none lg:shadow-none z-40">
                   <Link
-                    href={hasUnavailableItems ? "#" : "/checkout"}
+                    href={checkoutBlocked ? "#" : "/checkout"}
                     className={`w-full group relative flex flex-col items-center justify-center gap-1 px-8 py-5 bg-brand-brown text-brand-cream rounded-2xl text-[10px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_40px_-10px_rgba(60,54,42,0.3)] hover:translate-y-[-2px] ${
-                      hasUnavailableItems
+                      checkoutBlocked
                         ? "opacity-40 cursor-not-allowed grayscale"
                         : ""
                     }`}

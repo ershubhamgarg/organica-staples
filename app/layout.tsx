@@ -179,6 +179,15 @@ export default function RootLayout({
                 </li>
                 <li>
                   <Link
+                    href="/combo"
+                    className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
+                  >
+                    <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />
+                    Build Your Own Combo
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/our-story"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >

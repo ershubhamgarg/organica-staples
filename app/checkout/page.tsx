@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/userStore";
 import { Address, useAddressStore } from "@/store/addressStore";
 import type { PaymentDetails } from "@/store/orderStore";
 import { useOrderStore } from "@/store/orderStore";
+import { useProductStore } from "@/store/productStore";
 import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +41,8 @@ import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
 import { STANDARD_SHIPPING_RATE, isLocalDeliveryPincode } from "@/lib/shipping";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
+import { getComboCartState } from "@/lib/comboCart";
+import { isComboLive, useCombo } from "@/lib/useCombo";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
 import { createInstagramStoryReceiptImage } from "@/lib/instagramStoryReceipt";
 
@@ -327,7 +330,31 @@ export default function CheckoutPage() {
       }
     : fallbackCartDiscount;
 
+  const catalogProducts = useProductStore((state) => state.products);
+  const fetchCatalogProducts = useProductStore((state) => state.fetchProducts);
+  const { data: comboData } = useCombo();
+  const comboLive = isComboLive(comboData);
+
+  // Combo membership is derived from the catalogue, so it has to be loaded
+  // here too — someone can land on /checkout directly with a warm cart.
+  useEffect(() => {
+    if (catalogProducts.length === 0) {
+      void fetchCatalogProducts();
+    }
+  }, [catalogProducts.length, fetchCatalogProducts]);
+
   const hasUnavailableItems = items.some((item) => !isProductAvailable(item));
+
+  // A combo's sampler sizes aren't sold individually, so a part-built combo
+  // must not be orderable. The cart blocks it too; this is the backstop for
+  // anyone who lands on /checkout directly.
+  const comboCart = getComboCartState(
+    items,
+    catalogProducts,
+    comboData?.settings.minItems ?? 4,
+    comboLive,
+  );
+  const comboCartBlocked = comboCart.isActive && !comboCart.isValid;
 
   // Address state
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -810,6 +837,39 @@ export default function CheckoutPage() {
           >
             Refine Cart <ArrowLeft size={14} />
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (comboCartBlocked) {
+    return (
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center p-12 bg-white rounded-3xl shadow-2xl border border-brand-gold/10">
+          <div className="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-gold">
+            <Sparkles size={32} strokeWidth={1.5} />
+          </div>
+          <h2 className="text-3xl font-serif text-brand-brown mb-4 tracking-tight">
+            Your Combo Isn&apos;t Complete
+          </h2>
+          <p className="text-brand-brown/60 mb-10 font-light text-balance">
+            {comboCart.message} These sampler sizes are only sold as part of a
+            combo, so they can&apos;t be ordered on their own.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/combo"
+              className="inline-flex items-center justify-center gap-3 bg-brand-green text-brand-cream px-8 py-5 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all shadow-xl"
+            >
+              Add {comboCart.shortfall} More
+            </Link>
+            <Link
+              href="/cart"
+              className="inline-flex items-center justify-center gap-3 border border-brand-gold/25 text-brand-brown px-8 py-5 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-cream"
+            >
+              Back To Cart <ArrowLeft size={14} />
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -1848,6 +1908,7 @@ export default function CheckoutPage() {
                         isStartingPayment ||
                         isShippingRateLoading ||
                         freeOrderCartBlocked ||
+                        comboCartBlocked ||
                         (!isFreeCheckoutFlow && !selectedPayment)
                       }
                       className="flex-1 max-w-[180px] group relative flex items-center justify-center gap-2 py-3 px-4 bg-brand-green text-brand-cream rounded-full text-[9px] uppercase tracking-[0.15em] font-black transition-all duration-500 overflow-hidden shadow-[0_10px_25px_rgba(45,58,38,0.3)] active:scale-95 border border-brand-gold/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:grayscale"
@@ -1927,6 +1988,7 @@ export default function CheckoutPage() {
                       isStartingPayment ||
                       isShippingRateLoading ||
                       freeOrderCartBlocked ||
+                      comboCartBlocked ||
                       (!isFreeCheckoutFlow && !selectedPayment)
                     }
                     className="w-full group relative flex flex-col items-center justify-center gap-1 bg-brand-brown text-brand-cream py-3 lg:py-4 rounded-xl lg:rounded-2xl text-[10px] uppercase tracking-[0.4em] font-black transition-all duration-500 overflow-hidden shadow-[0_20px_50px_-15px_rgba(60,54,42,0.4)] hover:translate-y-[-2px] disabled:opacity-50"
