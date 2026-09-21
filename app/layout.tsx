@@ -33,7 +33,7 @@ const devanagari = Noto_Sans_Devanagari({
 const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://annvriksh.com";
 const SITE_TITLE = "ANNVRIKSH | Premium Organic Indian Staples & Spices";
 const SITE_DESCRIPTION =
-  "ANNVRIKSH brings you 100% organic, chemical-free Indian staples and spices — cold-pressed oils, atta, and more — ethically sourced direct from farms and delivered fresh to your door.";
+  "ANNVRIKSH brings you chemical-free Indian staples and spices, atta, and more — ethically sourced direct from farms and delivered fresh to your door.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -131,7 +131,9 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
         />
         <script
           type="application/ld+json"

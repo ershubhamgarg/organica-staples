@@ -471,7 +471,7 @@ Message: ${formData.message}
                 },
                 {
                   icon: Sprout,
-                  title: "100% Organic",
+                  title: "Chemical-Free",
                   body: "Grown with respect for the earth and free from synthetic chemicals.",
                 },
                 {
@@ -523,7 +523,7 @@ Message: ${formData.message}
           {[
             { icon: Truck, label: "Farm To Table" },
             { icon: Award, label: "Quality Assured" },
-            { icon: Sprout, label: "100% Organic" },
+            { icon: Sprout, label: "Chemical-Free" },
             { icon: Lock, label: "Secure Payments" },
           ].map((item) => {
             const Icon = item.icon;

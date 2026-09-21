@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 
-import { getProductThumbnail, isProductAvailable, type Product } from "@/lib/data";
+import {
+  getProductThumbnail,
+  isProductAvailable,
+  type Product,
+} from "@/lib/data";
 import ProductPageClient from "./ProductPageClient";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://annvriksh.com";
@@ -61,11 +65,11 @@ export async function generateMetadata({
     };
   }
 
-  const title = `Buy ${product.name} Online | 100% Organic`;
+  const title = `Buy ${product.name} Online | Pure & Chemical Free`;
   const socialTitle = `${title} | ANNVRIKSH`;
   const description = toPlainText(
     product.description ||
-      `Buy ${product.name} online from ANNVRIKSH — 100% organic, ethically sourced Indian staples delivered fresh to your door.`,
+      `Buy ${product.name} online from ANNVRIKSH — chemical-free, ethically sourced Indian staples delivered fresh to your door.`,
     160,
   );
   const image = getProductThumbnail(product);
@@ -80,7 +84,9 @@ export async function generateMetadata({
       description,
       url,
       type: "website",
-      images: image ? [{ url: image, width: 1200, height: 1200, alt: product.name }] : undefined,
+      images: image
+        ? [{ url: image, width: 1200, height: 1200, alt: product.name }]
+        : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -105,7 +111,9 @@ export default async function ProductPage({
         "@type": "Product",
         name: product.name,
         description: toPlainText(product.description || product.name, 500),
-        image: getProductThumbnail(product) ? [getProductThumbnail(product)] : undefined,
+        image: getProductThumbnail(product)
+          ? [getProductThumbnail(product)]
+          : undefined,
         sku: product.id,
         category: product.category,
         brand: { "@type": "Brand", name: "ANNVRIKSH" },

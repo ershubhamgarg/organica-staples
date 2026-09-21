@@ -22,7 +22,7 @@ import { useEffect } from "react";
 const HERO_IMAGE = "/organic-farming-bharat.jpeg";
 
 const trustBadges = [
-  { icon: Sprout, label: "100% Organic" },
+  { icon: Sprout, label: "Ethically Sourced" },
   { icon: Truck, label: "Farm to Table" },
   { icon: ShieldCheck, label: "Zero Chemicals" },
 ];
@@ -87,8 +87,8 @@ const DesiHero = () => {
 
             <p className="text-sm sm:text-base text-brand-brown/70 mb-8 sm:mb-9 max-w-md font-light leading-relaxed">
               Bringing back the lost flavors of traditional Indian kitchens.
-              Ethically sourced, 100% organic staples that nourish both body and
-              soul.
+              Ethically sourced, chemical-free, staples that nourish both body
+              and soul.
             </p>
 
             <div className="flex flex-wrap items-center justify-start gap-4">
@@ -154,7 +154,7 @@ const DesiHero = () => {
                   <ShieldCheck size={16} strokeWidth={1.8} />
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown">
-                  100% Organic &amp; Ethically Sourced
+                  Chemical-Free &amp; Ethically Sourced
                 </p>
               </div>
             </div>

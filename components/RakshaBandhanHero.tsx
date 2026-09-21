@@ -1,6 +1,13 @@
 "use client";
 
-import { ArrowRight, Check, Copy, ShieldCheck, Sprout, Truck } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  ShieldCheck,
+  Sprout,
+  Truck,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,7 +18,7 @@ const HERO_IMAGE =
   "https://images.unsplash.com/photo-1693040529947-20f023bb7f76?auto=format&fit=crop&q=80&w=1000";
 
 const trustBadges = [
-  { icon: Sprout, label: "100% Organic" },
+  { icon: Sprout, label: "Ethically Sourced" },
   { icon: Truck, label: "Farm to Table" },
   { icon: ShieldCheck, label: "Zero Chemicals" },
 ];
@@ -60,8 +67,8 @@ const RakshaBandhanHero = () => {
             </h1>
 
             <p className="text-sm sm:text-base text-brand-brown/70 mb-8 sm:mb-9 max-w-md font-light leading-relaxed">
-              Celebrate the bond of love and trust this Raksha Bandhan.
-              Enjoy 10% off your cart with code{" "}
+              Celebrate the bond of love and trust this Raksha Bandhan. Enjoy
+              10% off your cart with code{" "}
               <span className="font-semibold text-brand-brown">
                 {RAKHI_COUPON_CODE}
               </span>
@@ -105,7 +112,11 @@ const RakshaBandhanHero = () => {
                     key={badge.label}
                     className="flex items-center gap-2 text-brand-brown/45"
                   >
-                    <Icon size={14} strokeWidth={1.5} className="text-brand-gold" />
+                    <Icon
+                      size={14}
+                      strokeWidth={1.5}
+                      className="text-brand-gold"
+                    />
                     <span className="text-[9px] uppercase tracking-[0.2em] font-black">
                       {badge.label}
                     </span>
