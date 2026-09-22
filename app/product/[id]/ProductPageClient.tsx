@@ -581,8 +581,9 @@ export default function ProductPageClient({ id }: { id: string }) {
                         </span>
                       </div>
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green-fresh mt-1">
-                        You Save ₹{(displayProduct.price - discountedPrice).toFixed(2)}{" "}
-                        ({discountPercent}% Off)
+                        You Save ₹
+                        {(displayProduct.price - discountedPrice).toFixed(2)} (
+                        {discountPercent}% Off)
                       </p>
                     </div>
                   ) : available ? (
@@ -719,10 +720,11 @@ export default function ProductPageClient({ id }: { id: string }) {
                     </p>
                     <p className="mx-auto mt-2 max-w-xs text-xs font-light leading-relaxed text-brand-brown/55">
                       We offer this in a {comboSizeText} pack as part of a
-                      Build-Your-Own Combo, so you can try it without
-                      committing to a full size. Pick it along with{" "}
-                      {comboMinItems - 1} other different{" "}
-                      {comboMinItems - 1 === 1 ? "item" : "items"} and it&apos;s yours.
+                      Build-Your-Own Combo, so you can try it without committing
+                      to a full size. Pick it along with {comboMinItems - 1}{" "}
+                      other different{" "}
+                      {comboMinItems - 1 === 1 ? "item" : "items"} and it&apos;s
+                      yours.
                     </p>
                     <Link
                       href="/combo"
@@ -749,55 +751,59 @@ export default function ProductPageClient({ id }: { id: string }) {
                 ) : (
                   <div className="flex flex-col gap-5">
                     <div className="flex flex-col sm:flex-row items-center gap-8">
-                    <div className="flex items-center border border-brand-brown rounded-full px-6 py-3 lg:py-4 bg-white shadow-inner w-full sm:w-auto justify-between sm:justify-start">
+                      <div className="flex items-center border border-brand-brown rounded-full px-6 py-3 lg:py-4 bg-white shadow-inner w-full sm:w-auto justify-between sm:justify-start">
+                        <button
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="text-brand-brown hover:text-brand-terracotta transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        >
+                          <Minus size={16} strokeWidth={3} />
+                        </button>
+                        <span className="text-brand-brown text-lg font-black w-12 text-center">
+                          {quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            setQuantity(
+                              typeof displayProduct.stock_quantity === "number"
+                                ? Math.min(
+                                    displayProduct.stock_quantity,
+                                    quantity + 1,
+                                  )
+                                : quantity + 1,
+                            )
+                          }
+                          disabled={
+                            quantityLockedToOne ||
+                            (typeof displayProduct.stock_quantity ===
+                              "number" &&
+                              quantity >= displayProduct.stock_quantity)
+                          }
+                          title={
+                            quantityLockedToOne
+                              ? `${appliedDiscountCoupon?.code} allows only 1 of each product.`
+                              : undefined
+                          }
+                          className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-25"
+                        >
+                          <Plus size={16} strokeWidth={3} />
+                        </button>
+                      </div>
+
                       <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="text-brand-brown hover:text-brand-terracotta transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                        onClick={handleAddToCart}
+                        className={`w-full sm:flex-1 group relative flex items-center justify-center gap-4 px-10 py-5 bg-brand-brown text-brand-cream rounded-xl lg:rounded-full text-[12px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px] min-h-[56px] ${added ? "bg-brand-green" : ""}`}
                       >
-                        <Minus size={16} strokeWidth={3} />
-                      </button>
-                      <span className="text-brand-brown text-lg font-black w-12 text-center">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          setQuantity(
-                            typeof displayProduct.stock_quantity === "number"
-                              ? Math.min(displayProduct.stock_quantity, quantity + 1)
-                              : quantity + 1,
-                          )
-                        }
-                        disabled={
-                          quantityLockedToOne ||
-                          (typeof displayProduct.stock_quantity === "number" &&
-                            quantity >= displayProduct.stock_quantity)
-                        }
-                        title={
-                          quantityLockedToOne
-                            ? `${appliedDiscountCoupon?.code} allows only 1 of each product.`
-                            : undefined
-                        }
-                        className="text-brand-brown hover:text-brand-green transition-all p-2 lg:p-1 min-w-[44px] min-h-[44px] flex items-center justify-center disabled:cursor-not-allowed disabled:opacity-25"
-                      >
-                        <Plus size={16} strokeWidth={3} />
+                        <span className="relative z-10 flex items-center gap-3">
+                          {added ? (
+                            <Check size={18} />
+                          ) : (
+                            <ShoppingBag size={18} />
+                          )}
+                          {added ? "Added" : "Add to Cart"}
+                        </span>
+                        <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
                       </button>
                     </div>
-
-                    <button
-                      onClick={handleAddToCart}
-                      className={`w-full sm:flex-1 group relative flex items-center justify-center gap-4 px-10 py-5 bg-brand-brown text-brand-cream rounded-xl lg:rounded-full text-[12px] uppercase tracking-[0.3em] font-black transition-all duration-500 overflow-hidden shadow-2xl hover:translate-y-[-2px] min-h-[56px] ${added ? "bg-brand-green" : ""}`}
-                    >
-                      <span className="relative z-10 flex items-center gap-3">
-                        {added ? (
-                          <Check size={18} />
-                        ) : (
-                          <ShoppingBag size={18} />
-                        )}
-                        {added ? "Added" : "Add to Cart"}
-                      </span>
-                      <div className="absolute inset-0 bg-brand-brown-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />
-                    </button>
-                  </div>
                   </div>
                 )}
 
@@ -840,7 +846,7 @@ export default function ProductPageClient({ id }: { id: string }) {
           {[
             { icon: Award, label: "Farm Direct" },
             { icon: Sparkles, label: "Quality Assured" },
-            { icon: Leaf, label: "100% Organic" },
+            { icon: Leaf, label: "Chemical-Free" },
             { icon: Truck, label: "Pan-India Delivery" },
           ].map((item) => {
             const Icon = item.icon;
@@ -861,251 +867,255 @@ export default function ProductPageClient({ id }: { id: string }) {
 
       {/* Customer Reviews */}
       {available && (
-      <section
-        id="reviews"
-        className="bg-brand-cream border-b border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-8">
-            <div>
-              <div className="inline-flex items-center gap-2 mb-2">
-                <span className="h-[1px] w-6 bg-brand-terracotta" />
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-terracotta">
-                  Reviews
-                </span>
+        <section
+          id="reviews"
+          className="bg-brand-cream border-b border-brand-gold/10 py-8 md:py-12 scroll-mt-24"
+        >
+          <div className="max-w-6xl mx-auto px-4 md:px-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6 md:mb-8">
+              <div>
+                <div className="inline-flex items-center gap-2 mb-2">
+                  <span className="h-[1px] w-6 bg-brand-terracotta" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-black text-brand-terracotta">
+                    Reviews
+                  </span>
+                </div>
+                <h2 className="text-2xl lg:text-3xl font-serif text-brand-brown tracking-tight">
+                  Customer <span className="italic">Feedback</span>
+                </h2>
               </div>
-              <h2 className="text-2xl lg:text-3xl font-serif text-brand-brown tracking-tight">
-                Customer <span className="italic">Feedback</span>
-              </h2>
-            </div>
 
-            <div className="flex items-center gap-3 text-brand-brown bg-white/50 px-4 py-2 rounded-2xl border border-brand-gold/10">
-              <span className="text-3xl font-serif">
-                {averageRating.toFixed(1)}
-              </span>
-              <div className="flex flex-col">
-                <div className="flex text-brand-gold">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={10}
-                      className={
-                        i < Math.round(averageRating)
-                          ? "fill-brand-gold text-brand-gold"
-                          : "text-brand-gold/20"
-                      }
-                    />
-                  ))}
-                </div>
-                <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
-                  {reviewCount} Reviews
+              <div className="flex items-center gap-3 text-brand-brown bg-white/50 px-4 py-2 rounded-2xl border border-brand-gold/10">
+                <span className="text-3xl font-serif">
+                  {averageRating.toFixed(1)}
                 </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12">
-            {/* Review List */}
-            <div className="flex flex-col">
-              {reviews.length === 0 ? (
-                <div className="flex-grow flex items-center justify-center p-8 md:p-12 text-center border border-dashed border-brand-gold/15 rounded-3xl bg-white/30 min-h-[200px]">
-                  <p className="text-brand-brown/40 text-sm font-light italic">
-                    No customer reviews yet. Be the first to share your
-                    experience!
-                  </p>
-                </div>
-              ) : (
-                <div className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5">
-                <div
-                  className={`space-y-4 md:space-y-6 ${reviews.length >= 3 ? "max-h-[600px] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar" : ""}`}
-                >
-                  {paginatedReviews.map((review) => {
-                    const isOwnReview = user && review.user_id === user.id;
-                    return (
-                      <div
-                        key={review.id}
-                        className={`group pb-4 md:pb-6 border-b border-brand-gold/10 last:border-0 ${
-                          isOwnReview
-                            ? "bg-brand-green/[0.03] -mx-4 px-4 py-4 rounded-2xl border-brand-green/10"
-                            : ""
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-2 md:mb-3">
-                          <div className="flex items-center gap-3 md:gap-4">
-                            <div
-                              className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-serif text-sm md:text-base ${
-                                isOwnReview
-                                  ? "bg-brand-green/10 text-brand-green ring-1 ring-brand-green/30"
-                                  : "bg-brand-sand text-brand-brown"
-                              }`}
-                            >
-                              {review.user_name?.[0].toUpperCase() || "A"}
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
-                                  {review.user_name || "Anonymous"}
-                                </h5>
-                                {isOwnReview && (
-                                  <span className="text-[6px] uppercase tracking-widest font-black text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded-full border border-brand-green/20">
-                                    You
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-[8px] text-brand-brown/30 font-bold mt-0.5 uppercase tracking-tighter">
-                                {new Date(review.created_at).toLocaleDateString(
-                                  "en-IN",
-                                  { month: "short", year: "numeric" },
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex text-brand-gold">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                size={9}
-                                className={
-                                  i < (review.rating || 0)
-                                    ? "fill-brand-gold text-brand-gold"
-                                    : "text-brand-gold/10"
-                                }
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        {review.comment && review.comment.trim() && (
-                          <div className="text-brand-brown/70 font-light leading-relaxed pl-0 mt-1 md:pl-12 text-xs md:text-[13px] whitespace-pre-wrap">
-                            &quot;{review.comment}&quot;
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-3 pl-0 md:pl-12 pt-4 md:pt-6 mt-4 md:mt-6 border-t border-brand-gold/10">
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.max(1, currentPage - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                    <span className="text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
-                      {currentPage} <span className="mx-2">/</span>{" "}
-                      {totalPages}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.min(totalPages, currentPage + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                )}
-                </div>
-              )}
-            </div>
-
-            {/* Review Form */}
-            <div className="lg:sticky lg:top-32 h-max">
-              <form
-                onSubmit={handleSubmitReview}
-                className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5"
-              >
-                <h3 className="text-xl font-serif text-brand-brown mb-1">
-                  Write a Review
-                </h3>
-                <p className="text-[10px] text-brand-brown/40 font-light mb-6">
-                  Share your experience with this product.
-                </p>
-
-                {submitMessage && (
-                  <div
-                    className={`mb-6 p-3 text-[9px] uppercase tracking-widest font-black rounded-xl ${
-                      submitMessage.type === "success"
-                        ? "bg-brand-green/10 text-brand-green"
-                        : "bg-brand-terracotta/10 text-brand-terracotta"
-                    }`}
-                  >
-                    {submitMessage.text}
-                  </div>
-                )}
-
-                <div className="space-y-4 md:space-y-6">
-                  <div>
-                    <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-3">
-                      Rating
-                    </label>
-                    <div className="flex gap-1.5">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          onClick={() => setNewRating(star)}
-                          className="transition-transform hover:scale-110"
-                        >
-                          <Star
-                            size={20}
-                            className={
-                              star <= (newRating || 0)
-                                ? "fill-brand-gold text-brand-gold"
-                                : "text-brand-gold/20"
-                            }
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {!user && (
-                    <div>
-                      <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        value={newUserName}
-                        onChange={(e) => setNewUserName(e.target.value)}
-                        placeholder="Your name"
-                        className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/20 font-light"
+                <div className="flex flex-col">
+                  <div className="flex text-brand-gold">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={10}
+                        className={
+                          i < Math.round(averageRating)
+                            ? "fill-brand-gold text-brand-gold"
+                            : "text-brand-gold/20"
+                        }
                       />
+                    ))}
+                  </div>
+                  <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
+                    {reviewCount} Reviews
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12">
+              {/* Review List */}
+              <div className="flex flex-col">
+                {reviews.length === 0 ? (
+                  <div className="flex-grow flex items-center justify-center p-8 md:p-12 text-center border border-dashed border-brand-gold/15 rounded-3xl bg-white/30 min-h-[200px]">
+                    <p className="text-brand-brown/40 text-sm font-light italic">
+                      No customer reviews yet. Be the first to share your
+                      experience!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5">
+                    <div
+                      className={`space-y-4 md:space-y-6 ${reviews.length >= 3 ? "max-h-[600px] overflow-y-auto overflow-x-hidden pr-2 custom-scrollbar" : ""}`}
+                    >
+                      {paginatedReviews.map((review) => {
+                        const isOwnReview = user && review.user_id === user.id;
+                        return (
+                          <div
+                            key={review.id}
+                            className={`group pb-4 md:pb-6 border-b border-brand-gold/10 last:border-0 ${
+                              isOwnReview
+                                ? "bg-brand-green/[0.03] -mx-4 px-4 py-4 rounded-2xl border-brand-green/10"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2 md:mb-3">
+                              <div className="flex items-center gap-3 md:gap-4">
+                                <div
+                                  className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center font-serif text-sm md:text-base ${
+                                    isOwnReview
+                                      ? "bg-brand-green/10 text-brand-green ring-1 ring-brand-green/30"
+                                      : "bg-brand-sand text-brand-brown"
+                                  }`}
+                                >
+                                  {review.user_name?.[0].toUpperCase() || "A"}
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h5 className="text-[9px] uppercase tracking-widest font-black text-brand-brown">
+                                      {review.user_name || "Anonymous"}
+                                    </h5>
+                                    {isOwnReview && (
+                                      <span className="text-[6px] uppercase tracking-widest font-black text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded-full border border-brand-green/20">
+                                        You
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-[8px] text-brand-brown/30 font-bold mt-0.5 uppercase tracking-tighter">
+                                    {new Date(
+                                      review.created_at,
+                                    ).toLocaleDateString("en-IN", {
+                                      month: "short",
+                                      year: "numeric",
+                                    })}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex text-brand-gold">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={9}
+                                    className={
+                                      i < (review.rating || 0)
+                                        ? "fill-brand-gold text-brand-gold"
+                                        : "text-brand-gold/10"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            {review.comment && review.comment.trim() && (
+                              <div className="text-brand-brown/70 font-light leading-relaxed pl-0 mt-1 md:pl-12 text-xs md:text-[13px] whitespace-pre-wrap">
+                                &quot;{review.comment}&quot;
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {totalPages > 1 && (
+                      <div className="flex items-center gap-3 pl-0 md:pl-12 pt-4 md:pt-6 mt-4 md:mt-6 border-t border-brand-gold/10">
+                        <button
+                          onClick={() =>
+                            setCurrentPage(Math.max(1, currentPage - 1))
+                          }
+                          disabled={currentPage === 1}
+                          className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        >
+                          <ChevronLeft size={14} />
+                        </button>
+                        <span className="text-[9px] uppercase tracking-widest font-black text-brand-brown/40">
+                          {currentPage} <span className="mx-2">/</span>{" "}
+                          {totalPages}
+                        </span>
+                        <button
+                          onClick={() =>
+                            setCurrentPage(
+                              Math.min(totalPages, currentPage + 1),
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                          className="w-8 h-8 rounded-full border border-brand-gold/20 flex items-center justify-center text-brand-brown disabled:opacity-20 hover:bg-brand-gold/5 transition-colors"
+                        >
+                          <ChevronRight size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Review Form */}
+              <div className="lg:sticky lg:top-32 h-max">
+                <form
+                  onSubmit={handleSubmitReview}
+                  className="bg-white p-5 md:p-8 rounded-3xl shadow-xl shadow-brand-brown/5 border border-brand-gold/5"
+                >
+                  <h3 className="text-xl font-serif text-brand-brown mb-1">
+                    Write a Review
+                  </h3>
+                  <p className="text-[10px] text-brand-brown/40 font-light mb-6">
+                    Share your experience with this product.
+                  </p>
+
+                  {submitMessage && (
+                    <div
+                      className={`mb-6 p-3 text-[9px] uppercase tracking-widest font-black rounded-xl ${
+                        submitMessage.type === "success"
+                          ? "bg-brand-green/10 text-brand-green"
+                          : "bg-brand-terracotta/10 text-brand-terracotta"
+                      }`}
+                    >
+                      {submitMessage.text}
                     </div>
                   )}
 
-                  <div>
-                    <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
-                      Message
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Share your thoughts..."
-                      className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/20 font-light"
-                    />
-                  </div>
+                  <div className="space-y-4 md:space-y-6">
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-3">
+                        Rating
+                      </label>
+                      <div className="flex gap-1.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setNewRating(star)}
+                            className="transition-transform hover:scale-110"
+                          >
+                            <Star
+                              size={20}
+                              className={
+                                star <= (newRating || 0)
+                                  ? "fill-brand-gold text-brand-gold"
+                                  : "text-brand-gold/20"
+                              }
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-brand-brown text-brand-cream py-4 rounded-full text-[9px] uppercase tracking-[0.25em] font-black transition-all hover:bg-brand-brown-light disabled:opacity-50"
-                  >
-                    {isSubmitting ? "Submitting..." : "Send Review"}
-                  </button>
-                </div>
-              </form>
+                    {!user && (
+                      <div>
+                        <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          value={newUserName}
+                          onChange={(e) => setNewUserName(e.target.value)}
+                          placeholder="Your name"
+                          className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors placeholder:text-brand-brown/20 font-light"
+                        />
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-[9px] uppercase tracking-widest font-black text-brand-brown/60 mb-1.5">
+                        Message
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Share your thoughts..."
+                        className="w-full bg-brand-cream/30 border-b border-brand-gold/20 py-2 text-[13px] focus:outline-none focus:border-brand-brown transition-colors resize-none placeholder:text-brand-brown/20 font-light"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-brand-brown text-brand-cream py-4 rounded-full text-[9px] uppercase tracking-[0.25em] font-black transition-all hover:bg-brand-brown-light disabled:opacity-50"
+                    >
+                      {isSubmitting ? "Submitting..." : "Send Review"}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Related Products */}

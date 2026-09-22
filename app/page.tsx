@@ -20,7 +20,7 @@ import {
   Wheat,
 } from "lucide-react";
 import ProductListing from "@/components/ProductListing";
-import DesiHero from "@/components/DesiHero";
+import BestSellersHero from "@/components/BestSellersHero";
 import ScrollReveal from "@/components/ScrollReveal";
 import SpiceTicker from "@/components/SpiceTicker";
 import SpiceWheelImage from "@/components/SpiceWheelImage";
@@ -108,7 +108,8 @@ Message: ${formData.message}
   return (
     <div className="flex flex-col min-h-screen bg-[#fbfaf7] animate-fade-in bg-mandala">
       <WelcomeModal />
-      <DesiHero />
+      {/* Best sellers open the page; falls back to the regular hero when none are flagged. */}
+      <BestSellersHero />
 
       {/* Spices */}
       <section className="relative bg-brand-brown py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">

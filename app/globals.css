@@ -326,3 +326,61 @@ body {
     display: none !important;
   }
 }
+
+/* ---- Best sellers hero -------------------------------------------------
+   Names are deliberately specific (rays/bob/twinkle): this file already had
+   two animations sharing the name "marquee", and the later one silently won. */
+
+/* A toran — the pennant garland hung over Indian doorways — as a repeating
+   strip along the top edge. */
+.toran {
+  height: 44px;
+  background-repeat: repeat-x;
+  background-size: 96px 44px;
+  /* Dot colour is Best sellers' own background (cream) so it reads as a
+     punched-out bead against whatever the garland sits on. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='44' viewBox='0 0 96 44'%3E%3Cpath d='M0 2.5H96' stroke='%23C5A028' stroke-width='2'/%3E%3Cpath d='M4 3L28 3L16 39Z' fill='%23A65D47'/%3E%3Cpath d='M36 3L60 3L48 39Z' fill='%23E8D090'/%3E%3Cpath d='M68 3L92 3L80 39Z' fill='%23C5A028'/%3E%3Ccircle cx='16' cy='3' r='2.6' fill='%23FDFBF7'/%3E%3Ccircle cx='48' cy='3' r='2.6' fill='%23FDFBF7'/%3E%3Ccircle cx='80' cy='3' r='2.6' fill='%23FDFBF7'/%3E%3C/svg%3E");
+}
+
+.sunburst {
+  /* Warm gold rays, visible against either a dark or a cream backdrop —
+     opaque enough at the centre to read as a motif, faded at the mask edge. */
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(197, 160, 40, 0.14) 0deg 7deg,
+    transparent 7deg 15deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 66%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 66%);
+}
+
+@keyframes rays-turn {
+  to { transform: rotate(360deg); }
+}
+.animate-rays {
+  animation: rays-turn 180s linear infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.animate-bob {
+  animation: bob 6s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.animate-twinkle {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rays,
+  .animate-bob,
+  .animate-twinkle {
+    animation: none;
+  }
+}
