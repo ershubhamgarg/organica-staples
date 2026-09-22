@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Star, ChevronDown, Hourglass, Search, X } from "lucide-react";
 import ComboBanner from "@/components/ComboBanner";
 import QuickAddButton from "@/components/QuickAddButton";
@@ -52,7 +53,43 @@ export default function ProductListing() {
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortOrder, setSortOrder] = useState<string>("default");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  // Prefills from the header's search bar (?q=...#shop) so a search from
+  // anywhere on the site drops the customer straight onto matching results
+  // instead of a blank pantry they'd have to search again by hand.
+  const [searchQuery, setSearchQuery] = useState<string>(
+    () => searchParams.get("q") ?? "",
+  );
+
+  useEffect(() => {
+    const queryFromUrl = searchParams.get("q");
+    if (queryFromUrl === null) return;
+
+    setSearchQuery(queryFromUrl);
+    // The header search's whole point is "don't make them scroll to find
+    // it" — jump straight to the grid rather than leaving them at the top
+    // of a long home page.
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById("shop")
+        ?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+    // Re-run whenever the URL's `q` changes (a fresh header search while
+    // already on this page) — `searchParams` is a new instance per Next's
+    // own recommended pattern for reacting to that.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    if (searchParams.get("q") !== null) {
+      // Drop the stale ?q= param so a refresh doesn't silently re-apply a
+      // search the customer explicitly cleared.
+      router.replace("/#shop", { scroll: false });
+    }
+  };
+
   const { data: comboData } = useCombo();
   const comboLive = isComboLive(comboData);
 
@@ -206,7 +243,7 @@ export default function ProductListing() {
           {searchQuery && (
             <button
               type="button"
-              onClick={() => setSearchQuery("")}
+              onClick={clearSearch}
               aria-label="Clear search"
               className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-brown/30 transition-colors hover:text-brand-brown"
             >
@@ -280,7 +317,7 @@ export default function ProductListing() {
           </p>
           <button
             type="button"
-            onClick={() => setSearchQuery("")}
+            onClick={clearSearch}
             className="mt-6 rounded-full border border-brand-gold/20 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-brand-brown transition-colors hover:border-brand-gold/40"
           >
             Clear Search

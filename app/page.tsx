@@ -27,7 +27,7 @@ import SpiceWheelImage from "@/components/SpiceWheelImage";
 import WelcomeModal from "@/components/WelcomeModal";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import ReviewCarousel from "@/components/ReviewCarousel";
 
@@ -200,7 +200,11 @@ Message: ${formData.message}
       <SpiceTicker />
 
       {/* Product Grid Section */}
-      <ProductListing />
+      {/* useSearchParams (read inside ProductListing, to prefill from the
+          header search) requires a Suspense boundary. */}
+      <Suspense fallback={null}>
+        <ProductListing />
+      </Suspense>
 
       <ReviewCarousel />
 

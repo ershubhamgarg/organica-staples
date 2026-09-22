@@ -63,10 +63,10 @@ function BestSellerCard({
 
   return (
     <article
-      className={`group relative flex shrink-0 snap-center flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_8px_30px_-12px_rgba(17,44,36,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-16px_rgba(17,44,36,0.28)] ${
+      className={`group relative flex min-w-0 shrink-0 snap-center flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_8px_30px_-12px_rgba(17,44,36,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-16px_rgba(17,44,36,0.28)] ${
         featured
-          ? "w-[84vw] max-w-[23rem] ring-1 ring-brand-gold/40 xl:w-[20.5rem] 2xl:w-[23rem]"
-          : "w-[78vw] max-w-[21rem] xl:w-[18rem] 2xl:w-[20rem]"
+          ? "w-full ring-1 ring-brand-gold/40 xl:w-[20.5rem] 2xl:w-[23rem]"
+          : "w-full xl:w-[18rem] 2xl:w-[20rem]"
       }`}
     >
       {/* Photo takes the full width of the card — the product is the point. */}
@@ -78,7 +78,7 @@ function BestSellerCard({
           src={getProductThumbnail(product)}
           alt={product.name}
           fill
-          sizes="(max-width: 1024px) 84vw, 336px"
+          sizes="(max-width: 1279px) 45vw, 336px"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           priority={featured}
         />
@@ -88,25 +88,33 @@ function BestSellerCard({
           Best Seller
         </span>
 
+        {/* A diagonal ribbon rather than a quiet pill — the discount is the
+            commercial hook of this section (there's no price to compare
+            it against), so it needs to read at a glance, not on a second
+            look. Clipped to a clean corner by the photo's own overflow. */}
         {discountPercent > 0 && (
-          <span className="absolute right-3 top-3 rounded-full bg-brand-terracotta px-2.5 py-1 text-[10px] font-bold text-white shadow-sm">
-            {discountPercent}% OFF
-          </span>
+          <div className="absolute -right-11 top-5 w-40 rotate-45 bg-gradient-to-b from-brand-terracotta to-[#8a4a37] py-1.5 text-center shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
+            <span className="text-[13px] font-extrabold uppercase leading-none tracking-wide text-white drop-shadow-sm">
+              {discountPercent}% Off
+            </span>
+          </div>
         )}
       </Link>
 
       {/* Qualities: a loosely scattered pair beneath the photo, never over it. */}
       {benefits.length > 0 && (
-        <div className="-mt-3 flex flex-wrap justify-center gap-2 px-4">
+        <div className="-mt-3 flex flex-wrap justify-center gap-1.5 px-2 sm:gap-2 sm:px-4">
           {benefits.map((benefit, i) => {
             const Icon = CHIP_ICONS[i % CHIP_ICONS.length];
             return (
               <span
                 key={benefit}
-                className={`inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1.5 text-[10px] font-semibold text-brand-brown shadow-md ring-1 ring-brand-brown/5 ${CHIP_TILT[i % CHIP_TILT.length]}`}
+                className={`inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[9px] font-semibold text-brand-brown shadow-md ring-1 ring-brand-brown/5 sm:px-2.5 sm:py-1.5 sm:text-[10px] ${CHIP_TILT[i % CHIP_TILT.length]}`}
               >
                 <Icon size={11} className="shrink-0 text-brand-green-fresh" />
-                {benefit}
+                <span className="max-w-[4.75rem] break-words leading-tight sm:max-w-[6.5rem]">
+                  {benefit}
+                </span>
               </span>
             );
           })}
@@ -114,9 +122,9 @@ function BestSellerCard({
       )}
 
       {/* Name + CTA */}
-      <div className="flex flex-1 flex-col px-5 pb-5 pt-4 text-center">
+      <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-5 sm:pb-5 sm:pt-4">
         <Link href={href}>
-          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-brand-brown transition-colors group-hover:text-brand-terracotta xl:text-base">
+          <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug tracking-tight text-brand-brown transition-colors group-hover:text-brand-terracotta sm:text-[15px] xl:text-base">
             {product.name}
           </h3>
         </Link>
@@ -188,10 +196,17 @@ export default function BestSellersHero() {
   if (products.length === 0) return <HeroSkeleton />;
   if (entries.length === 0) return <DesiHero />;
 
-  // With three, the top seller stands in the middle and is drawn larger.
-  const staged =
-    entries.length === 3 ? [entries[1], entries[0], entries[2]] : entries;
+  // entries[0] is already the strongest performer (buildBestSellerEntries
+  // ranks by review count, then rating), so it doubles as "the featured
+  // card" with no reordering needed for the mobile grid, where it simply
+  // renders first. Centring it in the desktop row is done with `xl:order-*`
+  // below instead of reordering the array, since the array order is also
+  // what drives the mobile grid.
   const featuredKey = entries[0].product.id;
+  // Only meaningful with all 3 slots filled — centring one of two, or the
+  // only one, isn't a real "centre" position.
+  const centreOnDesktop = entries.length === 3;
+  const XL_ORDER = ["xl:order-2", "xl:order-1", "xl:order-3"];
 
   return (
     <section
@@ -227,7 +242,7 @@ export default function BestSellersHero() {
 
           <h1
             id="best-sellers-heading"
-            className="mt-5 font-serif text-4xl leading-[1.05] tracking-tight sm:text-5xl xl:text-6xl"
+            className="mt-3 font-serif text-3xl leading-[1.05] tracking-tight sm:mt-5 sm:text-4xl xl:text-6xl"
           >
             <span className="block text-brand-brown">Meet our</span>
             <span className="relative mt-1 inline-block italic text-brand-terracotta">
@@ -250,12 +265,15 @@ export default function BestSellersHero() {
             </span>
           </h1>
 
-          <p className="mt-9 max-w-md text-sm font-light leading-relaxed text-brand-brown/65 sm:text-base">
+          <p className="mt-4 max-w-md text-xs font-light leading-relaxed text-brand-brown/65 sm:mt-9 sm:text-sm md:text-base">
             The staples our customers order most — pure, chemical-free and
             priced honestly, straight from the farm to your kitchen.
           </p>
 
-          <ul className="mt-8 flex flex-wrap items-center gap-y-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/70 sm:text-[11px]">
+          {/* The credential row is a nice-to-have, not essential — it's
+              what a mobile visitor least needs before seeing products, so
+              it's hidden below sm rather than pushing them further down. */}
+          <ul className="mt-8 hidden flex-wrap items-center gap-y-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/70 sm:flex sm:text-[11px]">
             {["Chemical-Free", "Ethically Sourced"].map((label, i) => (
               <li
                 key={label}
@@ -270,7 +288,7 @@ export default function BestSellersHero() {
 
           <Link
             href="/#shop"
-            className="group mt-10 inline-flex items-center gap-3 rounded-full bg-brand-green px-8 py-4 text-[10px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light"
+            className="group mt-5 inline-flex items-center gap-3 rounded-full bg-brand-green px-6 py-3 text-[9px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light sm:mt-10 sm:px-8 sm:py-4 sm:text-[10px]"
           >
             Shop the full pantry
             <ArrowRight
@@ -280,16 +298,21 @@ export default function BestSellersHero() {
           </Link>
         </div>
 
-        {/* Stage: cards side by side on desktop, a snap carousel on mobile */}
-        <div className="-mx-5 flex snap-x snap-mandatory items-end gap-6 overflow-x-auto px-5 pb-8 pt-4 [scrollbar-width:none] sm:-mx-10 sm:px-10 xl:mx-0 xl:justify-center xl:overflow-visible xl:px-0 xl:gap-6 2xl:gap-10 [&::-webkit-scrollbar]:hidden">
-          {staged.map((entry) => {
+        {/* Stage: a compact 2-up grid on mobile (the featured card spans the
+            full row, so it's never fighting a huge single card for scroll
+            room) that becomes the centred desktop row at xl. */}
+        <div className="grid grid-cols-2 items-end gap-3 sm:gap-4 xl:mx-0 xl:flex xl:justify-center xl:gap-6 2xl:gap-10">
+          {entries.map((entry, index) => {
             const isFeatured = entry.product.id === featuredKey;
             return (
               <div
                 key={`${entry.product.id}-${entry.variant?.id ?? "base"}`}
-                // Lift the featured middle card above its neighbours.
-                className={`shrink-0 ${
-                  isFeatured && staged.length === 3 ? "lg:-translate-y-6" : ""
+                className={`min-w-0 shrink-0 ${isFeatured ? "col-span-2 xl:col-span-1" : ""} ${
+                  centreOnDesktop ? XL_ORDER[index] : ""
+                } ${
+                  // Lift the featured card above its neighbours once it's
+                  // actually centred among them.
+                  isFeatured && centreOnDesktop ? "xl:-translate-y-6" : ""
                 }`}
               >
                 <BestSellerCard entry={entry} featured={isFeatured} />

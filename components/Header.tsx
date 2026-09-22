@@ -7,6 +7,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/utils/supabase";
 import { ShoppingCart, Menu, UserCircle, X } from "lucide-react";
+import HeaderSearch from "@/components/HeaderSearch";
 import {
   useEffect,
   useState,
@@ -194,6 +195,8 @@ export default function Header() {
                 <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
               </Link>
             </nav>
+
+            <HeaderSearch />
 
             <div className="h-4 w-[1px] bg-brand-gold/20 hidden lg:block" />
 
