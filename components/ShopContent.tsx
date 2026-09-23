@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, ChevronDown, ChevronRight, Hourglass, Search, SlidersHorizontal, Star, X, PackagePlus } from "lucide-react";
@@ -57,7 +57,17 @@ const PRICE_BUCKETS: {
   { key: "300-plus", label: "₹300 & Above", test: (p) => p > 300 },
 ];
 
-type SortOrder = "default" | "price-asc" | "price-desc" | "best-selling";
+const SORT_ORDERS = [
+  "default",
+  "price-asc",
+  "price-desc",
+  "best-selling",
+] as const;
+
+type SortOrder = (typeof SORT_ORDERS)[number];
+
+/** Query-string keys the filter rail owns, so clearing is a single list. */
+const FILTER_PARAMS = ["category", "price", "instock", "sale"] as const;
 
 /**
  * Thin wrapper: reads the URL once and keys the real content by it, so a
@@ -124,14 +134,68 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
   const isBestSeller = (product: Product) =>
     bestSellerIds.includes(String(product.id));
 
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("default");
-  const [priceBucket, setPriceBucket] = useState<PriceBucketKey>("all");
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Filters live in the URL rather than in local state, so any filtered view
+  // is a link someone can share and Back/Forward step between filter states.
+  // Reading them straight off the query string also means there's no effect
+  // mirroring a URL value into state (what react-hooks/set-state-in-effect
+  // flags) — the render simply derives from the URL.
+  const selectedCategory = searchParams.get("category") ?? "All";
+
+  const priceParam = searchParams.get("price");
+  const priceBucket: PriceBucketKey = PRICE_BUCKETS.some(
+    (bucket) => bucket.key === priceParam,
+  )
+    ? (priceParam as PriceBucketKey)
+    : "all";
+
+  const sortParam = searchParams.get("sort");
+  const sortOrder: SortOrder = SORT_ORDERS.includes(sortParam as SortOrder)
+    ? (sortParam as SortOrder)
+    : "default";
+
+  const inStockOnly = searchParams.get("instock") === "1";
+  const onSaleOnly = searchParams.get("sale") === "1";
+
+  /**
+   * Writes filter changes into the query string. A value of `null` drops its
+   * param, and every setter passes `null` for its default — so the URL only
+   * ever carries the filters actually applied, and an unfiltered shop page
+   * stays a clean `/shop`. `replace` rather than `push`: clicking through
+   * four filters shouldn't leave four entries to back out of.
+   */
+  const applyFilters = useCallback(
+    (changes: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      Object.entries(changes).forEach(([key, value]) => {
+        if (value === null) params.delete(key);
+        else params.set(key, value);
+      });
+
+      const queryString = params.toString();
+      router.replace(queryString ? `/shop?${queryString}` : "/shop", {
+        scroll: false,
+      });
+    },
+    [router, searchParams],
+  );
+
+  const setSelectedCategory = (name: string) =>
+    applyFilters({ category: name === "All" ? null : name });
+  const setPriceBucket = (key: PriceBucketKey) =>
+    applyFilters({ price: key === "all" ? null : key });
+  const setSortOrder = (order: SortOrder) =>
+    applyFilters({ sort: order === "default" ? null : order });
+  const setInStockOnly = (enabled: boolean) =>
+    applyFilters({ instock: enabled ? "1" : null });
+  const setOnSaleOnly = (enabled: boolean) =>
+    applyFilters({ sale: enabled ? "1" : null });
+
   // Prefills from the header's search bar (?q=...) via the `initialQuery`
   // prop — the ShopContent wrapper above remounts this component whenever
   // that URL value changes, so it only needs to seed state once here.
@@ -141,8 +205,9 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
     setSearchQuery("");
     if (initialQuery) {
       // Drop the stale ?q= param so a refresh doesn't silently re-apply a
-      // search the customer explicitly cleared.
-      router.replace("/shop", { scroll: false });
+      // search the customer explicitly cleared — but keep whatever filters
+      // are applied, which a blanket replace("/shop") would have thrown away.
+      applyFilters({ q: null });
     }
   };
 
@@ -184,12 +249,11 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
     (inStockOnly ? 1 : 0) +
     (onSaleOnly ? 1 : 0);
 
-  const clearAllFilters = () => {
-    setSelectedCategory("All");
-    setPriceBucket("all");
-    setInStockOnly(false);
-    setOnSaleOnly(false);
-  };
+  // One write, not four setter calls — each would build its URL from the same
+  // render's `searchParams`, so only the last would survive and the rest of
+  // the filters would silently stay applied.
+  const clearAllFilters = () =>
+    applyFilters(Object.fromEntries(FILTER_PARAMS.map((key) => [key, null])));
 
   const filteredProducts = useMemo(() => {
     let result = [...visibleProducts];
