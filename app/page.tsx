@@ -97,7 +97,7 @@ Message: ${formData.message}
       <BestSellersHero />
 
       {/* Spices */}
-      <section className="relative bg-brand-brown py-16 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-brand-brown py-10 sm:py-14 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 bg-jute opacity-[0.04] pointer-events-none" />
         <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/10 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
         <div
@@ -200,7 +200,7 @@ Message: ${formData.message}
       <ReviewCarousel />
 
       {/* Story Behind the Name & Logo */}
-      <section className="relative bg-white py-14 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
+      <section className="relative bg-white py-9 sm:py-12 lg:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-y border-brand-gold/10">
         <div className="absolute inset-0 bg-mandala pointer-events-none opacity-70" />
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none" />
         <div
@@ -415,7 +415,7 @@ Message: ${formData.message}
       </section>
 
       {/* Values Section */}
-      <section className="relative bg-white py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section className="relative bg-white py-8 sm:py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
         {/* Decorative Leaf Backgrounds */}
         <div className="absolute top-10 left-0 w-48 h-48 bg-brand-green/5 rounded-full blur-3xl animate-pulse-slow pointer-events-none" />
@@ -514,7 +514,7 @@ Message: ${formData.message}
       </section>
 
       {/* Assurance Strip */}
-      <section className="relative bg-white py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-b border-brand-gold/10">
+      <section className="relative bg-white py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-8 border-b border-brand-gold/10">
         <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
           {[
             { icon: Truck, label: "Farm To Table" },
@@ -539,7 +539,7 @@ Message: ${formData.message}
       </section>
 
       {/* Contact Us Section */}
-      <section className="relative bg-brand-cream py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10">
+      <section className="relative bg-brand-cream py-8 sm:py-10 lg:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden border-t border-brand-gold/10">
         <div className="absolute inset-0 bg-stone-texture pointer-events-none opacity-[0.05]" />
         <div className="absolute top-0 left-0 w-full h-1 bg-brand-gold/10 indian-border-pattern opacity-30" />
 

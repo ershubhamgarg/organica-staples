@@ -20,6 +20,7 @@ import {
   Product,
 } from "@/lib/data";
 import { getComboAddHref } from "@/lib/comboLink";
+import { reviewCountLabel } from "@/lib/reviews";
 import { isComboLive, useCombo } from "@/lib/useCombo";
 import {
   getDiscountedPrice,
@@ -70,6 +71,41 @@ type SortOrder = "default" | "price-asc" | "price-desc" | "best-selling";
 export default function ShopContent() {
   const searchParams = useSearchParams();
   return <ShopGrid key={searchParams.get("q") ?? ""} initialQuery={searchParams.get("q") ?? ""} />;
+}
+
+/**
+ * One collapsible group in the filter rail. Open by default — a shopper
+ * should see what they can filter by without a click — but collapsible so a
+ * long category list can be folded away to reach the groups beneath it.
+ */
+function FilterSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div className="border-b border-brand-gold/10 pb-3 last:border-b-0 last:pb-0">
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        aria-expanded={isOpen}
+        className="flex w-full items-center justify-between py-2 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/50 transition-colors hover:text-brand-brown"
+      >
+        {title}
+        <ChevronDown
+          size={12}
+          className={`shrink-0 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {isOpen && <div className="mt-1">{children}</div>}
+    </div>
+  );
 }
 
 function ShopGrid({ initialQuery }: { initialQuery: string }) {
@@ -250,11 +286,8 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
   ]);
 
   const filtersPanel = (
-    <div className="space-y-8">
-      <div>
-        <h3 className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/50">
-          Category
-        </h3>
+    <div className="space-y-2">
+      <FilterSection title="Category">
         <ul className="space-y-1">
           {categories.map((category) => (
             <li key={category.name}>
@@ -281,55 +314,79 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
             </li>
           ))}
         </ul>
-      </div>
+      </FilterSection>
 
-      <div>
-        <h3 className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/50">
-          Price
-        </h3>
+      <FilterSection title="Price">
         <ul className="space-y-1">
-          {PRICE_BUCKETS.map((bucket) => (
-            <li key={bucket.key}>
-              <label className="flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-brand-brown/70 transition-colors hover:bg-brand-gold/10">
-                <input
-                  type="radio"
-                  name="price-bucket"
-                  checked={priceBucket === bucket.key}
-                  onChange={() => setPriceBucket(bucket.key)}
-                  className="h-3.5 w-3.5 accent-brand-brown"
-                />
-                {bucket.label}
-              </label>
-            </li>
-          ))}
+          {PRICE_BUCKETS.map((bucket) => {
+            const isSelected = priceBucket === bucket.key;
+            return (
+              <li key={bucket.key}>
+                {/* Selected rows carry the same filled treatment as a selected
+                    category — a bare radio dot alone was too quiet to register
+                    as "this is the filter currently applied". */}
+                <label
+                  className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
+                    isSelected
+                      ? "bg-brand-brown text-brand-cream"
+                      : "text-brand-brown/70 hover:bg-brand-gold/10"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="price-bucket"
+                    checked={isSelected}
+                    onChange={() => setPriceBucket(bucket.key)}
+                    className={`h-3.5 w-3.5 ${
+                      isSelected ? "accent-brand-gold" : "accent-brand-brown"
+                    }`}
+                  />
+                  {bucket.label}
+                </label>
+              </li>
+            );
+          })}
         </ul>
-      </div>
+      </FilterSection>
 
-      <div>
-        <h3 className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/50">
-          Availability
-        </h3>
+      <FilterSection title="Availability">
         <div className="space-y-1">
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-brand-brown/70 transition-colors hover:bg-brand-gold/10">
+          <label
+            className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
+              inStockOnly
+                ? "bg-brand-brown text-brand-cream"
+                : "text-brand-brown/70 hover:bg-brand-gold/10"
+            }`}
+          >
             <input
               type="checkbox"
               checked={inStockOnly}
               onChange={(e) => setInStockOnly(e.target.checked)}
-              className="h-3.5 w-3.5 rounded accent-brand-brown"
+              className={`h-3.5 w-3.5 rounded ${
+                inStockOnly ? "accent-brand-gold" : "accent-brand-brown"
+              }`}
             />
             In Stock Only
           </label>
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-brand-brown/70 transition-colors hover:bg-brand-gold/10">
+          <label
+            className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
+              onSaleOnly
+                ? "bg-brand-brown text-brand-cream"
+                : "text-brand-brown/70 hover:bg-brand-gold/10"
+            }`}
+          >
             <input
               type="checkbox"
               checked={onSaleOnly}
               onChange={(e) => setOnSaleOnly(e.target.checked)}
-              className="h-3.5 w-3.5 rounded accent-brand-brown"
+              className={`h-3.5 w-3.5 rounded ${
+                onSaleOnly ? "accent-brand-gold" : "accent-brand-brown"
+              }`}
             />
             On Sale
           </label>
         </div>
-      </div>
+      </FilterSection>
 
       {activeFilterCount > 0 && (
         <button
@@ -610,7 +667,7 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                         </div>
                       </Link>
 
-                      <div className="flex flex-col flex-grow text-center px-3 sm:px-5 pt-3 sm:pt-5 pb-3 sm:pb-5">
+                      <div className="flex flex-col flex-grow text-center px-3 sm:px-4 pt-2.5 sm:pt-3.5 pb-3 sm:pb-4">
                         <div className="flex flex-col items-center mb-1">
                           <span className="inline-flex items-center gap-1 text-[8px] sm:text-[9px] uppercase tracking-[0.25em] font-black text-brand-gold">
                             {product.category}
@@ -636,10 +693,10 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                         </div>
                         <Link
                           href={`/product/${product.slug ?? product.id}`}
-                          className="mb-1 sm:mb-2 block"
+                          className="mb-1 sm:mb-1.5 block"
                         >
-                          <div className="flex flex-col items-center justify-center min-h-[2.5em] sm:min-h-[3.5em]">
-                            <h3 className="text-sm sm:text-xl font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2">
+                          <div className="flex flex-col items-center justify-center min-h-[2.4em] sm:min-h-[2.7em]">
+                            <h3 className="text-sm sm:text-lg font-serif text-brand-brown group-hover:text-brand-terracotta transition-colors tracking-tight leading-tight line-clamp-2">
                               {product.name}
                             </h3>
                             {product.name2 && (
@@ -654,7 +711,7 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                           // Nothing here is purchasable on its own — the
                           // whole buy block is replaced with the sanctioned
                           // path into it, pre-loaded with this exact item.
-                          <div className="mb-3 flex flex-col items-center gap-2 sm:mb-4">
+                          <div className="mb-2 flex flex-col items-center gap-1.5 sm:mb-2.5">
                             <p className="text-[9px] sm:text-[11px] font-medium italic tracking-wide text-brand-gold">
                               {comboUnit?.label ?? displayProduct.weight}
                             </p>
@@ -664,7 +721,7 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                           </div>
                         ) : (
                           <div
-                            className={`flex flex-col items-center gap-2 ${available ? "mb-3 sm:mb-4" : "mb-2"}`}
+                            className={`flex flex-col items-center gap-1.5 ${available ? "mb-2 sm:mb-2.5" : "mb-2"}`}
                           >
                             {variants && variants.length > 1 ? (
                               <div className="relative w-full">
@@ -702,8 +759,8 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
 
                             {available && (
                               <>
-                                <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                                  <span className="text-lg sm:text-2xl font-semibold tracking-tight text-brand-brown">
+                                <div className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1">
+                                  <span className="text-lg sm:text-xl font-semibold tracking-tight text-brand-brown">
                                     ₹
                                     {(hasDiscount
                                       ? discountedPrice
@@ -712,11 +769,11 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                                   </span>
                                   {hasDiscount && (
                                     <>
-                                      <span className="text-xs sm:text-sm font-light text-brand-brown/40 line-through">
+                                      <span className="text-xs font-light text-brand-brown/40 line-through">
                                         ₹{displayProduct.price.toFixed(2)}
                                       </span>
                                       <span
-                                        className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-white ${
+                                        className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-white ${
                                           hasHighDiscount
                                             ? "bg-brand-terracotta"
                                             : "bg-brand-green-fresh"
@@ -786,7 +843,7 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                             ratings/reviews are a product-level fact either
                             way, so shown regardless there. */}
                         {(available || isFullyComboOnly) && (
-                          <div className="flex justify-center items-center gap-2 sm:gap-3 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-brand-gold/5">
+                          <div className="flex justify-center items-center gap-2 sm:gap-3 mt-2 sm:mt-2.5 pt-2 sm:pt-2.5 border-t border-brand-gold/5">
                             <div className="flex items-center gap-0.5 text-brand-gold">
                               {[...Array(5)].map((_, i) => (
                                 <Star
@@ -801,7 +858,7 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
                               ))}
                             </div>
                             <span className="text-[7px] sm:text-[8px] text-brand-brown/55 uppercase tracking-[0.2em] font-black">
-                              {product.review_count || 0} Reviews
+                              {reviewCountLabel(product.review_count || 0)}
                             </span>
                           </div>
                         )}

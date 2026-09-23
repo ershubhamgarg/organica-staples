@@ -158,9 +158,13 @@ export default function Header() {
         }`}
       >
         <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4 lg:gap-6">
+          {/* Three-part bar: both flanks are `flex-1 min-w-0`, so they share the
+              leftover space equally and may shrink to nothing — the logo between
+              them is therefore always dead-centre and the row can never grow
+              wider than the viewport. */}
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
             {/* Left — mobile: menu toggle · desktop: nav */}
-            <div className="flex items-center justify-start">
+            <div className="flex min-w-0 flex-1 items-center justify-start">
               <button
                 className="lg:hidden -ml-2 text-brand-brown hover:text-brand-green transition-all min-w-[48px] min-h-[48px] flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -177,14 +181,14 @@ export default function Header() {
                 <Link
                   href="/"
                   onClick={handleHomeClick}
-                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                  className="group relative whitespace-nowrap font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                 >
                   Home
                   <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
                 </Link>
                 <Link
                   href="/shop"
-                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                  className="group relative whitespace-nowrap font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                 >
                   The Pantry
                   <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -192,7 +196,7 @@ export default function Header() {
                 {comboLive && (
                   <Link
                     href="/combo"
-                    className="group relative flex items-center gap-1.5 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                    className="group relative flex items-center gap-1.5 whitespace-nowrap font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                   >
                     <PackagePlus size={12} className="text-brand-gold" strokeWidth={2} />
                     Build A Combo
@@ -203,7 +207,7 @@ export default function Header() {
             </div>
 
             {/* Center — brand logo */}
-            <div className="flex items-center justify-center">
+            <div className="flex shrink-0 items-center justify-center">
               <Link
                 href="/"
                 className="relative z-50 transition-transform duration-700"
@@ -221,11 +225,11 @@ export default function Header() {
             </div>
 
             {/* Right — mobile: cart only · desktop: nav tail, search, account, cart */}
-            <div className="flex items-center justify-end gap-3 sm:gap-4 lg:gap-6">
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-3 sm:gap-4 lg:gap-6">
               <nav className="hidden lg:flex items-center gap-8">
                 <Link
                   href="/our-story"
-                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                  className="group relative whitespace-nowrap font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                 >
                   About us
                   <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
@@ -233,7 +237,7 @@ export default function Header() {
                 <Link
                   href="/#contact"
                   onClick={(event) => handleSectionClick(event, "contact")}
-                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                  className="group relative whitespace-nowrap font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                 >
                   Contact Us
                   <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />

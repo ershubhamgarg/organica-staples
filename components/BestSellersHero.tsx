@@ -44,6 +44,12 @@ function FourPointStar({
 const CHIP_ICONS = [Leaf, ShieldCheck];
 const CHIP_TILT = ["-rotate-2", "rotate-2"];
 
+/** Whole rupees stay whole — "₹65", not "₹65.00", which is dead weight on a
+ *  card this narrow. Paise are shown only when a price actually has them. */
+function formatRupees(value: number) {
+  return Number.isInteger(value) ? `₹${value}` : `₹${value.toFixed(2)}`;
+}
+
 function BestSellerCard({
   entry,
   featured,
@@ -51,7 +57,7 @@ function BestSellerCard({
   entry: BestSellerEntry;
   featured: boolean;
 }) {
-  const { product, variant, display, discountPercent } = entry;
+  const { product, variant, display, price, mrp, discountPercent } = entry;
   // Capped to 4 words at a word boundary, not mid-word — a raw line-clamp on
   // a full benefit sentence ("Good source of plant-based protein") was
   // truncating mid-word into an ugly artifact.
@@ -63,27 +69,27 @@ function BestSellerCard({
 
   return (
     <article
-      className={`group relative flex min-w-0 shrink-0 snap-center flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_8px_30px_-12px_rgba(17,44,36,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-16px_rgba(17,44,36,0.28)] ${
+      className={`group relative flex min-w-0 shrink-0 flex-col overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_-12px_rgba(17,44,36,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-16px_rgba(17,44,36,0.28)] sm:rounded-[1.75rem] ${
         featured
-          ? "w-full ring-1 ring-brand-gold/40 xl:w-[20.5rem] 2xl:w-[23rem]"
-          : "w-full xl:w-[18rem] 2xl:w-[20rem]"
+          ? "w-full ring-1 ring-brand-gold/40 xl:w-[17rem] 2xl:w-[19rem]"
+          : "w-full xl:w-[15.5rem] 2xl:w-[17rem]"
       }`}
     >
       {/* Photo takes the full width of the card — the product is the point. */}
       <Link
         href={href}
-        className="relative block aspect-[4/5] overflow-hidden bg-brand-sand"
+        className="relative block aspect-square overflow-hidden bg-brand-sand"
       >
         <ImageWithFallback
           src={getProductThumbnail(product)}
           alt={product.name}
           fill
-          sizes="(max-width: 1279px) 45vw, 336px"
+          sizes="(max-width: 639px) 40vw, (max-width: 1279px) 25vw, 336px"
           className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           priority={featured}
         />
 
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-brand-brown shadow-sm backdrop-blur-sm">
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider text-brand-brown shadow-sm backdrop-blur-sm sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[9px]">
           <Star size={9} className="text-brand-gold" fill="currentColor" strokeWidth={0} />
           Best Seller
         </span>
@@ -93,8 +99,8 @@ function BestSellerCard({
             it against), so it needs to read at a glance, not on a second
             look. Clipped to a clean corner by the photo's own overflow. */}
         {discountPercent > 0 && (
-          <div className="absolute -right-11 top-5 w-40 rotate-45 bg-gradient-to-b from-brand-terracotta to-[#8a4a37] py-1.5 text-center shadow-[0_4px_12px_rgba(0,0,0,0.35)]">
-            <span className="text-[13px] font-extrabold uppercase leading-none tracking-wide text-white drop-shadow-sm">
+          <div className="absolute -right-9 top-3.5 w-32 rotate-45 bg-gradient-to-b from-brand-terracotta to-[#8a4a37] py-1 text-center shadow-[0_4px_12px_rgba(0,0,0,0.35)] sm:-right-11 sm:top-5 sm:w-40 sm:py-1.5">
+            <span className="text-[11px] font-extrabold uppercase leading-none tracking-wide text-white drop-shadow-sm sm:text-[13px]">
               {discountPercent}% Off
             </span>
           </div>
@@ -109,7 +115,11 @@ function BestSellerCard({
             return (
               <span
                 key={benefit}
-                className={`inline-flex items-center gap-1 rounded-full bg-white px-2 py-1 text-[9px] font-semibold text-brand-brown shadow-md ring-1 ring-brand-brown/5 sm:px-2.5 sm:py-1.5 sm:text-[10px] ${CHIP_TILT[i % CHIP_TILT.length]}`}
+                // Only the first chip on mobile — two of them wrap onto a
+                // second row on a card this narrow, for no added meaning.
+                className={`items-center gap-1 rounded-full bg-white px-2 py-1 text-[9px] font-semibold text-brand-brown shadow-md ring-1 ring-brand-brown/5 sm:px-2.5 sm:py-1.5 sm:text-[10px] ${
+                  i === 0 ? "inline-flex" : "hidden sm:inline-flex"
+                } ${CHIP_TILT[i % CHIP_TILT.length]}`}
               >
                 <Icon size={11} className="shrink-0 text-brand-green-fresh" />
                 <span className="max-w-[4.75rem] break-words leading-tight sm:max-w-[6.5rem]">
@@ -122,21 +132,33 @@ function BestSellerCard({
       )}
 
       {/* Name + CTA */}
-      <div className="flex flex-1 flex-col px-3 pb-4 pt-3 text-center sm:px-5 sm:pb-5 sm:pt-4">
+      <div className="flex flex-1 flex-col px-2 pb-3 pt-2 text-center sm:px-4 sm:pb-4 sm:pt-3">
         <Link href={href}>
           <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug tracking-tight text-brand-brown transition-colors group-hover:text-brand-terracotta sm:text-[15px] xl:text-base">
             {product.name}
           </h3>
         </Link>
-        <span className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-brand-brown/40">
+        {/* Size, then its price — the price belongs to this specific pack,
+            so the two read as one unit ("100g · ₹65") rather than a number
+            floating free of the size it applies to. */}
+        <span className="mt-1 flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-brown/40">
           {variant?.label ?? display.weight}
+          <span aria-hidden="true">·</span>
+          <span className="text-[12px] tracking-tight text-brand-brown sm:text-[13px]">
+            {formatRupees(price)}
+          </span>
+          {discountPercent > 0 && (
+            <span className="text-[10px] font-light text-brand-brown/35 line-through">
+              {formatRupees(mrp)}
+            </span>
+          )}
         </span>
 
-        <div className="mt-4">
+        <div className="mt-2.5 sm:mt-3">
           <QuickAddButton
             product={product}
             selectedVariant={variant}
-            className="!w-full !rounded-xl !py-3 !px-4"
+            className="!w-full !rounded-xl !px-2 !py-2.5"
           />
         </div>
       </div>
@@ -232,7 +254,7 @@ export default function BestSellersHero() {
         className="animate-twinkle absolute bottom-32 right-[3%] hidden h-5 w-5 text-brand-gold lg:block"
       />
 
-      <div className="relative z-10 mx-auto grid max-w-[95rem] items-center gap-10 px-5 pb-24 pt-20 sm:px-10 xl:grid-cols-[minmax(0,0.7fr)_minmax(0,1.6fr)] xl:gap-6 xl:pb-28 xl:pt-24">
+      <div className="relative z-10 mx-auto grid max-w-[95rem] items-center gap-5 px-5 pb-16 pt-7 sm:gap-8 sm:px-10 sm:pb-20 sm:pt-12 xl:grid-cols-[minmax(0,0.7fr)_minmax(0,1.6fr)] xl:gap-6 xl:pb-20 xl:pt-14">
         {/* Copy */}
         <div className="text-left">
           <span className="inline-flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.4em] text-brand-terracotta">
@@ -242,7 +264,7 @@ export default function BestSellersHero() {
 
           <h1
             id="best-sellers-heading"
-            className="mt-3 font-serif text-3xl leading-[1.05] tracking-tight sm:mt-5 sm:text-4xl xl:text-6xl"
+            className="mt-2 font-serif text-[1.7rem] leading-[1.05] tracking-tight sm:mt-5 sm:text-4xl xl:text-6xl"
           >
             <span className="block text-brand-brown">Meet our</span>
             <span className="relative mt-1 inline-block italic text-brand-terracotta">
@@ -251,7 +273,7 @@ export default function BestSellersHero() {
               <svg
                 viewBox="0 0 300 18"
                 preserveAspectRatio="none"
-                className="absolute -bottom-3 left-0 h-3.5 w-full text-brand-gold"
+                className="absolute -bottom-2 left-0 h-2.5 w-full text-brand-gold sm:-bottom-3 sm:h-3.5"
                 aria-hidden="true"
               >
                 <path
@@ -265,7 +287,7 @@ export default function BestSellersHero() {
             </span>
           </h1>
 
-          <p className="mt-4 max-w-md text-xs font-light leading-relaxed text-brand-brown/65 sm:mt-5 sm:text-sm md:text-base">
+          <p className="mt-2.5 max-w-md text-[11px] font-light leading-relaxed text-brand-brown/65 sm:mt-5 sm:text-sm md:text-base">
             The staples our customers order most — pure, chemical-free and
             priced honestly, straight from the farm to your kitchen.
           </p>
@@ -275,7 +297,7 @@ export default function BestSellersHero() {
               without scrolling, so nothing decorative sits in front of it. */}
           <Link
             href="/shop"
-            className="group mt-5 inline-flex items-center gap-3 rounded-full bg-brand-green px-6 py-3 text-[9px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light sm:px-8 sm:py-4 sm:text-[10px]"
+            className="group mt-4 inline-flex items-center gap-2.5 rounded-full bg-brand-green px-5 py-2.5 text-[9px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light sm:mt-6 sm:gap-3 sm:px-8 sm:py-4 sm:text-[10px]"
           >
             Shop the full pantry
             <ArrowRight
@@ -300,16 +322,17 @@ export default function BestSellersHero() {
           </ul>
         </div>
 
-        {/* Stage: a compact 2-up grid on mobile (the featured card spans the
-            full row, so it's never fighting a huge single card for scroll
-            room) that becomes the centred desktop row at xl. */}
-        <div className="grid grid-cols-2 items-end gap-3 sm:gap-4 xl:mx-0 xl:flex xl:justify-center xl:gap-6 2xl:gap-10">
+        {/* Stage: a swipeable, edge-to-edge row on mobile — every card is the
+            same compact size so all three are reachable within a thumb's
+            reach instead of one full-width card eating the whole screen.
+            Becomes the centred desktop row at xl. */}
+        <div className="-mx-5 flex snap-x snap-mandatory items-end gap-3 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-10 sm:gap-4 sm:px-10 xl:mx-0 xl:justify-center xl:gap-6 xl:overflow-visible xl:px-0 xl:pb-0 2xl:gap-10 [&::-webkit-scrollbar]:hidden">
           {entries.map((entry, index) => {
             const isFeatured = entry.product.id === featuredKey;
             return (
               <div
                 key={`${entry.product.id}-${entry.variant?.id ?? "base"}`}
-                className={`min-w-0 shrink-0 ${isFeatured ? "col-span-2 xl:col-span-1" : ""} ${
+                className={`w-[9.25rem] shrink-0 snap-start sm:w-[11.5rem] xl:w-auto ${
                   centreOnDesktop ? XL_ORDER[index] : ""
                 } ${
                   // Lift the featured card above its neighbours once it's
@@ -327,7 +350,7 @@ export default function BestSellersHero() {
       {/* Curved hand-off into the dark "Spices" section right beneath this one. */}
       <div className="absolute bottom-0 left-0 z-10 w-full overflow-hidden leading-none">
         <svg
-          className="relative block h-[60px] w-full"
+          className="relative block h-[34px] w-full sm:h-[60px]"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"

@@ -23,6 +23,7 @@ import {
   Product,
 } from "@/lib/data";
 import { getComboAddHref } from "@/lib/comboLink";
+import { reviewCountLabel, reviewNoun } from "@/lib/reviews";
 import { isComboLive, useCombo } from "@/lib/useCombo";
 import { supabase } from "@/utils/supabase";
 import {
@@ -534,7 +535,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                       }}
                       className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-green hover:text-brand-brown transition-all duration-300 border-b border-brand-green/30 hover:border-brand-brown/50 pb-0.5 text-left active:scale-95"
                     >
-                      {reviewCount} Customer Reviews
+                      {reviewCount} Customer {reviewNoun(reviewCount)}
                     </button>
                   </div>
                 )}
@@ -895,7 +896,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                     ))}
                   </div>
                   <span className="text-[8px] uppercase tracking-widest font-bold opacity-40">
-                    {reviewCount} Reviews
+                    {reviewCountLabel(reviewCount)}
                   </span>
                 </div>
               </div>
