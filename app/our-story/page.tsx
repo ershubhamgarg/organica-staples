@@ -140,7 +140,7 @@ export default function OurStory() {
                 difference of truly organic staples.
               </p>
               <Link
-                href="/#shop"
+                href="/shop"
                 className="inline-flex items-center gap-4 bg-brand-cream text-brand-brown px-12 py-6 rounded-full text-[12px] uppercase tracking-[0.4em] font-black transition-all duration-500 hover:bg-brand-gold hover:text-brand-brown hover:translate-y-[-4px] shadow-2xl"
               >
                 Explore Shop <ArrowRight size={18} />

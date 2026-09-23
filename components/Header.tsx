@@ -6,12 +6,14 @@ import LaunchOfferBanner from "@/components/LaunchOfferBanner";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import { supabase } from "@/utils/supabase";
-import { ShoppingCart, Menu, UserCircle, X } from "lucide-react";
+import { ShoppingCart, Menu, PackagePlus, Search, UserCircle, X } from "lucide-react";
 import HeaderSearch from "@/components/HeaderSearch";
+import { isComboLive, useCombo } from "@/lib/useCombo";
 import {
   useEffect,
   useState,
   useRef,
+  type FormEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -25,7 +27,12 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [mobileSearchTerm, setMobileSearchTerm] = useState("");
   const totalItems = getTotalItems();
+  // Gated so the nav never points at a builder with the feature switched
+  // off (or too few eligible items to complete one) in the CMS.
+  const { data: comboData } = useCombo();
+  const comboLive = isComboLive(comboData);
   const router = useRouter();
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -55,6 +62,16 @@ export default function Header() {
         target.scrollIntoView({ block: "start", behavior: "smooth" });
       }
     }
+  };
+
+  const handleMobileSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = mobileSearchTerm.trim();
+    if (!trimmed) return;
+
+    setIsMobileMenuOpen(false);
+    setMobileSearchTerm("");
+    router.push(`/shop?q=${encodeURIComponent(trimmed)}`);
   };
 
   useEffect(() => {
@@ -140,151 +157,169 @@ export default function Header() {
             : "bg-transparent py-0"
         }`}
       >
-        <div className="max-w-[95rem] mx-auto px-6 sm:px-10 flex items-center justify-between">
-          {/* Logo - Left */}
-          <div className="flex items-center">
-            <Link
-              href="/"
-              className="relative z-50 transition-transform duration-700 origin-left"
-              onClick={handleHomeClick}
-            >
-              <Image
-                src="/annvriksh_logo_horizontal.png"
-                alt="ANNVRIKSH"
-                width={212}
-                height={212}
-                className="h-20 w-60 object-contain"
-                priority
-              />
-            </Link>
-          </div>
+        <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-4 lg:gap-6">
+            {/* Left — mobile: menu toggle · desktop: nav */}
+            <div className="flex items-center justify-start">
+              <button
+                className="lg:hidden -ml-2 text-brand-brown hover:text-brand-green transition-all min-w-[48px] min-h-[48px] flex items-center justify-center"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              >
+                {isMobileMenuOpen ? (
+                  <X size={24} strokeWidth={1.2} />
+                ) : (
+                  <Menu size={24} strokeWidth={1.2} />
+                )}
+              </button>
 
-          {/* Actions & Navigation - Right */}
-          <div className="flex items-center justify-end gap-3 sm:gap-6 lg:gap-8 flex-1">
-            <nav className="hidden lg:flex items-center gap-8 mr-4">
+              <nav className="hidden lg:flex items-center gap-8">
+                <Link
+                  href="/"
+                  onClick={handleHomeClick}
+                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                >
+                  Home
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/shop"
+                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                >
+                  The Pantry
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                </Link>
+                {comboLive && (
+                  <Link
+                    href="/combo"
+                    className="group relative flex items-center gap-1.5 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                  >
+                    <PackagePlus size={12} className="text-brand-gold" strokeWidth={2} />
+                    Build A Combo
+                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                  </Link>
+                )}
+              </nav>
+            </div>
+
+            {/* Center — brand logo */}
+            <div className="flex items-center justify-center">
               <Link
                 href="/"
+                className="relative z-50 transition-transform duration-700"
                 onClick={handleHomeClick}
-                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
               >
-                Home
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                <Image
+                  src="/annvriksh_logo_horizontal.png"
+                  alt="ANNVRIKSH"
+                  width={212}
+                  height={212}
+                  className="h-10 w-32 sm:h-12 sm:w-36 lg:h-20 lg:w-60 object-contain"
+                  priority
+                />
               </Link>
-              <Link
-                href="/#shop"
-                onClick={(event) => handleSectionClick(event, "shop")}
-                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
-              >
-                The Pantry
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-              </Link>
-              <Link
-                href="/our-story"
-                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
-              >
-                About us
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-              </Link>
+            </div>
 
-              <Link
-                href="/#contact"
-                onClick={(event) => handleSectionClick(event, "contact")}
-                className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
-              >
-                Contact Us
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
-              </Link>
-            </nav>
-
-            <HeaderSearch />
-
-            <div className="h-4 w-[1px] bg-brand-gold/20 hidden lg:block" />
-
-            {user ? (
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
+            {/* Right — mobile: cart only · desktop: nav tail, search, account, cart */}
+            <div className="flex items-center justify-end gap-3 sm:gap-4 lg:gap-6">
+              <nav className="hidden lg:flex items-center gap-8">
+                <Link
+                  href="/our-story"
+                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
                 >
-                  <UserCircle size={24} strokeWidth={1.2} />
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-4 w-56 bg-brand-cream/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-brand-gold/10 py-3 z-50 animate-fade-in overflow-hidden">
-                    <div className="absolute inset-0 bg-jute opacity-5 pointer-events-none" />
-                    <Link
-                      href="/profile"
-                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      My Profile
-                    </Link>
-                    <Link
-                      href="/profile#orders"
-                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      My Orders
-                    </Link>
-                    <Link
-                      href="/profile#addresses"
-                      className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      My Addresses
-                    </Link>
+                  About us
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/#contact"
+                  onClick={(event) => handleSectionClick(event, "contact")}
+                  className="group relative font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-brand-brown hover:text-brand-green transition-colors"
+                >
+                  Contact Us
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-500 group-hover:w-full" />
+                </Link>
+              </nav>
+
+              <div className="hidden lg:flex items-center gap-4 lg:gap-6">
+                <HeaderSearch />
+
+                <div className="h-4 w-[1px] bg-brand-gold/20" />
+
+                {user ? (
+                  <div className="relative" ref={dropdownRef}>
                     <button
-                      onClick={async () => {
-                        await signOut();
-                        setIsDropdownOpen(false);
-                        router.push("/");
-                      }}
-                      className="relative w-full text-left px-5 py-3 text-[10px] uppercase tracking-widest text-brand-terracotta font-bold hover:bg-brand-terracotta/5 transition-colors"
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
                     >
-                      Sign Out
+                      <UserCircle size={24} strokeWidth={1.2} />
                     </button>
+                    {isDropdownOpen && (
+                      <div className="absolute right-0 top-full mt-4 w-56 bg-brand-cream/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-brand-gold/10 py-3 z-50 animate-fade-in overflow-hidden">
+                        <div className="absolute inset-0 bg-jute opacity-5 pointer-events-none" />
+                        <Link
+                          href="/profile"
+                          className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          My Profile
+                        </Link>
+                        <Link
+                          href="/profile#orders"
+                          className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          My Orders
+                        </Link>
+                        <Link
+                          href="/profile#addresses"
+                          className="relative block px-5 py-3 text-[10px] uppercase tracking-widest text-brand-brown font-bold hover:bg-brand-gold/5 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          My Addresses
+                        </Link>
+                        <button
+                          onClick={async () => {
+                            await signOut();
+                            setIsDropdownOpen(false);
+                            router.push("/");
+                          }}
+                          className="relative w-full text-left px-5 py-3 text-[10px] uppercase tracking-widest text-brand-terracotta font-bold hover:bg-brand-terracotta/5 transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
                   </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="text-brand-brown hover:text-brand-green transition-all font-serif text-[13px] uppercase tracking-[0.16em] font-semibold min-w-[48px] min-h-[48px] flex items-center justify-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
                 )}
               </div>
-            ) : (
+
               <Link
-                href="/login"
-                className="text-brand-brown hover:text-brand-green transition-all font-serif text-[13px] uppercase tracking-[0.16em] font-semibold min-w-[48px] min-h-[48px] flex items-center justify-center"
+                href="/cart"
+                className="relative text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Login
+                <ShoppingCart size={24} strokeWidth={1.5} />
+                {mounted && totalItems > 0 && (
+                  <span
+                    className={`absolute -top-1 -right-1 bg-brand-terracotta text-white text-[10px] font-black min-w-[20px] h-[20px] rounded-full flex items-center justify-center shadow-lg border-2 border-brand-cream z-50 transition-all duration-300 ${
+                      isAnimating
+                        ? "scale-125 bg-brand-green shadow-brand-green/20"
+                        : "scale-100"
+                    }`}
+                  >
+                    {totalItems}
+                  </span>
+                )}
               </Link>
-            )}
-
-            <Link
-              href="/cart"
-              className="relative text-brand-brown hover:text-brand-green transition-all hover:scale-110 min-w-[48px] min-h-[48px] flex items-center justify-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <ShoppingCart size={24} strokeWidth={1.5} />
-              {mounted && totalItems > 0 && (
-                <span
-                  className={`absolute -top-1 -right-1 bg-brand-terracotta text-white text-[10px] font-black min-w-[20px] h-[20px] rounded-full flex items-center justify-center shadow-lg border-2 border-brand-cream z-50 transition-all duration-300 ${
-                    isAnimating
-                      ? "scale-125 bg-brand-green shadow-brand-green/20"
-                      : "scale-100"
-                  }`}
-                >
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              className="lg:hidden text-brand-brown hover:text-brand-green transition-all min-w-[48px] min-h-[48px] flex items-center justify-center"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? (
-                <X size={24} strokeWidth={1.2} />
-              ) : (
-                <Menu size={24} strokeWidth={1.2} />
-              )}
-            </button>
+            </div>
           </div>
         </div>
       </header>
@@ -300,6 +335,20 @@ export default function Header() {
       >
         <div className="absolute inset-0 bg-jute opacity-10 pointer-events-none" />
         <div className="flex flex-col h-full justify-center p-12 gap-10">
+          <form
+            onSubmit={handleMobileSearchSubmit}
+            className="flex items-center gap-2 rounded-full border border-brand-gold/20 bg-white px-4 py-3 shadow-sm shadow-brand-brown/5"
+          >
+            <Search size={16} strokeWidth={2} className="shrink-0 text-brand-gold" />
+            <input
+              type="text"
+              value={mobileSearchTerm}
+              onChange={(event) => setMobileSearchTerm(event.target.value)}
+              placeholder="Search turmeric, dal, besan…"
+              className="w-full bg-transparent text-base text-brand-brown placeholder:text-brand-brown/40 focus:outline-none"
+            />
+          </form>
+
           <Link
             href="/"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
@@ -308,12 +357,21 @@ export default function Header() {
             Home
           </Link>
           <Link
-            href="/#shop"
+            href="/shop"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
-            onClick={(event) => handleSectionClick(event, "shop")}
+            onClick={() => setIsMobileMenuOpen(false)}
           >
             Shop
           </Link>
+          {comboLive && (
+            <Link
+              href="/combo"
+              className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Build A Combo
+            </Link>
+          )}
           <Link
             href="/our-story"
             className="text-4xl font-serif text-brand-brown hover:text-brand-gold transition-colors tracking-tight"

@@ -174,7 +174,7 @@ export default function RootLayout({
               <ul className="space-y-3 text-sm font-light">
                 <li>
                   <Link
-                    href="/#shop"
+                    href="/shop"
                     className="hover:text-brand-gold transition-all duration-300 flex items-center gap-2 group"
                   >
                     <span className="h-[1px] w-0 bg-brand-gold transition-all duration-300 group-hover:w-3" />

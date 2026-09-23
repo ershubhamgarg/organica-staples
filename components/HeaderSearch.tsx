@@ -6,10 +6,9 @@ import { useEffect, useRef, useState } from "react";
 
 /**
  * Search icon in the header that expands into a search bar. Submitting
- * routes to the home page's pantry grid with the term in the URL
- * (?q=...#shop) — ProductListing reads it and jumps straight to matching
- * results, so a customer searching from anywhere on the site never has to
- * scroll to find what they typed.
+ * routes to the dedicated shop page with the term in the URL (?q=...) —
+ * ShopContent reads it and shows matching results immediately, so a
+ * customer searching from anywhere on the site never has to hunt for it.
  *
  * One entry point rather than three (a persistent desktop bar + a mobile
  * icon + a field inside the hamburger menu) — it works identically and
@@ -55,7 +54,7 @@ export default function HeaderSearch() {
 
     setIsOpen(false);
     setTerm("");
-    router.push(`/?q=${encodeURIComponent(trimmed)}#shop`);
+    router.push(`/shop?q=${encodeURIComponent(trimmed)}`);
   };
 
   return (

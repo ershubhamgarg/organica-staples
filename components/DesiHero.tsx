@@ -93,7 +93,7 @@ const DesiHero = () => {
 
             <div className="flex flex-wrap items-center justify-start gap-4">
               <Link
-                href="/#shop"
+                href="/shop"
                 className="group relative inline-flex items-center justify-center gap-3 px-8 sm:px-9 py-4 bg-brand-green text-brand-cream rounded-full overflow-hidden transition-all duration-500 shadow-lg shadow-brand-green/20 hover:shadow-2xl hover:shadow-brand-green/30 hover:-translate-y-0.5"
               >
                 <span className="absolute inset-0 bg-brand-green-light translate-y-full transition-transform duration-500 group-hover:translate-y-0" />

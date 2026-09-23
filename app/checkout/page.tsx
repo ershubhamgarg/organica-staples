@@ -11,26 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  ShoppingBag,
-  ShieldCheck,
-  MapPin,
-  CreditCard,
-  ChevronRight,
-  ArrowRight,
-  Clock,
-  Plus,
-  Lock,
-  Banknote,
-  Share2,
-  Gift,
-  X,
-  Camera,
-  Sparkles,
-  AlertTriangle,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, ShoppingBag, ShieldCheck, MapPin, CreditCard, ChevronRight, ArrowRight, Clock, Plus, Lock, Banknote, Share2, Gift, X, Camera, AlertTriangle, Star, PackagePlus } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import type { DiscountCode } from "@/lib/discountCodes";
 import {
@@ -755,7 +736,7 @@ export default function CheckoutPage() {
 
               {isLaunchOfferConfirmation && (
                 <div className="mt-4 flex items-center justify-center gap-2 rounded-full border border-brand-terracotta/15 bg-brand-terracotta/5 px-4 py-2 text-brand-terracotta">
-                  <Sparkles size={13} strokeWidth={1.8} />
+                  <Star size={13} strokeWidth={1.8} />
                   <a
                     href="https://www.instagram.com/annvriksh_in/"
                     target="_blank"
@@ -764,7 +745,7 @@ export default function CheckoutPage() {
                   >
                     @annvriksh_in
                   </a>
-                  <Sparkles size={13} strokeWidth={1.8} />
+                  <Star size={13} strokeWidth={1.8} />
                 </div>
               )}
             </div>
@@ -847,7 +828,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center p-12 bg-white rounded-3xl shadow-2xl border border-brand-gold/10">
           <div className="w-20 h-20 bg-brand-gold/10 rounded-full flex items-center justify-center mx-auto mb-8 text-brand-gold">
-            <Sparkles size={32} strokeWidth={1.5} />
+            <PackagePlus size={32} strokeWidth={1.5} />
           </div>
           <h2 className="text-3xl font-serif text-brand-brown mb-4 tracking-tight">
             Your Combo Isn&apos;t Complete

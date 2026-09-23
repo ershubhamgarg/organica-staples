@@ -1,33 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import {
-  ArrowRight,
-  Award,
-  BadgeIndianRupee,
-  Circle,
-  Flower2,
-  Leaf,
-  Lock,
-  MapPin,
-  MessageCircle,
-  Plus,
-  ScrollText,
-  ShieldCheck,
-  Sparkles,
-  Sprout,
-  Truck,
-  Wheat,
-} from "lucide-react";
-import ProductListing from "@/components/ProductListing";
+import { ArrowRight, Award, BadgeIndianRupee, Circle, Flower2, Leaf, Lock, MapPin, MessageCircle, Plus, ScrollText, ShieldCheck, Sprout, Truck, Wheat, Zap, Star } from "lucide-react";
 import BestSellersHero from "@/components/BestSellersHero";
+import ComboBanner from "@/components/ComboBanner";
 import ScrollReveal from "@/components/ScrollReveal";
 import SpiceTicker from "@/components/SpiceTicker";
 import SpiceWheelImage from "@/components/SpiceWheelImage";
 import WelcomeModal from "@/components/WelcomeModal";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import ReviewCarousel from "@/components/ReviewCarousel";
 
@@ -62,7 +45,9 @@ export default function Home() {
     const scrollToHash = () => {
       const sectionId = window.location.hash.slice(1);
 
-      if (sectionId !== "shop" && sectionId !== "contact") {
+      // "shop" used to be a section on this page; the pantry grid now lives
+      // on its own /shop route, so only "contact" remains here.
+      if (sectionId !== "contact") {
         return;
       }
 
@@ -154,7 +139,7 @@ Message: ${formData.message}
               <div className="grid sm:grid-cols-2 gap-x-6 gap-y-7">
                 {[
                   {
-                    icon: Sparkles,
+                    icon: Zap,
                     title: "Rich in Antioxidants",
                     body: "Turmeric's curcumin, chilli's capsaicin — compounds diluted or lost when spices are cut, aged, or over-processed.",
                   },
@@ -199,12 +184,18 @@ Message: ${formData.message}
 
       <SpiceTicker />
 
-      {/* Product Grid Section */}
-      {/* useSearchParams (read inside ProductListing, to prefill from the
-          header search) requires a Suspense boundary. */}
-      <Suspense fallback={null}>
-        <ProductListing />
-      </Suspense>
+      {/* No separate "Shop the full pantry" teaser here — both BestSellersHero
+          and its DesiHero fallback already carry that exact CTA prominently
+          in their copy column, right at the top of the page. A second, lower
+          copy of the same link was the "very low on the screen, even gets
+          cut" one — removed rather than relocated, since the hero's version
+          already does the job higher up. */}
+
+      {/* Combo builder promo — renders nothing itself when the feature is
+          off or there aren't enough eligible items to complete one. */}
+      <div className="mx-auto max-w-[95rem] px-4 sm:px-10">
+        <ComboBanner />
+      </div>
 
       <ReviewCarousel />
 
@@ -353,7 +344,7 @@ Message: ${formData.message}
                     body: "Purity and authenticity at the heart of the symbol — the essence of food, kept untouched.",
                   },
                   {
-                    icon: Sparkles,
+                    icon: Star,
                     title: "Golden Points",
                     body: "The little details that matter — careful sourcing, honest processes and respect for every ingredient.",
                   },

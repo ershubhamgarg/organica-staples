@@ -4,16 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import ImageWithFallback from "./ImageWithFallback";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Calendar,
-  Bell,
-  X,
-  CheckCircle2,
-  Check,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, ArrowLeft, Calendar, Bell, X, CheckCircle2, Check, Rocket } from "lucide-react";
 import { Product, getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { getUnitPriceInfo } from "@/lib/pricing";
 
@@ -171,7 +162,7 @@ export default function LaunchCarousel({ products }: LaunchCarouselProps) {
                       >
                         {isJustLaunched ? (
                           <>
-                            <Sparkles size={12} strokeWidth={2.5} />
+                            <Rocket size={12} strokeWidth={2.5} />
                             Just Launched
                           </>
                         ) : isAvailable ? (

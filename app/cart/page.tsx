@@ -4,21 +4,7 @@ import { useCartStore, type CartItem } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
 import { useUserStore } from "@/store/userStore";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Minus,
-  Plus,
-  Trash2,
-  ShoppingBag,
-  ShieldCheck,
-  BadgePercent,
-  Truck,
-  ArrowRight,
-  ChevronDown,
-  X,
-  Sparkles,
-  AlertCircle,
-} from "lucide-react";
+import { ArrowLeft, Minus, Plus, Trash2, ShoppingBag, ShieldCheck, BadgePercent, Truck, ArrowRight, ChevronDown, X, AlertCircle, PackagePlus } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -593,7 +579,7 @@ export default function CartPage() {
             </div>
           )}
           <Link
-            href="/#shop"
+            href="/shop"
             className="inline-flex items-center gap-3 text-brand-brown/60 hover:text-brand-brown transition-all text-[9px] uppercase tracking-[0.2em] font-black"
           >
             <ArrowLeft size={12} /> Back to Shop
@@ -661,7 +647,7 @@ export default function CartPage() {
               collection.
             </p>
             <Link
-              href="/#shop"
+              href="/shop"
               className="inline-flex items-center gap-3 bg-brand-brown text-brand-cream px-6 py-3 rounded-full text-[9px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light shadow-xl"
             >
               Start Shopping <ArrowRight size={12} />
@@ -685,7 +671,7 @@ export default function CartPage() {
                         : "bg-brand-gold/6"
                     }`}
                   >
-                    <Sparkles
+                    <PackagePlus
                       size={16}
                       strokeWidth={1.5}
                       className={`shrink-0 ${
@@ -1062,7 +1048,7 @@ export default function CartPage() {
                         <p className="text-[11px] leading-relaxed text-brand-brown/70 font-medium">
                           {subtotalAfterDiscount >= freeShippingThreshold ? (
                             <span className="flex items-center gap-1.5 text-brand-green-fresh font-bold">
-                              <Sparkles size={10} />
+                              <Truck size={10} />
                               Your order qualifies for Free Shipping!
                             </span>
                           ) : (
@@ -1161,7 +1147,7 @@ export default function CartPage() {
                       onClick={() => setShowCoupons(true)}
                       className="mt-3 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-brand-gold transition-colors hover:text-brand-brown"
                     >
-                      <Sparkles size={12} />
+                      <BadgePercent size={12} />
                       View all coupons
                     </button>
                   )}

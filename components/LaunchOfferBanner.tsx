@@ -1,16 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  BadgeIndianRupee,
-  Camera,
-  CheckCircle2,
-  LockKeyhole,
-  ShoppingBag,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { ArrowRight, BadgeIndianRupee, Camera, CheckCircle2, Gift, LockKeyhole, ShoppingBag, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useLaunchOfferClaimStatus } from "@/lib/useLaunchOfferClaimStatus";
@@ -26,7 +17,7 @@ export default function LaunchOfferBanner() {
   const primaryCtaHref = hasClaimed
     ? "/profile#orders"
     : user
-      ? "/#shop"
+      ? "/shop"
       : "/login";
   const primaryCtaLabel = hasClaimed
     ? "View Order Status"
@@ -92,7 +83,7 @@ export default function LaunchOfferBanner() {
               {hasClaimed ? (
                 <CheckCircle2 size={20} strokeWidth={1.8} />
               ) : user ? (
-                <Sparkles size={20} strokeWidth={1.8} />
+                <Gift size={20} strokeWidth={1.8} />
               ) : (
                 <LockKeyhole size={20} strokeWidth={1.8} />
               )}
@@ -163,7 +154,7 @@ export default function LaunchOfferBanner() {
                     {hasClaimed ? (
                       <CheckCircle2 size={22} strokeWidth={1.7} />
                     ) : (
-                      <Sparkles size={22} strokeWidth={1.7} />
+                      <Gift size={22} strokeWidth={1.7} />
                     )}
                   </div>
                   <div>

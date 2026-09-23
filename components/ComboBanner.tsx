@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, PackagePlus } from "lucide-react";
 
 import { isComboLive, useCombo } from "@/lib/useCombo";
 
@@ -32,7 +32,7 @@ export default function ComboBanner() {
 
         <div className="relative">
           <span className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.3em] text-brand-gold">
-            <Sparkles size={10} strokeWidth={2.5} />
+            <PackagePlus size={10} strokeWidth={2.5} />
             Sampler Pack
           </span>
           <h3 className="mt-2 font-serif text-xl tracking-tight text-brand-cream sm:text-2xl">

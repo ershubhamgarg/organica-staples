@@ -76,7 +76,7 @@ export default function WelcomeModal() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
-              href="/#shop"
+              href="/shop"
               onClick={() => {
                 // Defer closing until after the browser has dispatched this
                 // click's default navigation — since the modal is rendered

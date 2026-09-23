@@ -265,15 +265,28 @@ export default function BestSellersHero() {
             </span>
           </h1>
 
-          <p className="mt-4 max-w-md text-xs font-light leading-relaxed text-brand-brown/65 sm:mt-9 sm:text-sm md:text-base">
+          <p className="mt-4 max-w-md text-xs font-light leading-relaxed text-brand-brown/65 sm:mt-5 sm:text-sm md:text-base">
             The staples our customers order most — pure, chemical-free and
             priced honestly, straight from the farm to your kitchen.
           </p>
 
-          {/* The credential row is a nice-to-have, not essential — it's
-              what a mobile visitor least needs before seeing products, so
-              it's hidden below sm rather than pushing them further down. */}
-          <ul className="mt-8 hidden flex-wrap items-center gap-y-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/70 sm:flex sm:text-[11px]">
+          {/* The CTA comes right after the intro, ahead of the credential
+              row below — it's the thing on this page most worth reaching
+              without scrolling, so nothing decorative sits in front of it. */}
+          <Link
+            href="/shop"
+            className="group mt-5 inline-flex items-center gap-3 rounded-full bg-brand-green px-6 py-3 text-[9px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light sm:px-8 sm:py-4 sm:text-[10px]"
+          >
+            Shop the full pantry
+            <ArrowRight
+              size={14}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </Link>
+
+          {/* Nice-to-have, not essential — hidden below sm so a mobile
+              visitor isn't scrolling past it to reach the CTA above. */}
+          <ul className="mt-6 hidden flex-wrap items-center gap-y-3 text-[10px] font-black uppercase tracking-[0.2em] text-brand-brown/70 sm:flex sm:text-[11px]">
             {["Chemical-Free", "Ethically Sourced"].map((label, i) => (
               <li
                 key={label}
@@ -285,17 +298,6 @@ export default function BestSellersHero() {
               </li>
             ))}
           </ul>
-
-          <Link
-            href="/#shop"
-            className="group mt-5 inline-flex items-center gap-3 rounded-full bg-brand-green px-6 py-3 text-[9px] font-black uppercase tracking-[0.25em] text-brand-cream shadow-xl shadow-brand-brown/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-light sm:mt-10 sm:px-8 sm:py-4 sm:text-[10px]"
-          >
-            Shop the full pantry
-            <ArrowRight
-              size={14}
-              className="transition-transform duration-300 group-hover:translate-x-1"
-            />
-          </Link>
         </div>
 
         {/* Stage: a compact 2-up grid on mobile (the featured card spans the

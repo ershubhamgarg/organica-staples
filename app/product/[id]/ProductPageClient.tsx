@@ -5,23 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Award,
-  Check,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  Leaf,
-  Minus,
-  Plus,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Star,
-  Truck,
-  ArrowRight,
-} from "lucide-react";
+import { Award, Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Leaf, Minus, Plus, ShieldCheck, ShoppingBag, Star, Truck, ArrowRight, PackagePlus, BadgeCheck } from "lucide-react";
 import { useEffect, useState, useMemo, useRef } from "react";
 import ProductImageCarousel, {
   getProductImages,
@@ -38,6 +22,7 @@ import {
   isProductLowStock,
   Product,
 } from "@/lib/data";
+import { getComboAddHref } from "@/lib/comboLink";
 import { isComboLive, useCombo } from "@/lib/useCombo";
 import { supabase } from "@/utils/supabase";
 import {
@@ -303,7 +288,7 @@ export default function ProductPageClient({ id }: { id: string }) {
             The staple you seek is currently beyond our reach.
           </p>
           <Link
-            href="/#shop"
+            href="/shop"
             className="inline-flex items-center gap-3 bg-brand-brown text-brand-cream px-8 py-4 rounded-full text-[10px] uppercase tracking-[0.3em] font-black transition-all hover:bg-brand-brown-light"
           >
             Explore Shop <ArrowRight size={14} />
@@ -329,6 +314,12 @@ export default function ProductPageClient({ id }: { id: string }) {
     comboOnlyVariants.length > 0
       ? comboOnlyVariants.map((v) => v.label).join(" or ")
       : product.weight;
+  // The specific combo-eligible size to deep-link the CTA to — cheapest when
+  // there's a choice between them. For a plain (non-variant) combo-only
+  // product this is undefined, and getComboAddHref falls back to the bare
+  // product id, matching /api/combo's own key format either way.
+  const comboUnit = [...comboOnlyVariants].sort((a, b) => a.price - b.price)[0];
+  const comboAddHref = getComboAddHref(product.id, comboUnit?.id);
   const selectedVariant = variants
     ? (variants.find((v) => v.id === selectedVariantId) ?? variants[0])
     : null;
@@ -382,7 +373,7 @@ export default function ProductPageClient({ id }: { id: string }) {
             </Link>
             <span className="text-brand-brown/20">/</span>
             <Link
-              href="/#shop"
+              href="/shop"
               className="hover:text-brand-brown transition-colors"
             >
               Shop
@@ -502,7 +493,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                 </Link>
                 <span>/</span>
                 <Link
-                  href="/#shop"
+                  href="/shop"
                   className="hover:text-brand-brown transition-colors"
                 >
                   Shop
@@ -713,7 +704,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                 {isComboOnly ? (
                   <div className="rounded-2xl border border-brand-gold/25 bg-white p-6 text-center">
                     <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold">
-                      <Sparkles size={18} strokeWidth={1.5} />
+                      <PackagePlus size={18} strokeWidth={1.5} />
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-brand-brown">
                       Part Of A Combo
@@ -727,7 +718,7 @@ export default function ProductPageClient({ id }: { id: string }) {
                       yours.
                     </p>
                     <Link
-                      href="/combo"
+                      href={comboAddHref}
                       className="mt-5 inline-flex items-center gap-2.5 rounded-full bg-brand-green px-7 py-3.5 text-[10px] font-black uppercase tracking-widest text-brand-cream transition-transform duration-300 hover:-translate-y-0.5"
                     >
                       Build Your Combo
@@ -812,10 +803,10 @@ export default function ProductPageClient({ id }: { id: string }) {
                     size silently missing from the dropdown. */}
                 {!isComboOnly && comboOnlyVariants.length > 0 && (
                   <Link
-                    href="/combo"
+                    href={comboAddHref}
                     className="group mt-5 flex items-center gap-3 rounded-2xl border border-brand-gold/25 bg-brand-gold/[0.06] px-5 py-4 transition-colors hover:border-brand-gold/50"
                   >
-                    <Sparkles
+                    <PackagePlus
                       size={16}
                       strokeWidth={1.5}
                       className="shrink-0 text-brand-gold"
@@ -845,7 +836,7 @@ export default function ProductPageClient({ id }: { id: string }) {
         <ScrollReveal className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
           {[
             { icon: Award, label: "Farm Direct" },
-            { icon: Sparkles, label: "Quality Assured" },
+            { icon: BadgeCheck, label: "Quality Assured" },
             { icon: Leaf, label: "Chemical-Free" },
             { icon: Truck, label: "Pan-India Delivery" },
           ].map((item) => {

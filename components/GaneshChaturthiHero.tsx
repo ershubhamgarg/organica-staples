@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ArrowRight,
-  Check,
-  Copy,
-  Flower2,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Check, Copy, Flower2, ShieldCheck, Leaf } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -18,7 +11,7 @@ const GANESH_IMAGE =
   "https://images.unsplash.com/photo-1610085927744-7217728267a6?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Z2FucGF0aXxlbnwwfHwwfHx8MA%3D%3D";
 
 const trustBadges = [
-  { icon: Sparkles, label: "Pure For Prasad" },
+  { icon: Leaf, label: "Pure For Prasad" },
   { icon: Flower2, label: "Blessed Beginnings" },
   { icon: ShieldCheck, label: "Zero Adulteration" },
 ];
@@ -86,7 +79,7 @@ const GaneshChaturthiHero = () => {
 
             <div className="flex flex-wrap items-center justify-start gap-4">
               <Link
-                href="/#shop"
+                href="/shop"
                 className="group relative inline-flex items-center justify-center gap-3 px-8 sm:px-9 py-4 bg-brand-terracotta text-brand-cream rounded-full overflow-hidden transition-all duration-500 shadow-lg shadow-brand-terracotta/20 hover:shadow-2xl hover:shadow-brand-terracotta/30 hover:-translate-y-0.5"
               >
                 <span className="absolute inset-0 bg-[#c1684f] translate-y-full transition-transform duration-500 group-hover:translate-y-0" />

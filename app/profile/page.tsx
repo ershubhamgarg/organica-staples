@@ -6,22 +6,7 @@ import { useOrderStore } from "@/store/orderStore";
 import type { Order } from "@/store/orderStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  UserCircle,
-  LogOut,
-  ArrowLeft,
-  MapPin,
-  Trash2,
-  Plus,
-  Package,
-  ShieldCheck,
-  ChevronRight,
-  ArrowRight,
-  ShoppingBag,
-  Share2,
-  Sparkles,
-  FileDown,
-} from "lucide-react";
+import { UserCircle, LogOut, ArrowLeft, MapPin, Trash2, Plus, Package, ShieldCheck, ChevronRight, ArrowRight, ShoppingBag, Share2, FileDown, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import OrderTrackingCard from "@/components/OrderTrackingCard";
@@ -499,7 +484,7 @@ export default function ProfilePage() {
                           <div className="flex flex-wrap items-center gap-3">
                             {isLaunchOffer && (
                               <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/20 bg-brand-green/10 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest text-brand-green">
-                                <Sparkles size={12} strokeWidth={1.8} />
+                                <Rocket size={12} strokeWidth={1.8} />
                                 Launch Offer
                               </span>
                             )}
@@ -829,7 +814,7 @@ export default function ProfilePage() {
                     You haven&apos;t placed any orders yet.
                   </p>
                   <Link
-                    href="/#shop"
+                    href="/shop"
                     className="inline-flex items-center gap-3 text-[10px] uppercase tracking-widest font-black text-brand-gold hover:text-brand-brown transition-colors"
                   >
                     Explore Shop <ArrowRight size={14} />
