@@ -22,6 +22,7 @@ import {
   isProductLowStock,
   Product,
 } from "@/lib/data";
+import { Skeleton } from "@/components/Skeleton";
 import { getComboAddHref } from "@/lib/comboLink";
 import { reviewCountLabel, reviewNoun } from "@/lib/reviews";
 import { isComboLive, useCombo } from "@/lib/useCombo";
@@ -255,25 +256,49 @@ export default function ProductPageClient({ id }: { id: string }) {
   };
 
   if ((!hasFetched || isLoading) && !product) {
+    // A skeleton of the real two-column layout — gallery beside the buy
+    // column — so the page settles into place instead of swapping a centred
+    // spinner for a full screen of content.
     return (
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24">
-            <div className="absolute inset-0 bg-brand-gold/20 rounded-full blur-xl animate-pulse-slow" />
-            <Image
-              src="/annvriksh_logo_mark.png"
-              alt="Loading"
-              fill
-              className="relative object-contain animate-spin-slow"
-              style={{ animationDuration: "2.4s" }}
-              sizes="96px"
-              priority
-            />
+      <div
+        role="status"
+        aria-label="Loading product"
+        className="min-h-screen bg-brand-cream"
+      >
+        <div className="mx-auto max-w-[90rem] px-4 py-8 sm:px-8 sm:py-12">
+          <Skeleton className="h-2.5 w-48 rounded-full" />
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <Skeleton className="aspect-square w-full rounded-3xl" />
+              <div className="mt-4 flex gap-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 w-16 rounded-xl sm:h-20 sm:w-20" />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <Skeleton className="h-2.5 w-24 rounded-full" />
+              <Skeleton className="mt-4 h-9 w-4/5 rounded-full sm:h-12" />
+              <Skeleton className="mt-3 h-4 w-1/3 rounded-full" />
+              <Skeleton className="mt-6 h-8 w-40 rounded-full" />
+
+              <Skeleton className="mt-8 h-3 w-full rounded-full" />
+              <Skeleton className="mt-2 h-3 w-full rounded-full" />
+              <Skeleton className="mt-2 h-3 w-2/3 rounded-full" />
+
+              <div className="mt-8 flex gap-3">
+                <Skeleton className="h-12 w-28 rounded-full" />
+                <Skeleton className="h-12 w-28 rounded-full" />
+              </div>
+
+              <Skeleton className="mt-6 h-14 w-full rounded-full" />
+            </div>
           </div>
-          <p className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-brown/40">
-            Fetching the harvest...
-          </p>
         </div>
+
+        <span className="sr-only">Loading product…</span>
       </div>
     );
   }

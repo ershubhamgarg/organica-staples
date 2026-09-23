@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Check, Leaf, Minus, Plus, ShoppingBasket, PackagePlus } from "lucide-react";
 
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { Skeleton } from "@/components/Skeleton";
 import type { ComboSettings, ComboUnit } from "@/app/api/combo/route";
 import { hasVariants, type Product } from "@/lib/data";
 import { useCartStore } from "@/store/cartStore";
@@ -223,9 +224,40 @@ export default function ComboContent() {
   };
 
   if (isLoading) {
+    // Mirrors the builder's own shape — centred heading block, then the item
+    // grid — rather than a spinner on an empty screen.
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-brand-cream">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-gold border-t-transparent" />
+      <div
+        role="status"
+        aria-label="Loading combo builder"
+        className="min-h-screen bg-brand-cream pb-40"
+      >
+        <section className="relative overflow-hidden px-4 pb-10 pt-10 sm:px-6 lg:px-8">
+          <div className="pointer-events-none absolute inset-0 bg-mandala opacity-60" />
+          <div className="relative mx-auto flex max-w-5xl flex-col items-center">
+            <Skeleton className="h-2.5 w-32 rounded-full" />
+            <Skeleton className="mt-4 h-8 w-64 rounded-full sm:h-10 sm:w-80" />
+            <Skeleton className="mt-3 h-3 w-full max-w-lg rounded-full" />
+            <Skeleton className="mt-2 h-3 w-3/4 max-w-md rounded-full" />
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-2xl border border-brand-gold/10 bg-white p-2.5"
+              >
+                <Skeleton className="aspect-square w-full rounded-xl" />
+                <Skeleton className="mt-2.5 h-3 w-3/4 rounded-full" />
+                <Skeleton className="mt-1.5 h-2.5 w-1/2 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <span className="sr-only">Loading combo builder…</span>
       </div>
     );
   }

@@ -122,6 +122,24 @@ body {
   100% { transform: translateX(100%); }
 }
 
+/* Loading skeletons (components/Skeleton.tsx). Deliberately NOT named
+   "shimmer": that one above is a one-shot hover sweep used by the cart and
+   checkout buttons, and sharing a name would mean whichever rule is declared
+   last silently wins — a collision this file has been bitten by before. */
+@keyframes skeleton-sweep {
+  100% { transform: translateX(100%); }
+}
+
+.animate-skeleton {
+  animation: skeleton-sweep 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-skeleton {
+    animation: none;
+  }
+}
+
 @keyframes confirmationCardIn {
   from {
     opacity: 0;

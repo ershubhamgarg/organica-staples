@@ -6,6 +6,7 @@ import { ArrowRight, Leaf, ShieldCheck, Star } from "lucide-react";
 
 import DesiHero from "@/components/DesiHero";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import { Skeleton } from "@/components/Skeleton";
 import QuickAddButton from "@/components/QuickAddButton";
 import { getProductThumbnail } from "@/lib/data";
 import {
@@ -166,14 +167,51 @@ function BestSellerCard({
   );
 }
 
+/**
+ * Mirrors the real section's two-column shape — copy on the left, a row of
+ * cards on the right — so the page doesn't jump when the data lands. The
+ * previous version was a single pill on an empty 640px block, which read as
+ * a broken page rather than a loading one.
+ */
 function HeroSkeleton() {
   return (
     <section
-      aria-hidden="true"
-      className="relative min-h-[640px] overflow-hidden bg-brand-cream lg:min-h-[720px]"
+      role="status"
+      aria-label="Loading best sellers"
+      className="relative overflow-hidden bg-brand-cream"
     >
-      <div className="toran opacity-70" />
-      <div className="mx-auto mt-16 h-10 w-64 animate-pulse rounded-full bg-brand-brown/5" />
+      <div className="toran pointer-events-none absolute inset-x-0 top-0 z-10" />
+
+      <div className="relative z-10 mx-auto grid max-w-[95rem] items-center gap-5 px-5 pb-16 pt-7 sm:gap-8 sm:px-10 sm:pb-20 sm:pt-12 xl:grid-cols-[minmax(0,0.7fr)_minmax(0,1.6fr)] xl:gap-6 xl:pb-20 xl:pt-14">
+        <div>
+          <Skeleton className="h-2.5 w-24 rounded-full" />
+          <Skeleton className="mt-3 h-8 w-48 rounded-full sm:h-10 sm:w-64 xl:h-14" />
+          <Skeleton className="mt-2 h-8 w-56 rounded-full sm:h-10 sm:w-72 xl:h-14" />
+          <Skeleton className="mt-4 h-3 w-full max-w-md rounded-full" />
+          <Skeleton className="mt-2 h-3 w-4/5 max-w-sm rounded-full" />
+          <Skeleton className="mt-5 h-10 w-44 rounded-full sm:h-12" />
+        </div>
+
+        <div className="-mx-5 flex items-end gap-3 overflow-hidden px-5 sm:-mx-10 sm:gap-4 sm:px-10 xl:mx-0 xl:justify-center xl:gap-6 xl:px-0">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-[9.25rem] shrink-0 sm:w-[11.5rem] xl:w-[15.5rem]"
+            >
+              <div className="overflow-hidden rounded-2xl bg-white shadow-[0_8px_30px_-12px_rgba(17,44,36,0.18)] sm:rounded-[1.75rem]">
+                <Skeleton className="aspect-square w-full rounded-none" />
+                <div className="flex flex-col items-center gap-2 px-2 pb-3 pt-3 sm:px-4 sm:pb-4">
+                  <Skeleton className="h-3 w-3/4 rounded-full" />
+                  <Skeleton className="h-2.5 w-2/3 rounded-full" />
+                  <Skeleton className="mt-1 h-8 w-full rounded-xl" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <span className="sr-only">Loading best sellers…</span>
     </section>
   );
 }

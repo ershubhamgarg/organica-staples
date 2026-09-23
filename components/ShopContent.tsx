@@ -7,6 +7,7 @@ import { ArrowRight, ChevronDown, ChevronRight, Hourglass, Search, SlidersHorizo
 import QuickAddButton from "@/components/QuickAddButton";
 import ProductImageCarousel from "@/components/ProductImageCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
+import { ProductGridSkeleton, Skeleton } from "@/components/Skeleton";
 import { useProductStore } from "@/store/productStore";
 import { useBestSellerIds } from "@/lib/useBestSellers";
 
@@ -119,7 +120,7 @@ function FilterSection({
 }
 
 function ShopGrid({ initialQuery }: { initialQuery: string }) {
-  const { products, fetchProducts } = useProductStore();
+  const { products, fetchProducts, hasLoaded } = useProductStore();
   const [selectedVariantIds, setSelectedVariantIds] = useState<
     Record<string, string>
   >({});
@@ -555,13 +556,25 @@ function ShopGrid({ initialQuery }: { initialQuery: string }) {
               </div>
             </div>
 
-            <p className="mb-5 text-[10px] font-bold uppercase tracking-widest text-brand-brown/40">
-              {filteredProducts.length}{" "}
-              {filteredProducts.length === 1 ? "Product" : "Products"}
-            </p>
+            {/* Held back until the catalogue lands — otherwise this reads a
+                confident "0 Products" over a grid that's still loading. */}
+            {hasLoaded ? (
+              <p className="mb-5 text-[10px] font-bold uppercase tracking-widest text-brand-brown/40">
+                {filteredProducts.length}{" "}
+                {filteredProducts.length === 1 ? "Product" : "Products"}
+              </p>
+            ) : (
+              <Skeleton className="mb-5 h-2.5 w-24 rounded-full" />
+            )}
 
-            {/* Grid */}
-            {filteredProducts.length === 0 ? (
+            {/* Grid. The skeleton comes first: before the catalogue lands
+                there are zero products, which is indistinguishable from a
+                filter that genuinely matches nothing — so a shared link with
+                ?category=... used to flash "No products match your filters"
+                on arrival. */}
+            {!hasLoaded ? (
+              <ProductGridSkeleton />
+            ) : filteredProducts.length === 0 ? (
               <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-gold/10 text-brand-gold">
                   <Search size={22} strokeWidth={1.5} />

@@ -12,6 +12,14 @@ type ProductsResponse = {
 interface ProductState {
   products: Product[];
   isLoading: boolean;
+  /**
+   * True once a catalogue fetch has finished, successfully or not.
+   * `isLoading` alone can't tell "nothing loaded yet" from "loaded and
+   * genuinely empty" — it's false on the very first render, before the
+   * fetching effect runs, which made filtered views flash an empty state
+   * before their products arrived. Consumers gate skeletons on this.
+   */
+  hasLoaded: boolean;
   error: string | null;
   fetchProducts: () => Promise<void>;
   fetchProductById: (id: string) => Promise<Product | null>;
@@ -20,6 +28,7 @@ interface ProductState {
 export const useProductStore = create<ProductState>()((set) => ({
   products: [],
   isLoading: false,
+  hasLoaded: false,
   error: null,
 
   fetchProducts: async () => {
@@ -31,11 +40,12 @@ export const useProductStore = create<ProductState>()((set) => ({
       set({
         error: result.error ?? "Unable to fetch products.",
         isLoading: false,
+        hasLoaded: true,
       });
       return;
     }
 
-    set({ products: result.products ?? [], isLoading: false });
+    set({ products: result.products ?? [], isLoading: false, hasLoaded: true });
   },
 
   fetchProductById: async (id: string) => {
