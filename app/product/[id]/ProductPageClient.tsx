@@ -1157,6 +1157,14 @@ export default function ProductPageClient({ id }: { id: string }) {
                 const available = isProductAvailable(p);
                 const lowStock = isProductLowStock(p);
                 const unitPrice = getUnitPriceInfo(p);
+                // These cards used to print the raw `p.price`, so a discounted
+                // product advertised its pre-discount MRP here while the
+                // per-100g figure beside it was already derived from the
+                // discounted price — the same card disagreed with itself, and
+                // with the shop grid.
+                const relatedHasDiscount = hasProductDiscount(p);
+                const relatedDiscountPercent = getDiscountPercent(p);
+                const relatedPrice = getDiscountedPrice(p);
                 return (
                   <div
                     key={p.id}
@@ -1208,16 +1216,32 @@ export default function ProductPageClient({ id }: { id: string }) {
                         <p className="text-[9px] text-brand-gold italic font-medium tracking-wide">
                           {p.weight}
                         </p>
-                        <div className="flex items-baseline gap-1">
+                        <div className="flex flex-wrap items-baseline justify-center gap-x-1.5 gap-y-0.5">
                           <p className="text-lg md:text-xl font-medium text-brand-brown tracking-tighter">
-                            ₹{p.price.toFixed(2)}
+                            ₹{relatedPrice.toFixed(2)}
                           </p>
+                          {relatedHasDiscount && (
+                            <span className="text-[11px] font-light text-brand-brown/40 line-through">
+                              ₹{p.price.toFixed(2)}
+                            </span>
+                          )}
                           {unitPrice && (
                             <span className="text-[9px] text-brand-brown/30 font-light">
                               ({unitPrice})
                             </span>
                           )}
                         </div>
+                        {relatedHasDiscount && (
+                          <span
+                            className={`mt-0.5 rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white ${
+                              hasHighProductDiscount(p)
+                                ? "bg-brand-terracotta"
+                                : "bg-brand-green-fresh"
+                            }`}
+                          >
+                            {relatedDiscountPercent}% Off
+                          </span>
+                        )}
                       </div>
                     ) : (
                       <div className="h-10" />

@@ -123,3 +123,6 @@ yarn-error.*
 .next
 
 .env.local
+
+# Security audit report — confidential, keep out of the repo
+SECURITY-AUDIT.md
