@@ -122,6 +122,17 @@ export function normalizeTrackingStatus(status: string | null | undefined) {
   if (value.includes("deliver")) return "delivered";
   if (value.includes("transit") || value.includes("shipped")) return "in_transit";
   if (value.includes("cancel")) return "cancelled";
+  // "Picked Up" (Shiprocket's real status once the courier has actually
+  // collected the package — confirmed live, e.g. status label "PICKED UP")
+  // is a genuine milestone past AWB assignment: the shipment is physically
+  // moving now. Checked as the exact two-word phrase, before the broader
+  // "pick" fallback below, so it doesn't get conflated with "Pickup
+  // Scheduled"/"Pickup Generated"/"Out for Pickup" — real Shiprocket
+  // statuses for a pickup that's been arranged but hasn't happened yet,
+  // which correctly stay at awb_assigned. ("pickup"/"out for pickup" as one
+  // word never matches "picked up" as two, so this doesn't need a
+  // negative-lookahead — verified against a real order's activity log.)
+  if (value.includes("picked up")) return "in_transit";
   if (value.includes("pick") || value.includes("manifest")) return "awb_assigned";
 
   return "awb_assigned";

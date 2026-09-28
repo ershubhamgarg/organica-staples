@@ -388,7 +388,7 @@ export default function CheckoutPage() {
   const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
   const shippingCap = STANDARD_SHIPPING_RATE;
   const isCapped =
-    !launchOffer.isEligible &&
+    !isFreeCheckoutFlow &&
     subtotalAfterDiscount < 1000 &&
     rawShippingAmount > shippingCap;
 
@@ -400,7 +400,13 @@ export default function CheckoutPage() {
         ? shippingCap
         : rawShippingAmount;
 
-  const extraShippingAmount = launchOffer.isEligible
+  // Net shipping loss = full freight - what the customer paid toward it.
+  // On any zero-payment flow (launch offer OR a barter/collab coupon) the
+  // customer pays nothing, so the company absorbs the *entire* freight.
+  // This previously only special-cased the launch offer, so collab orders
+  // fell through to the capped branch and booked `freight - 149`,
+  // under-reporting the loss and overstating profit in the CMS P&L.
+  const extraShippingAmount = isFreeCheckoutFlow
     ? (dynamicShipping?.freightCharge ?? 0)
     : subtotalAfterDiscount >= 1000
       ? (dynamicShipping?.freightCharge ?? 0)
