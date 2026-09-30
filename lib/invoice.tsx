@@ -49,8 +49,10 @@ export function getFinancialYear(date: Date): string {
   return `${startYear}-${String((startYear + 1) % 100).padStart(2, "0")}`;
 }
 
+/** "2026-27", 4 → "ANV/26-27/04". `financialYear` stays the long form —
+ * it's also the invoice_sequences counter key, which must not change. */
 export function formatInvoiceNumber(financialYear: string, sequence: number) {
-  return `ANV/${financialYear}/${String(sequence).padStart(4, "0")}`;
+  return `ANV/${financialYear.slice(2)}/${String(sequence).padStart(2, "0")}`;
 }
 
 // GST state codes (Schedule III, CGST Act). Buyer state is free-text at
@@ -500,10 +502,10 @@ export function InvoiceDocument({
   // Shipping, convenience and COD charges are incidental to the supply of
   // goods (Sec. 15(2)(c)) and taxed at the same rate — but each is its own
   // named charge on the invoice, not merged into one bucket.
-  const extraCharges: { label: string; amount: number }[] = [];
-  if (shipping > 0) extraCharges.push({ label: "Shipping & Handling", amount: shipping });
-  if (convenienceFee > 0) extraCharges.push({ label: "Convenience Fee", amount: convenienceFee });
-  if (codFee > 0) extraCharges.push({ label: "COD Charge", amount: codFee });
+  const extraCharges: { label: string; sac: string; amount: number }[] = [];
+  if (shipping > 0) extraCharges.push({ label: "Shipping & Handling", sac: "9965", amount: shipping });
+  if (convenienceFee > 0) extraCharges.push({ label: "Convenience Fee", sac: "998399", amount: convenienceFee });
+  if (codFee > 0) extraCharges.push({ label: "COD Charge", sac: "996812", amount: codFee });
 
   const extraChargeRows = extraCharges.map((charge) => {
     const { taxableValue, taxAmount } = splitInclusiveTax(charge.amount);
@@ -724,7 +726,11 @@ export function InvoiceDocument({
               ))}
               {extraChargeRows.map((charge) => (
                 <View style={styles.tableRow} key={charge.label}>
-                  <Text style={{ ...styles.hsnCell, ...styles.hsnColHsn }}>{charge.label}</Text>
+                  <Text style={{ ...styles.hsnCell, ...styles.hsnColHsn }}>
+                    {charge.sac}
+                    {"\n"}
+                    <Text style={{ fontSize: 5.5, color: COLORS.muted }}>{charge.label}</Text>
+                  </Text>
                   <Text style={{ ...styles.hsnCell, ...styles.hsnColTaxable }}>{charge.taxableValue.toFixed(2)}</Text>
                   <Text style={{ ...styles.hsnCell, ...styles.hsnColRate }}>{GST_RATE}%</Text>
                   <Text style={{ ...styles.hsnCell, ...styles.hsnColTax }}>

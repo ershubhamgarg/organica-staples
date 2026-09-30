@@ -20,7 +20,7 @@ import {
 } from "@/lib/discountCodes";
 import { LAUNCH_OFFER_CODE, getLaunchOfferState } from "@/lib/launchOffer";
 import { getDiscountedPrice } from "@/lib/pricing";
-import { STANDARD_SHIPPING_RATE, isLocalDeliveryPincode } from "@/lib/shipping";
+import { getShippingCharge, isLocalDeliveryPincode } from "@/lib/shipping";
 import { getProductThumbnail, isProductAvailable } from "@/lib/data";
 import { getComboCartState } from "@/lib/comboCart";
 import { isComboLive, useCombo } from "@/lib/useCombo";
@@ -281,13 +281,7 @@ export default function CheckoutPage() {
       fallbackCartDiscount.subtotalAfterDiscount);
   const baseShipping = launchOffer.isEligible
     ? 0
-    : subtotalAfterDiscount >= 1000
-      ? 0
-      : subtotalAfterDiscount >= 500
-        ? STANDARD_SHIPPING_RATE
-        : subtotalAfterDiscount > 0
-          ? 149
-          : 0;
+    : getShippingCharge(subtotalAfterDiscount);
   const convenienceFee = isFreeCheckoutFlow
     ? 0
     : (usableOrderSummary?.convenienceFee ?? (actualSubtotal <= 300 ? 5 : 10));
@@ -384,35 +378,26 @@ export default function CheckoutPage() {
 
   const isLocalDelivery = isLocalDeliveryPincode(selectedAddress?.zipCode);
 
-  // Real-time shipping logic with capping
-  const rawShippingAmount = dynamicShipping?.shippingAmount ?? baseShipping;
-  const shippingCap = STANDARD_SHIPPING_RATE;
-  const isCapped =
-    !isFreeCheckoutFlow &&
-    subtotalAfterDiscount < 1000 &&
-    rawShippingAmount > shippingCap;
+  // What the courier will actually charge us. Used for cost accounting only
+  // (see `extraShippingAmount`) — never to price the customer, who pays the
+  // published flat tier regardless of pincode and weight.
+  const actualFreightCharge =
+    dynamicShipping?.freightCharge ?? dynamicShipping?.shippingAmount ?? 0;
 
   const shipping = isFreeCheckoutFlow
     ? 0
-    : subtotalAfterDiscount >= 1000
+    : isLocalDelivery
       ? 0
-      : isCapped
-        ? shippingCap
-        : rawShippingAmount;
+      : baseShipping;
 
-  // Net shipping loss = full freight - what the customer paid toward it.
-  // On any zero-payment flow (launch offer OR a barter/collab coupon) the
-  // customer pays nothing, so the company absorbs the *entire* freight.
-  // This previously only special-cased the launch offer, so collab orders
-  // fell through to the capped branch and booked `freight - 149`,
-  // under-reporting the loss and overstating profit in the CMS P&L.
-  const extraShippingAmount = isFreeCheckoutFlow
-    ? (dynamicShipping?.freightCharge ?? 0)
-    : subtotalAfterDiscount >= 1000
-      ? (dynamicShipping?.freightCharge ?? 0)
-      : isCapped
-        ? Number((rawShippingAmount - shippingCap).toFixed(2))
-        : 0;
+  // Net shipping loss we absorb = full freight - what the customer paid
+  // toward it (AGENTS.md). One formula now covers every case: free-shipping
+  // orders, the flat tiers, local delivery, and zero-payment collab/launch
+  // orders all pay less than freight, and the gap is the loss. Floored at 0
+  // so a cheap pincode where the tier exceeds freight books no negative cost.
+  const extraShippingAmount = Number(
+    Math.max(actualFreightCharge - shipping, 0).toFixed(2),
+  );
 
   const finalTotal = isFreeCheckoutFlow
     ? 0

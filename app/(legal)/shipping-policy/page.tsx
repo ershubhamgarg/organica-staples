@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPageHeader from "@/components/LegalPageHeader";
-import { STANDARD_SHIPPING_RATE } from "@/lib/shipping";
+import {
+  FREE_SHIPPING_THRESHOLD,
+  REDUCED_SHIPPING_THRESHOLD,
+  STANDARD_SHIPPING_RATE,
+  SUB_500_SHIPPING_RATE,
+} from "@/lib/shipping";
 
 export const metadata: Metadata = {
   title: "Shipping Policy",
@@ -64,12 +69,23 @@ export default function ShippingPolicyPage() {
           <h2 className="text-xl font-serif text-brand-brown mb-3 tracking-tight">
             3. Shipping Charges
           </h2>
+          <p className="mb-3">
+            Shipping is a flat fee based on your order value (after
+            discounts) — it does not vary by pincode or parcel weight:
+          </p>
           <ul className="list-disc pl-5 space-y-1.5">
-            <li>Orders of ₹1,000 and above ship free.</li>
             <li>
-              Orders below ₹1,000 are charged a flat shipping fee starting
-              at ₹{STANDARD_SHIPPING_RATE}, calculated at checkout based on
-              your delivery pincode and order weight.
+              Orders below ₹{REDUCED_SHIPPING_THRESHOLD}: flat ₹
+              {SUB_500_SHIPPING_RATE}.
+            </li>
+            <li>
+              Orders from ₹{REDUCED_SHIPPING_THRESHOLD} up to ₹
+              {(FREE_SHIPPING_THRESHOLD - 1).toLocaleString("en-IN")}: flat ₹
+              {STANDARD_SHIPPING_RATE}.
+            </li>
+            <li>
+              Orders of ₹{FREE_SHIPPING_THRESHOLD.toLocaleString("en-IN")} and
+              above: free shipping.
             </li>
             <li>
               Cash on Delivery (COD) orders may attract a small additional

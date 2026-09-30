@@ -20,7 +20,7 @@ Next 16 + React 19 ecommerce app for ANNVRIKSH, an organic pantry store. App Rou
 
 - `/`: hero + product listing
 - `/product/[id]`: product detail from `useProductStore`
-- `/cart`: cart quantity/remove + tiered shipping (₹149 < ₹500, ₹99 < ₹1000, ₹49 < ₹1500, Free >= ₹1500)
+- `/cart`: cart quantity/remove. Shipping is a flat tier on the post-discount subtotal, resolved by `getShippingCharge` in `lib/shipping.ts` and charged at checkout: ₹149 under ₹500, ₹99 from ₹500 to ₹999, free from ₹1,000. Local-delivery pincodes and zero-payment flows (launch offer, barter/collab coupon) ship free.
 - `/checkout`: address, mocked UPI verify, order placement
 - `/login`: Supabase email/password auth
 - `/profile`: user profile/orders/addresses
